@@ -1168,33 +1168,31 @@ function UploadView({
 }) {
   return (
     <main className={`upload-shell ${themeClass(theme)}`}>
-      <button className="button small theme-toggle upload-theme-toggle" type="button" onClick={onToggleTheme}>
-        <Palette size={14} />
-        {theme === "se" ? "Dark Theme" : "Light Theme"}
-      </button>
       <section className="upload-grid">
         <div className="upload-copy">
           <p className="eyebrow">Premium CDR Concept</p>
           <h1>Traffic command center for massive CDR workbooks.</h1>
           <p className="lead"></p>
         </div>
-        <label className="drop-zone">
-          <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUpload} />
-          <UploadCloud size={150} />
-          <strong>{isParsing ? "Reading workbook..." : "Upload CDR workbook"}</strong>
-          <span>Supported: .xlsx, .xlsm, .xls, .xlsb</span>
-        </label>
-        <article className={`saved-workbook-card ${savedWorkbook ? "" : "empty"}`}>
-          <HardDrive size={34} />
-          <div>
-            <span>Previous workbook</span>
-            <strong>{savedWorkbook?.fileName ?? "No saved workbook yet"}</strong>
-            <p>{savedWorkbook ? `${formatNumber(savedWorkbook.rawRows)} records - loaded ${savedWorkbook.loadedAt}` : "Upload a workbook once, then it will appear here for quick reopening."}</p>
-          </div>
-          <button className="button primary" type="button" onClick={onLoadSaved} disabled={!savedWorkbook || isLoadingSaved || isParsing}>
-            {isLoadingSaved ? "Opening..." : "Work with previous file"}
+        <div className="workbook-choice-panel">
+          <button className="button small theme-toggle upload-theme-toggle" type="button" onClick={onToggleTheme}>
+            <Palette size={14} />
+            {theme === "se" ? "Dark Theme" : "Light Theme"}
           </button>
-        </article>
+          <label className="workbook-choice-card upload-choice-card">
+            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUpload} />
+            <span className="choice-icon"><UploadCloud size={38} /></span>
+            <span className="choice-eyebrow">New analysis</span>
+            <strong>{isParsing ? "Reading workbook..." : "Upload CDR workbook"}</strong>
+            <p>Start fresh from an Excel CDR file. Supported formats: .xlsx, .xlsm, .xls, .xlsb.</p>
+          </label>
+          <button className={`workbook-choice-card previous-choice-card ${savedWorkbook ? "" : "empty"}`} type="button" onClick={onLoadSaved} disabled={!savedWorkbook || isLoadingSaved || isParsing}>
+            <span className="choice-icon"><HardDrive size={38} /></span>
+            <span className="choice-eyebrow">Continue work</span>
+            <strong>{isLoadingSaved ? "Opening previous workbook..." : savedWorkbook?.fileName ?? "No saved workbook yet"}</strong>
+            <p>{savedWorkbook ? `${formatNumber(savedWorkbook.rawRows)} records - loaded ${savedWorkbook.loadedAt}` : "After your first upload, this tile reopens the last workbook saved in this browser."}</p>
+          </button>
+        </div>
       </section>
       {error && <div className="toast error">{error}</div>}
     </main>
