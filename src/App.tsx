@@ -8,6 +8,7 @@ import pptxgen from "pptxgenjs";
 import {
   Activity,
   AlertTriangle,
+  ArrowUp,
   BarChart3,
   Building2,
   ChevronDown,
@@ -1165,6 +1166,12 @@ function SectionTitle({
       </div>
       <div className="section-title-actions">
         {actions}
+        {id && (
+          <button className="button small section-top-button" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+            <ArrowUp size={15} />
+            <span>Top</span>
+          </button>
+        )}
         {onToggle && (
           <button className="button small section-toggle" type="button" onClick={onToggle} aria-expanded={!collapsed} aria-controls={id ? `${id}-content` : undefined}>
             <ChevronDown size={15} />

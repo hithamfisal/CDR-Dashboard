@@ -741,6 +741,10 @@ button, label { cursor: pointer; }
   justify-content: flex-end;
   gap: 8px;
 }
+.section-top-button {
+  border-color: rgba(93, 183, 183, 0.42);
+  color: #dffafe;
+}
 .section-toggle svg {
   transition: transform 0.18s ease;
 }
@@ -1327,6 +1331,10 @@ button, label { cursor: pointer; }
 .se-theme .quick-card-export {
   background: rgba(255,255,255,0.88);
   color: #0b4267;
+}
+.se-theme .section-top-button {
+  color: #0b4267;
+  border-color: rgba(0,120,255,0.24);
 }
 .se-theme .section-nav button {
   color: #4a6578;
