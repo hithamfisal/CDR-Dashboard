@@ -147,17 +147,22 @@ button, label { cursor: pointer; }
   overflow-x: auto;
   padding: 12px 0 16px;
 }
-.section-nav a {
+.section-nav button {
   color: var(--muted);
-  text-transform: capitalize;
-  text-decoration: none;
+  font: inherit;
   border: 1px solid var(--line);
   background: rgba(15,27,36,0.72);
   padding: 9px 13px;
   font-weight: 700;
   white-space: nowrap;
+  border-radius: 999px;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
 }
-.section-nav a:hover { color: var(--text); border-color: var(--blue); }
+.section-nav button:hover {
+  color: var(--text);
+  border-color: var(--blue);
+  transform: translateY(-1px);
+}
 
 .upload-shell {
   min-height: 100vh;
@@ -714,6 +719,7 @@ button, label { cursor: pointer; }
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
+  scroll-margin-top: 112px;
 }
 .section-title p {
   margin: 0;
@@ -1322,12 +1328,12 @@ button, label { cursor: pointer; }
   background: rgba(255,255,255,0.88);
   color: #0b4267;
 }
-.se-theme .section-nav a {
+.se-theme .section-nav button {
   color: #4a6578;
   border-color: rgba(0,120,255,0.15);
   background: rgba(255,255,255,0.74);
 }
-.se-theme .section-nav a:hover {
+.se-theme .section-nav button:hover {
   color: #0058b8;
   border-color: rgba(0,120,255,0.48);
   background: #ffffff;

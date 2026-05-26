@@ -115,6 +115,16 @@ type ChartExportDataset = {
   rows: ExportCell[][];
 };
 
+const SECTION_NAV_ITEMS = [
+  { id: "kpi", label: "KPI Table" },
+  { id: "Company", label: "Company Contribution" },
+  { id: "Performance", label: "Performance Charts" },
+  { id: "General", label: "General Charts" },
+  { id: "Charts", label: "Top 10 Charts" },
+  { id: "users", label: "Top Radios & Users" },
+  { id: "records", label: "Filtered Calls Register" },
+];
+
 const EMPTY_FILTERS: Filters = {
   region: [],
   year: [],
@@ -1264,6 +1274,9 @@ export default function App() {
     () => new Set(["kpi", "Company", "Performance", "General", "Charts", "users", "records"])
   );
   const toggleTheme = useCallback(() => setTheme((current) => (current === "se" ? "dark" : "se")), []);
+  const scrollToSection = useCallback((id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
   const toggleSection = useCallback((id: string) => {
     setCollapsedSections((current) => {
       const next = new Set(current);
@@ -2638,7 +2651,11 @@ export default function App() {
       </header>
 
       <nav className="section-nav">
-        {["command", "filters", "kpi", "Company", "Performance", "General", "Charts", "users", "records"].map((id) => <a key={id} href={`#${id}`}>{id}</a>)}
+        {SECTION_NAV_ITEMS.map((item) => (
+          <button key={item.id} type="button" onClick={() => scrollToSection(item.id)}>
+            {item.label}
+          </button>
+        ))}
       </nav>
 
       <section id="command" className="hero-panel">
