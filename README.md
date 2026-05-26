@@ -1,6 +1,6 @@
-# CDR Dashboard Premium Concept
+# CDR Analysis Dashboard
 
-This is a separate experimental dashboard concept. It does not overwrite the existing CDR dashboard.
+Premium browser-based CDR dashboard for Excel workbook analysis, KPI review, chart exploration, filtered call-register paging, and export workflows.
 
 ## Run locally
 
