@@ -118,6 +118,12 @@ button, label { cursor: pointer; }
   padding: 0 11px;
   font-size: 12px;
 }
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+  box-shadow: none;
+}
 .export-button,
 .quick-card-export {
   border: 1px solid rgba(148, 163, 184, 0.28);
@@ -182,7 +188,7 @@ button, label { cursor: pointer; }
   grid-template-columns: 1fr 0.9fr;
   gap: 24px;
 }
-.upload-copy, .drop-zone {
+.upload-copy, .drop-zone, .saved-workbook-card {
   border: 1px solid var(--line);
   background: rgba(15,27,36,0.9);
   box-shadow: 0 28px 70px rgba(0,0,0,0.28);
@@ -230,6 +236,39 @@ button, label { cursor: pointer; }
   font-size: 34px;
 }
 .drop-zone span { color: var(--muted); max-width: 420px; line-height: 1.7; }
+.saved-workbook-card {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+}
+.saved-workbook-card svg {
+  color: var(--blue);
+}
+.saved-workbook-card span {
+  display: block;
+  color: var(--amber);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.saved-workbook-card strong {
+  display: block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+.saved-workbook-card p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.saved-workbook-card .button {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+}
 
 .hero-panel {
   display: grid;
@@ -1297,7 +1336,8 @@ button, label { cursor: pointer; }
 .se-theme .records-card,
 .se-theme .section-title,
 .se-theme .upload-copy,
-.se-theme .drop-zone {
+.se-theme .drop-zone,
+.se-theme .saved-workbook-card {
   background: rgba(255, 255, 255, 0.84);
   border-color: rgba(0, 120, 255, 0.14);
   box-shadow: 0 18px 52px rgba(13, 73, 118, 0.12);
@@ -1433,6 +1473,7 @@ button, label { cursor: pointer; }
   .summary-cards { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
   .summary-card.wide { grid-column: span 1; }
   .hero-panel, .upload-grid, .quality-grid, .kpi-grid, .department-grid { grid-template-columns: 1fr; }
+  .saved-workbook-card { grid-column: span 1; }
   .dashboard-chart-grid, .performance-chart-grid, .top-10-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kpi-table { grid-column: span 1; }
   .hero-insights { grid-template-columns: repeat(2, 1fr); }
@@ -1461,5 +1502,6 @@ button, label { cursor: pointer; }
   .radio-month-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .Company-pie-layout { flex-direction: column; }
   .chart-legend.pie-legend { max-width: 100%; width: 100%; max-height: 250px; }
+  .saved-workbook-card { grid-column: span 1; }
   .upload-copy h1 { font-size: 46px; }
 }

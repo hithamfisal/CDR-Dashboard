@@ -92,6 +92,13 @@ type DashboardData = {
   warnings: string[];
 };
 
+type SavedWorkbookMeta = {
+  fileName: string;
+  sourceSheet: string;
+  loadedAt: string;
+  rawRows: number;
+};
+
 type Filters = {
   region: string[];
   year: string[];
@@ -125,6 +132,11 @@ const SECTION_NAV_ITEMS = [
   { id: "users", label: "Top Radios & Users" },
   { id: "records", label: "Filtered Calls Register" },
 ];
+
+const SAVED_WORKBOOK_DB = "cdr-dashboard-cache";
+const SAVED_WORKBOOK_STORE = "workbooks";
+const SAVED_WORKBOOK_KEY = "last-workbook";
+const SAVED_WORKBOOK_META_KEY = "cdr-dashboard-last-workbook-meta";
 
 const EMPTY_FILTERS: Filters = {
   region: [],
@@ -1072,15 +1084,83 @@ function themeClass(theme: ThemeName) {
   return theme === "se" ? "se-theme" : "";
 }
 
+function workbookMeta(data: DashboardData): SavedWorkbookMeta {
+  return {
+    fileName: data.fileName,
+    sourceSheet: data.sourceSheet,
+    loadedAt: data.loadedAt,
+    rawRows: data.rawRows,
+  };
+}
+
+function getSavedWorkbookMeta(): SavedWorkbookMeta | null {
+  try {
+    const raw = window.localStorage.getItem(SAVED_WORKBOOK_META_KEY);
+    return raw ? JSON.parse(raw) as SavedWorkbookMeta : null;
+  } catch {
+    return null;
+  }
+}
+
+function setSavedWorkbookMeta(meta: SavedWorkbookMeta | null) {
+  try {
+    if (meta) window.localStorage.setItem(SAVED_WORKBOOK_META_KEY, JSON.stringify(meta));
+    else window.localStorage.removeItem(SAVED_WORKBOOK_META_KEY);
+  } catch {
+    // Metadata is only used to show the previous workbook option on the upload screen.
+  }
+}
+
+function openSavedWorkbookDb(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = window.indexedDB.open(SAVED_WORKBOOK_DB, 1);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(SAVED_WORKBOOK_STORE);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveWorkbookToBrowser(data: DashboardData) {
+  const db = await openSavedWorkbookDb();
+  await new Promise<void>((resolve, reject) => {
+    const transaction = db.transaction(SAVED_WORKBOOK_STORE, "readwrite");
+    transaction.objectStore(SAVED_WORKBOOK_STORE).put(data, SAVED_WORKBOOK_KEY);
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+  });
+  db.close();
+  setSavedWorkbookMeta(workbookMeta(data));
+}
+
+async function loadWorkbookFromBrowser(): Promise<DashboardData | null> {
+  const db = await openSavedWorkbookDb();
+  const data = await new Promise<DashboardData | null>((resolve, reject) => {
+    const transaction = db.transaction(SAVED_WORKBOOK_STORE, "readonly");
+    const request = transaction.objectStore(SAVED_WORKBOOK_STORE).get(SAVED_WORKBOOK_KEY);
+    request.onsuccess = () => resolve((request.result as DashboardData | undefined) ?? null);
+    request.onerror = () => reject(request.error);
+  });
+  db.close();
+  return data;
+}
+
 function UploadView({
   onUpload,
+  onLoadSaved,
+  savedWorkbook,
   isParsing,
+  isLoadingSaved,
   error,
   theme,
   onToggleTheme,
 }: {
   onUpload: (event: ChangeEvent<HTMLInputElement>) => void;
+  onLoadSaved: () => void;
+  savedWorkbook: SavedWorkbookMeta | null;
   isParsing: boolean;
+  isLoadingSaved: boolean;
   error: string;
   theme: ThemeName;
   onToggleTheme: () => void;
@@ -1103,6 +1183,19 @@ function UploadView({
           <strong>{isParsing ? "Reading workbook..." : "Upload CDR workbook"}</strong>
           <span>Supported: .xlsx, .xlsm, .xls, .xlsb</span>
         </label>
+        {savedWorkbook && (
+          <article className="saved-workbook-card">
+            <HardDrive size={34} />
+            <div>
+              <span>Previous workbook</span>
+              <strong>{savedWorkbook.fileName}</strong>
+              <p>{formatNumber(savedWorkbook.rawRows)} records - loaded {savedWorkbook.loadedAt}</p>
+            </div>
+            <button className="button primary" type="button" onClick={onLoadSaved} disabled={isLoadingSaved || isParsing}>
+              {isLoadingSaved ? "Opening..." : "Work with uploaded file"}
+            </button>
+          </article>
+        )}
       </section>
       {error && <div className="toast error">{error}</div>}
     </main>
@@ -1275,6 +1368,8 @@ export default function App() {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [error, setError] = useState("");
   const [isParsing, setIsParsing] = useState(false);
+  const [isLoadingSaved, setIsLoadingSaved] = useState(false);
+  const [savedWorkbook, setSavedWorkbook] = useState<SavedWorkbookMeta | null>(() => getSavedWorkbookMeta());
   const [page, setPage] = useState(1);
   const [theme, setTheme] = useState<ThemeName>("se");
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
@@ -1308,7 +1403,15 @@ export default function App() {
     try {
       await new Promise((resolve) => requestAnimationFrame(resolve));
       const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
-      setData(parseWorkbook(workbook, file.name));
+      const parsedData = parseWorkbook(workbook, file.name);
+      setData(parsedData);
+      try {
+        await saveWorkbookToBrowser(parsedData);
+        setSavedWorkbook(workbookMeta(parsedData));
+      } catch {
+        setSavedWorkbookMeta(null);
+        setSavedWorkbook(null);
+      }
       setFilters(EMPTY_FILTERS);
       setPage(1);
     } catch (uploadError) {
@@ -1316,6 +1419,28 @@ export default function App() {
     } finally {
       setIsParsing(false);
       event.target.value = "";
+    }
+  }, []);
+
+  const handleLoadSavedWorkbook = useCallback(async () => {
+    setError("");
+    setIsLoadingSaved(true);
+    try {
+      const saved = await loadWorkbookFromBrowser();
+      if (!saved) {
+        setSavedWorkbook(null);
+        setSavedWorkbookMeta(null);
+        setError("No previous workbook was found. Please upload the workbook again.");
+        return;
+      }
+      setData(saved);
+      setSavedWorkbook(workbookMeta(saved));
+      setFilters(EMPTY_FILTERS);
+      setPage(1);
+    } catch {
+      setError("Previous workbook could not be opened. Please upload the workbook again.");
+    } finally {
+      setIsLoadingSaved(false);
     }
   }, []);
 
@@ -2630,7 +2755,7 @@ export default function App() {
     return () => buttons.forEach((button) => button.remove());
   }, [CompanyPeriodLabel, chartExportDatasets, data, exportTitle, filtered.length, page]);
 
-  if (!data) return <UploadView onUpload={handleUpload} isParsing={isParsing} error={error} theme={theme} onToggleTheme={toggleTheme} />;
+  if (!data) return <UploadView onUpload={handleUpload} onLoadSaved={handleLoadSavedWorkbook} savedWorkbook={savedWorkbook} isParsing={isParsing} isLoadingSaved={isLoadingSaved} error={error} theme={theme} onToggleTheme={toggleTheme} />;
 
   return (
     <main className={`app-shell ${themeClass(theme)}`}>
