@@ -1260,7 +1260,9 @@ export default function App() {
   const [isParsing, setIsParsing] = useState(false);
   const [page, setPage] = useState(1);
   const [theme, setTheme] = useState<ThemeName>("se");
-  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => new Set());
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
+    () => new Set(["kpi", "Company", "Performance", "General", "Charts", "users", "records"])
+  );
   const toggleTheme = useCallback(() => setTheme((current) => (current === "se" ? "dark" : "se")), []);
   const toggleSection = useCallback((id: string) => {
     setCollapsedSections((current) => {
