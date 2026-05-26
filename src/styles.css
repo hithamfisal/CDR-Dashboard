@@ -247,6 +247,9 @@ button, label { cursor: pointer; }
 .saved-workbook-card svg {
   color: var(--blue);
 }
+.saved-workbook-card.empty svg {
+  color: var(--muted);
+}
 .saved-workbook-card span {
   display: block;
   color: var(--amber);

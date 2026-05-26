@@ -22,6 +22,7 @@ import {
   Filter,
   Gauge,
   HardDrive,
+  Home,
   Palette,
   Presentation,
   Radio,
@@ -1183,19 +1184,17 @@ function UploadView({
           <strong>{isParsing ? "Reading workbook..." : "Upload CDR workbook"}</strong>
           <span>Supported: .xlsx, .xlsm, .xls, .xlsb</span>
         </label>
-        {savedWorkbook && (
-          <article className="saved-workbook-card">
-            <HardDrive size={34} />
-            <div>
-              <span>Previous workbook</span>
-              <strong>{savedWorkbook.fileName}</strong>
-              <p>{formatNumber(savedWorkbook.rawRows)} records - loaded {savedWorkbook.loadedAt}</p>
-            </div>
-            <button className="button primary" type="button" onClick={onLoadSaved} disabled={isLoadingSaved || isParsing}>
-              {isLoadingSaved ? "Opening..." : "Work with uploaded file"}
-            </button>
-          </article>
-        )}
+        <article className={`saved-workbook-card ${savedWorkbook ? "" : "empty"}`}>
+          <HardDrive size={34} />
+          <div>
+            <span>Previous workbook</span>
+            <strong>{savedWorkbook?.fileName ?? "No saved workbook yet"}</strong>
+            <p>{savedWorkbook ? `${formatNumber(savedWorkbook.rawRows)} records - loaded ${savedWorkbook.loadedAt}` : "Upload a workbook once, then it will appear here for quick reopening."}</p>
+          </div>
+          <button className="button primary" type="button" onClick={onLoadSaved} disabled={!savedWorkbook || isLoadingSaved || isParsing}>
+            {isLoadingSaved ? "Opening..." : "Work with previous file"}
+          </button>
+        </article>
       </section>
       {error && <div className="toast error">{error}</div>}
     </main>
@@ -2768,6 +2767,10 @@ export default function App() {
         <div className="topbar-actions">
           <img className="brand-logo" src="/assets/se.png" alt="Saudi Energy" />
           <img className="brand-logo" src="/assets/nglogo.png" alt="National Grid" />
+          <button className="button small" type="button" onClick={() => { setData(null); setError(""); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+            <Home size={14} />
+            Home
+          </button>
           <button className="button small theme-toggle" type="button" onClick={toggleTheme}>
             <Palette size={14} />
             {theme === "se" ? "Dark Theme" : "Light Theme"}
