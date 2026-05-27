@@ -83,6 +83,33 @@ type LookupRecord = {
   talkgroup: string;
 };
 
+type FleetmapRecord = {
+  radioId: string;
+  radioAlias: string;
+  employeeName: string;
+  employeeId: string;
+  company: string;
+  region: string;
+  talkgroup: string;
+  mobileType: string;
+  source: "master" | "fixed";
+};
+
+type FleetmapMeta = { fileName: string; loadedAt: string };
+
+type FleetmapState = {
+  records: FleetmapRecord[];
+  meta: FleetmapMeta | null;
+  isParsing: boolean;
+};
+
+type CdrSource = {
+  fileName: string;
+  rawRows: number;
+  loadedAt: string;
+  recordCount: number;
+};
+
 type DashboardData = {
   fileName: string;
   sourceSheet: string;
@@ -90,6 +117,8 @@ type DashboardData = {
   rawRows: number;
   records: CallRecord[];
   lookupRecords: LookupRecord[];
+  fleetmapRecords: FleetmapRecord[];
+  cdrSources: CdrSource[];
   warnings: string[];
 };
 
@@ -125,12 +154,16 @@ type ChartExportDataset = {
 };
 
 const SECTION_NAV_ITEMS = [
+  { id: "networkUtilization", label: "Network Utilization" },
+  { id: "regionPerformance", label: "Region Performance" },
+  { id: "trafficIntensity", label: "Traffic Intensity" },
+  { id: "talkgroupEfficiency", label: "Talkgroup Efficiency" },
   { id: "kpi", label: "KPI Table" },
   { id: "Company", label: "Company Contribution" },
   { id: "Performance", label: "Performance Charts" },
   { id: "General", label: "General Charts" },
   { id: "Charts", label: "Top 10 Charts" },
-  { id: "users", label: "Top Radios & Users" },
+  { id: "users", label: "Radio & User Behavior" },
   { id: "records", label: "Filtered Calls Register" },
 ];
 
@@ -138,6 +171,8 @@ const SAVED_WORKBOOK_DB = "cdr-dashboard-cache";
 const SAVED_WORKBOOK_STORE = "workbooks";
 const SAVED_WORKBOOK_KEY = "last-workbook";
 const SAVED_WORKBOOK_META_KEY = "cdr-dashboard-last-workbook-meta";
+const SAVED_MASTER_FLEETMAP_KEY = "master-fleetmap";
+const SAVED_FIXED_FLEETMAP_KEY = "fixed-fleetmap";
 
 const EMPTY_FILTERS: Filters = {
   region: [],
@@ -200,6 +235,17 @@ const HEADER_ALIASES = {
   durationSeconds: ["durationseconds", "duration seconds", "duration sec", "duration (sec)", "seconds"],
   trafficHours: ["traffichours", "traffic hours", "traffic", "erlangs"],
   baseStation: ["callerbasestation", "caller base station", "base station", "station"],
+};
+
+const FLEETMAP_HEADER_ALIASES = {
+  radioId:      ["radioid", "radio id", "radio", "id", "subscriberid", "subscriber id"],
+  radioAlias:   ["radioalias", "radio alias", "alias", "name"],
+  employeeName: ["employeename", "employee name", "user name", "username", "user", "employee"],
+  employeeId:   ["employeeid", "employee id", "user id", "userid"],
+  company:      ["company", "company / bl", "department", "bl", "business line"],
+  region:       ["region", "area", "site", "location"],
+  talkgroup:    ["talkgroupalias", "talkgroup alias", "talkgroup", "talk group", "group"],
+  mobileType:   ["mobiletype", "mobile type", "radio type", "radiotype", "terminal type", "device type", "type"],
 };
 
 function normalizeHeader(value: unknown) {
@@ -284,13 +330,8 @@ function formatDateTime(value: unknown) {
   const date = parseDate(value);
   if (!date) return cleanText(value, "");
   return date.toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
+    day: "2-digit", month: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
   });
 }
 
@@ -365,10 +406,7 @@ function companyFromRadioId(radioId: string, company: string) {
   if (!["", "unknown", "not found"].includes(currentCompany.toLowerCase())) return currentCompany;
   const firstDigit = /^\s*([1-4])/.exec(radioId)?.[1];
   const fallback: Record<string, string> = {
-    "1": "HSSE",
-    "2": "GENERATION",
-    "3": "NATIONAL GRID",
-    "4": "DISTRIBUTION & CUSTOMER SERVICES",
+    "1": "HSSE", "2": "GENERATION", "3": "NATIONAL GRID", "4": "DISTRIBUTION & CUSTOMER SERVICES",
   };
   return firstDigit ? fallback[firstDigit] ?? currentCompany : currentCompany;
 }
@@ -378,27 +416,63 @@ function mobileTypeFromRadioId(radioId: string, mobileType: string) {
   if (!["", "unknown", "not found"].includes(currentType.toLowerCase())) return currentType;
   const thirdDigit = `${radioId ?? ""}`.trim().charAt(2);
   const fallback: Record<string, string> = {
-    "1": "PORTABLE - جهاز محمول",
-    "2": "ATEX - محمول خاص",
-    "3": "MOBILE - سيار",
-    "4": "FIXED - مكتبي",
-    "5": "Dispatcher",
+    "1": MOBILE_TYPE_LABELS[0],
+    "2": MOBILE_TYPE_LABELS[1],
+    "3": MOBILE_TYPE_LABELS[2],
+    "4": MOBILE_TYPE_LABELS[3],
+    "5": MOBILE_TYPE_LABELS[4],
   };
-  fallback["1"] = MOBILE_TYPE_LABELS[0];
-  fallback["2"] = MOBILE_TYPE_LABELS[1];
-  fallback["3"] = MOBILE_TYPE_LABELS[2];
-  fallback["4"] = MOBILE_TYPE_LABELS[3];
-  fallback["5"] = MOBILE_TYPE_LABELS[4];
   return thirdDigit ? fallback[thirdDigit] ?? currentType : currentType;
 }
 
-function parseWorkbook(workbook: XLSX.WorkBook, fileName: string): DashboardData {
+// ─── Fleetmap helpers ────────────────────────────────────────────────
+
+function parseFleetmap(workbook: XLSX.WorkBook, source: "master" | "fixed"): FleetmapRecord[] {
+  const preferred = workbook.SheetNames.find((n) => /fleet|master|fixed|lookup/i.test(n));
+  const sheetName = preferred ?? workbook.SheetNames[0];
+  const rows = XLSX.utils.sheet_to_json<RawRow>(workbook.Sheets[sheetName], { defval: "", raw: true });
+  return rows
+    .map((row): FleetmapRecord => {
+      const radioId   = cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.radioId), "");
+      const company   = cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.company), "");
+      const mobileType = cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.mobileType), "");
+      return {
+        radioId,
+        radioAlias:   cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.radioAlias), ""),
+        employeeName: cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.employeeName), ""),
+        employeeId:   cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.employeeId), ""),
+        company:      companyFromRadioId(radioId, company),
+        region:       cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.region), ""),
+        talkgroup:    cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.talkgroup), ""),
+        mobileType:   mobileTypeFromRadioId(radioId, mobileType),
+        source,
+      };
+    })
+    .filter((r) => r.radioId && r.radioId !== "Unknown");
+}
+
+function unionFleetmaps(master: FleetmapRecord[], fixed: FleetmapRecord[]): FleetmapRecord[] {
+  const map = new Map<string, FleetmapRecord>();
+  [...master, ...fixed].forEach((rec) => { if (!map.has(rec.radioId)) map.set(rec.radioId, rec); });
+  return [...map.values()];
+}
+
+// ─── Workbook parser ─────────────────────────────────────────────────
+
+function parseWorkbook(workbook: XLSX.WorkBook, fileName: string, fleetmap: FleetmapRecord[] = []): DashboardData {
   const sourceSheet = workbook.SheetNames.includes("Raw_Data") ? "Raw_Data" : workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sourceSheet];
   const rows = XLSX.utils.sheet_to_json<RawRow>(worksheet, { defval: "", raw: true });
+
+  const fleetIndex = new Map<string, FleetmapRecord>();
+  fleetmap.forEach((rec) => fleetIndex.set(rec.radioId, rec));
+
   const lookupRows = workbook.SheetNames.includes("lookup")
     ? XLSX.utils.sheet_to_json<RawRow>(workbook.Sheets.lookup, { defval: "", raw: true })
     : [];
+
+  const pickFleet = (cdrValue: string, fleetValue: string | undefined, fallback: string) =>
+    isKnownLabel(cdrValue) ? cdrValue : (fleetValue && isKnownLabel(fleetValue) ? fleetValue : fallback);
 
   const records = rows
     .map((row): CallRecord => {
@@ -407,27 +481,35 @@ function parseWorkbook(workbook: XLSX.WorkBook, fileName: string): DashboardData
       const endRaw = findValue(row, HEADER_ALIASES.endTime);
       const durationSeconds = parseDurationSeconds(row);
       const radioId = cleanText(findValue(row, HEADER_ALIASES.radioId));
-      const company = cleanText(findValue(row, HEADER_ALIASES.company), "Unknown");
-      const mobileType = cleanText(findValue(row, HEADER_ALIASES.mobileType), "Unknown");
+      const fleet = fleetIndex.get(radioId);
+
+      const rawCompany    = cleanText(findValue(row, HEADER_ALIASES.company),    "Unknown");
+      const rawMobileType = cleanText(findValue(row, HEADER_ALIASES.mobileType), "Unknown");
+      const rawAlias      = cleanText(findValue(row, HEADER_ALIASES.radioAlias), "Not labelled");
+      const rawEmpName    = cleanText(findValue(row, HEADER_ALIASES.employeeName),"Unknown");
+      const rawEmpId      = cleanText(findValue(row, HEADER_ALIASES.employeeId),  "Unknown");
+      const rawRegion     = cleanText(findValue(row, HEADER_ALIASES.region),      "Unknown");
+      const rawTalkgroup  = cleanText(findValue(row, HEADER_ALIASES.talkgroup),   "Unknown");
+
       return {
         radioId,
-        radioAlias: cleanText(findValue(row, HEADER_ALIASES.radioAlias), "Not labelled"),
-        mobileType: mobileTypeFromRadioId(radioId, mobileType),
-        employeeName: cleanText(findValue(row, HEADER_ALIASES.employeeName), "Unknown"),
-        employeeId: cleanText(findValue(row, HEADER_ALIASES.employeeId), "Unknown"),
-        region: cleanText(findValue(row, HEADER_ALIASES.region), "Unknown"),
-        company: companyFromRadioId(radioId, company),
-        talkgroup: cleanText(findValue(row, HEADER_ALIASES.talkgroup), "Unknown"),
-        callDate: formatDate(dateRaw),
-        startTime: combineDateAndTime(dateRaw, startRaw),
-        endTime: combineDateAndTime(dateRaw, endRaw),
-        year: yearLabel(findValue(row, HEADER_ALIASES.year), dateRaw),
-        month: monthLabel(findValue(row, HEADER_ALIASES.month), dateRaw),
-        week: cleanText(findValue(row, HEADER_ALIASES.week), "Unknown"),
-        hour: hourLabel(findValue(row, HEADER_ALIASES.hour)),
+        radioAlias:   pickFleet(rawAlias,     fleet?.radioAlias,   "Not labelled"),
+        mobileType:   mobileTypeFromRadioId(radioId, pickFleet(rawMobileType, fleet?.mobileType, "Unknown")),
+        employeeName: pickFleet(rawEmpName,   fleet?.employeeName, "Unknown"),
+        employeeId:   pickFleet(rawEmpId,     fleet?.employeeId,   "Unknown"),
+        region:       pickFleet(rawRegion,    fleet?.region,       "Unknown"),
+        company:      companyFromRadioId(radioId, pickFleet(rawCompany, fleet?.company, "Unknown")),
+        talkgroup:    pickFleet(rawTalkgroup, fleet?.talkgroup,    "Unknown"),
+        callDate:     formatDate(dateRaw),
+        startTime:    combineDateAndTime(dateRaw, startRaw),
+        endTime:      combineDateAndTime(dateRaw, endRaw),
+        year:         yearLabel(findValue(row, HEADER_ALIASES.year), dateRaw),
+        month:        monthLabel(findValue(row, HEADER_ALIASES.month), dateRaw),
+        week:         cleanText(findValue(row, HEADER_ALIASES.week), "Unknown"),
+        hour:         hourLabel(findValue(row, HEADER_ALIASES.hour)),
         durationSeconds,
         trafficHours: parseNumber(findValue(row, HEADER_ALIASES.trafficHours), durationSeconds / 3600),
-        baseStation: cleanText(findValue(row, HEADER_ALIASES.baseStation), "Unknown"),
+        baseStation:  cleanText(findValue(row, HEADER_ALIASES.baseStation), "Unknown"),
       };
     })
     .filter((record) => record.radioId !== "Unknown" || record.company !== "Unknown" || record.durationSeconds > 0);
@@ -436,18 +518,21 @@ function parseWorkbook(workbook: XLSX.WorkBook, fileName: string): DashboardData
     .map((row): LookupRecord => {
       const radioId = cleanText(findValue(row, HEADER_ALIASES.radioId), "");
       const company = cleanText(findValue(row, HEADER_ALIASES.company), "");
-      return {
-        radioId,
-        company: companyFromRadioId(radioId, company),
-        region: cleanText(findValue(row, HEADER_ALIASES.region), ""),
-        talkgroup: cleanText(findValue(row, HEADER_ALIASES.talkgroup), ""),
-      };
+      return { radioId, company: companyFromRadioId(radioId, company), region: cleanText(findValue(row, HEADER_ALIASES.region), ""), talkgroup: cleanText(findValue(row, HEADER_ALIASES.talkgroup), "") };
     })
     .filter((record) => record.radioId && record.company);
 
+  const fleetAsLookup: LookupRecord[] = fleetmap
+    .filter((r) => r.radioId && r.company)
+    .map((r) => ({ radioId: r.radioId, company: r.company, region: r.region, talkgroup: r.talkgroup }));
+
+  const lookupMap = new Map<string, LookupRecord>();
+  [...lookupRecords, ...fleetAsLookup].forEach((rec) => { if (!lookupMap.has(rec.radioId)) lookupMap.set(rec.radioId, rec); });
+  const combinedLookup = [...lookupMap.values()];
+
   const warnings: string[] = [];
   if (!workbook.SheetNames.includes("Raw_Data")) warnings.push("Raw_Data sheet was not found. The first sheet was used.");
-  if (!workbook.SheetNames.includes("lookup")) warnings.push("lookup sheet was not found. KPI activated users fall back to calling radio users.");
+  if (!workbook.SheetNames.includes("lookup") && fleetmap.length === 0) warnings.push("No lookup sheet or fleetmap loaded. KPI activated users will fall back to calling radio users.");
   if (records.length === 0) warnings.push("No CDR rows could be parsed. Check the header row.");
   if (records.some((record) => record.durationSeconds <= 0)) warnings.push("Some rows have zero or missing duration.");
 
@@ -457,8 +542,21 @@ function parseWorkbook(workbook: XLSX.WorkBook, fileName: string): DashboardData
     loadedAt: new Date().toLocaleString("en-GB"),
     rawRows: rows.length,
     records,
-    lookupRecords,
+    lookupRecords: combinedLookup,
+    fleetmapRecords: fleetmap,
+    cdrSources: [{ fileName, rawRows: rows.length, loadedAt: new Date().toLocaleString("en-GB"), recordCount: records.length }],
     warnings,
+  };
+}
+
+function mergeCdrIntoData(base: DashboardData, addition: DashboardData): DashboardData {
+  return {
+    ...base,
+    records:    [...base.records, ...addition.records],
+    rawRows:    base.rawRows + addition.rawRows,
+    cdrSources: [...base.cdrSources, ...addition.cdrSources],
+    warnings:   Array.from(new Set([...base.warnings, ...addition.warnings])),
+    loadedAt:   new Date().toLocaleString("en-GB"),
   };
 }
 
@@ -637,19 +735,7 @@ function CompanyPerformanceTooltip({ active, payload, label }: any) {
   );
 }
 
-function CallsDurationPerformanceChart({
-  title,
-  data,
-  height = 360,
-  xTickFormatter = (value: unknown) => truncateLabel(value, 18),
-  gradientId,
-}: {
-  title: string;
-  data: Ranking[];
-  height?: number;
-  xTickFormatter?: (value: unknown) => string;
-  gradientId: string;
-}) {
+function CallsDurationPerformanceChart({ title, data, height = 360, xTickFormatter = (value: unknown) => truncateLabel(value, 18), gradientId }: { title: string; data: Ranking[]; height?: number; xTickFormatter?: (value: unknown) => string; gradientId: string }) {
   return (
     <>
       <h3>{title}</h3>
@@ -663,10 +749,7 @@ function CallsDurationPerformanceChart({
             </linearGradient>
             <filter id={`${gradientId}Glow`} x="-40%" y="-40%" width="180%" height="180%">
               <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
             </filter>
           </defs>
           <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" vertical={false} opacity={0.32} />
@@ -800,38 +883,6 @@ function mobileTypeColor(type: string) {
   return COLORS[hash % COLORS.length];
 }
 
-// type CompanyPieCardProps = {
-//   title: string;
-//   totalLabel: string;
-//   data: { name: string; value: number }[];
-//   valueFormatter?: (value: number) => string;
-//   tone?: "blue" | "red" | "neutral";
-// };
-
-// function CompanyPieCard({ title, totalLabel, data, valueFormatter = chartLabel, tone = "neutral" }: CompanyPieCardProps) {
-//   return (
-//     <article className={`chart-card Company-card ${tone}`}>
-//       <h3>{title}</h3>
-//       <p>{totalLabel}</p>
-//       <div className="Company-pie-layout">
-//         <ResponsiveContainer width="58%" height={240}>
-//           <PieChart>
-//             <Pie data={data} dataKey="value" nameKey="name" outerRadius={92} paddingAngle={2} label={({ value }) => valueFormatter(Number(value ?? 0))}>
-//               {data.map((entry, index) => <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />)}
-//             </Pie>
-//             <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => valueFormatter(value)} />
-//           </PieChart>
-//         </ResponsiveContainer>
-//         <div className="Company-legend">
-//           {data.map((item, index) => (
-//             <span key={item.name}><i style={{ background: COLORS[index % COLORS.length] }} />{item.name}</span>
-//           ))}
-//         </div>
-//       </div>
-//     </article>
-//   );
-// }
-
 function monthSortValue(label: string) {
   const text = `${label ?? ""}`.toLowerCase();
   if (!text || text === "unknown") return Number.MAX_SAFE_INTEGER;
@@ -880,42 +931,30 @@ function downloadText(fileName: string, text: string) {
   const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+  link.href = url; link.download = fileName;
+  document.body.appendChild(link); link.click(); link.remove();
   URL.revokeObjectURL(url);
 }
 
 function downloadBlob(fileName: string, blob: Blob) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+  link.href = url; link.download = fileName;
+  document.body.appendChild(link); link.click(); link.remove();
   URL.revokeObjectURL(url);
 }
 
 function downloadDataUrl(fileName: string, dataUrl: string) {
   const link = document.createElement("a");
-  link.href = dataUrl;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+  link.href = dataUrl; link.download = fileName;
+  document.body.appendChild(link); link.click(); link.remove();
 }
 
 function downloadWorkbookData(fileName: string, sheetName: string, title: string, dataset: ChartExportDataset) {
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.aoa_to_sheet([[title], [], dataset.headers, ...dataset.rows]);
   worksheet["!cols"] = dataset.headers.map((header, index) => {
-    const maxLength = Math.max(
-      `${header}`.length,
-      ...dataset.rows.slice(0, 200).map((row) => `${row[index] ?? ""}`.length)
-    );
+    const maxLength = Math.max(`${header}`.length, ...dataset.rows.slice(0, 200).map((row) => `${row[index] ?? ""}`.length));
     return { wch: Math.min(Math.max(maxLength + 2, 12), 34) };
   });
   worksheet["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: Math.max(0, dataset.headers.length - 1) } }];
@@ -925,11 +964,7 @@ function downloadWorkbookData(fileName: string, sheetName: string, title: string
 }
 
 function fileSlug(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 90) || "dashboard-card";
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 90) || "dashboard-card";
 }
 
 function exportIconSvg(kind: "png" | "xlsx" | "ppt" | "pdf" | "view" | "csv") {
@@ -945,47 +980,31 @@ function exportIconSvg(kind: "png" | "xlsx" | "ppt" | "pdf" | "view" | "csv") {
 }
 
 function escapeXml(value: unknown) {
-  return `${value ?? ""}`
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
+  return `${value ?? ""}`.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+}
+
+function htmlEscape(value: unknown) {
+  return `${value ?? ""}`.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 function excelColumnName(index: number) {
-  let value = index;
-  let name = "";
-  while (value > 0) {
-    const remainder = (value - 1) % 26;
-    name = String.fromCharCode(65 + remainder) + name;
-    value = Math.floor((value - 1) / 26);
-  }
+  let value = index; let name = "";
+  while (value > 0) { const r = (value - 1) % 26; name = String.fromCharCode(65 + r) + name; value = Math.floor((value - 1) / 26); }
   return name;
 }
 
 function excelRange(sheetName: string, col: number, startRow: number, endRow: number) {
   const safeName = sheetName.replace(/'/g, "''");
-  const column = excelColumnName(col);
-  return `'${safeName}'!$${column}$${startRow}:$${column}$${endRow}`;
+  return `'${safeName}'!$${excelColumnName(col)}$${startRow}:$${excelColumnName(col)}$${endRow}`;
 }
 
 type NativeChartSeries = { name: string; valuesRef: string; color: string };
-type NativeChartConfig = {
-  sheetIndex: number;
-  chartIndex: number;
-  title: string;
-  type: "bar" | "line" | "doughnut";
-  categoriesRef: string;
-  series: NativeChartSeries[];
-  from?: { col: number; row: number };
-  to?: { col: number; row: number };
-};
+type NativeChartConfig = { sheetIndex: number; chartIndex: number; title: string; type: "bar" | "line" | "doughnut"; categoriesRef: string; series: NativeChartSeries[]; from?: { col: number; row: number }; to?: { col: number; row: number } };
 
 function nativeSeriesXml(series: NativeChartSeries, index: number, categoriesRef: string, chartType: "bar" | "line" | "doughnut") {
   const shape = `<c:spPr><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill><a:ln><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill></a:ln></c:spPr>`;
   const marker = chartType === "line" ? `<c:marker><c:symbol val="circle"/><c:size val="6"/><c:spPr><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill><a:ln><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill></a:ln></c:spPr></c:marker>` : "";
-  const dPts = chartType === "doughnut" ? COLORS.map((color, pointIndex) => `<c:dPt><c:idx val="${pointIndex}"/><c:spPr><a:solidFill><a:srgbClr val="${color.replace("#", "")}"/></a:solidFill></c:spPr></c:dPt>`).join("") : "";
+  const dPts = chartType === "doughnut" ? COLORS.map((color, i) => `<c:dPt><c:idx val="${i}"/><c:spPr><a:solidFill><a:srgbClr val="${color.replace("#", "")}"/></a:solidFill></c:spPr></c:dPt>`).join("") : "";
   return `<c:ser><c:idx val="${index}"/><c:order val="${index}"/><c:tx><c:v>${escapeXml(series.name)}</c:v></c:tx>${shape}${marker}${dPts}<c:cat><c:strRef><c:f>${escapeXml(categoriesRef)}</c:f></c:strRef></c:cat><c:val><c:numRef><c:f>${escapeXml(series.valuesRef)}</c:f></c:numRef></c:val></c:ser>`;
 }
 
@@ -996,26 +1015,14 @@ function nativeChartXml(config: NativeChartConfig) {
     : config.type === "line"
       ? `<c:lineChart><c:grouping val="standard"/><c:varyColors val="0"/>${series}<c:dLbls><c:showVal val="1"/><c:showLegendKey val="0"/><c:showCatName val="0"/><c:showSerName val="0"/></c:dLbls><c:axId val="10"/><c:axId val="20"/></c:lineChart>`
       : `<c:doughnutChart><c:varyColors val="1"/>${series}<c:dLbls><c:showVal val="1"/><c:showLeaderLines val="1"/><c:showLegendKey val="0"/><c:showCatName val="0"/><c:showSerName val="0"/><c:showPercent val="0"/></c:dLbls><c:holeSize val="55"/></c:doughnutChart>`;
-  const axes = config.type === "doughnut" ? "" : `
-      <c:catAx><c:axId val="10"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="l"/><c:tickLblPos val="nextTo"/><c:crossAx val="20"/><c:crosses val="autoZero"/></c:catAx>
-      <c:valAx><c:axId val="20"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="b"/><c:majorGridlines/><c:numFmt formatCode="#,##0" sourceLinked="0"/><c:tickLblPos val="nextTo"/><c:crossAx val="10"/><c:crosses val="autoZero"/></c:valAx>`;
-  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <c:date1904 val="0"/><c:lang val="en-US"/><c:roundedCorners val="0"/>
-  <c:chart>
-    <c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" b="1" sz="1400"/><a:t>${escapeXml(config.title)}</a:t></a:r></a:p></c:rich></c:tx><c:layout/></c:title>
-    <c:plotArea><c:layout/>${chartBody}${axes}</c:plotArea>
-    <c:legend><c:legendPos val="r"/><c:layout/></c:legend>
-    <c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/>
-  </c:chart>
-</c:chartSpace>`;
+  const axes = config.type === "doughnut" ? "" : `<c:catAx><c:axId val="10"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="l"/><c:tickLblPos val="nextTo"/><c:crossAx val="20"/><c:crosses val="autoZero"/></c:catAx><c:valAx><c:axId val="20"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="b"/><c:majorGridlines/><c:numFmt formatCode="#,##0" sourceLinked="0"/><c:tickLblPos val="nextTo"/><c:crossAx val="10"/><c:crosses val="autoZero"/></c:valAx>`;
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><c:date1904 val="0"/><c:lang val="en-US"/><c:roundedCorners val="0"/><c:chart><c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" b="1" sz="1400"/><a:t>${escapeXml(config.title)}</a:t></a:r></a:p></c:rich></c:tx><c:layout/></c:title><c:plotArea><c:layout/>${chartBody}${axes}</c:plotArea><c:legend><c:legendPos val="r"/><c:layout/></c:legend><c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/></c:chart></c:chartSpace>`;
 }
 
 async function patchWorkbookWithNativeCharts(buffer: ExcelJS.Buffer, configs: NativeChartConfig[]) {
   const zip = await JSZip.loadAsync(buffer);
   const contentTypePath = "[Content_Types].xml";
   let contentTypes = await zip.file(contentTypePath)?.async("string");
-
   for (const config of configs) {
     const chartPath = `xl/charts/chart${config.chartIndex}.xml`;
     const drawingPath = `xl/drawings/drawing${config.chartIndex}.xml`;
@@ -1024,31 +1031,19 @@ async function patchWorkbookWithNativeCharts(buffer: ExcelJS.Buffer, configs: Na
     const sheetPath = `xl/worksheets/sheet${config.sheetIndex}.xml`;
     const from = config.from ?? { col: 4, row: 1 };
     const to = config.to ?? { col: 14, row: 24 };
-
     zip.file(chartPath, nativeChartXml(config));
-    zip.file(drawingPath, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
-  <xdr:twoCellAnchor>
-    <xdr:from><xdr:col>${from.col}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${from.row}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
-    <xdr:to><xdr:col>${to.col}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${to.row}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
-    <xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="2" name="${escapeXml(config.title)}"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1"/></a:graphicData></a:graphic></xdr:graphicFrame>
-    <xdr:clientData/>
-  </xdr:twoCellAnchor>
-</xdr:wsDr>`);
+    zip.file(drawingPath, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><xdr:twoCellAnchor><xdr:from><xdr:col>${from.col}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${from.row}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from><xdr:to><xdr:col>${to.col}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${to.row}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to><xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="2" name="${escapeXml(config.title)}"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1"/></a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>`);
     zip.file(drawingRelPath, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="../charts/chart${config.chartIndex}.xml"/></Relationships>`);
-
     const sheetRelXml = await zip.file(sheetRelPath)?.async("string");
-    const existingRids = [...(sheetRelXml ?? "").matchAll(/Id="rId(\d+)"/g)].map((match) => Number(match[1]));
+    const existingRids = [...(sheetRelXml ?? "").matchAll(/Id="rId(\d+)"/g)].map((m) => Number(m[1]));
     const nextRid = `rId${Math.max(0, ...existingRids) + 1}`;
     const drawingRel = `<Relationship Id="${nextRid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing${config.chartIndex}.xml"/>`;
     zip.file(sheetRelPath, sheetRelXml ? sheetRelXml.replace("</Relationships>", `${drawingRel}</Relationships>`) : `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${drawingRel}</Relationships>`);
-
     const sheetXml = await zip.file(sheetPath)?.async("string");
     if (sheetXml && !sheetXml.includes("<drawing ")) {
       const withNs = sheetXml.includes("xmlns:r=") ? sheetXml : sheetXml.replace("<worksheet ", '<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ');
       zip.file(sheetPath, withNs.replace("</worksheet>", `<drawing r:id="${nextRid}"/></worksheet>`));
     }
-
     if (contentTypes) {
       const chartOverride = `<Override PartName="/${chartPath}" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>`;
       const drawingOverride = `<Override PartName="/${drawingPath}" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>`;
@@ -1056,68 +1051,35 @@ async function patchWorkbookWithNativeCharts(buffer: ExcelJS.Buffer, configs: Na
       if (!contentTypes.includes(drawingPath)) contentTypes = contentTypes.replace("</Types>", `${drawingOverride}</Types>`);
     }
   }
-
   if (contentTypes) zip.file(contentTypePath, contentTypes);
   return zip.generateAsync({ type: "blob" });
 }
 
 async function captureElementPng(element: HTMLElement, backgroundColor = "#ffffff") {
-  const canvas = await html2canvas(element, {
-    backgroundColor,
-    scale: 2,
-    useCORS: true,
-  });
+  const canvas = await html2canvas(element, { backgroundColor, scale: 2, useCORS: true });
   return canvas.toDataURL("image/png");
 }
 
-function htmlEscape(value: unknown) {
-  return `${value ?? ""}`
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+type ThemeName = "dark" | "light";
 
-type ThemeName = "dark" | "se";
-
-function themeClass(theme: ThemeName) {
-  return theme === "se" ? "se-theme" : "";
-}
+function themeClass(theme: ThemeName) { return theme === "light" ? "light-background-theme" : "dark-background-theme"; }
 
 function workbookMeta(data: DashboardData): SavedWorkbookMeta {
-  return {
-    fileName: data.fileName,
-    sourceSheet: data.sourceSheet,
-    loadedAt: data.loadedAt,
-    rawRows: data.rawRows,
-  };
+  return { fileName: data.fileName, sourceSheet: data.sourceSheet, loadedAt: data.loadedAt, rawRows: data.rawRows };
 }
 
 function getSavedWorkbookMeta(): SavedWorkbookMeta | null {
-  try {
-    const raw = window.localStorage.getItem(SAVED_WORKBOOK_META_KEY);
-    return raw ? JSON.parse(raw) as SavedWorkbookMeta : null;
-  } catch {
-    return null;
-  }
+  try { const raw = window.localStorage.getItem(SAVED_WORKBOOK_META_KEY); return raw ? JSON.parse(raw) as SavedWorkbookMeta : null; } catch { return null; }
 }
 
 function setSavedWorkbookMeta(meta: SavedWorkbookMeta | null) {
-  try {
-    if (meta) window.localStorage.setItem(SAVED_WORKBOOK_META_KEY, JSON.stringify(meta));
-    else window.localStorage.removeItem(SAVED_WORKBOOK_META_KEY);
-  } catch {
-    // Metadata is only used to show the previous workbook option on the upload screen.
-  }
+  try { if (meta) window.localStorage.setItem(SAVED_WORKBOOK_META_KEY, JSON.stringify(meta)); else window.localStorage.removeItem(SAVED_WORKBOOK_META_KEY); } catch { /* ignore */ }
 }
 
 function openSavedWorkbookDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = window.indexedDB.open(SAVED_WORKBOOK_DB, 1);
-    request.onupgradeneeded = () => {
-      request.result.createObjectStore(SAVED_WORKBOOK_STORE);
-    };
+    request.onupgradeneeded = () => { request.result.createObjectStore(SAVED_WORKBOOK_STORE); };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
@@ -1126,10 +1088,9 @@ function openSavedWorkbookDb(): Promise<IDBDatabase> {
 async function saveWorkbookToBrowser(data: DashboardData) {
   const db = await openSavedWorkbookDb();
   await new Promise<void>((resolve, reject) => {
-    const transaction = db.transaction(SAVED_WORKBOOK_STORE, "readwrite");
-    transaction.objectStore(SAVED_WORKBOOK_STORE).put(data, SAVED_WORKBOOK_KEY);
-    transaction.oncomplete = () => resolve();
-    transaction.onerror = () => reject(transaction.error);
+    const tx = db.transaction(SAVED_WORKBOOK_STORE, "readwrite");
+    tx.objectStore(SAVED_WORKBOOK_STORE).put(data, SAVED_WORKBOOK_KEY);
+    tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error);
   });
   db.close();
   setSavedWorkbookMeta(workbookMeta(data));
@@ -1138,28 +1099,50 @@ async function saveWorkbookToBrowser(data: DashboardData) {
 async function loadWorkbookFromBrowser(): Promise<DashboardData | null> {
   const db = await openSavedWorkbookDb();
   const data = await new Promise<DashboardData | null>((resolve, reject) => {
-    const transaction = db.transaction(SAVED_WORKBOOK_STORE, "readonly");
-    const request = transaction.objectStore(SAVED_WORKBOOK_STORE).get(SAVED_WORKBOOK_KEY);
-    request.onsuccess = () => resolve((request.result as DashboardData | undefined) ?? null);
-    request.onerror = () => reject(request.error);
+    const tx = db.transaction(SAVED_WORKBOOK_STORE, "readonly");
+    const req = tx.objectStore(SAVED_WORKBOOK_STORE).get(SAVED_WORKBOOK_KEY);
+    req.onsuccess = () => resolve((req.result as DashboardData | undefined) ?? null);
+    req.onerror = () => reject(req.error);
   });
   db.close();
   return data;
 }
 
+async function saveFleetmapToBrowser(key: string, records: FleetmapRecord[], meta: FleetmapMeta) {
+  const db = await openSavedWorkbookDb();
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(SAVED_WORKBOOK_STORE, "readwrite");
+    tx.objectStore(SAVED_WORKBOOK_STORE).put({ records, meta }, key);
+    tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error);
+  });
+  db.close();
+}
+
+async function loadFleetmapFromBrowser(key: string): Promise<{ records: FleetmapRecord[]; meta: FleetmapMeta } | null> {
+  const db = await openSavedWorkbookDb();
+  const data = await new Promise<any>((resolve, reject) => {
+    const tx = db.transaction(SAVED_WORKBOOK_STORE, "readonly");
+    const req = tx.objectStore(SAVED_WORKBOOK_STORE).get(key);
+    req.onsuccess = () => resolve(req.result ?? null); req.onerror = () => reject(req.error);
+  });
+  db.close();
+  return data;
+}
+
+// ─── Upload view ─────────────────────────────────────────────────────
+
 function UploadView({
-  onUpload,
-  onLoadSaved,
-  savedWorkbook,
-  isParsing,
-  isLoadingSaved,
-  error,
-  theme,
-  onToggleTheme,
+  onUploadCdr, onUploadMasterFleetmap, onUploadFixedFleetmap,
+  onLoadSaved, savedWorkbook, masterFleetmap, fixedFleetmap,
+  isParsing, isLoadingSaved, error, theme, onToggleTheme,
 }: {
-  onUpload: (event: ChangeEvent<HTMLInputElement>) => void;
+  onUploadCdr: (event: ChangeEvent<HTMLInputElement>) => void;
+  onUploadMasterFleetmap: (event: ChangeEvent<HTMLInputElement>) => void;
+  onUploadFixedFleetmap: (event: ChangeEvent<HTMLInputElement>) => void;
   onLoadSaved: () => void;
   savedWorkbook: SavedWorkbookMeta | null;
+  masterFleetmap: FleetmapState;
+  fixedFleetmap: FleetmapState;
   isParsing: boolean;
   isLoadingSaved: boolean;
   error: string;
@@ -1168,44 +1151,100 @@ function UploadView({
 }) {
   return (
     <main className={`upload-shell ${themeClass(theme)}`}>
-      <section className="upload-grid">
+      <section className="upload-grid upload-grid-wide">
         <div className="upload-copy">
           <p className="eyebrow">Premium CDR Concept</p>
           <h1>Traffic command center for massive CDR workbooks.</h1>
-          <p className="lead"></p>
+          <p className="lead">
+            Upload the Master Fleetmap and Fixed Fleetmap once — they are saved in this browser
+            and reused automatically. CDR files from multiple regions can be uploaded together
+            and merge into a single dataset.
+          </p>
         </div>
-        <div className="workbook-choice-panel">
+
+        <div className="workbook-choice-panel three-tile">
           <button className="button small theme-toggle upload-theme-toggle" type="button" onClick={onToggleTheme}>
             <Palette size={14} />
-            {theme === "se" ? "Dark Theme" : "Light Theme"}
+            {theme === "light" ? "Dark Theme" : "Light Theme"}
           </button>
-          <label className="workbook-choice-card upload-choice-card">
-            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUpload} />
+
+          {/* Master Fleetmap */}
+          <label className={`workbook-choice-card fleetmap-choice-card ${masterFleetmap.meta ? "loaded" : ""}`}>
+            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadMasterFleetmap} />
+            <span className="choice-icon"><Users size={34} /></span>
+            <span className="choice-eyebrow">Reference 1</span>
+            <strong>
+              {masterFleetmap.isParsing ? "Reading..." : masterFleetmap.meta?.fileName ?? "Upload Master Fleetmap"}
+            </strong>
+            <p>
+              {masterFleetmap.meta
+                ? `${formatNumber(masterFleetmap.records.length)} radios · saved ${masterFleetmap.meta.loadedAt}. Click to replace.`
+                : "Enriches CDR rows with company, region and user details."}
+            </p>
+          </label>
+
+          {/* Fixed Fleetmap */}
+          <label className={`workbook-choice-card fleetmap-choice-card ${fixedFleetmap.meta ? "loaded" : ""}`}>
+            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadFixedFleetmap} />
+            <span className="choice-icon"><Radio size={34} /></span>
+            <span className="choice-eyebrow">Reference 2</span>
+            <strong>
+              {fixedFleetmap.isParsing ? "Reading..." : fixedFleetmap.meta?.fileName ?? "Upload Fixed Fleetmap"}
+            </strong>
+            <p>
+              {fixedFleetmap.meta
+                ? `${formatNumber(fixedFleetmap.records.length)} radios · saved ${fixedFleetmap.meta.loadedAt}. Click to replace.`
+                : "Combined with Master Fleetmap — union of all radios."}
+            </p>
+          </label>
+
+          {/* CDR upload — multi-file */}
+          <label className="workbook-choice-card upload-choice-card cdr-choice-card">
+            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={onUploadCdr} />
             <span className="choice-icon"><UploadCloud size={38} /></span>
             <span className="choice-eyebrow">New analysis</span>
-            <strong>{isParsing ? "Reading workbook..." : "Upload CDR workbook"}</strong>
-            <p>Start fresh from an Excel CDR file. Supported formats: .xlsx, .xlsm, .xls, .xlsb.</p>
+            <strong>{isParsing ? "Reading CDR workbooks..." : "Upload CDR workbook(s)"}</strong>
+            <p>Select one or more CDR files. Multiple regions merge into a single dataset. Formats: .xlsx, .xlsm, .xls, .xlsb.</p>
           </label>
-          <button className={`workbook-choice-card previous-choice-card ${savedWorkbook ? "" : "empty"}`} type="button" onClick={onLoadSaved} disabled={!savedWorkbook || isLoadingSaved || isParsing}>
+
+          {/* Continue previous */}
+          <button
+            className={`workbook-choice-card previous-choice-card ${savedWorkbook ? "" : "empty"}`}
+            type="button"
+            onClick={onLoadSaved}
+            disabled={!savedWorkbook || isLoadingSaved || isParsing}
+          >
             <span className="choice-icon"><HardDrive size={38} /></span>
             <span className="choice-eyebrow">Continue work</span>
-            <strong>{isLoadingSaved ? "Opening previous workbook..." : savedWorkbook?.fileName ?? "No saved workbook yet"}</strong>
-            <p>{savedWorkbook ? `${formatNumber(savedWorkbook.rawRows)} records - loaded ${savedWorkbook.loadedAt}` : "After your first upload, this tile reopens the last workbook saved in this browser."}</p>
+            <strong>{isLoadingSaved ? "Opening previous workbook..." : savedWorkbook?.fileName ?? "No saved CDR yet"}</strong>
+            <p>
+              {savedWorkbook
+                ? `${formatNumber(savedWorkbook.rawRows)} records · loaded ${savedWorkbook.loadedAt}`
+                : "After your first upload, this tile reopens the last CDR saved in this browser."}
+            </p>
           </button>
         </div>
       </section>
+      {(isParsing || isLoadingSaved || masterFleetmap.isParsing || fixedFleetmap.isParsing) && (
+        <div className="loading-overlay" role="status" aria-live="polite">
+          <div className="loading-card">
+            <Activity size={28} />
+            <strong>{isLoadingSaved ? "Opening previous workbook..." : "Processing workbook..."}</strong>
+            <span>Preparing the dashboard data and saved references.</span>
+          </div>
+        </div>
+      )}
       {error && <div className="toast error">{error}</div>}
     </main>
   );
 }
 
+// ─── Shared sub-components ────────────────────────────────────────────
+
 function MetricCard({ label, value, detail, icon: Icon, tone = "blue" }: { label: string; value: string; detail: string; icon: typeof Activity; tone?: "blue" | "amber" | "green" | "red" }) {
   return (
     <article className={`metric-card ${tone}`}>
-      <div>
-        <span>{label}</span>
-        <strong>{value}</strong>
-      </div>
+      <div><span>{label}</span><strong>{value}</strong></div>
       <Icon size={22} />
       <p>{detail}</p>
     </article>
@@ -1213,61 +1252,26 @@ function MetricCard({ label, value, detail, icon: Icon, tone = "blue" }: { label
 }
 
 function ExportButton({ kind, label, onClick, title }: { kind: "xlsx" | "ppt" | "pdf" | "view" | "csv" | "png"; label: string; onClick: () => void; title?: string }) {
-  const icons = {
-    xlsx: FileSpreadsheet,
-    ppt: Presentation,
-    pdf: FileText,
-    view: Eye,
-    csv: Download,
-    png: FileImage,
-  };
+  const icons = { xlsx: FileSpreadsheet, ppt: Presentation, pdf: FileText, view: Eye, csv: Download, png: FileImage };
   const Icon = icons[kind];
   return (
     <button className={`button small export-button export-button-${kind}`} type="button" onClick={onClick} title={title ?? label}>
-      <Icon size={14} />
-      <span>{label}</span>
+      <Icon size={14} /><span>{label}</span>
     </button>
   );
 }
 
-function SectionTitle({
-  id,
-  eyebrow,
-  title,
-  text,
-  actions,
-  collapsed = false,
-  onToggle,
-}: {
-  id?: string;
-  eyebrow: string;
-  title: string;
-  text?: string;
-  actions?: ReactNode;
-  collapsed?: boolean;
-  onToggle?: () => void;
-}) {
+function SectionTitle({ id, eyebrow, title, text, actions, collapsed = false, onToggle }: { id?: string; eyebrow: string; title: string; text?: string; actions?: ReactNode; collapsed?: boolean; onToggle?: () => void }) {
   return (
     <div id={id} className={`section-title ${collapsed ? "section-title-collapsed" : ""}`}>
       <div className="section-title-copy">
-        <p>{eyebrow}</p>
-        <h2>{title}</h2>
+        <p>{eyebrow}</p><h2>{title}</h2>
         {text && <span>{text}</span>}
       </div>
       <div className="section-title-actions">
         {actions}
-        {id && (
-          <button className="button small section-top-button" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-            <ArrowUp size={15} />
-            <span>Top</span>
-          </button>
-        )}
-        {onToggle && (
-          <button className="button small section-toggle" type="button" onClick={onToggle} aria-expanded={!collapsed} aria-controls={id ? `${id}-content` : undefined}>
-            <ChevronDown size={15} />
-            <span>{collapsed ? "Expand" : "Collapse"}</span>
-          </button>
-        )}
+        {id && <button className="button small section-top-button" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}><ArrowUp size={15} /><span>Top</span></button>}
+        {onToggle && <button className="button small section-toggle" type="button" onClick={onToggle} aria-expanded={!collapsed}><ChevronDown size={15} /><span>{collapsed ? "Expand" : "Collapse"}</span></button>}
       </div>
     </div>
   );
@@ -1293,40 +1297,27 @@ function MultiSelectFilter({ label, value, options, optionLabels, onChange, show
   function computePosition() {
     if (!triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
-    const longest = Math.max(...options.map((option) => (optionLabels?.[option] ?? option).length), label.length, 10);
+    const longest = Math.max(...options.map((o) => (optionLabels?.[o] ?? o).length), label.length, 10);
     const dropWidth = Math.min(Math.max(rect.width, longest * 8 + 58, 220), 520);
     const dropHeight = Math.min(280, options.length * 36 + 48);
     const spaceBelow = window.innerHeight - rect.bottom;
     const left = Math.min(rect.left, window.innerWidth - dropWidth - 8);
-    if (spaceBelow >= dropHeight || spaceBelow >= 160) {
-      setDropdownStyle({ position: "fixed", top: rect.bottom + 4, left, width: dropWidth, zIndex: 99999 });
-    } else {
-      setDropdownStyle({ position: "fixed", bottom: window.innerHeight - rect.top + 4, left, width: dropWidth, zIndex: 99999 });
-    }
+    if (spaceBelow >= dropHeight || spaceBelow >= 160) setDropdownStyle({ position: "fixed", top: rect.bottom + 4, left, width: dropWidth, zIndex: 99999 });
+    else setDropdownStyle({ position: "fixed", bottom: window.innerHeight - rect.top + 4, left, width: dropWidth, zIndex: 99999 });
   }
 
-  function handleOpen() {
-    if (!open) computePosition();
-    setOpen((current) => !current);
-  }
+  function handleOpen() { if (!open) computePosition(); setOpen((c) => !c); }
 
   useEffect(() => {
     if (!open) return;
     const update = () => computePosition();
-    window.addEventListener("scroll", update, true);
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update, true);
-      window.removeEventListener("resize", update);
-    };
+    window.addEventListener("scroll", update, true); window.addEventListener("resize", update);
+    return () => { window.removeEventListener("scroll", update, true); window.removeEventListener("resize", update); };
   }, [open, options.length]);
 
   const toggleOption = (option: string) => {
-    if (!active) {
-      onChange([option]);
-      return;
-    }
-    onChange(value.includes(option) ? value.filter((item) => item !== option) : [...value, option]);
+    if (!active) { onChange([option]); return; }
+    onChange(value.includes(option) ? value.filter((i) => i !== option) : [...value, option]);
   };
   const displayValue = active ? value.length === 1 ? (optionLabels?.[value[0]] ?? value[0]) : `${value.length} selected` : "All";
   const dropdown = open ? createPortal(
@@ -1360,31 +1351,53 @@ function MultiSelectFilter({ label, value, options, optionLabels, onChange, show
   );
 }
 
+// ─── Main App ─────────────────────────────────────────────────────────
+
 export default function App() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [error, setError] = useState("");
   const [isParsing, setIsParsing] = useState(false);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
+  const [isAddingMoreCdr, setIsAddingMoreCdr] = useState(false);
   const [savedWorkbook, setSavedWorkbook] = useState<SavedWorkbookMeta | null>(() => getSavedWorkbookMeta());
+  const [masterFleetmap, setMasterFleetmap] = useState<FleetmapState>({ records: [], meta: null, isParsing: false });
+  const [fixedFleetmap, setFixedFleetmap]   = useState<FleetmapState>({ records: [], meta: null, isParsing: false });
   const [page, setPage] = useState(1);
-  const [theme, setTheme] = useState<ThemeName>("se");
+  const [theme, setTheme] = useState<ThemeName>("light");
+  const [activeSection, setActiveSection] = useState(SECTION_NAV_ITEMS[0]?.id ?? "kpi");
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
-    () => new Set(["kpi", "Company", "Performance", "General", "Charts", "users", "records"])
+    () => new Set(["kpi", "regionPerformance", "networkUtilization", "trafficIntensity", "talkgroupEfficiency", "Company", "Performance", "General", "Charts", "users", "records"])
   );
-  const toggleTheme = useCallback(() => setTheme((current) => (current === "se" ? "dark" : "se")), []);
+
+  const toggleTheme = useCallback(() => setTheme((c) => (c === "light" ? "dark" : "light")), []);
   const scrollToSection = useCallback((id: string) => {
+    setActiveSection(id);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
   const toggleSection = useCallback((id: string) => {
-    setCollapsedSections((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setCollapsedSections((c) => { const n = new Set(c); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   }, []);
   const isSectionCollapsed = useCallback((id: string) => collapsedSections.has(id), [collapsedSections]);
+
+  useEffect(() => {
+    const targets = SECTION_NAV_ITEMS
+      .map((item) => document.getElementById(item.id))
+      .filter((el): el is HTMLElement => Boolean(el));
+    if (!targets.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target?.id) setActiveSection(visible.target.id);
+      },
+      { root: null, rootMargin: "-22% 0px -64% 0px", threshold: [0.1, 0.25, 0.5, 0.75] }
+    );
+    targets.forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, [data]);
+
   const kpiTableRef = useRef<HTMLDivElement | null>(null);
   const kpiAverageChartRef = useRef<HTMLElement | null>(null);
   const kpiCallsDurationChartRef = useRef<HTMLElement | null>(null);
@@ -1392,70 +1405,121 @@ export default function App() {
   const kpiTotalAvgChartRef = useRef<HTMLElement | null>(null);
   const monthlyCompanyChartRef = useRef<HTMLElement | null>(null);
 
-  const handleUpload = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
+  // Load saved fleetmaps on mount
+  useEffect(() => {
+    void (async () => {
+      try {
+        const m = await loadFleetmapFromBrowser(SAVED_MASTER_FLEETMAP_KEY);
+        if (m) setMasterFleetmap({ records: m.records, meta: m.meta, isParsing: false });
+      } catch { /* ignore */ }
+      try {
+        const f = await loadFleetmapFromBrowser(SAVED_FIXED_FLEETMAP_KEY);
+        if (f) setFixedFleetmap({ records: f.records, meta: f.meta, isParsing: false });
+      } catch { /* ignore */ }
+    })();
+  }, []);
+
+  const handleUploadMasterFleetmap = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     setError("");
-    setIsParsing(true);
+    setMasterFleetmap((s) => ({ ...s, isParsing: true }));
     try {
-      await new Promise((resolve) => requestAnimationFrame(resolve));
       const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
-      const parsedData = parseWorkbook(workbook, file.name);
-      setData(parsedData);
-      try {
-        await saveWorkbookToBrowser(parsedData);
-        setSavedWorkbook(workbookMeta(parsedData));
-      } catch {
-        setSavedWorkbookMeta(null);
-        setSavedWorkbook(null);
-      }
-      setFilters(EMPTY_FILTERS);
-      setPage(1);
-    } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : "Workbook could not be parsed.");
-    } finally {
-      setIsParsing(false);
-      event.target.value = "";
-    }
+      const records = parseFleetmap(workbook, "master");
+      const meta: FleetmapMeta = { fileName: file.name, loadedAt: new Date().toLocaleString("en-GB") };
+      setMasterFleetmap({ records, meta, isParsing: false });
+      try { await saveFleetmapToBrowser(SAVED_MASTER_FLEETMAP_KEY, records, meta); } catch { /* ignore */ }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Master Fleetmap could not be parsed.");
+      setMasterFleetmap((s) => ({ ...s, isParsing: false }));
+    } finally { event.target.value = ""; }
   }, []);
 
-  const handleLoadSavedWorkbook = useCallback(async () => {
+  const handleUploadFixedFleetmap = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
     setError("");
-    setIsLoadingSaved(true);
+    setFixedFleetmap((s) => ({ ...s, isParsing: true }));
+    try {
+      const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
+      const records = parseFleetmap(workbook, "fixed");
+      const meta: FleetmapMeta = { fileName: file.name, loadedAt: new Date().toLocaleString("en-GB") };
+      setFixedFleetmap({ records, meta, isParsing: false });
+      try { await saveFleetmapToBrowser(SAVED_FIXED_FLEETMAP_KEY, records, meta); } catch { /* ignore */ }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Fixed Fleetmap could not be parsed.");
+      setFixedFleetmap((s) => ({ ...s, isParsing: false }));
+    } finally { event.target.value = ""; }
+  }, []);
+
+  const handleUpload = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    if (files.length === 0) return;
+    setError(""); setIsParsing(true);
+    try {
+      const combinedFleetmap = unionFleetmaps(masterFleetmap.records, fixedFleetmap.records);
+      let merged: DashboardData | null = null;
+      for (const file of files) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
+        const parsed = parseWorkbook(workbook, file.name, combinedFleetmap);
+        merged = merged ? mergeCdrIntoData(merged, parsed) : parsed;
+      }
+      if (!merged) return;
+      if (files.length > 1) merged.fileName = `${files.length} CDR files merged`;
+      setData(merged);
+      try { await saveWorkbookToBrowser(merged); setSavedWorkbook(workbookMeta(merged)); }
+      catch { setSavedWorkbookMeta(null); setSavedWorkbook(null); }
+      setFilters(EMPTY_FILTERS); setPage(1);
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Workbook could not be parsed.");
+    } finally { setIsParsing(false); event.target.value = ""; }
+  }, [masterFleetmap.records, fixedFleetmap.records]);
+
+  const handleAddMoreCdr = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    if (files.length === 0 || !data) return;
+    setError(""); setIsAddingMoreCdr(true);
+    try {
+      const combinedFleetmap = unionFleetmaps(masterFleetmap.records, fixedFleetmap.records);
+      let merged: DashboardData = data;
+      for (const file of files) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
+        const parsed = parseWorkbook(workbook, file.name, combinedFleetmap);
+        merged = mergeCdrIntoData(merged, parsed);
+      }
+      merged.fileName = `${merged.cdrSources.length} CDR files merged`;
+      setData(merged);
+      try { await saveWorkbookToBrowser(merged); setSavedWorkbook(workbookMeta(merged)); } catch { /* ignore */ }
+      setPage(1);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Additional workbook could not be parsed.");
+    } finally { setIsAddingMoreCdr(false); event.target.value = ""; }
+  }, [data, masterFleetmap.records, fixedFleetmap.records]);
+
+  const handleLoadSavedWorkbook = useCallback(async () => {
+    setError(""); setIsLoadingSaved(true);
     try {
       const saved = await loadWorkbookFromBrowser();
-      if (!saved) {
-        setSavedWorkbook(null);
-        setSavedWorkbookMeta(null);
-        setError("No previous workbook was found. Please upload the workbook again.");
-        return;
-      }
-      setData(saved);
-      setSavedWorkbook(workbookMeta(saved));
-      setFilters(EMPTY_FILTERS);
-      setPage(1);
-    } catch {
-      setError("Previous workbook could not be opened. Please upload the workbook again.");
-    } finally {
-      setIsLoadingSaved(false);
-    }
+      if (!saved) { setSavedWorkbook(null); setSavedWorkbookMeta(null); setError("No previous workbook was found. Please upload the workbook again."); return; }
+      setData(saved); setSavedWorkbook(workbookMeta(saved)); setFilters(EMPTY_FILTERS); setPage(1);
+    } catch { setError("Previous workbook could not be opened. Please upload the workbook again."); }
+    finally { setIsLoadingSaved(false); }
   }, []);
 
   const records = data?.records ?? [];
   const talkgroupLabels = useMemo(() => ({ [NUMERIC_TALKGROUP_FILTER]: "Numeric group" }), []);
   const options = useMemo(() => ({
-    region: uniqueOptions(records, (record) => record.region),
-    year: uniqueOptions(records, (record) => record.year).sort((a, b) => Number(a) - Number(b) || a.localeCompare(b)),
-    company: uniqueOptions(records, (record) => record.company),
-    month: uniqueOptions(
-      filters.year.length ? records.filter((record) => filters.year.includes(record.year)) : records,
-      (record) => record.month,
-      true
-    ),
-    baseStation: uniqueOptions(records, (record) => record.baseStation),
+    region: uniqueOptions(records, (r) => r.region),
+    year: uniqueOptions(records, (r) => r.year).sort((a, b) => Number(a) - Number(b) || a.localeCompare(b)),
+    company: uniqueOptions(records, (r) => r.company),
+    month: uniqueOptions(filters.year.length ? records.filter((r) => filters.year.includes(r.year)) : records, (r) => r.month, true),
+    baseStation: uniqueOptions(records, (r) => r.baseStation),
     talkgroup: [
-      ...uniqueOptions(records, (record) => record.talkgroup).filter((talkgroup) => !/^\d+$/.test(talkgroup)),
-      ...(records.some((record) => /^\d+$/.test(record.talkgroup)) ? [NUMERIC_TALKGROUP_FILTER] : []),
+      ...uniqueOptions(records, (r) => r.talkgroup).filter((t) => !/^\d+$/.test(t)),
+      ...(records.some((r) => /^\d+$/.test(r.talkgroup)) ? [NUMERIC_TALKGROUP_FILTER] : []),
     ],
   }), [filters.year, records]);
 
@@ -1476,216 +1540,311 @@ export default function App() {
       return [record.radioId, record.radioAlias, record.employeeName, record.employeeId].join(" ").toLowerCase().includes(search);
     });
   }, [filters, options.month, records]);
+
   const pagedRecords = useMemo(() => filtered.slice((page - 1) * 50, page * 50), [filtered, page]);
   const pageCount = Math.max(1, Math.ceil(filtered.length / 50));
 
   const metrics = useMemo(() => {
     const totalCalls = filtered.length;
-    const totalDuration = filtered.reduce((sum, record) => sum + record.durationSeconds, 0);
-    const trafficHours = filtered.reduce((sum, record) => sum + record.trafficHours, 0);
-    const radios = new Set(filtered.map((record) => record.radioId).filter(isKnownLabel)).size;
-    const companies = new Set(filtered.map((record) => record.company)).size;
-    const regions = new Set(filtered.map((record) => record.region)).size;
-    const talkgroups = new Set(filtered.map((record) => record.talkgroup).filter(isKnownLabel)).size;
-    const stations = new Set(filtered.map((record) => record.baseStation)).size;
+    const totalDuration = filtered.reduce((sum, r) => sum + r.durationSeconds, 0);
+    const trafficHours = filtered.reduce((sum, r) => sum + r.trafficHours, 0);
+    const radios = new Set(filtered.map((r) => r.radioId).filter(isKnownLabel)).size;
+    const companies = new Set(filtered.map((r) => r.company)).size;
+    const regions = new Set(filtered.map((r) => r.region)).size;
+    const talkgroups = new Set(filtered.map((r) => r.talkgroup).filter(isKnownLabel)).size;
+    const stations = new Set(filtered.map((r) => r.baseStation)).size;
     const averageDuration = totalCalls ? totalDuration / totalCalls : 0;
     return { totalCalls, totalDuration, trafficHours, radios, companies, regions, talkgroups, stations, averageDuration };
   }, [filtered]);
 
   const rankings = useMemo(() => ({
-    company: groupBy(filtered, (record) => record.company),
-    station: groupBy(filtered, (record) => record.baseStation),
-    talkgroup: groupBy(filtered, (record) => record.talkgroup),
-    region: groupBy(filtered, (record) => record.region),
-    mobileType: groupBy(filtered, (record) => record.mobileType),
-    radio: groupBy(filtered, (record) => `${record.radioId} - ${record.radioAlias}`),
-    user: groupBy(filtered, (record) => `${record.employeeName} - ${record.employeeId}`),
-    hour: groupBy(filtered, (record) => record.hour).sort((a, b) => a.name.localeCompare(b.name)),
-    month: groupBy(filtered, (record) => record.month).sort((a, b) => monthSortValue(a.name) - monthSortValue(b.name) || a.name.localeCompare(b.name)),
+    company:    groupBy(filtered, (r) => r.company),
+    station:    groupBy(filtered, (r) => r.baseStation),
+    talkgroup:  groupBy(filtered, (r) => r.talkgroup),
+    region:     groupBy(filtered, (r) => r.region),
+    mobileType: groupBy(filtered, (r) => r.mobileType),
+    radio:      groupBy(filtered, (r) => `${r.radioId} - ${r.radioAlias}`),
+    user:       groupBy(filtered, (r) => `${r.employeeName} - ${r.employeeId}`),
+    hour:       groupBy(filtered, (r) => r.hour).sort((a, b) => a.name.localeCompare(b.name)),
+    month:      groupBy(filtered, (r) => r.month).sort((a, b) => monthSortValue(a.name) - monthSortValue(b.name) || a.name.localeCompare(b.name)),
   }), [filtered]);
+
+  const regionPerformanceRows = useMemo(() => {
+    const map = new Map<string, { name: string; calls: number; durationSeconds: number; trafficHours: number; radios: Set<string>; talkgroups: Set<string>; companies: Set<string>; stations: Set<string>; hours: Map<string, number>; companyCalls: Map<string, number> }>();
+    filtered.forEach((record) => {
+      const name = record.region || "Unknown";
+      const current = map.get(name) ?? { name, calls: 0, durationSeconds: 0, trafficHours: 0, radios: new Set<string>(), talkgroups: new Set<string>(), companies: new Set<string>(), stations: new Set<string>(), hours: new Map<string, number>(), companyCalls: new Map<string, number>() };
+      current.calls += 1;
+      current.durationSeconds += record.durationSeconds;
+      current.trafficHours += record.trafficHours;
+      if (isKnownLabel(record.radioId)) current.radios.add(record.radioId);
+      if (isKnownLabel(record.talkgroup)) current.talkgroups.add(record.talkgroup);
+      if (isKnownLabel(record.company)) current.companies.add(record.company);
+      if (isKnownLabel(record.baseStation)) current.stations.add(record.baseStation);
+      current.hours.set(record.hour, (current.hours.get(record.hour) ?? 0) + 1);
+      current.companyCalls.set(record.company, (current.companyCalls.get(record.company) ?? 0) + 1);
+      map.set(name, current);
+    });
+    return [...map.values()].map((row) => ({
+      name: row.name,
+      calls: row.calls,
+      durationSeconds: row.durationSeconds,
+      trafficHours: row.trafficHours,
+      radios: row.radios.size,
+      talkgroups: row.talkgroups.size,
+      companies: row.companies.size,
+      stations: row.stations.size,
+      averageDuration: row.calls ? row.durationSeconds / row.calls : 0,
+      peakHour: [...row.hours.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? "--",
+      topCompany: [...row.companyCalls.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? "--",
+    })).sort((a, b) => b.calls - a.calls || b.durationSeconds - a.durationSeconds);
+  }, [filtered]);
+
+  const fleetActivation = useMemo(() => {
+    const activeRadioIds = new Set(filtered.map((record) => record.radioId).filter(isKnownLabel));
+    const registeredMap = new Map<string, FleetmapRecord>();
+    (data?.fleetmapRecords ?? []).forEach((record) => {
+      if (isKnownLabel(record.radioId) && !registeredMap.has(record.radioId)) registeredMap.set(record.radioId, record);
+    });
+    const registered = [...registeredMap.values()];
+    const activeRegistered = registered.filter((record) => activeRadioIds.has(record.radioId));
+    const inactive = registered.filter((record) => !activeRadioIds.has(record.radioId));
+    const groupInactive = (getName: (record: FleetmapRecord) => string) => {
+      const map = new Map<string, number>();
+      inactive.forEach((record) => {
+        const name = getName(record) || "Unknown";
+        map.set(name, (map.get(name) ?? 0) + 1);
+      });
+      return [...map.entries()].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    };
+    const groupInactiveAllCompanies = () => {
+      const map = new Map<string, number>();
+      registered.forEach((record) => {
+        const name = record.company || "Unknown";
+        if (!map.has(name)) map.set(name, 0);
+      });
+      inactive.forEach((record) => {
+        const name = record.company || "Unknown";
+        map.set(name, (map.get(name) ?? 0) + 1);
+      });
+      return [...map.entries()].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    };
+    return {
+      registeredCount: registered.length,
+      activeRegisteredCount: activeRegistered.length,
+      inactiveCount: inactive.length,
+      activationRate: registered.length ? (activeRegistered.length / registered.length) * 100 : 0,
+      inactiveByCompany: groupInactiveAllCompanies(),
+      inactiveByRegion: groupInactive((record) => record.region),
+      inactiveByMobileType: groupInactive((record) => record.mobileType),
+    };
+  }, [data?.fleetmapRecords, filtered]);
+
+  const trafficIntensity = useMemo(() => {
+    const busyTrafficHour = [...rankings.hour].sort((a, b) => b.trafficHours - a.trafficHours || b.calls - a.calls)[0];
+    return {
+      trafficPerRadio: metrics.radios ? metrics.trafficHours / metrics.radios : 0,
+      trafficPerTalkgroup: metrics.talkgroups ? metrics.trafficHours / metrics.talkgroups : 0,
+      trafficPerCompany: metrics.companies ? metrics.trafficHours / metrics.companies : 0,
+      trafficPerRegion: metrics.regions ? metrics.trafficHours / metrics.regions : 0,
+      busyTrafficHour,
+    };
+  }, [metrics, rankings.hour]);
+
+  const heatmapHours = useMemo(() => uniqueOptions(filtered, (record) => record.hour).sort((a, b) => a.localeCompare(b)), [filtered]);
+
+  const regionHourHeatmap = useMemo(() => {
+    const topRegions = regionPerformanceRows.slice(0, 8).map((row) => row.name);
+    return topRegions.map((region) => {
+      const cells = heatmapHours.map((hour) => filtered.filter((record) => record.region === region && record.hour === hour).length);
+      return { region, cells, total: cells.reduce((sum, value) => sum + value, 0) };
+    });
+  }, [filtered, heatmapHours, regionPerformanceRows]);
+
+  const heatmapMax = useMemo(() => Math.max(1, ...regionHourHeatmap.flatMap((row) => row.cells)), [regionHourHeatmap]);
+
+  const talkgroupEfficiencyRows = useMemo(() => {
+    const map = new Map<string, { name: string; calls: number; durationSeconds: number; trafficHours: number; radios: Set<string>; users: Set<string>; regions: Map<string, number>; companies: Map<string, number>; hours: Map<string, number> }>();
+    filtered.forEach((record) => {
+      const name = record.talkgroup || "Unknown";
+      const current = map.get(name) ?? { name, calls: 0, durationSeconds: 0, trafficHours: 0, radios: new Set<string>(), users: new Set<string>(), regions: new Map<string, number>(), companies: new Map<string, number>(), hours: new Map<string, number>() };
+      current.calls += 1;
+      current.durationSeconds += record.durationSeconds;
+      current.trafficHours += record.trafficHours;
+      if (isKnownLabel(record.radioId)) current.radios.add(record.radioId);
+      if (isKnownLabel(record.employeeName) || isKnownLabel(record.employeeId)) current.users.add(`${record.employeeName} - ${record.employeeId}`);
+      current.regions.set(record.region, (current.regions.get(record.region) ?? 0) + 1);
+      current.companies.set(record.company, (current.companies.get(record.company) ?? 0) + 1);
+      current.hours.set(record.hour, (current.hours.get(record.hour) ?? 0) + 1);
+      map.set(name, current);
+    });
+    const topEntry = (input: Map<string, number>) => [...input.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? "--";
+    return [...map.values()].map((row) => ({
+      name: row.name,
+      calls: row.calls,
+      durationSeconds: row.durationSeconds,
+      trafficHours: row.trafficHours,
+      radios: row.radios.size,
+      users: row.users.size,
+      averageDuration: row.calls ? row.durationSeconds / row.calls : 0,
+      peakHour: topEntry(row.hours),
+      peakRegion: topEntry(row.regions),
+      peakCompany: topEntry(row.companies),
+    })).sort((a, b) => b.trafficHours - a.trafficHours || b.calls - a.calls).slice(0, 20);
+  }, [filtered]);
+
+  const userBehaviorRows = useMemo(() => {
+    const map = new Map<string, { name: string; calls: number; durationSeconds: number; radios: Set<string>; talkgroups: Set<string>; regions: Set<string>; companies: Set<string> }>();
+    filtered.forEach((record) => {
+      const name = `${record.employeeName} - ${record.employeeId}`;
+      const current = map.get(name) ?? { name, calls: 0, durationSeconds: 0, radios: new Set<string>(), talkgroups: new Set<string>(), regions: new Set<string>(), companies: new Set<string>() };
+      current.calls += 1;
+      current.durationSeconds += record.durationSeconds;
+      if (isKnownLabel(record.radioId)) current.radios.add(record.radioId);
+      if (isKnownLabel(record.talkgroup)) current.talkgroups.add(record.talkgroup);
+      if (isKnownLabel(record.region)) current.regions.add(record.region);
+      if (isKnownLabel(record.company)) current.companies.add(record.company);
+      map.set(name, current);
+    });
+    return [...map.values()].map((row) => ({ ...row, radios: row.radios.size, talkgroups: row.talkgroups.size, regions: row.regions.size, companies: row.companies.size, averageDuration: row.calls ? row.durationSeconds / row.calls : 0 })).sort((a, b) => b.calls - a.calls || b.durationSeconds - a.durationSeconds).slice(0, 15);
+  }, [filtered]);
+
+  const radioBehaviorRows = useMemo(() => {
+    const map = new Map<string, { radioId: string; alias: string; company: string; calls: number; durationSeconds: number; talkgroups: Set<string>; stations: Set<string>; users: Set<string>; regions: Set<string> }>();
+    filtered.forEach((record) => {
+      const key = record.radioId;
+      const current = map.get(key) ?? { radioId: record.radioId, alias: record.radioAlias, company: record.company, calls: 0, durationSeconds: 0, talkgroups: new Set<string>(), stations: new Set<string>(), users: new Set<string>(), regions: new Set<string>() };
+      current.calls += 1;
+      current.durationSeconds += record.durationSeconds;
+      if (isKnownLabel(record.talkgroup)) current.talkgroups.add(record.talkgroup);
+      if (isKnownLabel(record.baseStation)) current.stations.add(record.baseStation);
+      if (isKnownLabel(record.employeeName) || isKnownLabel(record.employeeId)) current.users.add(`${record.employeeName} - ${record.employeeId}`);
+      if (isKnownLabel(record.region)) current.regions.add(record.region);
+      map.set(key, current);
+    });
+    return [...map.values()].map((row) => ({ ...row, talkgroups: row.talkgroups.size, stations: row.stations.size, users: row.users.size, regions: row.regions.size, averageDuration: row.calls ? row.durationSeconds / row.calls : 0 })).sort((a, b) => b.calls - a.calls || b.durationSeconds - a.durationSeconds).slice(0, 15);
+  }, [filtered]);
 
   const topRadioUsers = useMemo(() => {
     const map = new Map<string, { radioId: string; radioAlias: string; employeeName: string; company: string; calls: number; durationSeconds: number }>();
-    filtered.forEach((record) => {
-      const key = `${record.radioId}||${record.radioAlias}||${record.employeeName}||${record.company}`;
-      const current = map.get(key) ?? {
-        radioId: record.radioId,
-        radioAlias: record.radioAlias,
-        employeeName: record.employeeName,
-        company: record.company,
-        calls: 0,
-        durationSeconds: 0,
-      };
-      current.calls += 1;
-      current.durationSeconds += record.durationSeconds;
-      map.set(key, current);
+    filtered.forEach((r) => {
+      const key = `${r.radioId}||${r.radioAlias}||${r.employeeName}||${r.company}`;
+      const cur = map.get(key) ?? { radioId: r.radioId, radioAlias: r.radioAlias, employeeName: r.employeeName, company: r.company, calls: 0, durationSeconds: 0 };
+      cur.calls += 1; cur.durationSeconds += r.durationSeconds;
+      map.set(key, cur);
     });
-    return [...map.values()]
-      .sort((a, b) => b.calls - a.calls || b.durationSeconds - a.durationSeconds || a.radioId.localeCompare(b.radioId))
-      .slice(0, 10);
+    return [...map.values()].sort((a, b) => b.calls - a.calls || b.durationSeconds - a.durationSeconds || a.radioId.localeCompare(b.radioId)).slice(0, 10);
   }, [filtered]);
 
   const radioMonths = useMemo(() => {
     const rows = [...rankings.month].sort((a, b) => monthSortValue(a.name) - monthSortValue(b.name) || a.name.localeCompare(b.name));
-    const total = rows.reduce((sum, row) => sum + row.radios, 0);
-    return rows.map((row) => ({ ...row, share: total ? (row.radios / total) * 100 : 0 }));
+    const total = rows.reduce((sum, r) => sum + r.radios, 0);
+    return rows.map((r) => ({ ...r, share: total ? (r.radios / total) * 100 : 0 }));
   }, [rankings.month]);
 
   const mobileTypes = useMemo(() => {
-    return uniqueOptions(filtered, (record) => record.mobileType)
-      .filter((type) => type !== "Unknown" && type !== "Not Found")
-      .sort((a, b) => {
-        const ai = MOBILE_TYPE_LABELS.indexOf(a);
-        const bi = MOBILE_TYPE_LABELS.indexOf(b);
-        return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi) || a.localeCompare(b);
-      });
+    return uniqueOptions(filtered, (r) => r.mobileType)
+      .filter((t) => t !== "Unknown" && t !== "Not Found")
+      .sort((a, b) => { const ai = MOBILE_TYPE_LABELS.indexOf(a); const bi = MOBILE_TYPE_LABELS.indexOf(b); return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi) || a.localeCompare(b); });
   }, [filtered]);
 
   const mobileTypeByCompany = useMemo(() => {
     const map = new Map<string, { name: string; total: Set<string>; byType: Map<string, Set<string>> }>();
-    filtered.forEach((record) => {
-      if (record.company === "Unknown" || record.company === "Not Found" || record.radioId === "Unknown") return;
-      const current = map.get(record.company) ?? { name: record.company, total: new Set<string>(), byType: new Map<string, Set<string>>() };
-      current.total.add(record.radioId);
-      if (record.mobileType !== "Unknown" && record.mobileType !== "Not Found") {
-        const typeSet = current.byType.get(record.mobileType) ?? new Set<string>();
-        typeSet.add(record.radioId);
-        current.byType.set(record.mobileType, typeSet);
+    filtered.forEach((r) => {
+      if (r.company === "Unknown" || r.company === "Not Found" || r.radioId === "Unknown") return;
+      const cur = map.get(r.company) ?? { name: r.company, total: new Set<string>(), byType: new Map<string, Set<string>>() };
+      cur.total.add(r.radioId);
+      if (r.mobileType !== "Unknown" && r.mobileType !== "Not Found") {
+        const ts = cur.byType.get(r.mobileType) ?? new Set<string>();
+        ts.add(r.radioId); cur.byType.set(r.mobileType, ts);
       }
-      map.set(record.company, current);
+      map.set(r.company, cur);
     });
-    return [...map.values()]
-      .map((row) => {
-        const next: Record<string, string | number> = { name: row.name, total: row.total.size };
-        mobileTypes.forEach((type) => {
-          next[mobileTypeKey(type)] = row.byType.get(type)?.size ?? 0;
-        });
-        return next;
-      })
-      .filter((row) => Number(row.total) > 0)
-      .sort((a, b) => `${a.name}`.localeCompare(`${b.name}`));
+    return [...map.values()].map((row) => {
+      const next: Record<string, string | number> = { name: row.name, total: row.total.size };
+      mobileTypes.forEach((type) => { next[mobileTypeKey(type)] = row.byType.get(type)?.size ?? 0; });
+      return next;
+    }).filter((r) => Number(r.total) > 0).sort((a, b) => `${a.name}`.localeCompare(`${b.name}`));
   }, [filtered, mobileTypes]);
 
   const mobileTypeByMonth = useMemo(() => {
     const map = new Map<string, { name: string; total: Set<string>; byType: Map<string, Set<string>> }>();
-    filtered.forEach((record) => {
-      if (record.month === "Unknown" || record.radioId === "Unknown") return;
-      const current = map.get(record.month) ?? { name: record.month, total: new Set<string>(), byType: new Map<string, Set<string>>() };
-      current.total.add(record.radioId);
-      if (record.mobileType !== "Unknown" && record.mobileType !== "Not Found") {
-        const typeSet = current.byType.get(record.mobileType) ?? new Set<string>();
-        typeSet.add(record.radioId);
-        current.byType.set(record.mobileType, typeSet);
+    filtered.forEach((r) => {
+      if (r.month === "Unknown" || r.radioId === "Unknown") return;
+      const cur = map.get(r.month) ?? { name: r.month, total: new Set<string>(), byType: new Map<string, Set<string>>() };
+      cur.total.add(r.radioId);
+      if (r.mobileType !== "Unknown" && r.mobileType !== "Not Found") {
+        const ts = cur.byType.get(r.mobileType) ?? new Set<string>();
+        ts.add(r.radioId); cur.byType.set(r.mobileType, ts);
       }
-      map.set(record.month, current);
+      map.set(r.month, cur);
     });
-    return [...map.values()]
-      .map((row) => {
-        const next: Record<string, string | number> = { name: row.name, total: row.total.size };
-        mobileTypes.forEach((type) => {
-          next[mobileTypeKey(type)] = row.byType.get(type)?.size ?? 0;
-        });
-        return next;
-      })
-      .filter((row) => Number(row.total) > 0)
-      .sort((a, b) => monthSortValue(`${a.name}`) - monthSortValue(`${b.name}`) || `${a.name}`.localeCompare(`${b.name}`));
+    return [...map.values()].map((row) => {
+      const next: Record<string, string | number> = { name: row.name, total: row.total.size };
+      mobileTypes.forEach((type) => { next[mobileTypeKey(type)] = row.byType.get(type)?.size ?? 0; });
+      return next;
+    }).filter((r) => Number(r.total) > 0).sort((a, b) => monthSortValue(`${a.name}`) - monthSortValue(`${b.name}`) || `${a.name}`.localeCompare(`${b.name}`));
   }, [filtered, mobileTypes]);
 
   const kpiRows = useMemo(() => {
     const map = new Map<string, { calls: number; durationSeconds: number; talkgroups: Set<string>; radios: Set<string> }>();
-    const lookupCompanies = new Set((data?.lookupRecords ?? []).map((record) => record.company));
+    const lookupCompanies = new Set((data?.lookupRecords ?? []).map((r) => r.company));
     const lookupCompanyCounts = new Map<string, number>();
     (data?.lookupRecords ?? [])
-      .filter((record) => filters.region.length === 0 || filters.region.includes(record.region))
-      .forEach((record) => lookupCompanyCounts.set(record.company, (lookupCompanyCounts.get(record.company) ?? 0) + 1));
-    const unlistedCompanyUserCount = filtered.filter((record) => !lookupCompanies.has(record.company)).length;
-
-    filtered.forEach((record) => {
-      const current = map.get(record.company) ?? { calls: 0, durationSeconds: 0, talkgroups: new Set<string>(), radios: new Set<string>() };
-      current.calls += 1;
-      current.durationSeconds += record.durationSeconds;
-      if (record.talkgroup !== "Unknown") current.talkgroups.add(record.talkgroup);
-      if (record.radioId !== "Unknown") current.radios.add(record.radioId);
-      map.set(record.company, current);
+      .filter((r) => filters.region.length === 0 || filters.region.includes(r.region))
+      .forEach((r) => lookupCompanyCounts.set(r.company, (lookupCompanyCounts.get(r.company) ?? 0) + 1));
+    const unlistedCount = filtered.filter((r) => !lookupCompanies.has(r.company)).length;
+    filtered.forEach((r) => {
+      const cur = map.get(r.company) ?? { calls: 0, durationSeconds: 0, talkgroups: new Set<string>(), radios: new Set<string>() };
+      cur.calls += 1; cur.durationSeconds += r.durationSeconds;
+      if (r.talkgroup !== "Unknown") cur.talkgroups.add(r.talkgroup);
+      if (r.radioId !== "Unknown") cur.radios.add(r.radioId);
+      map.set(r.company, cur);
     });
     return Array.from(map.entries())
       .filter(([company]) => company !== "Unknown" && company !== "Not Found")
       .map(([company, value]) => {
-        const lookupActivated = lookupCompanyCounts.get(company) ?? (lookupCompanies.has(company) ? 0 : unlistedCompanyUserCount);
-        return {
-          company,
-          talkgroupsInUse: value.talkgroups.size,
-          calls: value.calls,
-          durationSeconds: value.durationSeconds,
-          usersActivated: lookupActivated || value.radios.size,
-          callingUsers: value.radios.size,
-          kpiAvgDurationPerUser: 0,
-        };
+        const lookupActivated = lookupCompanyCounts.get(company) ?? (lookupCompanies.has(company) ? 0 : unlistedCount);
+        return { company, talkgroupsInUse: value.talkgroups.size, calls: value.calls, durationSeconds: value.durationSeconds, usersActivated: lookupActivated || value.radios.size, callingUsers: value.radios.size, kpiAvgDurationPerUser: 0 };
       })
-      .map((row) => ({
-        ...row,
-        kpiAvgDurationPerUser: row.usersActivated ? row.durationSeconds / row.usersActivated : 0,
-      }))
+      .map((row) => ({ ...row, kpiAvgDurationPerUser: row.usersActivated ? row.durationSeconds / row.usersActivated : 0 }))
       .sort((a, b) => a.company.localeCompare(b.company));
   }, [data?.lookupRecords, filtered, filters.region]);
 
   const kpiAverage = useMemo(() => {
-    const values = kpiRows.map((row) => row.kpiAvgDurationPerUser).filter((value) => value > 0);
-    return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+    const values = kpiRows.map((r) => r.kpiAvgDurationPerUser).filter((v) => v > 0);
+    return values.length ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
   }, [kpiRows]);
 
   const monthlyKpi = useMemo(() => {
-    const companies = uniqueOptions(filtered, (record) => record.company)
-      .filter((company) => company !== "Unknown" && company !== "Not Found")
-      .sort((a, b) => a.localeCompare(b));
-    const months = uniqueOptions(filtered, (record) => record.month, true)
-      .sort((a, b) => monthSortValue(a) - monthSortValue(b) || a.localeCompare(b));
+    const companies = uniqueOptions(filtered, (r) => r.company).filter((c) => c !== "Unknown" && c !== "Not Found").sort((a, b) => a.localeCompare(b));
+    const months = uniqueOptions(filtered, (r) => r.month, true).sort((a, b) => monthSortValue(a) - monthSortValue(b) || a.localeCompare(b));
     const stats = new Map<string, { calls: number; durationSeconds: number }>();
-
-    filtered.forEach((record) => {
-      if (record.company === "Unknown" || record.company === "Not Found") return;
-      const key = `${record.company}||${record.month}`;
-      const current = stats.get(key) ?? { calls: 0, durationSeconds: 0 };
-      current.calls += 1;
-      current.durationSeconds += record.durationSeconds;
-      stats.set(key, current);
+    filtered.forEach((r) => {
+      if (r.company === "Unknown" || r.company === "Not Found") return;
+      const key = `${r.company}||${r.month}`;
+      const cur = stats.get(key) ?? { calls: 0, durationSeconds: 0 };
+      cur.calls += 1; cur.durationSeconds += r.durationSeconds; stats.set(key, cur);
     });
-
     const rows = companies.map((company) => {
       const row: Record<string, string | number | null> = { company };
-      months.forEach((month) => {
-        const current = stats.get(`${company}||${month}`);
-        row[dataKey(month)] = current?.calls ? current.durationSeconds / current.calls : null;
-      });
+      months.forEach((month) => { const cur = stats.get(`${company}||${month}`); row[dataKey(month)] = cur?.calls ? cur.durationSeconds / cur.calls : null; });
       return row;
     });
-
-    return {
-      rows,
-      months: months.map((month, index) => ({ name: month, key: dataKey(month), color: COLORS[index % COLORS.length] })),
-    };
+    return { rows, months: months.map((month, i) => ({ name: month, key: dataKey(month), color: COLORS[i % COLORS.length] })) };
   }, [filtered]);
 
   const monthlyKpiPieData = useMemo(() => {
     return [...rankings.month]
       .sort((a, b) => monthSortValue(a.name) - monthSortValue(b.name) || a.name.localeCompare(b.name))
-      .filter((row) => row.calls > 0 && row.durationSeconds > 0)
-      .map((row) => ({
-        name: shortMonthLabel(row.name),
-        value: row.durationSeconds / row.calls,
-      }));
+      .filter((r) => r.calls > 0 && r.durationSeconds > 0)
+      .map((r) => ({ name: shortMonthLabel(r.name), value: r.durationSeconds / r.calls }));
   }, [rankings.month]);
 
   const CompanyPeriodLabel = useMemo(() => {
     const years = [...filters.year].sort((a, b) => Number(a) - Number(b) || a.localeCompare(b));
-    const months = [...filters.month]
-      .sort((a, b) => monthSortValue(a) - monthSortValue(b) || a.localeCompare(b))
-      .map(shortMonthLabel);
-    if (months.length) {
-      const monthText = months.join(", ");
-      const monthTextHasYear = months.some((month) => /(19|20)\d{2}/.test(month));
-      return !monthTextHasYear && years.length ? `${monthText} ${years.join(", ")}` : monthText;
-    }
+    const months = [...filters.month].sort((a, b) => monthSortValue(a) - monthSortValue(b) || a.localeCompare(b)).map(shortMonthLabel);
+    if (months.length) { const t = months.join(", "); const hasYear = months.some((m) => /(19|20)\d{2}/.test(m)); return !hasYear && years.length ? `${t} ${years.join(", ")}` : t; }
     if (years.length) return years.join(", ");
     return "selected period";
   }, [filters.month, filters.year]);
@@ -1699,31 +1858,11 @@ export default function App() {
     { title: "KPI Total Avg. Duration", ref: kpiTotalAvgChartRef },
   ], []);
 
-  const kpiTableHeaders = [
-    "Call Source",
-    "Talk groups in use",
-    "No. of Calls",
-    "Duration (Sec)",
-    "Duration (hh:mm:ss)",
-    "Total No. of Users activated",
-    "Call Performed by (No. of Users)",
-    "KPI (Avg. Duration per User per Company) in sec",
-    "KPI",
-  ];
+  const kpiTableHeaders = ["Call Source","Talk groups in use","No. of Calls","Duration (Sec)","Duration (hh:mm:ss)","Total No. of Users activated","Call Performed by (No. of Users)","KPI (Avg. Duration per User per Company) in sec","KPI"];
 
   const kpiExportTableRows = useMemo(() => [
     kpiTableHeaders,
-    ...kpiRows.map((row, index) => [
-      row.company,
-      formatNumber(row.talkgroupsInUse),
-      formatNumber(row.calls),
-      formatNumber(row.durationSeconds),
-      secondsToClock(row.durationSeconds),
-      formatNumber(row.usersActivated),
-      formatNumber(row.callingUsers),
-      formatNumber(row.kpiAvgDurationPerUser),
-      index === 0 ? formatNumber(kpiAverage) : "",
-    ]),
+    ...kpiRows.map((row, i) => [row.company, formatNumber(row.talkgroupsInUse), formatNumber(row.calls), formatNumber(row.durationSeconds), secondsToClock(row.durationSeconds), formatNumber(row.usersActivated), formatNumber(row.callingUsers), formatNumber(row.kpiAvgDurationPerUser), i === 0 ? formatNumber(kpiAverage) : ""]),
   ], [kpiAverage, kpiRows]);
 
   const captureKpiChartImages = useCallback(async () => {
@@ -1739,127 +1878,30 @@ export default function App() {
     void (async () => {
       const workbook = new ExcelJS.Workbook();
       workbook.creator = "CDR Dashboard";
-      const worksheet = workbook.addWorksheet("KPI Table", { views: [{ showGridLines: false }] });
+      const worksheet = workbook.addWorksheet("KPI Measurements", { views: [{ showGridLines: false }] });
       const border = { top: { style: "thin" as const }, left: { style: "thin" as const }, bottom: { style: "thin" as const }, right: { style: "thin" as const } };
       const headerFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFFFF00" } };
-
-      worksheet.addRow([exportTitle("KPI Table")]);
+      worksheet.addRow([exportTitle("KPI Measurements")]);
       worksheet.mergeCells(1, 1, 1, kpiTableHeaders.length);
       worksheet.addRow(kpiTableHeaders);
-      kpiRows.forEach((row, index) => worksheet.addRow([
-        row.company,
-        row.talkgroupsInUse,
-        row.calls,
-        row.durationSeconds,
-        secondsToClock(row.durationSeconds),
-        row.usersActivated,
-        row.callingUsers,
-        row.kpiAvgDurationPerUser,
-        index === 0 ? kpiAverage : "",
-      ]));
-      worksheet.eachRow((row, rowNumber) => {
-        row.height = rowNumber <= 2 ? 28 : 22;
-        row.eachCell((cell) => {
-          cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-          cell.border = border;
-          if (rowNumber <= 2) {
-            cell.font = { bold: true, color: { argb: "FF000000" } };
-            cell.fill = headerFill;
-          }
-        });
-      });
-      worksheet.columns = kpiTableHeaders.map((header, index) => ({
-        width: Math.min(34, Math.max(14, header.length / 1.7, ...kpiRows.map((row) => {
-          const values = [
-            row.company,
-            row.talkgroupsInUse,
-            row.calls,
-            row.durationSeconds,
-            secondsToClock(row.durationSeconds),
-            row.usersActivated,
-            row.callingUsers,
-            row.kpiAvgDurationPerUser,
-            kpiAverage,
-          ];
-          return `${values[index] ?? ""}`.length + 2;
-        }))),
-      }));
-
-      const styleDataSheet = (sheet: ExcelJS.Worksheet) => {
-        sheet.getRow(1).font = { bold: true };
-        sheet.getRow(1).fill = headerFill;
-        sheet.eachRow((row) => row.eachCell((cell) => {
-          cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-          cell.border = border;
-        }));
-      };
-
+      kpiRows.forEach((row, i) => worksheet.addRow([row.company, row.talkgroupsInUse, row.calls, row.durationSeconds, secondsToClock(row.durationSeconds), row.usersActivated, row.callingUsers, row.kpiAvgDurationPerUser, i === 0 ? kpiAverage : ""]));
+      worksheet.eachRow((row, rn) => { row.height = rn <= 2 ? 28 : 22; row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true }; cell.border = border; if (rn <= 2) { cell.font = { bold: true, color: { argb: "FF000000" } }; cell.fill = headerFill; } }); });
+      worksheet.columns = kpiTableHeaders.map((h, i) => ({ width: Math.min(34, Math.max(14, h.length / 1.7, ...kpiRows.map((r) => `${[r.company, r.talkgroupsInUse, r.calls, r.durationSeconds, secondsToClock(r.durationSeconds), r.usersActivated, r.callingUsers, r.kpiAvgDurationPerUser, kpiAverage][i] ?? ""}`.length + 2))) }));
+      const styleDataSheet = (sheet: ExcelJS.Worksheet) => { sheet.getRow(1).font = { bold: true }; sheet.getRow(1).fill = headerFill; sheet.eachRow((row) => row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true }; cell.border = border; })); };
       const avgSheet = workbook.addWorksheet("KPI Avg Duration", { views: [{ showGridLines: false }] });
-      avgSheet.addRow(["Company", "KPI Avg Duration"]);
-      kpiRows.forEach((row) => avgSheet.addRow([row.company, row.kpiAvgDurationPerUser]));
-      avgSheet.columns = [{ width: 28 }, { width: 18 }];
-      styleDataSheet(avgSheet);
-
+      avgSheet.addRow(["Company", "KPI Avg Duration"]); kpiRows.forEach((r) => avgSheet.addRow([r.company, r.kpiAvgDurationPerUser])); avgSheet.columns = [{ width: 28 }, { width: 18 }]; styleDataSheet(avgSheet);
       const callsSheet = workbook.addWorksheet("KPI Calls Duration", { views: [{ showGridLines: false }] });
-      callsSheet.addRow(["Company", "Calls", "Duration Seconds"]);
-      kpiRows.forEach((row) => callsSheet.addRow([row.company, row.calls, row.durationSeconds]));
-      callsSheet.columns = [{ width: 28 }, { width: 14 }, { width: 18 }];
-      styleDataSheet(callsSheet);
-
+      callsSheet.addRow(["Company", "Calls", "Duration Seconds"]); kpiRows.forEach((r) => callsSheet.addRow([r.company, r.calls, r.durationSeconds])); callsSheet.columns = [{ width: 28 }, { width: 14 }, { width: 18 }]; styleDataSheet(callsSheet);
       const monthlySheet = workbook.addWorksheet("Monthly KPI", { views: [{ showGridLines: false }] });
-      monthlySheet.addRow(["Company", ...monthlyKpi.months.map((month) => shortMonthLabel(month.name))]);
-      monthlyKpi.rows.forEach((row) => monthlySheet.addRow([row.company, ...monthlyKpi.months.map((month) => row[month.key] ?? "")]));
-      monthlySheet.columns = [{ width: 28 }, ...monthlyKpi.months.map(() => ({ width: 14 }))];
-      styleDataSheet(monthlySheet);
-
+      monthlySheet.addRow(["Company", ...monthlyKpi.months.map((m) => shortMonthLabel(m.name))]); monthlyKpi.rows.forEach((r) => monthlySheet.addRow([r.company, ...monthlyKpi.months.map((m) => r[m.key] ?? "")])); monthlySheet.columns = [{ width: 28 }, ...monthlyKpi.months.map(() => ({ width: 14 }))]; styleDataSheet(monthlySheet);
       const totalAvgSheet = workbook.addWorksheet("KPI Total Avg", { views: [{ showGridLines: false }] });
-      totalAvgSheet.addRow(["Month Year", "KPI Total Avg Duration"]);
-      monthlyKpiPieData.forEach((row) => totalAvgSheet.addRow([row.name, row.value]));
-      totalAvgSheet.columns = [{ width: 18 }, { width: 22 }];
-      styleDataSheet(totalAvgSheet);
-
+      totalAvgSheet.addRow(["Month Year", "KPI Total Avg Duration"]); monthlyKpiPieData.forEach((r) => totalAvgSheet.addRow([r.name, r.value])); totalAvgSheet.columns = [{ width: 18 }, { width: 22 }]; styleDataSheet(totalAvgSheet);
       const chartConfigs: NativeChartConfig[] = [
-        {
-          sheetIndex: 2,
-          chartIndex: 1,
-          title: exportTitle("KPI Average Duration per Company"),
-          type: "bar",
-          categoriesRef: excelRange("KPI Avg Duration", 1, 2, Math.max(2, kpiRows.length + 1)),
-          series: [{ name: "Average duration per activated user", valuesRef: excelRange("KPI Avg Duration", 2, 2, Math.max(2, kpiRows.length + 1)), color: "37A6D9" }],
-        },
-        {
-          sheetIndex: 3,
-          chartIndex: 2,
-          title: exportTitle("KPI Calls and Duration per Company"),
-          type: "line",
-          categoriesRef: excelRange("KPI Calls Duration", 1, 2, Math.max(2, kpiRows.length + 1)),
-          series: [
-            { name: "Calls", valuesRef: excelRange("KPI Calls Duration", 2, 2, Math.max(2, kpiRows.length + 1)), color: "65C18C" },
-            { name: "Duration seconds", valuesRef: excelRange("KPI Calls Duration", 3, 2, Math.max(2, kpiRows.length + 1)), color: "F0B84F" },
-          ],
-        },
-        {
-          sheetIndex: 4,
-          chartIndex: 3,
-          title: exportTitle("Monthly KPI"),
-          type: "line",
-          categoriesRef: excelRange("Monthly KPI", 1, 2, Math.max(2, monthlyKpi.rows.length + 1)),
-          series: monthlyKpi.months.map((month, index) => ({
-            name: shortMonthLabel(month.name),
-            valuesRef: excelRange("Monthly KPI", index + 2, 2, Math.max(2, monthlyKpi.rows.length + 1)),
-            color: month.color.replace("#", "").toUpperCase(),
-          })),
-        },
-        {
-          sheetIndex: 5,
-          chartIndex: 4,
-          title: exportTitle("KPI Total Avg. Duration"),
-          type: "doughnut",
-          categoriesRef: excelRange("KPI Total Avg", 1, 2, Math.max(2, monthlyKpiPieData.length + 1)),
-          series: [{ name: "KPI Total Avg. Duration", valuesRef: excelRange("KPI Total Avg", 2, 2, Math.max(2, monthlyKpiPieData.length + 1)), color: "37A6D9" }],
-        },
+        { sheetIndex: 2, chartIndex: 1, title: exportTitle("KPI Average Duration per Company"), type: "bar", categoriesRef: excelRange("KPI Avg Duration", 1, 2, Math.max(2, kpiRows.length + 1)), series: [{ name: "Average duration per activated user", valuesRef: excelRange("KPI Avg Duration", 2, 2, Math.max(2, kpiRows.length + 1)), color: "37A6D9" }] },
+        { sheetIndex: 3, chartIndex: 2, title: exportTitle("KPI Calls and Duration per Company"), type: "line", categoriesRef: excelRange("KPI Calls Duration", 1, 2, Math.max(2, kpiRows.length + 1)), series: [{ name: "Calls", valuesRef: excelRange("KPI Calls Duration", 2, 2, Math.max(2, kpiRows.length + 1)), color: "65C18C" }, { name: "Duration seconds", valuesRef: excelRange("KPI Calls Duration", 3, 2, Math.max(2, kpiRows.length + 1)), color: "F0B84F" }] },
+        { sheetIndex: 4, chartIndex: 3, title: exportTitle("Monthly KPI"), type: "line", categoriesRef: excelRange("Monthly KPI", 1, 2, Math.max(2, monthlyKpi.rows.length + 1)), series: monthlyKpi.months.map((m, i) => ({ name: shortMonthLabel(m.name), valuesRef: excelRange("Monthly KPI", i + 2, 2, Math.max(2, monthlyKpi.rows.length + 1)), color: m.color.replace("#", "").toUpperCase() })) },
+        { sheetIndex: 5, chartIndex: 4, title: exportTitle("KPI Total Avg. Duration"), type: "doughnut", categoriesRef: excelRange("KPI Total Avg", 1, 2, Math.max(2, monthlyKpiPieData.length + 1)), series: [{ name: "KPI Total Avg. Duration", valuesRef: excelRange("KPI Total Avg", 2, 2, Math.max(2, monthlyKpiPieData.length + 1)), color: "37A6D9" }] },
       ];
-
       const buffer = await workbook.xlsx.writeBuffer();
       const patched = await patchWorkbookWithNativeCharts(buffer, chartConfigs);
       downloadBlob("kpi-table-and-charts.xlsx", patched);
@@ -1876,23 +1918,19 @@ export default function App() {
       const drawKpiTable = () => {
         const colWeights = [1.45, 0.9, 0.8, 0.95, 1.1, 1.15, 1.15, 1.45, 0.65];
         const tableWidth = pageWidth - margin * 2;
-        const totalWeight = colWeights.reduce((sum, item) => sum + item, 0);
-        const colWidths = colWeights.map((weight) => tableWidth * weight / totalWeight);
+        const totalWeight = colWeights.reduce((s, w) => s + w, 0);
+        const colWidths = colWeights.map((w) => tableWidth * w / totalWeight);
         const rowHeight = Math.min(30, (pageHeight - 76) / Math.max(1, kpiExportTableRows.length));
         let y = 52;
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(16);
-        pdf.text(exportTitle("KPI Table"), pageWidth / 2, 28, { align: "center" });
-        kpiExportTableRows.forEach((row, rowIndex) => {
+        pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
+        pdf.text(exportTitle("KPI Measurements"), pageWidth / 2, 28, { align: "center" });
+        kpiExportTableRows.forEach((row, ri) => {
           let x = margin;
-          row.forEach((cell, colIndex) => {
-            const width = colWidths[colIndex];
-            pdf.setDrawColor(20, 36, 48);
-            pdf.setFillColor(rowIndex === 0 ? "#fff200" : "#ffffff");
+          row.forEach((cell, ci) => {
+            const width = colWidths[ci];
+            pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff");
             pdf.rect(x, y, width, rowHeight, "FD");
-            pdf.setFont("helvetica", rowIndex === 0 ? "bold" : "normal");
-            pdf.setFontSize(rowIndex === 0 ? 6.5 : 7);
-            pdf.setTextColor(0, 0, 0);
+            pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 6.5 : 7); pdf.setTextColor(0, 0, 0);
             pdf.text(String(cell), x + width / 2, y + rowHeight / 2 + 2.5, { align: "center", maxWidth: width - 4 });
             x += width;
           });
@@ -1901,16 +1939,12 @@ export default function App() {
       };
       const addImagePage = (title: string, image: string, firstPage = false) => {
         if (!firstPage) pdf.addPage("a4", "landscape");
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(16);
+        pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
         pdf.text(title, pageWidth / 2, 28, { align: "center" });
         const props = pdf.getImageProperties(image);
-        const maxWidth = pageWidth - margin * 2;
-        const maxHeight = pageHeight - margin * 2 - 24;
+        const maxWidth = pageWidth - margin * 2; const maxHeight = pageHeight - margin * 2 - 24;
         const ratio = Math.min(maxWidth / props.width, maxHeight / props.height);
-        const width = props.width * ratio;
-        const height = props.height * ratio;
-        pdf.addImage(image, "PNG", (pageWidth - width) / 2, 48 + (maxHeight - height) / 2, width, height);
+        pdf.addImage(image, "PNG", (pageWidth - props.width * ratio) / 2, 48 + (maxHeight - props.height * ratio) / 2, props.width * ratio, props.height * ratio);
       };
       drawKpiTable();
       charts.forEach((chart) => addImagePage(chart.title, chart.image));
@@ -1922,38 +1956,12 @@ export default function App() {
     void (async () => {
       const charts = await captureKpiChartImages();
       const pptx = new pptxgen();
-      pptx.layout = "LAYOUT_WIDE";
-      pptx.author = "CDR Dashboard";
+      pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard";
       const tableSlide = pptx.addSlide();
       tableSlide.background = { color: "FFFFFF" };
-      tableSlide.addText(exportTitle("KPI Table"), { x: 0.3, y: 0.18, w: 12.7, h: 0.36, fontSize: 18, bold: true, align: "center", color: "111111" });
-      const pptTableRows = kpiExportTableRows.map((row, rowIndex) => row.map((cell) => ({
-        text: String(cell),
-        options: {
-          bold: rowIndex === 0,
-          fill: { color: rowIndex === 0 ? "FFF200" : "FFFFFF" },
-          color: "111111",
-        },
-      })));
-      tableSlide.addTable(pptTableRows, {
-        x: 0.18,
-        y: 0.7,
-        w: 12.98,
-        h: 6.25,
-        fontFace: "Arial",
-        fontSize: 5.7,
-        color: "111111",
-        margin: 0.02,
-        align: "center",
-        valign: "mid",
-        border: { type: "solid", color: "111111", pt: 0.5 },
-        fill: { color: "FFFFFF" },
-        autoFit: false,
-        colW: [1.45, 0.86, 0.75, 0.86, 1.02, 1.08, 1.08, 1.45, 0.55],
-        rowH: kpiExportTableRows.map((_, index) => index === 0 ? 0.58 : 0.38),
-        bold: false,
-        fit: "shrink",
-      });
+      tableSlide.addText(exportTitle("KPI Measurements"), { x: 0.3, y: 0.18, w: 12.7, h: 0.36, fontSize: 18, bold: true, align: "center", color: "111111" });
+      const pptTableRows = kpiExportTableRows.map((row, ri) => row.map((cell) => ({ text: String(cell), options: { bold: ri === 0, fill: { color: ri === 0 ? "FFF200" : "FFFFFF" }, color: "111111" } })));
+      tableSlide.addTable(pptTableRows, { x: 0.18, y: 0.7, w: 12.98, h: 6.25, fontFace: "Arial", fontSize: 5.7, color: "111111", margin: 0.02, align: "center", valign: "mid", border: { type: "solid", color: "111111", pt: 0.5 }, fill: { color: "FFFFFF" }, autoFit: false, colW: [1.45, 0.86, 0.75, 0.86, 1.02, 1.08, 1.08, 1.45, 0.55], rowH: kpiExportTableRows.map((_, i) => i === 0 ? 0.58 : 0.38), bold: false, fit: "shrink" });
       const addImageSlide = (title: string, image: string) => {
         const slide = pptx.addSlide();
         slide.background = { color: "0F1B24" };
@@ -1969,91 +1977,56 @@ export default function App() {
     const map = new Map<string, { calls: number; durationSeconds: number; talkgroupsUsed: Set<string>; callingUsers: Set<string>; totalTalkgroups: Set<string>; totalUsers: Set<string> }>();
     const ensure = (company: string) => {
       const key = company || "Unknown";
-      const current = map.get(key) ?? { calls: 0, durationSeconds: 0, talkgroupsUsed: new Set<string>(), callingUsers: new Set<string>(), totalTalkgroups: new Set<string>(), totalUsers: new Set<string>() };
-      map.set(key, current);
-      return current;
+      const cur = map.get(key) ?? { calls: 0, durationSeconds: 0, talkgroupsUsed: new Set<string>(), callingUsers: new Set<string>(), totalTalkgroups: new Set<string>(), totalUsers: new Set<string>() };
+      map.set(key, cur); return cur;
     };
-
-    filtered.forEach((record) => {
-      const current = ensure(record.company);
-      current.calls += 1;
-      current.durationSeconds += record.durationSeconds;
-      if (record.talkgroup !== "Unknown") current.talkgroupsUsed.add(record.talkgroup);
-      if (record.radioId !== "Unknown") current.callingUsers.add(record.radioId);
+    filtered.forEach((r) => {
+      const cur = ensure(r.company); cur.calls += 1; cur.durationSeconds += r.durationSeconds;
+      if (r.talkgroup !== "Unknown") cur.talkgroupsUsed.add(r.talkgroup);
+      if (r.radioId !== "Unknown") cur.callingUsers.add(r.radioId);
     });
-
     const search = filters.search.toLowerCase().trim();
-    (data?.lookupRecords ?? [])
-      .filter((record) => {
-        if (!record.company || record.company === "Unknown" || record.company === "Not Found") return false;
-        if (filters.region.length && !filters.region.includes(record.region)) return false;
-        if (filters.company.length && !filters.company.includes(record.company)) return false;
-        if (filters.talkgroup.length) {
-          const numericMatch = filters.talkgroup.includes(NUMERIC_TALKGROUP_FILTER) && /^\d+$/.test(record.talkgroup);
-          if (!numericMatch && !filters.talkgroup.includes(record.talkgroup)) return false;
-        }
-        if (search && ![record.radioId, record.company, record.region, record.talkgroup].join(" ").toLowerCase().includes(search)) return false;
-        return true;
-      })
-      .forEach((record) => {
-        const current = ensure(record.company);
-        if (record.talkgroup) current.totalTalkgroups.add(record.talkgroup);
-        if (record.radioId) current.totalUsers.add(record.radioId);
-      });
-
-    return [...map.entries()]
-      .map(([name, value]) => ({
-        name,
-        calls: value.calls,
-        durationSeconds: value.durationSeconds,
-        talkgroupsTotal: Math.max(value.totalTalkgroups.size, value.talkgroupsUsed.size),
-        usersTotal: Math.max(value.totalUsers.size, value.callingUsers.size),
-        talkgroupsUsed: value.talkgroupsUsed.size,
-        callingUsers: value.callingUsers.size,
-      }))
-      .filter((row) => row.calls > 0 || row.usersTotal > 0 || row.talkgroupsTotal > 0)
-      .sort((a, b) => a.name.localeCompare(b.name));
+    (data?.lookupRecords ?? []).filter((r) => {
+      if (!r.company || r.company === "Unknown" || r.company === "Not Found") return false;
+      if (filters.region.length && !filters.region.includes(r.region)) return false;
+      if (filters.company.length && !filters.company.includes(r.company)) return false;
+      if (filters.talkgroup.length) { const nm = filters.talkgroup.includes(NUMERIC_TALKGROUP_FILTER) && /^\d+$/.test(r.talkgroup); if (!nm && !filters.talkgroup.includes(r.talkgroup)) return false; }
+      if (search && ![r.radioId, r.company, r.region, r.talkgroup].join(" ").toLowerCase().includes(search)) return false;
+      return true;
+    }).forEach((r) => {
+      const cur = ensure(r.company);
+      if (r.talkgroup) cur.totalTalkgroups.add(r.talkgroup);
+      if (r.radioId) cur.totalUsers.add(r.radioId);
+    });
+    return [...map.entries()].map(([name, v]) => ({ name, calls: v.calls, durationSeconds: v.durationSeconds, talkgroupsTotal: Math.max(v.totalTalkgroups.size, v.talkgroupsUsed.size), usersTotal: Math.max(v.totalUsers.size, v.callingUsers.size), talkgroupsUsed: v.talkgroupsUsed.size, callingUsers: v.callingUsers.size })).filter((r) => r.calls > 0 || r.usersTotal > 0 || r.talkgroupsTotal > 0).sort((a, b) => a.name.localeCompare(b.name));
   }, [data?.lookupRecords, filtered, filters.company, filters.region, filters.search, filters.talkgroup]);
 
   const CompanyChartData = {
-    duration: CompanyRows.filter((row) => row.durationSeconds > 0).map((row) => ({ name: row.name, value: row.durationSeconds })),
-    totalTalkgroups: CompanyRows.filter((row) => row.talkgroupsTotal > 0).map((row) => ({ name: row.name, value: row.talkgroupsTotal })),
-    totalUsers: CompanyRows.filter((row) => row.usersTotal > 0).map((row) => ({ name: row.name, value: row.usersTotal })),
-    calls: CompanyRows.filter((row) => row.calls > 0).map((row) => ({ name: row.name, value: row.calls })),
-    talkgroupsUsed: CompanyRows.filter((row) => row.talkgroupsUsed > 0).map((row) => ({ name: row.name, value: row.talkgroupsUsed })),
-    callingUsers: CompanyRows.filter((row) => row.callingUsers > 0).map((row) => ({ name: row.name, value: row.callingUsers })),
+    duration: CompanyRows.filter((r) => r.durationSeconds > 0).map((r) => ({ name: r.name, value: r.durationSeconds })),
+    totalTalkgroups: CompanyRows.filter((r) => r.talkgroupsTotal > 0).map((r) => ({ name: r.name, value: r.talkgroupsTotal })),
+    totalUsers: CompanyRows.filter((r) => r.usersTotal > 0).map((r) => ({ name: r.name, value: r.usersTotal })),
+    calls: CompanyRows.filter((r) => r.calls > 0).map((r) => ({ name: r.name, value: r.calls })),
+    talkgroupsUsed: CompanyRows.filter((r) => r.talkgroupsUsed > 0).map((r) => ({ name: r.name, value: r.talkgroupsUsed })),
+    callingUsers: CompanyRows.filter((r) => r.callingUsers > 0).map((r) => ({ name: r.name, value: r.callingUsers })),
   };
 
   const monthlyCompanyRows = useMemo(() => {
-    const selectedCompanies = filters.company.length
-      ? [...filters.company].sort((a, b) => a.localeCompare(b))
-      : rankings.company.map((row) => row.name).sort((a, b) => a.localeCompare(b));
+    const selectedCompanies = filters.company.length ? [...filters.company].sort((a, b) => a.localeCompare(b)) : rankings.company.map((r) => r.name).sort((a, b) => a.localeCompare(b));
     const allowedCompanies = new Set(selectedCompanies);
     const groupByWeek = filters.month.length === 1;
-    const periods = groupByWeek
-      ? uniqueOptions(filtered, (record) => record.week).sort((a, b) => weekSortValue(a) - weekSortValue(b) || a.localeCompare(b))
-      : rankings.month.map((row) => row.name).sort((a, b) => monthSortValue(a) - monthSortValue(b) || a.localeCompare(b));
+    const periods = groupByWeek ? uniqueOptions(filtered, (r) => r.week).sort((a, b) => weekSortValue(a) - weekSortValue(b) || a.localeCompare(b)) : rankings.month.map((r) => r.name).sort((a, b) => monthSortValue(a) - monthSortValue(b) || a.localeCompare(b));
     const map = new Map<string, { period: string; company: string; calls: number; durationSeconds: number; sort: number }>();
-
-    filtered.forEach((record) => {
-      if (!allowedCompanies.has(record.company)) return;
-      const period = groupByWeek ? record.week : record.month;
-      const key = `${period}||${record.company}`;
-      const current = map.get(key) ?? { period, company: record.company, calls: 0, durationSeconds: 0, sort: groupByWeek ? weekSortValue(period) : monthSortValue(period) };
-      current.calls += 1;
-      current.durationSeconds += record.durationSeconds;
-      map.set(key, current);
+    filtered.forEach((r) => {
+      if (!allowedCompanies.has(r.company)) return;
+      const period = groupByWeek ? r.week : r.month;
+      const key = `${period}||${r.company}`;
+      const cur = map.get(key) ?? { period, company: r.company, calls: 0, durationSeconds: 0, sort: groupByWeek ? weekSortValue(period) : monthSortValue(period) };
+      cur.calls += 1; cur.durationSeconds += r.durationSeconds; map.set(key, cur);
     });
-
-    return periods.flatMap((period) => selectedCompanies.map((company, companyIndex) => {
+    return periods.flatMap((period) => selectedCompanies.map((company, ci) => {
       const row = map.get(`${period}||${company}`) ?? { period, company, calls: 0, durationSeconds: 0, sort: groupByWeek ? weekSortValue(period) : monthSortValue(period) };
-      const isMiddleCompany = companyIndex === Math.floor((selectedCompanies.length - 1) / 2);
-      return {
-        ...row,
-        companyLabel: truncateLabel(company, 18),
-        periodLabel: isMiddleCompany ? (groupByWeek ? period : shortMonthLabel(period)) : "",
-        periodType: groupByWeek ? "Week" : "Month",
-      };
+      const isMiddle = ci === Math.floor((selectedCompanies.length - 1) / 2);
+      return { ...row, companyLabel: truncateLabel(company, 18), periodLabel: isMiddle ? (groupByWeek ? period : shortMonthLabel(period)) : "", periodType: groupByWeek ? "Week" : "Month" };
     }));
   }, [filtered, filters.company, filters.month, rankings.company, rankings.month]);
 
@@ -2062,94 +2035,49 @@ export default function App() {
   const topCompany = rankings.company[0];
   const topStation = rankings.station[0];
   const topTalkgroup = rankings.talkgroup[0];
-  const peakRadioEntry = modeBy(filtered, (record) => record.radioId);
-  const peakUserEntry = modeBy(filtered, (record) => `${record.employeeName}||${record.employeeId}||${record.company}`);
+  const peakRadioEntry = modeBy(filtered, (r) => r.radioId);
+  const peakUserEntry = modeBy(filtered, (r) => `${r.employeeName}||${r.employeeId}||${r.company}`);
   const peakUserParts = `${peakUserEntry?.[0] ?? "Unknown||Unknown||Unknown"}`.split("||");
-  const peakMonthEntry = modeBy(filtered, (record) => record.month);
-  const peakWeekEntry = modeBy(filtered, (record) => record.week);
-  const peakDayEntry = modeBy(filtered, (record) => record.callDate);
-  const maxDuration = filtered.reduce((max, record) => Math.max(max, record.durationSeconds), 0);
-  const minDuration = filtered.reduce((min, record) => {
-    if (record.durationSeconds <= 0) return min;
-    return min === 0 ? record.durationSeconds : Math.min(min, record.durationSeconds);
-  }, 0);
+  const peakMonthEntry = modeBy(filtered, (r) => r.month);
+  const peakWeekEntry = modeBy(filtered, (r) => r.week);
+  const peakDayEntry = modeBy(filtered, (r) => r.callDate);
+  const maxDuration = filtered.reduce((max, r) => Math.max(max, r.durationSeconds), 0);
+  const minDuration = filtered.reduce((min, r) => { if (r.durationSeconds <= 0) return min; return min === 0 ? r.durationSeconds : Math.min(min, r.durationSeconds); }, 0);
   const peakHourAvgDuration = peakHour?.calls ? peakHour.durationSeconds / peakHour.calls : 0;
   const filteredShare = records.length ? (filtered.length / records.length) * 100 : 0;
+
   const qualityIssues = useMemo(() => {
     const total = records.length || 1;
-    const missingCompany = records.filter((record) => record.company === "Unknown").length;
-    const missingStation = records.filter((record) => record.baseStation === "Unknown").length;
-    const missingDuration = records.filter((record) => record.durationSeconds <= 0).length;
-    const missingRadio = records.filter((record) => record.radioId === "Unknown").length;
-    return [
-      { name: "Missing company", count: missingCompany, pct: (missingCompany / total) * 100 },
-      { name: "Missing station", count: missingStation, pct: (missingStation / total) * 100 },
-      { name: "Missing duration", count: missingDuration, pct: (missingDuration / total) * 100 },
-      { name: "Missing radio", count: missingRadio, pct: (missingRadio / total) * 100 },
-    ];
+    const mc = records.filter((r) => r.company === "Unknown").length;
+    const ms = records.filter((r) => r.baseStation === "Unknown").length;
+    const md = records.filter((r) => r.durationSeconds <= 0).length;
+    const mr = records.filter((r) => r.radioId === "Unknown").length;
+    return [{ name: "Missing company", count: mc, pct: (mc / total) * 100 }, { name: "Missing station", count: ms, pct: (ms / total) * 100 }, { name: "Missing duration", count: md, pct: (md / total) * 100 }, { name: "Missing radio", count: mr, pct: (mr / total) * 100 }];
   }, [records]);
-  const qualityScore = Math.max(0, 100 - qualityIssues.reduce((sum, item) => sum + item.pct, 0));
+  const qualityScore = Math.max(0, 100 - qualityIssues.reduce((s, i) => s + i.pct, 0));
 
   const exportSummary = useCallback(() => {
-    const rows = [
-      ["Metric", "Value"],
-      ["Total calls", metrics.totalCalls],
-      ["Traffic hours", formatDecimal(metrics.trafficHours, 2)],
-      ["Average duration", secondsToClock(metrics.averageDuration)],
-      ["Active radios", metrics.radios],
-      ["Companies", metrics.companies],
-      ["Regions", metrics.regions],
-      ["Period", CompanyPeriodLabel],
-      ["Top company", topCompany?.name ?? ""],
-      ["Peak hour", peakHour?.name ?? ""],
-    ];
-    downloadText("premium-cdr-summary.csv", rows.map((row) => row.map(csvEscape).join(",")).join("\n"));
+    const rows = [["Metric", "Value"], ["Total calls", metrics.totalCalls], ["Traffic hours", formatDecimal(metrics.trafficHours, 2)], ["Average duration", secondsToClock(metrics.averageDuration)], ["Active radios", metrics.radios], ["Companies", metrics.companies], ["Regions", metrics.regions], ["Period", CompanyPeriodLabel], ["Top company", topCompany?.name ?? ""], ["Peak hour", peakHour?.name ?? ""]];
+    downloadText("premium-cdr-summary.csv", rows.map((r) => r.map(csvEscape).join(",")).join("\n"));
   }, [CompanyPeriodLabel, metrics, peakHour, topCompany]);
 
   const recordExportHeaders = ["SN", "Radio ID", "Radio Alias", "Mobile Type", "Employee Name", "Employee ID", "Region", "Company", "Talkgroup Alias", "Start Time", "End Time", "Duration (s)", "Caller Base Station"];
-  const filteredRecordRows = useMemo(() => filtered.map((record, index) => [index + 1, record.radioId, record.radioAlias, record.mobileType, record.employeeName, record.employeeId, record.region, record.company, record.talkgroup, record.startTime, record.endTime, record.durationSeconds, record.baseStation]), [filtered]);
+  const filteredRecordRows = useMemo(() => filtered.map((r, i) => [i + 1, r.radioId, r.radioAlias, r.mobileType, r.employeeName, r.employeeId, r.region, r.company, r.talkgroup, r.startTime, r.endTime, r.durationSeconds, r.baseStation]), [filtered]);
 
   const exportRows = useCallback(() => {
-    downloadText("premium-cdr-filtered-records.csv", [[exportTitle("Filtered Calls Register")], [], recordExportHeaders, ...filteredRecordRows].map((row) => row.map(csvEscape).join(",")).join("\n"));
+    downloadText("premium-cdr-filtered-records.csv", [[exportTitle("Filtered Calls Register")], [], recordExportHeaders, ...filteredRecordRows].map((r) => r.map(csvEscape).join(",")).join("\n"));
   }, [exportTitle, filteredRecordRows]);
 
   const exportRowsXlsx = useCallback(() => {
     void (async () => {
-      const workbook = new ExcelJS.Workbook();
-      workbook.creator = "CDR Dashboard";
+      const workbook = new ExcelJS.Workbook(); workbook.creator = "CDR Dashboard";
       const worksheet = workbook.addWorksheet("Filtered Calls Register", { views: [{ showGridLines: false }] });
       const border = { top: { style: "thin" as const }, left: { style: "thin" as const }, bottom: { style: "thin" as const }, right: { style: "thin" as const } };
       const headerFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFFFF00" } };
-      worksheet.addRow([exportTitle("Filtered Calls Register")]);
-      worksheet.mergeCells(1, 1, 1, recordExportHeaders.length);
-      worksheet.addRow(recordExportHeaders);
-      filteredRecordRows.forEach((row) => worksheet.addRow(row));
-      worksheet.eachRow((row, rowNumber) => {
-        row.height = rowNumber <= 2 ? 24 : 18;
-        row.eachCell((cell) => {
-          cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-          cell.border = border;
-          if (rowNumber <= 2) {
-            cell.font = { bold: true, color: { argb: "FF000000" } };
-            cell.fill = headerFill;
-          }
-        });
-      });
-      worksheet.columns = [
-        { width: 8 },
-        { width: 14 },
-        { width: 18 },
-        { width: 24 },
-        { width: 24 },
-        { width: 14 },
-        { width: 14 },
-        { width: 22 },
-        { width: 24 },
-        { width: 22 },
-        { width: 22 },
-        { width: 14 },
-        { width: 26 },
-      ];
+      worksheet.addRow([exportTitle("Filtered Calls Register")]); worksheet.mergeCells(1, 1, 1, recordExportHeaders.length);
+      worksheet.addRow(recordExportHeaders); filteredRecordRows.forEach((r) => worksheet.addRow(r));
+      worksheet.eachRow((row, rn) => { row.height = rn <= 2 ? 24 : 18; row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true }; cell.border = border; if (rn <= 2) { cell.font = { bold: true, color: { argb: "FF000000" } }; cell.fill = headerFill; } }); });
+      worksheet.columns = [{ width: 8 }, { width: 14 }, { width: 18 }, { width: 24 }, { width: 24 }, { width: 14 }, { width: 14 }, { width: 22 }, { width: 24 }, { width: 22 }, { width: 22 }, { width: 14 }, { width: 26 }];
       worksheet.autoFilter = { from: "A2", to: `${excelColumnName(recordExportHeaders.length)}2` };
       const buffer = await workbook.xlsx.writeBuffer();
       downloadBlob("premium-cdr-filtered-records.xlsx", new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
@@ -2162,25 +2090,20 @@ export default function App() {
     const margin = 18;
     const tableWidth = pageWidth - margin * 2;
     const colWeights = [0.42, 0.78, 0.9, 1.18, 1.18, 0.78, 0.78, 1.05, 1.15, 0.95, 0.95, 0.65, 1.18];
-    const totalWeight = colWeights.reduce((sum, item) => sum + item, 0);
-    const colWidths = colWeights.map((weight) => tableWidth * weight / totalWeight);
-    const rows = pagedRecords.map((record, index) => [(page - 1) * 50 + index + 1, record.radioId, record.radioAlias, record.mobileType, record.employeeName, record.employeeId, record.region, record.company, record.talkgroup, record.startTime, record.endTime, record.durationSeconds, record.baseStation]);
+    const totalWeight = colWeights.reduce((s, w) => s + w, 0);
+    const colWidths = colWeights.map((w) => tableWidth * w / totalWeight);
+    const rows = pagedRecords.map((r, i) => [(page - 1) * 50 + i + 1, r.radioId, r.radioAlias, r.mobileType, r.employeeName, r.employeeId, r.region, r.company, r.talkgroup, r.startTime, r.endTime, r.durationSeconds, r.baseStation]);
     const allRows = [recordExportHeaders, ...rows];
-    let y = 44;
-    const rowHeight = 10;
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(14);
+    let y = 44; const rowHeight = 10;
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(14);
     pdf.text(`${exportTitle("Filtered Calls Register")} - Page ${page}`, pageWidth / 2, 24, { align: "center" });
-    allRows.forEach((row, rowIndex) => {
+    allRows.forEach((row, ri) => {
       let x = margin;
-      row.forEach((cell, colIndex) => {
-        const width = colWidths[colIndex];
-        pdf.setDrawColor(20, 36, 48);
-        pdf.setFillColor(rowIndex === 0 ? "#fff200" : "#ffffff");
+      row.forEach((cell, ci) => {
+        const width = colWidths[ci];
+        pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff");
         pdf.rect(x, y, width, rowHeight, "FD");
-        pdf.setFont("helvetica", rowIndex === 0 ? "bold" : "normal");
-        pdf.setFontSize(rowIndex === 0 ? 4.5 : 4.7);
-        pdf.setTextColor(0, 0, 0);
+        pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 4.5 : 4.7); pdf.setTextColor(0, 0, 0);
         pdf.text(String(cell), x + width / 2, y + 7, { align: "center", maxWidth: width - 2 });
         x += width;
       });
@@ -2191,37 +2114,20 @@ export default function App() {
 
   const exportUtilizationXlsx = useCallback(() => {
     void (async () => {
-      const workbook = new ExcelJS.Workbook();
-      workbook.creator = "CDR Dashboard";
+      const workbook = new ExcelJS.Workbook(); workbook.creator = "CDR Dashboard";
       const border = { top: { style: "thin" as const }, left: { style: "thin" as const }, bottom: { style: "thin" as const }, right: { style: "thin" as const } };
       const headerFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFFFF00" } };
-      const styleSheet = (sheet: ExcelJS.Worksheet) => {
-        sheet.eachRow((row, rowNumber) => row.eachCell((cell) => {
-          cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-          cell.border = border;
-          if (rowNumber <= 2) {
-            cell.font = { bold: true, color: { argb: "FF000000" } };
-            cell.fill = headerFill;
-          }
-        }));
-      };
-
+      const styleSheet = (sheet: ExcelJS.Worksheet) => { sheet.eachRow((row, rn) => row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true }; cell.border = border; if (rn <= 2) { cell.font = { bold: true, color: { argb: "FF000000" } }; cell.fill = headerFill; } })); };
       const radios = workbook.addWorksheet("Top Radios", { views: [{ showGridLines: false }] });
-      radios.addRow([exportTitle("Top Radios")]);
-      radios.mergeCells(1, 1, 1, 5);
+      radios.addRow([exportTitle("Top Radios")]); radios.mergeCells(1, 1, 1, 5);
       radios.addRow(["Radio ID & Alias", "Employee Name", "Company", "Total Calls", "Total Duration"]);
       topRadioUsers.forEach((item) => radios.addRow([`${item.radioId} - ${item.radioAlias}`, item.employeeName, item.company, item.calls, secondsToClock(item.durationSeconds)]));
-      radios.columns = [{ width: 28 }, { width: 26 }, { width: 22 }, { width: 14 }, { width: 16 }];
-      styleSheet(radios);
-
+      radios.columns = [{ width: 28 }, { width: 26 }, { width: 22 }, { width: 14 }, { width: 16 }]; styleSheet(radios);
       const users = workbook.addWorksheet("Top Users", { views: [{ showGridLines: false }] });
-      users.addRow([exportTitle("Top Users")]);
-      users.mergeCells(1, 1, 1, 3);
+      users.addRow([exportTitle("Top Users")]); users.mergeCells(1, 1, 1, 3);
       users.addRow(["User", "Total Calls", "Total Duration"]);
       rankings.user.slice(0, 10).forEach((item) => users.addRow([item.name, item.calls, secondsToClock(item.durationSeconds)]));
-      users.columns = [{ width: 42 }, { width: 14 }, { width: 16 }];
-      styleSheet(users);
-
+      users.columns = [{ width: 42 }, { width: 14 }, { width: 16 }]; styleSheet(users);
       const buffer = await workbook.xlsx.writeBuffer();
       downloadBlob("top-radios-users.xlsx", new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
     })();
@@ -2229,26 +2135,19 @@ export default function App() {
 
   const exportUtilizationPdf = useCallback(() => {
     const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const margin = 24;
+    const pageWidth = pdf.internal.pageSize.getWidth(); const margin = 24;
     const drawTable = (title: string, headers: string[], rows: (string | number)[][], startY: number, widths: number[]) => {
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(13);
+      pdf.setFont("helvetica", "bold"); pdf.setFontSize(13);
       pdf.text(title, pageWidth / 2, startY, { align: "center" });
       let y = startY + 16;
-      const tableWidth = widths.reduce((sum, item) => sum + item, 0);
-      const startX = (pageWidth - tableWidth) / 2;
-      const rowHeight = 18;
-      [headers, ...rows].forEach((row, rowIndex) => {
+      const tableW = widths.reduce((s, w) => s + w, 0); const startX = (pageWidth - tableW) / 2; const rowHeight = 18;
+      [headers, ...rows].forEach((row, ri) => {
         let x = startX;
-        row.forEach((cell, colIndex) => {
-          const width = widths[colIndex];
-          pdf.setDrawColor(20, 36, 48);
-          pdf.setFillColor(rowIndex === 0 ? "#fff200" : "#ffffff");
+        row.forEach((cell, ci) => {
+          const width = widths[ci];
+          pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff");
           pdf.rect(x, y, width, rowHeight, "FD");
-          pdf.setFont("helvetica", rowIndex === 0 ? "bold" : "normal");
-          pdf.setFontSize(rowIndex === 0 ? 7 : 7.5);
-          pdf.setTextColor(0, 0, 0);
+          pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 7 : 7.5); pdf.setTextColor(0, 0, 0);
           pdf.text(String(cell), x + width / 2, y + 12, { align: "center", maxWidth: width - 4 });
           x += width;
         });
@@ -2256,43 +2155,27 @@ export default function App() {
       });
       return y;
     };
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(16);
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
     pdf.text(exportTitle("Top radios and employee utilization"), pageWidth / 2, 26, { align: "center" });
-    const nextY = drawTable(
-      "Top Radios",
-      ["Radio ID & Alias", "Employee Name", "Company", "Total Calls", "Total Duration"],
-      topRadioUsers.map((item) => [`${item.radioId} - ${item.radioAlias}`, item.employeeName, item.company, formatNumber(item.calls), secondsToClock(item.durationSeconds)]),
-      52,
-      [170, 160, 130, 80, 95],
-    );
-    drawTable(
-      "Top Users",
-      ["User", "Total Calls", "Total Duration"],
-      rankings.user.slice(0, 10).map((item) => [item.name, formatNumber(item.calls), secondsToClock(item.durationSeconds)]),
-      nextY + 28,
-      [360, 95, 110],
-    );
+    const nextY = drawTable("Top Radios", ["Radio ID & Alias", "Employee Name", "Company", "Total Calls", "Total Duration"], topRadioUsers.map((item) => [`${item.radioId} - ${item.radioAlias}`, item.employeeName, item.company, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), 52, [170, 160, 130, 80, 95]);
+    drawTable("Top Users", ["User", "Total Calls", "Total Duration"], rankings.user.slice(0, 10).map((item) => [item.name, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), nextY + 28, [360, 95, 110]);
     pdf.save("top-radios-users.pdf");
   }, [exportTitle, rankings.user, topRadioUsers]);
 
   const monthlyCompanyPivot = useMemo(() => {
-    const companies = [...new Set(monthlyCompanyRows.map((row) => row.company))].sort((a, b) => a.localeCompare(b));
-    const periods = [...new Set(monthlyCompanyRows.map((row) => row.period))].sort((a, b) => {
-      const firstType = monthlyCompanyRows.find((row) => row.period === a)?.periodType;
-      return firstType === "Week" ? weekSortValue(a) - weekSortValue(b) || a.localeCompare(b) : monthSortValue(a) - monthSortValue(b) || a.localeCompare(b);
+    const companies = [...new Set(monthlyCompanyRows.map((r) => r.company))].sort((a, b) => a.localeCompare(b));
+    const periods = [...new Set(monthlyCompanyRows.map((r) => r.period))].sort((a, b) => {
+      const ft = monthlyCompanyRows.find((r) => r.period === a)?.periodType;
+      return ft === "Week" ? weekSortValue(a) - weekSortValue(b) || a.localeCompare(b) : monthSortValue(a) - monthSortValue(b) || a.localeCompare(b);
     });
     const periodType = monthlyCompanyRows[0]?.periodType ?? "Period";
-    const byKey = new Map(monthlyCompanyRows.map((row) => [`${row.period}||${row.company}`, row]));
-    const totals = new Map(companies.map((company) => [company, { calls: 0, durationSeconds: 0 }]));
+    const byKey = new Map(monthlyCompanyRows.map((r) => [`${r.period}||${r.company}`, r]));
+    const totals = new Map(companies.map((c) => [c, { calls: 0, durationSeconds: 0 }]));
     const rows = periods.map((period) => {
       const values = companies.map((company) => {
         const row = byKey.get(`${period}||${company}`);
         const total = totals.get(company);
-        if (total && row) {
-          total.calls += row.calls;
-          total.durationSeconds += row.durationSeconds;
-        }
+        if (total && row) { total.calls += row.calls; total.durationSeconds += row.durationSeconds; }
         return { calls: row?.calls ?? 0, durationSeconds: row?.durationSeconds ?? 0 };
       });
       return { period, label: periodType === "Week" ? period : shortMonthLabel(period), values };
@@ -2301,13 +2184,7 @@ export default function App() {
   }, [monthlyCompanyRows]);
 
   const monthlyCompanyChartData = useMemo(() => {
-    return monthlyCompanyRows.map((row) => ({
-      category: `${row.periodType === "Week" ? row.period : shortMonthLabel(row.period)} - ${row.company}`,
-      company: row.company,
-      period: row.period,
-      calls: row.calls,
-      durationSeconds: row.durationSeconds,
-    })).filter((row) => row.calls > 0 || row.durationSeconds > 0);
+    return monthlyCompanyRows.map((r) => ({ category: `${r.periodType === "Week" ? r.period : shortMonthLabel(r.period)} - ${r.company}`, company: r.company, period: r.period, calls: r.calls, durationSeconds: r.durationSeconds })).filter((r) => r.calls > 0 || r.durationSeconds > 0);
   }, [monthlyCompanyRows]);
 
   const patchWorkbookWithNativeChart = useCallback(async (buffer: ExcelJS.Buffer) => {
@@ -2316,34 +2193,8 @@ export default function App() {
     const categoriesRef = `'ChartData'!$A$2:$A$${lastRow}`;
     const callsRef = `'ChartData'!$B$2:$B$${lastRow}`;
     const durationRef = `'ChartData'!$C$2:$C$${lastRow}`;
-    const chartXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <c:date1904 val="0"/><c:lang val="en-US"/><c:roundedCorners val="0"/>
-  <c:chart>
-    <c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" b="1" sz="1400"/><a:t>${escapeXml(exportTitle("Calls and Duration per Company"))}</a:t></a:r></a:p></c:rich></c:tx><c:layout/></c:title>
-    <c:plotArea><c:layout/>
-      <c:barChart><c:barDir val="col"/><c:grouping val="clustered"/><c:varyColors val="0"/>
-        <c:ser><c:idx val="0"/><c:order val="0"/><c:tx><c:v>Calls</c:v></c:tx><c:spPr><a:solidFill><a:srgbClr val="2D86B4"/></a:solidFill></c:spPr><c:cat><c:strRef><c:f>${categoriesRef}</c:f></c:strRef></c:cat><c:val><c:numRef><c:f>${callsRef}</c:f></c:numRef></c:val></c:ser>
-        <c:ser><c:idx val="1"/><c:order val="1"/><c:tx><c:v>Duration Seconds</c:v></c:tx><c:spPr><a:solidFill><a:srgbClr val="8FD0E8"/></a:solidFill></c:spPr><c:cat><c:strRef><c:f>${categoriesRef}</c:f></c:strRef></c:cat><c:val><c:numRef><c:f>${durationRef}</c:f></c:numRef></c:val></c:ser>
-        <c:axId val="12345678"/><c:axId val="12345679"/>
-      </c:barChart>
-      <c:catAx><c:axId val="12345678"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="b"/><c:tickLblPos val="low"/><c:crossAx val="12345679"/><c:crosses val="autoZero"/><c:auto val="1"/><c:lblAlgn val="ctr"/><c:lblOffset val="100"/></c:catAx>
-      <c:valAx><c:axId val="12345679"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="l"/><c:majorGridlines/><c:numFmt formatCode="#,##0" sourceLinked="0"/><c:tickLblPos val="nextTo"/><c:crossAx val="12345678"/><c:crosses val="autoZero"/><c:crossBetween val="between"/></c:valAx>
-    </c:plotArea>
-    <c:legend><c:legendPos val="b"/><c:layout/><c:overlay val="0"/></c:legend>
-    <c:plotVisOnly val="1"/>
-  </c:chart>
-  <c:printSettings><c:headerFooter/><c:pageMargins b="0.75" l="0.7" r="0.7" t="0.75" header="0.3" footer="0.3"/><c:pageSetup/></c:printSettings>
-</c:chartSpace>`;
-    const drawingXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
-  <xdr:twoCellAnchor>
-    <xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${monthlyCompanyPivot.rows.length + 5}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
-    <xdr:to><xdr:col>12</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${monthlyCompanyPivot.rows.length + 25}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
-    <xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="2" name="Calls Duration Chart"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1"/></a:graphicData></a:graphic></xdr:graphicFrame>
-    <xdr:clientData/>
-  </xdr:twoCellAnchor>
-</xdr:wsDr>`;
+    const chartXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><c:date1904 val="0"/><c:lang val="en-US"/><c:roundedCorners val="0"/><c:chart><c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" b="1" sz="1400"/><a:t>${escapeXml(exportTitle("Calls and Duration per Company"))}</a:t></a:r></a:p></c:rich></c:tx><c:layout/></c:title><c:plotArea><c:layout/><c:barChart><c:barDir val="col"/><c:grouping val="clustered"/><c:varyColors val="0"/><c:ser><c:idx val="0"/><c:order val="0"/><c:tx><c:v>Calls</c:v></c:tx><c:spPr><a:solidFill><a:srgbClr val="2D86B4"/></a:solidFill></c:spPr><c:cat><c:strRef><c:f>${categoriesRef}</c:f></c:strRef></c:cat><c:val><c:numRef><c:f>${callsRef}</c:f></c:numRef></c:val></c:ser><c:ser><c:idx val="1"/><c:order val="1"/><c:tx><c:v>Duration Seconds</c:v></c:tx><c:spPr><a:solidFill><a:srgbClr val="8FD0E8"/></a:solidFill></c:spPr><c:cat><c:strRef><c:f>${categoriesRef}</c:f></c:strRef></c:cat><c:val><c:numRef><c:f>${durationRef}</c:f></c:numRef></c:val></c:ser><c:axId val="12345678"/><c:axId val="12345679"/></c:barChart><c:catAx><c:axId val="12345678"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="b"/><c:tickLblPos val="low"/><c:crossAx val="12345679"/><c:crosses val="autoZero"/><c:auto val="1"/><c:lblAlgn val="ctr"/><c:lblOffset val="100"/></c:catAx><c:valAx><c:axId val="12345679"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="l"/><c:majorGridlines/><c:numFmt formatCode="#,##0" sourceLinked="0"/><c:tickLblPos val="nextTo"/><c:crossAx val="12345678"/><c:crosses val="autoZero"/><c:crossBetween val="between"/></c:valAx></c:plotArea><c:legend><c:legendPos val="b"/><c:layout/><c:overlay val="0"/></c:legend><c:plotVisOnly val="1"/></c:chart></c:chartSpace>`;
+    const drawingXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><xdr:twoCellAnchor><xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${monthlyCompanyPivot.rows.length + 5}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from><xdr:to><xdr:col>12</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${monthlyCompanyPivot.rows.length + 25}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to><xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="2" name="Calls Duration Chart"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1"/></a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>`;
     zip.file("xl/charts/chart1.xml", chartXml);
     zip.file("xl/drawings/drawing1.xml", drawingXml);
     zip.file("xl/drawings/_rels/drawing1.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="../charts/chart1.xml"/></Relationships>`);
@@ -2352,19 +2203,16 @@ export default function App() {
     const nextRid = sheetRelXml ? `rId${(sheetRelXml.match(/Id="rId\d+"/g)?.length ?? 0) + 1}` : "rId1";
     const drawingRel = `<Relationship Id="${nextRid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/>`;
     zip.file(sheetRelPath, sheetRelXml ? sheetRelXml.replace("</Relationships>", `${drawingRel}</Relationships>`) : `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${drawingRel}</Relationships>`);
-    const sheetPath = "xl/worksheets/sheet1.xml";
-    const sheetXml = await zip.file(sheetPath)?.async("string");
+    const sheetXml = await zip.file("xl/worksheets/sheet1.xml")?.async("string");
     if (sheetXml) {
       const withNs = sheetXml.includes("xmlns:r=") ? sheetXml : sheetXml.replace("<worksheet ", '<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ');
-      zip.file(sheetPath, withNs.replace("</worksheet>", `<drawing r:id="${nextRid}"/></worksheet>`));
+      zip.file("xl/worksheets/sheet1.xml", withNs.replace("</worksheet>", `<drawing r:id="${nextRid}"/></worksheet>`));
     }
     const contentTypes = await zip.file("[Content_Types].xml")?.async("string");
     if (contentTypes) {
-      const chartOverride = '<Override PartName="/xl/charts/chart1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>';
-      const drawingOverride = '<Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>';
       let next = contentTypes;
-      if (!next.includes('/xl/charts/chart1.xml')) next = next.replace("</Types>", `${chartOverride}</Types>`);
-      if (!next.includes('/xl/drawings/drawing1.xml')) next = next.replace("</Types>", `${drawingOverride}</Types>`);
+      if (!next.includes('/xl/charts/chart1.xml')) next = next.replace("</Types>", '<Override PartName="/xl/charts/chart1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/></Types>');
+      if (!next.includes('/xl/drawings/drawing1.xml')) next = next.replace("</Types>", '<Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/></Types>');
       zip.file("[Content_Types].xml", next);
     }
     return zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
@@ -2372,39 +2220,10 @@ export default function App() {
 
   const monthlyCompanyTableHtml = useCallback(() => {
     const { companies, periodType, rows, totals } = monthlyCompanyPivot;
-    const bodyRows = rows.map((row) => {
-      const cells = row.values.map((value) => {
-        return `<td>${formatNumber(value.calls)}</td><td>${formatNumber(value.durationSeconds)}</td>`;
-      }).join("");
-      return `<tr><th>${htmlEscape(row.label)}</th>${cells}</tr>`;
-    }).join("");
-    const totalCells = companies.map((company) => {
-      const total = totals.get(company) ?? { calls: 0, durationSeconds: 0 };
-      return `<td>${formatNumber(total.calls)}</td><td>${formatNumber(total.durationSeconds)}</td>`;
-    }).join("");
-    return `
-      <table>
-        <thead>
-          <tr><th class="period">Period</th>${companies.map((company) => `<th colspan="2">${htmlEscape(company)}</th>`).join("")}</tr>
-          <tr><th>${htmlEscape(periodType === "Week" ? "Week" : "Month Year")}</th>${companies.map(() => "<th>Calls</th><th>Duration</th>").join("")}</tr>
-        </thead>
-        <tbody>${bodyRows}</tbody>
-        <tfoot><tr><th>Total</th>${totalCells}</tr></tfoot>
-      </table>
-    `;
+    const bodyRows = rows.map((row) => `<tr><th>${htmlEscape(row.label)}</th>${row.values.map((v) => `<td>${formatNumber(v.calls)}</td><td>${formatNumber(v.durationSeconds)}</td>`).join("")}</tr>`).join("");
+    const totalCells = companies.map((c) => { const t = totals.get(c) ?? { calls: 0, durationSeconds: 0 }; return `<td>${formatNumber(t.calls)}</td><td>${formatNumber(t.durationSeconds)}</td>`; }).join("");
+    return `<table><thead><tr><th class="period">Period</th>${companies.map((c) => `<th colspan="2">${htmlEscape(c)}</th>`).join("")}</tr><tr><th>${htmlEscape(periodType === "Week" ? "Week" : "Month Year")}</th>${companies.map(() => "<th>Calls</th><th>Duration</th>").join("")}</tr></thead><tbody>${bodyRows}</tbody><tfoot><tr><th>Total</th>${totalCells}</tr></tfoot></table>`;
   }, [monthlyCompanyPivot]);
-
-  const captureMonthlyCompanyTable = useCallback(async () => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "export-capture-table";
-    wrapper.innerHTML = `<h1>${htmlEscape(exportTitle("Calls and Duration per Company"))}</h1>${monthlyCompanyTableHtml()}`;
-    document.body.appendChild(wrapper);
-    try {
-      return await captureElementPng(wrapper, "#ffffff");
-    } finally {
-      wrapper.remove();
-    }
-  }, [exportTitle, monthlyCompanyTableHtml]);
 
   const captureMonthlyCompanyChart = useCallback(async () => {
     const chart = monthlyCompanyChartRef.current?.querySelector(".recharts-wrapper") as HTMLElement | null;
@@ -2412,42 +2231,10 @@ export default function App() {
     return captureElementPng(chart, "#0f1b24");
   }, []);
 
-  const monthlyCompanyChartHtml = useCallback(() => {
-    return monthlyCompanyChartRef.current?.querySelector(".recharts-wrapper")?.outerHTML ?? "";
-  }, []);
+  const monthlyCompanyChartHtml = useCallback(() => monthlyCompanyChartRef.current?.querySelector(".recharts-wrapper")?.outerHTML ?? "", []);
 
   const monthlyCompanyExportHtml = useCallback((autoPrint = false) => {
-    const chartHtml = monthlyCompanyChartHtml();
-    const tableHtml = monthlyCompanyTableHtml();
-    return `
-      <!doctype html>
-      <html>
-        <head>
-          <title>${htmlEscape(exportTitle("No. of Calls and Duration per Company"))}</title>
-          <style>
-            body { margin: 0; padding: 18px; font-family: Arial, sans-serif; background: #f4f6f8; color: #050505; }
-            h1 { margin: 0 0 12px; text-align: center; font-size: 22px; }
-            .table-wrap { overflow: auto; border: 1px solid #111; background: #fff; }
-            table { width: max-content; min-width: 100%; border-collapse: collapse; table-layout: auto; }
-            th, td { border: 1px solid #111; padding: 6px 8px; text-align: center; white-space: nowrap; }
-            thead th { background: #fff; font-weight: 800; }
-            thead tr:first-child th { font-size: 16px; }
-            tbody th, tfoot th { background: #f8fafc; font-weight: 800; }
-            tfoot td, tfoot th { background: #fff200; font-weight: 900; }
-            .period { width: 120px; }
-            .chart-wrap { margin-top: 22px; padding: 14px; background: #0f1b24; border: 1px solid #111; overflow: auto; }
-            .chart-wrap svg { max-width: 100%; height: auto; }
-            @media print { body { background: #fff; padding: 0; } .table-wrap { border: 0; } }
-          </style>
-        </head>
-        <body>
-          <h1>${htmlEscape(exportTitle("No. of Calls and Duration per Company"))}</h1>
-          <div class="table-wrap">${tableHtml}</div>
-          <div class="chart-wrap">${chartHtml}</div>
-          ${autoPrint ? "<script>window.onload = () => setTimeout(() => window.print(), 250);</script>" : ""}
-        </body>
-      </html>
-    `;
+    return `<!doctype html><html><head><title>${htmlEscape(exportTitle("No. of Calls and Duration per Company"))}</title><style>body{margin:0;padding:18px;font-family:Arial,sans-serif;background:#f4f6f8;color:#050505}h1{margin:0 0 12px;text-align:center;font-size:22px}.table-wrap{overflow:auto;border:1px solid #111;background:#fff}table{width:max-content;min-width:100%;border-collapse:collapse;table-layout:auto}th,td{border:1px solid #111;padding:6px 8px;text-align:center;white-space:nowrap}thead th{background:#fff;font-weight:800}thead tr:first-child th{font-size:16px}tbody th,tfoot th{background:#f8fafc;font-weight:800}tfoot td,tfoot th{background:#fff200;font-weight:900}.period{width:120px}.chart-wrap{margin-top:22px;padding:14px;background:#0f1b24;border:1px solid #111;overflow:auto}.chart-wrap svg{max-width:100%;height:auto}</style></head><body><h1>${htmlEscape(exportTitle("No. of Calls and Duration per Company"))}</h1><div class="table-wrap">${monthlyCompanyTableHtml()}</div><div class="chart-wrap">${monthlyCompanyChartHtml()}</div>${autoPrint ? "<script>window.onload=()=>setTimeout(()=>window.print(),250);</script>" : ""}</body></html>`;
   }, [exportTitle, monthlyCompanyChartHtml, monthlyCompanyTableHtml]);
 
   const exportMonthlyCompanyXlsx = useCallback(async () => {
@@ -2457,31 +2244,16 @@ export default function App() {
     const chartData = workbook.addWorksheet("ChartData", { state: "hidden" });
     const headerFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFFFF00" } };
     const border = { top: { style: "thin" as const }, left: { style: "thin" as const }, bottom: { style: "thin" as const }, right: { style: "thin" as const } };
-
-    worksheet.addRow([exportTitle("Calls and Duration per Company")]);
-    worksheet.mergeCells(1, 1, 1, 1 + companies.length * 2);
-    worksheet.addRow(["Period", ...companies.flatMap((company) => [company, ""])]);
+    worksheet.addRow([exportTitle("Calls and Duration per Company")]); worksheet.mergeCells(1, 1, 1, 1 + companies.length * 2);
+    worksheet.addRow(["Period", ...companies.flatMap((c) => [c, ""])]);
     worksheet.addRow([periodType === "Week" ? "Week" : "Month Year", ...companies.flatMap(() => ["Calls", "Duration"])]);
-    companies.forEach((_, index) => worksheet.mergeCells(2, 2 + index * 2, 2, 3 + index * 2));
-    rows.forEach((row) => worksheet.addRow([row.label, ...row.values.flatMap((value) => [value.calls, value.durationSeconds])]));
-    worksheet.addRow(["Total", ...companies.flatMap((company) => {
-      const total = totals.get(company) ?? { calls: 0, durationSeconds: 0 };
-      return [total.calls, total.durationSeconds];
-    })]);
-
-    worksheet.eachRow((row, rowNumber) => {
-      row.eachCell((cell) => {
-        cell.alignment = { horizontal: "center", vertical: "middle" };
-        cell.border = border;
-        if (rowNumber <= 3 || rowNumber === rows.length + 4) {
-          cell.font = { bold: true };
-          cell.fill = rowNumber === rows.length + 4 || rowNumber === 1 ? headerFill : undefined;
-        }
-      });
-    });
-    worksheet.columns = [{ width: 16 }, ...companies.flatMap((company) => [{ width: Math.max(12, company.length + 3) }, { width: 14 }])];
+    companies.forEach((_, i) => worksheet.mergeCells(2, 2 + i * 2, 2, 3 + i * 2));
+    rows.forEach((row) => worksheet.addRow([row.label, ...row.values.flatMap((v) => [v.calls, v.durationSeconds])]));
+    worksheet.addRow(["Total", ...companies.flatMap((c) => { const t = totals.get(c) ?? { calls: 0, durationSeconds: 0 }; return [t.calls, t.durationSeconds]; })]);
+    worksheet.eachRow((row, rn) => { row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle" }; cell.border = border; if (rn <= 3 || rn === rows.length + 4) { cell.font = { bold: true }; cell.fill = rn === rows.length + 4 || rn === 1 ? headerFill : undefined; } }); });
+    worksheet.columns = [{ width: 16 }, ...companies.flatMap((c) => [{ width: Math.max(12, c.length + 3) }, { width: 14 }])];
     chartData.addRow(["Category", "Calls", "Duration Seconds"]);
-    monthlyCompanyChartData.forEach((row) => chartData.addRow([row.category, row.calls, row.durationSeconds]));
+    monthlyCompanyChartData.forEach((r) => chartData.addRow([r.category, r.calls, r.durationSeconds]));
     chartData.columns = [{ width: 34 }, { width: 14 }, { width: 18 }];
     const buffer = await workbook.xlsx.writeBuffer();
     const patched = await patchWorkbookWithNativeChart(buffer);
@@ -2493,70 +2265,41 @@ export default function App() {
     void (async () => {
       const chartPng = await captureMonthlyCompanyChart();
       const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 24;
-      const totalCols = 1 + companies.length * 2;
-      const cellW = Math.min(86, (pageWidth - margin * 2) / totalCols);
-      const tableW = cellW * totalCols;
-      const startX = (pageWidth - tableW) / 2;
-      const rowH = 28;
+      const pageWidth = pdf.internal.pageSize.getWidth(); const pageHeight = pdf.internal.pageSize.getHeight(); const margin = 24;
+      const totalCols = 1 + companies.length * 2; const cellW = Math.min(86, (pageWidth - margin * 2) / totalCols);
+      const tableW = cellW * totalCols; const startX = (pageWidth - tableW) / 2; const rowH = 28;
       let y = 58;
       const drawCell = (text: string, x: number, cy: number, w: number, h: number, fill?: string, bold = false) => {
-        if (fill) {
-          pdf.setFillColor(fill);
-          pdf.rect(x, cy, w, h, "F");
-        }
-        pdf.setDrawColor(0);
-        pdf.rect(x, cy, w, h);
-        pdf.setFont("helvetica", bold ? "bold" : "normal");
-        pdf.setFontSize(8);
+        if (fill) { pdf.setFillColor(fill); pdf.rect(x, cy, w, h, "F"); }
+        pdf.setDrawColor(0); pdf.rect(x, cy, w, h);
+        pdf.setFont("helvetica", bold ? "bold" : "normal"); pdf.setFontSize(8);
         pdf.text(String(text), x + w / 2, cy + h / 2 + 3, { align: "center", maxWidth: w - 4 });
       };
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(16);
+      pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
       pdf.text(exportTitle("Calls and Duration per Company"), pageWidth / 2, 30, { align: "center" });
       drawCell("Period", startX, y, cellW, rowH, "#fff200", true);
-      companies.forEach((company, index) => drawCell(company, startX + cellW + index * cellW * 2, y, cellW * 2, rowH, "#fff200", true));
+      companies.forEach((c, i) => drawCell(c, startX + cellW + i * cellW * 2, y, cellW * 2, rowH, "#fff200", true));
       y += rowH;
       drawCell(periodType === "Week" ? "Week" : "Month Year", startX, y, cellW, rowH, "#fff200", true);
-      companies.forEach((_, index) => {
-        drawCell("Calls", startX + cellW + index * cellW * 2, y, cellW, rowH, "#ffffff", true);
-        drawCell("Duration", startX + cellW * 2 + index * cellW * 2, y, cellW, rowH, "#ffffff", true);
-      });
+      companies.forEach((_, i) => { drawCell("Calls", startX + cellW + i * cellW * 2, y, cellW, rowH, "#ffffff", true); drawCell("Duration", startX + cellW * 2 + i * cellW * 2, y, cellW, rowH, "#ffffff", true); });
       y += rowH;
       rows.forEach((row) => {
-        if (y + rowH > pageHeight - margin) {
-          pdf.addPage("a4", "landscape");
-          y = margin;
-        }
+        if (y + rowH > pageHeight - margin) { pdf.addPage("a4", "landscape"); y = margin; }
         drawCell(row.label, startX, y, cellW, rowH, "#f8fafc", true);
-        row.values.forEach((value, index) => {
-          drawCell(formatNumber(value.calls), startX + cellW + index * cellW * 2, y, cellW, rowH);
-          drawCell(formatNumber(value.durationSeconds), startX + cellW * 2 + index * cellW * 2, y, cellW, rowH);
-        });
+        row.values.forEach((v, i) => { drawCell(formatNumber(v.calls), startX + cellW + i * cellW * 2, y, cellW, rowH); drawCell(formatNumber(v.durationSeconds), startX + cellW * 2 + i * cellW * 2, y, cellW, rowH); });
         y += rowH;
       });
       drawCell("Total", startX, y, cellW, rowH, "#fff200", true);
-      companies.forEach((company, index) => {
-        const total = totals.get(company) ?? { calls: 0, durationSeconds: 0 };
-        drawCell(formatNumber(total.calls), startX + cellW + index * cellW * 2, y, cellW, rowH, "#fff200", true);
-        drawCell(formatNumber(total.durationSeconds), startX + cellW * 2 + index * cellW * 2, y, cellW, rowH, "#fff200", true);
-      });
-      const tableBottom = y + rowH;
-      const chartMargin = 10;
+      companies.forEach((c, i) => { const t = totals.get(c) ?? { calls: 0, durationSeconds: 0 }; drawCell(formatNumber(t.calls), startX + cellW + i * cellW * 2, y, cellW, rowH, "#fff200", true); drawCell(formatNumber(t.durationSeconds), startX + cellW * 2 + i * cellW * 2, y, cellW, rowH, "#fff200", true); });
+      const tableBottom = y + rowH; const gap = 18;
       const props = pdf.getImageProperties(chartPng);
-      const gap = 18;
-      const remainingHeight = pageHeight - tableBottom - gap - chartMargin;
+      const remainingHeight = pageHeight - tableBottom - gap - margin;
       const samePage = remainingHeight >= 170;
       if (!samePage) pdf.addPage("a4", "landscape");
-      const chartTop = samePage ? tableBottom + gap : chartMargin;
-      const maxChartWidth = pageWidth - chartMargin * 2;
-      const maxChartHeight = samePage ? remainingHeight : pageHeight - chartMargin * 2;
-      const chartRatio = Math.min(maxChartWidth / props.width, maxChartHeight / props.height);
-      const chartWidth = props.width * chartRatio;
-      const chartHeight = props.height * chartRatio;
-      pdf.addImage(chartPng, "PNG", (pageWidth - chartWidth) / 2, samePage ? chartTop : (pageHeight - chartHeight) / 2, chartWidth, chartHeight);
+      const chartTop = samePage ? tableBottom + gap : margin;
+      const maxW = pageWidth - margin * 2; const maxH = samePage ? remainingHeight : pageHeight - margin * 2;
+      const ratio = Math.min(maxW / props.width, maxH / props.height);
+      pdf.addImage(chartPng, "PNG", (pageWidth - props.width * ratio) / 2, samePage ? chartTop : (pageHeight - props.height * ratio) / 2, props.width * ratio, props.height * ratio);
       pdf.save("calls-duration-per-company.pdf");
     })();
   }, [captureMonthlyCompanyChart, exportTitle, monthlyCompanyPivot]);
@@ -2564,134 +2307,43 @@ export default function App() {
   const exportMonthlyCompanyPpt = useCallback(() => {
     void (async () => {
       const { companies, periodType, rows, totals } = monthlyCompanyPivot;
-      const pptx = new pptxgen();
-      pptx.layout = "LAYOUT_WIDE";
-      pptx.author = "CDR Dashboard";
+      const pptx = new pptxgen(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard";
       const tableSlide = pptx.addSlide();
       tableSlide.addText(exportTitle("Calls and Duration per Company - Table"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" });
-      const pptRows = [
-        ["Period", ...companies.flatMap((company) => [`${company} Calls`, `${company} Duration`])],
-        ...rows.map((row) => [row.label, ...row.values.flatMap((value) => [formatNumber(value.calls), formatNumber(value.durationSeconds)])]),
-        ["Total", ...companies.flatMap((company) => {
-          const total = totals.get(company) ?? { calls: 0, durationSeconds: 0 };
-          return [formatNumber(total.calls), formatNumber(total.durationSeconds)];
-        })],
-      ];
-      const tableX = 0.2;
-      const tableY = 0.7;
-      const tableW = 12.93;
-      const colW = tableW / Math.max(1, pptRows[0].length);
-      const rowH = Math.min(0.42, 6.45 / Math.max(1, pptRows.length));
-      pptRows.forEach((row, rowIndex) => {
-        row.forEach((cell, colIndex) => {
-          const isHeader = rowIndex === 0 || rowIndex === pptRows.length - 1;
-          tableSlide.addShape(pptx.ShapeType.rect, {
-            x: tableX + colIndex * colW,
-            y: tableY + rowIndex * rowH,
-            w: colW,
-            h: rowH,
-            fill: { color: isHeader ? "FFF200" : "FFFFFF" },
-            line: { color: "111111", width: 0.5 },
-          });
-          tableSlide.addText(cell, {
-            x: tableX + colIndex * colW + 0.01,
-            y: tableY + rowIndex * rowH + 0.02,
-            w: colW - 0.02,
-            h: rowH - 0.04,
-            fontSize: rowIndex === 0 ? 5.7 : 6.3,
-            bold: isHeader,
-            align: "center",
-            valign: "mid",
-            color: "111111",
-            fit: "shrink",
-            margin: 0,
-          });
-        });
-      });
+      const pptRows = [["Period", ...companies.flatMap((c) => [`${c} Calls`, `${c} Duration`])], ...rows.map((r) => [r.label, ...r.values.flatMap((v) => [formatNumber(v.calls), formatNumber(v.durationSeconds)])]), ["Total", ...companies.flatMap((c) => { const t = totals.get(c) ?? { calls: 0, durationSeconds: 0 }; return [formatNumber(t.calls), formatNumber(t.durationSeconds)]; })]];
+      const tableX = 0.2; const tableY = 0.7; const tableW = 12.93; const colW = tableW / Math.max(1, pptRows[0].length); const rowH = Math.min(0.42, 6.45 / Math.max(1, pptRows.length));
+      pptRows.forEach((row, ri) => { row.forEach((cell, ci) => { const isH = ri === 0 || ri === pptRows.length - 1; tableSlide.addShape(pptx.ShapeType.rect, { x: tableX + ci * colW, y: tableY + ri * rowH, w: colW, h: rowH, fill: { color: isH ? "FFF200" : "FFFFFF" }, line: { color: "111111", width: 0.5 } }); tableSlide.addText(cell, { x: tableX + ci * colW + 0.01, y: tableY + ri * rowH + 0.02, w: colW - 0.02, h: rowH - 0.04, fontSize: ri === 0 ? 5.7 : 6.3, bold: isH, align: "center", valign: "mid", color: "111111", fit: "shrink", margin: 0 }); }); });
       const chartSlide = pptx.addSlide();
       chartSlide.addText(exportTitle("Calls and Duration per Company - Chart"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" });
-      chartSlide.addChart("bar", [
-        { name: "Calls", labels: monthlyCompanyChartData.map((row) => row.category), values: monthlyCompanyChartData.map((row) => row.calls) },
-        { name: "Duration Seconds", labels: monthlyCompanyChartData.map((row) => row.category), values: monthlyCompanyChartData.map((row) => row.durationSeconds) },
-      ], {
-        x: 0.45,
-        y: 0.75,
-        w: 12.4,
-        h: 6.25,
-        showLegend: true,
-        showTitle: false,
-        catAxisLabelRotate: 270,
-        valAxisLabelColor: "111111",
-        catAxisLabelColor: "111111",
-        chartColors: ["2D86B4", "8FD0E8"],
-      });
+      chartSlide.addChart("bar", [{ name: "Calls", labels: monthlyCompanyChartData.map((r) => r.category), values: monthlyCompanyChartData.map((r) => r.calls) }, { name: "Duration Seconds", labels: monthlyCompanyChartData.map((r) => r.category), values: monthlyCompanyChartData.map((r) => r.durationSeconds) }], { x: 0.45, y: 0.75, w: 12.4, h: 6.25, showLegend: true, showTitle: false, catAxisLabelRotate: 270, valAxisLabelColor: "111111", catAxisLabelColor: "111111", chartColors: ["2D86B4", "8FD0E8"] });
       await pptx.writeFile({ fileName: "calls-duration-per-company.pptx" });
     })();
   }, [exportTitle, monthlyCompanyChartData, monthlyCompanyPivot]);
 
   const openMonthlyCompanyTable = useCallback(() => {
-    const tableWindow = window.open("", "cdr-monthly-company-table", "width=1400,height=800,scrollbars=yes,resizable=yes");
-    if (!tableWindow) return;
-    tableWindow.document.open();
-    tableWindow.document.write(monthlyCompanyExportHtml(false));
-    tableWindow.document.close();
-    tableWindow.focus();
+    const w = window.open("", "cdr-monthly-company-table", "width=1400,height=800,scrollbars=yes,resizable=yes");
+    if (!w) return;
+    w.document.open(); w.document.write(monthlyCompanyExportHtml(false)); w.document.close(); w.focus();
   }, [monthlyCompanyExportHtml]);
 
   const chartExportDatasets = useMemo<Record<string, ChartExportDataset>>(() => {
-    const valueDataset = (headers: string[], rows: { name: string; value: number }[]): ChartExportDataset => ({
-      headers,
-      rows: rows.map((row) => [row.name, row.value]),
-    });
-    const rankingDataset = (rows: Ranking[]): ChartExportDataset => ({
-      headers: ["Name", "Calls", "Duration Seconds", "Traffic Hours", "Radios"],
-      rows: rows.map((row) => [row.name, row.calls, row.durationSeconds, formatDecimal(row.trafficHours, 3), row.radios]),
-    });
-    const mobileDataset = (rows: Record<string, string | number>[], firstColumn: string): ChartExportDataset => ({
-      headers: [firstColumn, "Total Radios", ...mobileTypes],
-      rows: rows.map((row) => [`${row.name}`, Number(row.total ?? 0), ...mobileTypes.map((type) => Number(row[mobileTypeKey(type)] ?? 0))]),
-    });
+    const valueDataset = (headers: string[], rows: { name: string; value: number }[]): ChartExportDataset => ({ headers, rows: rows.map((r) => [r.name, r.value]) });
+    const rankingDataset = (rows: Ranking[]): ChartExportDataset => ({ headers: ["Name", "Calls", "Duration Seconds", "Traffic Hours", "Radios"], rows: rows.map((r) => [r.name, r.calls, r.durationSeconds, formatDecimal(r.trafficHours, 3), r.radios]) });
+    const mobileDataset = (rows: Record<string, string | number>[], firstColumn: string): ChartExportDataset => ({ headers: [firstColumn, "Total Radios", ...mobileTypes], rows: rows.map((r) => [`${r.name}`, Number(r.total ?? 0), ...mobileTypes.map((type) => Number(r[mobileTypeKey(type)] ?? 0))]) });
     return {
-      "KPI Average Duration per Company": {
-        headers: ["Company", "KPI Avg Duration per Activated User (sec)", "Users Activated", "Calling Users"],
-        rows: kpiRows.map((row) => [row.company, formatDecimal(row.kpiAvgDurationPerUser, 2), row.usersActivated, row.callingUsers]),
-      },
-      "KPI Calls and Duration per Company": {
-        headers: ["Company", "Calls", "Duration Seconds", "Duration"],
-        rows: kpiRows.map((row) => [row.company, row.calls, row.durationSeconds, secondsToClock(row.durationSeconds)]),
-      },
-      "Monthly KPI": {
-        headers: ["Company", ...monthlyKpi.months.map((month) => shortMonthLabel(month.name))],
-        rows: monthlyKpi.rows.map((row) => [`${row.company}`, ...monthlyKpi.months.map((month) => row[month.key] == null ? "" : Number(row[month.key]))]),
-      },
+      "KPI Average Duration per Company": { headers: ["Company", "KPI Avg Duration per Activated User (sec)", "Users Activated", "Calling Users"], rows: kpiRows.map((r) => [r.company, formatDecimal(r.kpiAvgDurationPerUser, 2), r.usersActivated, r.callingUsers]) },
+      "KPI Calls and Duration per Company": { headers: ["Company", "Calls", "Duration Seconds", "Duration"], rows: kpiRows.map((r) => [r.company, r.calls, r.durationSeconds, secondsToClock(r.durationSeconds)]) },
+      "Monthly KPI": { headers: ["Company", ...monthlyKpi.months.map((m) => shortMonthLabel(m.name))], rows: monthlyKpi.rows.map((r) => [`${r.company}`, ...monthlyKpi.months.map((m) => r[m.key] == null ? "" : Number(r[m.key]))]) },
       "KPI Total Avg. Duration": valueDataset(["Month", "Avg Duration per Call (sec)"], monthlyKpiPieData),
-      "Company Calls & Duration Performance": {
-        headers: ["Company", "Calls", "Duration Seconds", "Duration", "Avg Duration per Call"],
-        rows: CompanyRows.map((row) => [row.name, row.calls, row.durationSeconds, secondsToClock(row.durationSeconds), secondsToClock(row.calls ? row.durationSeconds / row.calls : 0)]),
-      },
+      "Company Calls & Duration Performance": { headers: ["Company", "Calls", "Duration Seconds", "Duration", "Avg Duration per Call"], rows: CompanyRows.map((r) => [r.name, r.calls, r.durationSeconds, secondsToClock(r.durationSeconds), secondsToClock(r.calls ? r.durationSeconds / r.calls : 0)]) },
       "Total Calls per Company": valueDataset(["Company", "Calls"], CompanyChartData.calls),
-      "Total Duration per Company": {
-        headers: ["Company", "Duration Seconds", "Duration"],
-        rows: CompanyChartData.duration.map((row) => [row.name, row.value, secondsToClock(row.value)]),
-      },
-      "Talkgroups per Company": {
-        headers: ["Company", "Total Talkgroups", "Used Talkgroups"],
-        rows: CompanyRows.map((row) => [row.name, row.talkgroupsTotal, row.talkgroupsUsed]),
-      },
-      "Radios per Company": {
-        headers: ["Company", "Total Radios", "Radios Made Calls"],
-        rows: CompanyRows.map((row) => [row.name, row.usersTotal, row.callingUsers]),
-      },
+      "Total Duration per Company": { headers: ["Company", "Duration Seconds", "Duration"], rows: CompanyChartData.duration.map((r) => [r.name, r.value, secondsToClock(r.value)]) },
+      "Talkgroups per Company": { headers: ["Company", "Total Talkgroups", "Used Talkgroups"], rows: CompanyRows.map((r) => [r.name, r.talkgroupsTotal, r.talkgroupsUsed]) },
+      "Radios per Company": { headers: ["Company", "Total Radios", "Radios Made Calls"], rows: CompanyRows.map((r) => [r.name, r.usersTotal, r.callingUsers]) },
       "Radios Type per Company": mobileDataset(mobileTypeByCompany, "Company"),
-      "Calls and Duration per Company": {
-        headers: ["Period", "Company", "Calls", "Duration Seconds", "Duration"],
-        rows: monthlyCompanyRows.map((row) => [row.period, row.company, row.calls, row.durationSeconds, secondsToClock(row.durationSeconds)]),
-      },
+      "Calls and Duration per Company": { headers: ["Period", "Company", "Calls", "Duration Seconds", "Duration"], rows: monthlyCompanyRows.map((r) => [r.period, r.company, r.calls, r.durationSeconds, secondsToClock(r.durationSeconds)]) },
       "Monthly Performance": rankingDataset(rankings.month),
-      "Radios per Month": {
-        headers: ["Month", "Radios", "Share"],
-        rows: radioMonths.map((row) => [row.name, row.radios, formatPercent(row.share, 2)]),
-      },
+      "Radios per Month": { headers: ["Month", "Radios", "Share"], rows: radioMonths.map((r) => [r.name, r.radios, formatPercent(r.share, 2)]) },
       "Radio Type per Month": mobileDataset(mobileTypeByMonth, "Month"),
       "Region  Performance": rankingDataset(rankings.region),
       "Calls per Month": rankingDataset(rankings.month),
@@ -2716,43 +2368,42 @@ export default function App() {
       const dataset = chartExportDatasets[title];
       if (dataset) {
         const xlsxButton = document.createElement("button");
-        xlsxButton.type = "button";
-        xlsxButton.className = "button small quick-card-export quick-card-export-xlsx";
-        xlsxButton.innerHTML = `${exportIconSvg("xlsx")}<span>XLSX</span>`;
-        xlsxButton.title = `Export ${title} data`;
-        xlsxButton.addEventListener("click", (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          downloadWorkbookData(`${fileSlug(exportTitle(title))}.xlsx`, title, exportTitle(title), dataset);
-        });
-        card.appendChild(xlsxButton);
-        buttons.push(xlsxButton);
+        xlsxButton.type = "button"; xlsxButton.className = "button small quick-card-export quick-card-export-xlsx";
+        xlsxButton.innerHTML = `${exportIconSvg("xlsx")}<span>XLSX</span>`; xlsxButton.title = `Export ${title} data`;
+        xlsxButton.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); downloadWorkbookData(`${fileSlug(exportTitle(title))}.xlsx`, title, exportTitle(title), dataset); });
+        card.appendChild(xlsxButton); buttons.push(xlsxButton);
       }
       const button = document.createElement("button");
-      button.type = "button";
-      button.className = "button small quick-card-export";
-      button.innerHTML = `${exportIconSvg("png")}<span>PNG</span>`;
-      button.title = `Export ${title}`;
-      button.addEventListener("click", async (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+      button.type = "button"; button.className = "button small quick-card-export";
+      button.innerHTML = `${exportIconSvg("png")}<span>PNG</span>`; button.title = `Export ${title}`;
+      button.addEventListener("click", async (e) => {
+        e.preventDefault(); e.stopPropagation();
         const exportButtons = Array.from(card.querySelectorAll<HTMLElement>(".quick-card-export"));
-        exportButtons.forEach((item) => { item.style.visibility = "hidden"; });
-        try {
-          await new Promise((resolve) => requestAnimationFrame(resolve));
-          const image = await captureElementPng(card, "#0f1b24");
-          downloadDataUrl(`${fileSlug(exportTitle(title))}.png`, image);
-        } finally {
-          exportButtons.forEach((item) => { item.style.visibility = ""; });
-        }
+        exportButtons.forEach((b) => { b.style.visibility = "hidden"; });
+        try { await new Promise((resolve) => requestAnimationFrame(resolve)); const image = await captureElementPng(card, "#0f1b24"); downloadDataUrl(`${fileSlug(exportTitle(title))}.png`, image); }
+        finally { exportButtons.forEach((b) => { b.style.visibility = ""; }); }
       });
-      card.appendChild(button);
-      buttons.push(button);
+      card.appendChild(button); buttons.push(button);
     });
-    return () => buttons.forEach((button) => button.remove());
+    return () => buttons.forEach((b) => b.remove());
   }, [CompanyPeriodLabel, chartExportDatasets, data, exportTitle, filtered.length, page]);
 
-  if (!data) return <UploadView onUpload={handleUpload} onLoadSaved={handleLoadSavedWorkbook} savedWorkbook={savedWorkbook} isParsing={isParsing} isLoadingSaved={isLoadingSaved} error={error} theme={theme} onToggleTheme={toggleTheme} />;
+  if (!data) return (
+    <UploadView
+      onUploadCdr={handleUpload}
+      onUploadMasterFleetmap={handleUploadMasterFleetmap}
+      onUploadFixedFleetmap={handleUploadFixedFleetmap}
+      onLoadSaved={handleLoadSavedWorkbook}
+      savedWorkbook={savedWorkbook}
+      masterFleetmap={masterFleetmap}
+      fixedFleetmap={fixedFleetmap}
+      isParsing={isParsing}
+      isLoadingSaved={isLoadingSaved}
+      error={error}
+      theme={theme}
+      onToggleTheme={toggleTheme}
+    />
+  );
 
   return (
     <main className={`app-shell ${themeClass(theme)}`}>
@@ -2760,54 +2411,76 @@ export default function App() {
         <div className="brand-block">
           <img src="/assets/nascologo.png" alt="NASCO" />
           <p>CDR Command Center</p>
-          <h1>DMR Call Data Records Analasys</h1>
+          <h1>DMR Call Data Records Analysis</h1>
         </div>
         <div className="topbar-actions">
           <img className="brand-logo" src="/assets/se.png" alt="Saudi Energy" />
           <img className="brand-logo" src="/assets/nglogo.png" alt="National Grid" />
           <button className="button small" type="button" onClick={() => { setData(null); setError(""); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-            <Home size={14} />
-            Home
+            <Home size={14} /> Home
           </button>
           <button className="button small theme-toggle" type="button" onClick={toggleTheme}>
-            <Palette size={14} />
-            {theme === "se" ? "Dark Theme" : "Light Theme"}
+            <Palette size={14} /> {theme === "light" ? "Dark Theme" : "Light Theme"}
           </button>
+          <label className="button small add-region-button" title="Upload another region's CDR and merge into current view">
+            <UploadCloud size={14} />
+            {isAddingMoreCdr ? "Merging..." : `Add Region${data.cdrSources.length > 1 ? ` (${data.cdrSources.length})` : ""}`}
+            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={handleAddMoreCdr} />
+          </label>
           <label className="button primary">
-            <UploadCloud size={16} />
-            Upload
-            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={handleUpload} />
+            <UploadCloud size={16} /> New Upload
+            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={handleUpload} />
           </label>
           <button className="button" onClick={exportSummary}><Download size={16} /> Summary</button>
           <button className="button" onClick={exportRows}><Download size={16} /> Rows</button>
         </div>
       </header>
 
-      <nav className="section-nav">
+      <nav className="section-nav" aria-label="Dashboard sections">
         {SECTION_NAV_ITEMS.map((item) => (
-          <button key={item.id} type="button" onClick={() => scrollToSection(item.id)}>
+          <button
+            key={item.id}
+            className={`button small section-nav-button ${activeSection === item.id ? "active" : ""}`}
+            type="button"
+            onClick={() => scrollToSection(item.id)}
+          >
             {item.label}
           </button>
         ))}
       </nav>
 
       <section id="command" className="hero-panel">
-        <div className="hero-main">
-          <p className="eyebrow">Live workbook profile</p>
-          <h2>{formatNumber(metrics.totalCalls)} calls under analysis</h2>
-          {/* <p>{formatPercent(filteredShare, 1)} of the uploaded register is in the current view. Peak demand is {peakHour?.name ?? "--"} and {topCompany?.name ?? "no company"} leads the selected activity.</p> */}
-          {/* <div className="hero-insights">
-            <span><strong>{topCompany?.name ?? "--"}</strong> top company</span>
-            <span><strong>{topStation?.name ?? "--"}</strong> top station</span>
-            <span><strong>{topTalkgroup?.name ?? "--"}</strong> top talkgroup</span>
-            <span><strong>{formatNumber(metrics.radios)}</strong> active radios</span>
-          </div> */}
+        <div className="hero-main hero-main-with-icon">
+          <img className="hero-call-icon" src="/assets/call.png" alt="Calls under analysis" />
+          <div className="hero-profile-copy">
+            <p className="eyebrow">Live workbook profile</p>
+            <h2>{formatNumber(metrics.totalCalls)}</h2>
+            <p className="hero-subtitle">calls under analysis</p>
+          </div>
         </div>
-        <div className="workbook-card">
-          <ShieldCheck size={28} />
-          <span>Workbook</span>
-          <strong>{data.fileName}</strong>
-          <p>{formatNumber(data.rawRows)} records - loaded {data.loadedAt}</p>
+        <div className="workbook-card workbook-card-compact">
+          <div className="workbook-card-header">
+            <ShieldCheck size={22} />
+            <div className="workbook-card-title">
+              <span>Workbook</span>
+              <strong>{data.fileName}</strong>
+            </div>
+          </div>
+          <p className="workbook-card-meta">{formatNumber(data.rawRows)} records - loaded {data.loadedAt}</p>
+          {data.cdrSources.length > 1 && (
+            <ul className="cdr-sources-list cdr-sources-list-compact">
+              {data.cdrSources.map((src, i) => (
+                <li key={`${src.fileName}-${i}`}><strong>{src.fileName}</strong> — {formatNumber(src.recordCount)} rows</li>
+              ))}
+            </ul>
+          )}
+          {(masterFleetmap.meta || fixedFleetmap.meta) && (
+            <p className="fleetmap-status fleetmap-status-compact">
+              Fleetmap: {masterFleetmap.meta ? `Master (${formatNumber(masterFleetmap.records.length)})` : "—"}
+              {" + "}
+              {fixedFleetmap.meta ? `Fixed (${formatNumber(fixedFleetmap.records.length)})` : "—"}
+            </p>
+          )}
         </div>
       </section>
 
@@ -2819,149 +2492,201 @@ export default function App() {
         <label className="search-box search-compact">
           <span>Search Radio / User</span>
           <Search size={16} />
-          <input value={filters.search} onChange={(event) => { setFilters((current) => ({ ...current, search: event.target.value })); setPage(1); }} placeholder="Radio ID, alias, user, employee ID" />
+          <input value={filters.search} onChange={(e) => { setFilters((c) => ({ ...c, search: e.target.value })); setPage(1); }} placeholder="Radio ID, alias, user, employee ID" />
         </label>
-        <MultiSelectFilter className="filter-compact" label="Region" value={filters.region} options={options.region} onChange={(region) => { setFilters((current) => ({ ...current, region })); setPage(1); }} />
-        <MultiSelectFilter className="filter-compact" label="Year" value={filters.year} options={options.year} onChange={(year) => { setFilters((current) => ({ ...current, year })); setPage(1); }} />
-        <MultiSelectFilter className="filter-compact" label="Month" value={filters.month} options={options.month} onChange={(month) => { setFilters((current) => ({ ...current, month })); setPage(1); }} />
-        <MultiSelectFilter className="filter-company" label="Company" value={filters.company} options={options.company} onChange={(company) => { setFilters((current) => ({ ...current, company })); setPage(1); }} />
-        <MultiSelectFilter className="filter-xwide" label="Base Station" value={filters.baseStation} options={options.baseStation} onChange={(baseStation) => { setFilters((current) => ({ ...current, baseStation })); setPage(1); }} />
-        <MultiSelectFilter className="filter-wide" label="Talkgroup" value={filters.talkgroup} options={options.talkgroup} optionLabels={talkgroupLabels} onChange={(talkgroup) => { setFilters((current) => ({ ...current, talkgroup })); setPage(1); }} />
-        <button className="button" onClick={() => { setFilters(EMPTY_FILTERS); setPage(1); }}><X size={16} /> Clear</button>
-        <span className="filter-count">{formatNumber(filtered.length)} from {formatNumber(records.length)}</span>
+        <MultiSelectFilter className="filter-compact" label="Region" value={filters.region} options={options.region} onChange={(region) => { setFilters((c) => ({ ...c, region })); setPage(1); }} />
+        <MultiSelectFilter className="filter-compact" label="Year" value={filters.year} options={options.year} onChange={(year) => { setFilters((c) => ({ ...c, year })); setPage(1); }} />
+        <MultiSelectFilter className="filter-compact" label="Month" value={filters.month} options={options.month} onChange={(month) => { setFilters((c) => ({ ...c, month })); setPage(1); }} />
+        <MultiSelectFilter className="filter-company" label="Company" value={filters.company} options={options.company} onChange={(company) => { setFilters((c) => ({ ...c, company })); setPage(1); }} />
+        <MultiSelectFilter className="filter-xwide" label="Base Station" value={filters.baseStation} options={options.baseStation} onChange={(baseStation) => { setFilters((c) => ({ ...c, baseStation })); setPage(1); }} />
+        <MultiSelectFilter className="filter-wide" label="Talkgroup" value={filters.talkgroup} options={options.talkgroup} optionLabels={talkgroupLabels} onChange={(talkgroup) => { setFilters((c) => ({ ...c, talkgroup })); setPage(1); }} />
+        <button className="button reset-filter-button" onClick={() => { setFilters(EMPTY_FILTERS); setPage(1); }}><X size={16} /> Reset Filters</button>
+        <span className="filter-count">{formatNumber(filtered.length)} from {formatNumber(records.length)} · {formatPercent(filteredShare)}</span>
       </section>
 
-      <section className="summary-cards">
-        <div className="summary-card yellow"><span>Total Calls</span><strong>{formatNumber(metrics.totalCalls)}</strong></div>
-        <div className="summary-card green"><span>Total Duration</span><strong>{secondsToClock(metrics.totalDuration)}</strong></div>
-        <div className="summary-card yellow"><span>Max Duration</span><strong>{secondsToClock(maxDuration)}</strong></div>
-        <div className="summary-card green"><span>Min Duration</span><strong>{secondsToClock(minDuration)}</strong></div>
-        <div className="summary-card yellow"><span>Average Duration</span><strong>{secondsToClock(metrics.averageDuration)}</strong></div>
-        <div className="summary-card yellow"><span>Companies</span><strong>{formatNumber(metrics.companies)}</strong></div>
-        <div className="summary-card yellow"><span>Base Stations</span><strong>{formatNumber(metrics.stations)}</strong></div>
-        <div className="summary-card green"><span>Talkgroups</span><strong>{formatNumber(metrics.talkgroups)}</strong></div>
-        <div className="summary-card green"><span>Radios</span><strong>{formatNumber(metrics.radios)}</strong></div>
-        <div className="summary-card yellow"><span>Peak Radio</span><strong>{peakRadioEntry?.[0] ?? "--"}</strong></div>
-        <div className="summary-card green"><span>Peak User Name</span><strong>{peakUserParts[0] ?? "--"}</strong></div>
-        <div className="summary-card yellow"><span>Peak User ID</span><strong>{peakUserParts[1] ?? "--"}</strong></div>
-        <div className="summary-card yellow"><span>Peak User Company</span><strong>{peakUserParts[2] ?? "--"}</strong></div>
-        <div className="summary-card yellow"><span>Peak Month</span><strong>{peakMonthEntry?.[0] ?? "--"}</strong></div>
-        <div className="summary-card green"><span>Peak Week</span><strong>{peakWeekEntry?.[0] ?? "--"}</strong></div>
-        <div className="summary-card yellow"><span>Peak Day</span><strong>{peakDayEntry?.[0] ?? "--"}</strong></div>
-        <div className="summary-card green"><span>Peak Company</span><strong>{topCompany?.name ?? "--"}</strong></div>
-        <div className="summary-card yellow"><span>Peak Talkgroup</span><strong>{topTalkgroup?.name ?? "--"}</strong></div>
-        <div className="summary-card green"><span>Peak Base Station</span><strong>{topStation?.name ?? "--"}</strong></div>        
-        <div className="summary-card green"><span>Traffic (Erlangs)</span><strong>{formatDecimal(metrics.trafficHours, 1)}</strong></div>
-        <div className="summary-card yellow"><span>Busy Hour</span><strong>{peakHour?.name ?? "--"}</strong></div>
-        <div className="summary-card green"><span>Peak Traffic (Erlangs)</span><strong>{formatDecimal(peakTrafficHour?.trafficHours ?? 0, 1)}</strong></div>
-        <div className="summary-card yellow"><span>Peak Hour Calls</span><strong>{formatNumber(peakHour?.calls ?? 0)}</strong></div>
-        <div className="summary-card green"><span>Peak Hour Avg Duration</span><strong>{formatDecimal(peakHourAvgDuration, 1)}</strong></div>
+      <section className="summary-cards summary-cards-arranged">
+        {/* Coverage overview: the best first-row order is Calls → Regions → Companies → Radios → Talkgroups → Base Stations. */}
+        <div className="summary-card yellow summary-card-primary"><span>Total Calls</span><strong>{formatNumber(metrics.totalCalls)}</strong><small>Filtered result</small></div>
+        <div className="summary-card green"><span>Regions</span><strong>{formatNumber(metrics.regions)}</strong><small>Geographic coverage</small></div>
+        <div className="summary-card yellow"><span>Companies</span><strong>{formatNumber(metrics.companies)}</strong><small>Business coverage</small></div>
+        <div className="summary-card green"><span>Radios</span><strong>{formatNumber(metrics.radios)}</strong><small>Active radio users</small></div>
+        <div className="summary-card green"><span>Talkgroups</span><strong>{formatNumber(metrics.talkgroups)}</strong><small>Used groups</small></div>
+        <div className="summary-card yellow"><span>Base Stations</span><strong>{formatNumber(metrics.stations)}</strong><small>Network sites</small></div>
+
+        {/* Duration overview */}
+        <div className="summary-card green"><span>Total Duration</span><strong>{secondsToClock(metrics.totalDuration)}</strong><small>Filtered result</small></div>
+        <div className="summary-card yellow"><span>Average Duration</span><strong>{secondsToClock(metrics.averageDuration)}</strong><small>Per call</small></div>
+        <div className="summary-card yellow"><span>Max Duration</span><strong>{secondsToClock(maxDuration)}</strong><small>Longest call</small></div>
+        <div className="summary-card green"><span>Min Duration</span><strong>{secondsToClock(minDuration)}</strong><small>Shortest call</small></div>
+
+        {/* Peak usage */}
+        <div className="summary-card yellow"><span>Peak Radio</span><strong>{peakRadioEntry?.[0] ?? "--"}</strong><small>Most active radio</small></div>
+        <div className="summary-card green"><span>Peak User Name</span><strong>{peakUserParts[0] ?? "--"}</strong><small>Most active user</small></div>
+        <div className="summary-card yellow"><span>Peak User ID</span><strong>{peakUserParts[1] ?? "--"}</strong><small>User identifier</small></div>
+        <div className="summary-card yellow"><span>Peak User Company</span><strong>{peakUserParts[2] ?? "--"}</strong><small>User company</small></div>
+        <div className="summary-card green"><span>Peak Company</span><strong>{topCompany?.name ?? "--"}</strong><small>Most calls</small></div>
+        <div className="summary-card yellow"><span>Peak Talkgroup</span><strong>{topTalkgroup?.name ?? "--"}</strong><small>Most calls</small></div>
+        <div className="summary-card green"><span>Peak Base Station</span><strong>{topStation?.name ?? "--"}</strong><small>Most calls</small></div>
+
+        {/* Time and traffic */}
+        <div className="summary-card yellow"><span>Peak Month</span><strong>{peakMonthEntry?.[0] ?? "--"}</strong><small>Highest calls</small></div>
+        <div className="summary-card green"><span>Peak Week</span><strong>{peakWeekEntry?.[0] ?? "--"}</strong><small>Highest calls</small></div>
+        <div className="summary-card yellow"><span>Peak Day</span><strong>{peakDayEntry?.[0] ?? "--"}</strong><small>Highest calls</small></div>
+        <div className="summary-card yellow"><span>Busy Hour</span><strong>{peakHour?.name ?? "--"}</strong><small>Highest calls</small></div>
+        <div className="summary-card yellow"><span>Peak Hour Calls</span><strong>{formatNumber(peakHour?.calls ?? 0)}</strong><small>Busy hour volume</small></div>
+        <div className="summary-card green"><span>Traffic (Erlangs)</span><strong>{formatDecimal(metrics.trafficHours, 1)}</strong><small>Total traffic</small></div>
+        <div className="summary-card green"><span>Peak Traffic (Erlangs)</span><strong>{formatDecimal(peakTrafficHour?.trafficHours ?? 0, 1)}</strong><small>Highest traffic hour</small></div>
+        <div className="summary-card green"><span>Peak Hour Avg Duration</span><strong>{formatDecimal(peakHourAvgDuration, 1)}</strong><small>Seconds per call</small></div>
       </section>
 
-      <SectionTitle
-        id="kpi"
-        eyebrow="KPI recreation"
-        title="KPI Table"
-        collapsed={isSectionCollapsed("kpi")}
-        onToggle={() => toggleSection("kpi")}
-        actions={(
-          <>
-            <ExportButton kind="xlsx" label="XLSX" onClick={exportKpiXlsx} />
-            <ExportButton kind="ppt" label="PPT" onClick={exportKpiPpt} />
-            <ExportButton kind="pdf" label="PDF" onClick={exportKpiPdf} />
-          </>
-        )}
-      />
+      <section className="data-quality-panel" aria-label="Data quality and filter health">
+        <div className="quality-score-card">
+          <span>Data Quality Score</span>
+          <strong>{formatDecimal(qualityScore, 1)}%</strong>
+          <small>{formatNumber(records.length)} source rows checked</small>
+        </div>
+        <div className="quality-issue-grid">
+          {qualityIssues.map((issue) => (
+            <div className="quality-issue" key={issue.name}>
+              <span>{issue.name}</span>
+              <strong>{formatNumber(issue.count)}</strong>
+              <small>{formatDecimal(issue.pct, 1)}%</small>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {filtered.length === 0 && (
+        <div className="empty-state" role="status">
+          <Search size={34} />
+          <strong>No records found</strong>
+          <span>Try changing or resetting your filters.</span>
+        </div>
+      )}
+
+      <SectionTitle id="networkUtilization" eyebrow="Fleet activation" title={`Network Utilization & Fleet Activation in ${CompanyPeriodLabel}`} text="Compare registered fleetmap radios against radios that made calls in the filtered period." collapsed={isSectionCollapsed("networkUtilization")} onToggle={() => toggleSection("networkUtilization")} />
+      <section id="networkUtilization-content" className={`network-utilization-section ${isSectionCollapsed("networkUtilization") ? "section-content-collapsed" : ""}`}>
+        <div className="summary-cards network-utilization-cards">
+          <div className="summary-card yellow"><span>Registered Radios</span><strong>{formatNumber(fleetActivation.registeredCount)}</strong><small>From fleetmap</small></div>
+          <div className="summary-card green"><span>Active Registered</span><strong>{formatNumber(fleetActivation.activeRegisteredCount)}</strong><small>Made calls</small></div>
+          <div className="summary-card yellow"><span>Inactive Radios</span><strong>{formatNumber(fleetActivation.inactiveCount)}</strong><small>No calls found</small></div>
+          <div className="summary-card green"><span>Activation %</span><strong>{formatDecimal(fleetActivation.activationRate, 1)}%</strong><small>Active / registered</small></div>
+          <div className="summary-card yellow"><span>Traffic / Active Radio</span><strong>{formatDecimal(trafficIntensity.trafficPerRadio, 2)}</strong><small>Erlangs per radio</small></div>
+        </div>
+        <div className="quality-grid">
+          <article className="table-card">
+            <h3>Inactive Radios by Company</h3>
+            <table><thead><tr><th>Company</th><th>Inactive Radios</th></tr></thead><tbody>{fleetActivation.inactiveByCompany.map((item) => <tr key={item.name}><td>{item.name}</td><td>{formatNumber(item.count)}</td></tr>)}</tbody></table>
+          </article>
+          <article className="table-card">
+            <h3>Inactive Radios by Region</h3>
+            <table><thead><tr><th>Region</th><th>Inactive Radios</th></tr></thead><tbody>{fleetActivation.inactiveByRegion.slice(0, 12).map((item) => <tr key={item.name}><td>{item.name}</td><td>{formatNumber(item.count)}</td></tr>)}</tbody></table>
+          </article>
+        </div>
+      </section>
+
+      <SectionTitle id="regionPerformance" eyebrow="Regional deck" title={`Region Performance in ${CompanyPeriodLabel}`} text="Compare regional calls, duration, traffic, active radios, talkgroups, companies, and peak operating periods." collapsed={isSectionCollapsed("regionPerformance")} onToggle={() => toggleSection("regionPerformance")} />
+      <section id="regionPerformance-content" className={`region-performance-section ${isSectionCollapsed("regionPerformance") ? "section-content-collapsed" : ""}`}>
+        <article className="table-card wide-table-card">
+          <h3>Region Performance Matrix</h3>
+          <div className="records-scroll small">
+            <table>
+              <thead><tr><th>Region</th><th>Calls</th><th>Total Duration</th><th>Traffic</th><th>Active Radios</th><th>Talkgroups</th><th>Companies</th><th>Base Stations</th><th>Avg Duration</th><th>Peak Hour</th><th>Top Company</th></tr></thead>
+              <tbody>{regionPerformanceRows.map((row) => <tr key={row.name}><td>{row.name}</td><td>{formatNumber(row.calls)}</td><td>{secondsToClock(row.durationSeconds)}</td><td>{formatDecimal(row.trafficHours, 2)}</td><td>{formatNumber(row.radios)}</td><td>{formatNumber(row.talkgroups)}</td><td>{formatNumber(row.companies)}</td><td>{formatNumber(row.stations)}</td><td>{secondsToClock(row.averageDuration)}</td><td>{row.peakHour}</td><td>{row.topCompany}</td></tr>)}</tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <SectionTitle id="trafficIntensity" eyebrow="Traffic deck" title={`Busy Hour & Traffic Intensity in ${CompanyPeriodLabel}`} text="Show when the network is busiest and how much traffic each operational dimension carries." collapsed={isSectionCollapsed("trafficIntensity")} onToggle={() => toggleSection("trafficIntensity")} />
+      <section id="trafficIntensity-content" className={`traffic-intensity-section ${isSectionCollapsed("trafficIntensity") ? "section-content-collapsed" : ""}`}>
+        <div className="summary-cards traffic-intensity-cards">
+          <div className="summary-card yellow"><span>Busy Traffic Hour</span><strong>{trafficIntensity.busyTrafficHour?.name ?? "--"}</strong><small>Highest Erlangs</small></div>
+          <div className="summary-card green"><span>Busy Hour Traffic</span><strong>{formatDecimal(trafficIntensity.busyTrafficHour?.trafficHours ?? 0, 2)}</strong><small>Erlangs</small></div>
+          <div className="summary-card yellow"><span>Traffic / Talkgroup</span><strong>{formatDecimal(trafficIntensity.trafficPerTalkgroup, 2)}</strong><small>Erlangs</small></div>
+          <div className="summary-card green"><span>Traffic / Company</span><strong>{formatDecimal(trafficIntensity.trafficPerCompany, 2)}</strong><small>Erlangs</small></div>
+          <div className="summary-card yellow"><span>Traffic / Region</span><strong>{formatDecimal(trafficIntensity.trafficPerRegion, 2)}</strong><small>Erlangs</small></div>
+        </div>
+        <article className="table-card wide-table-card">
+          <h3>Region × Hour Busy Map</h3>
+          <div className="heatmap-scroll">
+            <table className="busy-heatmap-table">
+              <thead><tr><th>Region</th>{heatmapHours.map((hour) => <th key={hour}>{hour}</th>)}<th>Total</th></tr></thead>
+              <tbody>{regionHourHeatmap.map((row) => <tr key={row.region}><td>{row.region}</td>{row.cells.map((value, index) => <td key={`${row.region}-${heatmapHours[index]}`}><span className="busy-heat-cell" style={{ opacity: Math.max(0.18, value / heatmapMax) }}>{formatNumber(value)}</span></td>)}<td>{formatNumber(row.total)}</td></tr>)}</tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <SectionTitle id="talkgroupEfficiency" eyebrow="Talkgroup deck" title={`Talkgroup Efficiency in ${CompanyPeriodLabel}`} text="Rank talkgroups by traffic, active radios, active users, average duration, and peak operating context." collapsed={isSectionCollapsed("talkgroupEfficiency")} onToggle={() => toggleSection("talkgroupEfficiency")} />
+      <section id="talkgroupEfficiency-content" className={`talkgroup-efficiency-section ${isSectionCollapsed("talkgroupEfficiency") ? "section-content-collapsed" : ""}`}>
+        <article className="table-card wide-table-card">
+          <h3>Talkgroup Efficiency Matrix</h3>
+          <div className="records-scroll small no-scroll-table fixed-row-table">
+            <table>
+              <thead><tr><th>Talkgroup</th><th>Calls</th><th>Duration</th><th>Traffic</th><th>Active Radios</th><th>Active Users</th><th>Avg Duration</th><th>Peak Hour</th><th>Peak Region</th><th>Peak Company</th></tr></thead>
+              <tbody>{talkgroupEfficiencyRows.map((row) => <tr key={row.name}><td>{row.name}</td><td>{formatNumber(row.calls)}</td><td>{secondsToClock(row.durationSeconds)}</td><td>{formatDecimal(row.trafficHours, 2)}</td><td>{formatNumber(row.radios)}</td><td>{formatNumber(row.users)}</td><td>{secondsToClock(row.averageDuration)}</td><td>{row.peakHour}</td><td>{row.peakRegion}</td><td>{row.peakCompany}</td></tr>)}</tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <SectionTitle id="kpi" eyebrow="KPI Metrics" title="KPI Measurements" collapsed={isSectionCollapsed("kpi")} onToggle={() => toggleSection("kpi")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportKpiXlsx} /><ExportButton kind="ppt" label="PPT" onClick={exportKpiPpt} /><ExportButton kind="pdf" label="PDF" onClick={exportKpiPdf} /></>} />
       <section id="kpi-content" className={`kpi-grid ${isSectionCollapsed("kpi") ? "section-content-collapsed" : ""}`}>
         <article className="table-card kpi-table">
-          <h3>KPI sheet table</h3>
+          <h3>KPI Measurements</h3>
           <div className="records-scroll small" ref={kpiTableRef}>
             <table>
-              <thead>
-                <tr>
-                  <th>Call Source</th>
-                  <th>Talk groups in use</th>
-                  <th>No. of Calls</th>
-                  <th>Duration (Sec)</th>
-                  <th>Duration (hh:mm:ss)</th>
-                  <th>Total No. of Users activated</th>
-                  <th>Call Performed by (No. of Users)</th>
-                  <th>KPI (Avg. Duration per User per Company) in sec</th>
-                  <th>KPI</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Call Source</th><th>Talk groups in use</th><th>No. of Calls</th><th>Duration (Sec)</th><th>Duration (hh:mm:ss)</th><th>Total No. of Users activated</th><th>Call Performed by (No. of Users)</th><th>KPI (Avg. Duration per User per Company) in sec</th><th>KPI</th></tr></thead>
               <tbody>
-                {kpiRows.map((row, index) => (
+                {kpiRows.map((row, i) => (
                   <tr key={row.company}>
-                    <td>{row.company}</td>
-                    <td>{formatNumber(row.talkgroupsInUse)}</td>
-                    <td>{formatNumber(row.calls)}</td>
-                    <td>{formatNumber(row.durationSeconds)}</td>
-                    <td>{secondsToClock(row.durationSeconds)}</td>
-                    <td>{formatNumber(row.usersActivated)}</td>
-                    <td>{formatNumber(row.callingUsers)}</td>
-                    <td>{formatNumber(row.kpiAvgDurationPerUser)}</td>
-                    <td>{index === 0 ? formatNumber(kpiAverage) : ""}</td>
+                    <td>{row.company}</td><td>{formatNumber(row.talkgroupsInUse)}</td><td>{formatNumber(row.calls)}</td>
+                    <td>{formatNumber(row.durationSeconds)}</td><td>{secondsToClock(row.durationSeconds)}</td>
+                    <td>{formatNumber(row.usersActivated)}</td><td>{formatNumber(row.callingUsers)}</td>
+                    <td>{formatNumber(row.kpiAvgDurationPerUser)}</td><td>{i === 0 ? formatNumber(kpiAverage) : ""}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </article>
-        
         <article className="chart-card" ref={kpiAverageChartRef}>
           <h3>KPI Average Duration per Company</h3>
           <ResponsiveContainer width="100%" height={Math.max(340, kpiRows.length * 34)}>
             <BarChart layout="vertical" data={kpiRows} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
               <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
-              <YAxis type="category" dataKey="company" width={140} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(value) => truncateLabel(value, 18)} interval={0} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => [`${formatDecimal(value, 1)} sec`, "KPI avg duration"]} />
-              <Bar dataKey="kpiAvgDurationPerUser" fill={CHART_COLORS.calls}>
-                <LabelList dataKey="kpiAvgDurationPerUser" content={RightValueLabel} />
-              </Bar>
+              <YAxis type="category" dataKey="company" width={140} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 18)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => [`${formatDecimal(v, 1)} sec`, "KPI avg duration"]} />
+              <Bar dataKey="kpiAvgDurationPerUser" fill={CHART_COLORS.calls}><LabelList dataKey="kpiAvgDurationPerUser" content={RightValueLabel} /></Bar>
             </BarChart>
           </ResponsiveContainer>
           <ChartLegend items={[{ name: "Average duration per activated user", color: CHART_COLORS.calls }]} />
         </article>
-        
         <article className="chart-card" ref={kpiCallsDurationChartRef}>
           <h3>KPI Calls and Duration per Company</h3>
           <ResponsiveContainer width="100%" height={390}>
             <ComposedChart data={kpiRows} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} />
-              <XAxis dataKey="company" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} angle={-55} textAnchor="end" interval={0} tickMargin={12} height={128} tickFormatter={(value) => truncateLabel(value, 18)} />
+              <XAxis dataKey="company" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} angle={-55} textAnchor="end" interval={0} tickMargin={12} height={128} tickFormatter={(v) => truncateLabel(v, 18)} />
               <YAxis yAxisId="calls" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
               <YAxis yAxisId="duration" orientation="right" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => formatNumber(value)} />
-              <Line yAxisId="calls" dataKey="calls" stroke={CHART_COLORS.calls} strokeWidth={3} dot={{ r: 4, fill: CHART_COLORS.calls }} name="Calls">
-                <LabelList dataKey="calls" content={KpiBarLabel} />
-              </Line>
-              <Line yAxisId="duration" dataKey="durationSeconds" stroke={CHART_COLORS.duration} strokeWidth={3} name="Duration seconds">
-                <LabelList dataKey="durationSeconds" content={KpiLineLabel} />
-              </Line>
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Line yAxisId="calls" dataKey="calls" stroke={CHART_COLORS.calls} strokeWidth={3} dot={{ r: 4, fill: CHART_COLORS.calls }} name="Calls"><LabelList dataKey="calls" content={KpiBarLabel} /></Line>
+              <Line yAxisId="duration" dataKey="durationSeconds" stroke={CHART_COLORS.duration} strokeWidth={3} name="Duration seconds"><LabelList dataKey="durationSeconds" content={KpiLineLabel} /></Line>
             </ComposedChart>
           </ResponsiveContainer>
           <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.calls }, { name: "Duration seconds", color: CHART_COLORS.duration }]} />
         </article>
-        
         <article className="chart-card monthly-kpi-card" ref={monthlyKpiChartRef}>
-          <h3>Monthly KPI</h3>
-          <p>(Avg. call duration per company) in sec</p>
+          <h3>Monthly KPI</h3><p>(Avg. call duration per company) in sec</p>
           <ResponsiveContainer width="100%" height={430}>
             <LineChart data={monthlyKpi.rows} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} />
-              <XAxis dataKey="company" tick={{ fill: CHART_COLORS.axis, fontSize: 11, fontWeight: 700 }} tickFormatter={(value) => truncateLabel(value, 22)} interval={0} angle={-35} textAnchor="end" tickMargin={12} height={82} />
-              <YAxis
-                tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                tickFormatter={(value) => `${formatDecimal(Number(value), 0)}s`}
-                domain={[0, "dataMax + 20"]}
-                label={{ value: "Average duration (sec)", angle: -90, position: "insideLeft", fill: CHART_COLORS.axis, fontSize: 12 }}
-              />
-              <Tooltip
-                contentStyle={TOOLTIP_STYLE}
-                formatter={(value: number, name: string) => [value == null ? "" : `${formatDecimal(value, 2)} sec`, name]}
-              />
+              <XAxis dataKey="company" tick={{ fill: CHART_COLORS.axis, fontSize: 11, fontWeight: 700 }} tickFormatter={(v) => truncateLabel(v, 22)} interval={0} angle={-35} textAnchor="end" tickMargin={12} height={82} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => `${formatDecimal(Number(v), 0)}s`} domain={[0, "dataMax + 20"]} label={{ value: "Average duration (sec)", angle: -90, position: "insideLeft", fill: CHART_COLORS.axis, fontSize: 12 }} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string) => [v == null ? "" : `${formatDecimal(v, 2)} sec`, name]} />
               {monthlyKpi.months.map((month) => (
                 <Line key={month.key} type="monotone" dataKey={month.key} name={shortMonthLabel(month.name)} stroke={month.color} strokeWidth={3} dot={{ r: 6 }} activeDot={{ r: 8 }} connectNulls={false}>
                   <LabelList dataKey={month.key} content={(props) => <PointValueLabel {...props} fill={month.color} />} />
@@ -2969,71 +2694,37 @@ export default function App() {
               ))}
             </LineChart>
           </ResponsiveContainer>
-          <div className="chart-legend">
-            {monthlyKpi.months.map((month) => <span key={month.key}><i style={{ background: month.color }} />{shortMonthLabel(month.name)}</span>)}
-          </div>
+          <div className="chart-legend">{monthlyKpi.months.map((m) => <span key={m.key}><i style={{ background: m.color }} />{shortMonthLabel(m.name)}</span>)}</div>
         </article>
-        
         <article className="chart-card monthly-kpi-card" ref={kpiTotalAvgChartRef}>
-          <h3>KPI Total Avg. Duration</h3>
-          <p>Average call duration by month in sec</p>
+          <h3>KPI Total Avg. Duration</h3><p>Average call duration by month in sec</p>
           <div className="Company-pie-layout">
             <ResponsiveContainer width="64%" height={430}>
               <PieChart margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
                 <Pie data={monthlyKpiPieData} dataKey="value" nameKey="name" outerRadius={180} innerRadius={100} paddingAngle={2} label={PieDecimalLabel} labelLine={false}>
-                  {monthlyKpiPieData.map((entry, index) => <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />)}
+                  {monthlyKpiPieData.map((entry, i) => <Cell key={entry.name} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => [`${formatDecimal(value, 2)} sec`, "Average duration"]} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => [`${formatDecimal(v, 2)} sec`, "Average duration"]} />
               </PieChart>
             </ResponsiveContainer>
-            <ChartLegend className="pie-legend kpi-total-avg-legend" items={monthlyKpiPieData.map((item, index) => ({ name: item.name, color: COLORS[index % COLORS.length] }))} />
+            <ChartLegend className="pie-legend kpi-total-avg-legend" items={monthlyKpiPieData.map((item, i) => ({ name: item.name, color: COLORS[i % COLORS.length] }))} />
           </div>
         </article>
       </section>
 
-      <SectionTitle
-        id="Company"
-        eyebrow="Company deck"
-        title={`Company contribution in ${CompanyPeriodLabel}`}
-        collapsed={isSectionCollapsed("Company")}
-        onToggle={() => toggleSection("Company")}
-        actions={(
-          <>
-            <ExportButton kind="view" label="View" onClick={openMonthlyCompanyTable} />
-            <ExportButton kind="xlsx" label="XLSX" onClick={exportMonthlyCompanyXlsx} />
-            <ExportButton kind="ppt" label="PPT" onClick={exportMonthlyCompanyPpt} />
-            <ExportButton kind="pdf" label="PDF" onClick={exportMonthlyCompanyPdf} />
-          </>
-        )}
-      />
-
+      <SectionTitle id="Company" eyebrow="Company deck" title={`Company contribution in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Company")} onToggle={() => toggleSection("Company")} actions={<><ExportButton kind="view" label="View" onClick={openMonthlyCompanyTable} /><ExportButton kind="xlsx" label="XLSX" onClick={exportMonthlyCompanyXlsx} /><ExportButton kind="ppt" label="PPT" onClick={exportMonthlyCompanyPpt} /><ExportButton kind="pdf" label="PDF" onClick={exportMonthlyCompanyPdf} /></>} />
       <section id="Company-content" className={`chart-grid dashboard-chart-grid company-chart-grid ${isSectionCollapsed("Company") ? "section-content-collapsed" : ""}`}>
-        {/* Company contribution charts */}
-
         <article className="chart-card Company-card company-talkgroups" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Talkgroups per Company</h3>
           <p>Total {formatNumber(sumValues(CompanyChartData.totalTalkgroups))} &nbsp;·&nbsp; Used {formatNumber(sumValues(CompanyChartData.talkgroupsUsed))}</p>
           <ChartLegend items={[{ name: "Total talkgroups", color: CHART_COLORS.total }, { name: "Used talkgroups", color: CHART_COLORS.used }]} />
           <ResponsiveContainer width="100%" height={340}>
-            <BarChart
-              data={CompanyChartData.totalTalkgroups.map((item) => ({
-                name: item.name,
-                total: item.value,
-                used: CompanyChartData.talkgroupsUsed.find((u) => u.name === item.name)?.value ?? 0,
-              }))}
-              margin={{ left: 0, right: 0, top: 12, bottom: 0 }}
-            >
+            <BarChart data={CompanyChartData.totalTalkgroups.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.talkgroupsUsed.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
               <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={40} tickMargin={0} tickFormatter={(v) => truncateLabel(v, 12)} />
-              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.35)]} allowDataOverflow={false} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.35)]} allowDataOverflow={false} />
               <Tooltip content={<TalkgroupTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar
-                dataKey="total"
-                name="total"
-                shape={(props: any) => <OverlayBarShape {...props} totalColor={CHART_COLORS.total} usedColor={CHART_COLORS.used} />}
-              >
-                <LabelList dataKey="total" content={() => null} />
-              </Bar>
+              <Bar dataKey="total" name="total" shape={(props: any) => <OverlayBarShape {...props} totalColor={CHART_COLORS.total} usedColor={CHART_COLORS.used} />}><LabelList dataKey="total" content={() => null} /></Bar>
             </BarChart>
           </ResponsiveContainer>
         </article>
@@ -3042,93 +2733,46 @@ export default function App() {
           <p>Total {formatNumber(sumValues(CompanyChartData.totalUsers))} &nbsp;·&nbsp; Made Calls {formatNumber(sumValues(CompanyChartData.callingUsers))}</p>
           <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.totalGreen }, { name: "Radios made calls", color: CHART_COLORS.usedGreen }]} />
           <ResponsiveContainer width="100%" height={340}>
-            <BarChart
-              data={CompanyChartData.totalUsers.map((item) => ({
-                name: item.name,
-                total: item.value,
-                used: CompanyChartData.callingUsers.find((u) => u.name === item.name)?.value ?? 0,
-              }))}
-              margin={{ left: 0, right: 0, top: 12, bottom: 0 }}
-            >
+            <BarChart data={CompanyChartData.totalUsers.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.callingUsers.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
               <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={40} tickMargin={0} tickFormatter={(v) => truncateLabel(v, 12)} />
-              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.35)]} allowDataOverflow={false} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.35)]} allowDataOverflow={false} />
               <Tooltip content={<RadioTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar
-                dataKey="total"
-                name="total"
-                shape={(props: any) => <OverlayBarShape {...props} totalColor={CHART_COLORS.totalGreen} usedColor={CHART_COLORS.usedGreen} />}
-              >
-                <LabelList dataKey="total" content={() => null} />
-              </Bar>
+              <Bar dataKey="total" name="total" shape={(props: any) => <OverlayBarShape {...props} totalColor={CHART_COLORS.totalGreen} usedColor={CHART_COLORS.usedGreen} />}><LabelList dataKey="total" content={() => null} /></Bar>
             </BarChart>
           </ResponsiveContainer>
         </article>
         <article className="chart-card Company-card company-radio-type" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Radios Type per Company</h3>
-          <p>Total radios {formatNumber(mobileTypeByCompany.reduce((sum, row) => sum + Number(row.total ?? 0), 0))}</p>
+          <p>Total radios {formatNumber(mobileTypeByCompany.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
           <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.total }, ...mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))]} />
           <ResponsiveContainer width="100%" height={340}>
             <BarChart data={mobileTypeByCompany} margin={{ left: 0, right: 0, top: 14, bottom: 0 }} barCategoryGap="14%" barGap={2}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
               <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={44} tickMargin={2} tickFormatter={(v) => truncateLabel(v, 12)} />
-              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.28)]} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.28)]} />
               <Tooltip content={(props) => <MobileTypeTooltip {...props} mobileTypes={mobileTypes} />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar
-                dataKey="total"
-                name="Total radios"
-                maxBarSize={72}
-                shape={(props: any) => <MobileTypeOverlayBarShape {...props} mobileTypes={mobileTypes} />}
-              >
-                <LabelList dataKey="total" content={() => null} />
-              </Bar>
+              <Bar dataKey="total" name="Total radios" maxBarSize={72} shape={(props: any) => <MobileTypeOverlayBarShape {...props} mobileTypes={mobileTypes} />}><LabelList dataKey="total" content={() => null} /></Bar>
             </BarChart>
           </ResponsiveContainer>
         </article>
         <article className="chart-card wide monthly-Company-card" ref={monthlyCompanyChartRef}>
           <h3>Calls and Duration per Company</h3>
           <div className="company-color-legend">
-            {[...new Set(monthlyCompanyRows.map((row) => row.company))].map((company) => (
-              <span key={company}>
-                <i style={{ background: companyColor(company) }} />
-                {company}
-              </span>
+            {[...new Set(monthlyCompanyRows.map((r) => r.company))].map((company) => (
+              <span key={company}><i style={{ background: companyColor(company) }} />{company}</span>
             ))}
           </div>
           <ResponsiveContainer width="100%" height={430}>
             <BarChart data={monthlyCompanyRows} margin={{ left: 0, right: 0, top: 0, bottom: 0 }} barCategoryGap="20%">
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} />
-              <XAxis
-                xAxisId="company"
-                dataKey="companyLabel"
-                interval={0}
-                angle={-90}
-                textAnchor="end"
-                height={112}
-                tickMargin={8}
-                tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-              />
-              <XAxis
-                xAxisId="month"
-                dataKey="periodLabel"
-                interval={0}
-                axisLine={false}
-                tickLine={false}
-                height={28}
-                tick={{ fill: CHART_COLORS.axis, fontSize: 12, fontWeight: 700 }}
-              />
+              <XAxis xAxisId="company" dataKey="companyLabel" interval={0} angle={-90} textAnchor="end" height={112} tickMargin={8} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
+              <XAxis xAxisId="month" dataKey="periodLabel" interval={0} axisLine={false} tickLine={false} height={28} tick={{ fill: CHART_COLORS.axis, fontSize: 12, fontWeight: 700 }} />
               <YAxis yAxisId="duration" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={chartLabel} />
               <YAxis yAxisId="calls" orientation="right" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={chartLabel} />
-              <Tooltip
-                contentStyle={TOOLTIP_STYLE}
-                formatter={(value: number, name: string) => [formatNumber(value), name]}
-                labelFormatter={(_, payload) => {
-                  const row = payload?.[0]?.payload;
-                  return row ? `${row.periodType} ${row.period} - ${row.company}` : "";
-                }}
-              />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string) => [formatNumber(v), name]} labelFormatter={(_, payload) => { const r = payload?.[0]?.payload; return r ? `${r.periodType} ${r.period} - ${r.company}` : ""; }} />
               <Bar xAxisId="company" yAxisId="duration" dataKey="durationSeconds" name="Duration (Sec)" maxBarSize={28}>
-                {monthlyCompanyRows.map((entry) => <Cell key={`duration-${entry.period}-${entry.company}`} fill={companyMetricColor(entry.company, "duration")} />)}
+                {monthlyCompanyRows.map((entry) => <Cell key={`dur-${entry.period}-${entry.company}`} fill={companyMetricColor(entry.company, "duration")} />)}
                 <LabelList dataKey="durationSeconds" content={TopValueLabel} />
               </Bar>
               <Bar xAxisId="company" yAxisId="calls" dataKey="calls" name="No. of Calls" maxBarSize={28}>
@@ -3143,194 +2787,146 @@ export default function App() {
 
       <SectionTitle id="Performance" eyebrow="Performance" title={`Calls & Duration Performance in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Performance")} onToggle={() => toggleSection("Performance")} />
       <section id="Performance-content" className={`chart-grid performance-chart-grid ${isSectionCollapsed("Performance") ? "section-content-collapsed" : ""}`}>
-        <article className="chart-card performance-region">
-          <CallsDurationPerformanceChart title="Regions Performance" data={rankings.region} gradientId="performanceRegion" />
-        </article>
-        <article className="chart-card performance-month">
-          <CallsDurationPerformanceChart title="Monthly Performance" data={rankings.month} gradientId="performanceMonth" xTickFormatter={shortMonthLabel} />
-        </article>
-        <article className="chart-card performance-company">
-          <CallsDurationPerformanceChart title="Companies Performance" data={rankings.company} gradientId="performanceCompany" />
-        </article>
-        <article className="chart-card performance-talkgroup">
-          <CallsDurationPerformanceChart title="Talkgroups Performance" data={rankings.talkgroup.slice(0, 12)} gradientId="performanceTalkgroup" />
-        </article>
-        <article className="chart-card performance-basestation">
-          <CallsDurationPerformanceChart title="Base Stations Performance" data={rankings.station.slice(0, 12)} gradientId="performanceStation" />
-        </article>
-        <article className="chart-card performance-hour">
-          <CallsDurationPerformanceChart title="Hours Performance" data={rankings.hour} gradientId="performanceHour" xTickFormatter={(value) => `${value ?? ""}`} />
-        </article>
+        <article className="chart-card performance-region"><CallsDurationPerformanceChart title="Regions Performance" data={rankings.region} gradientId="performanceRegion" /></article>
+        <article className="chart-card performance-month"><CallsDurationPerformanceChart title="Monthly Performance" data={rankings.month} gradientId="performanceMonth" xTickFormatter={shortMonthLabel} /></article>
+        <article className="chart-card performance-company"><CallsDurationPerformanceChart title="Companies Performance" data={rankings.company} gradientId="performanceCompany" /></article>
+        <article className="chart-card performance-talkgroup"><CallsDurationPerformanceChart title="Talkgroups Performance" data={rankings.talkgroup.slice(0, 12)} gradientId="performanceTalkgroup" /></article>
+        <article className="chart-card performance-basestation"><CallsDurationPerformanceChart title="Base Stations Performance" data={rankings.station.slice(0, 12)} gradientId="performanceStation" /></article>
+        <article className="chart-card performance-hour"><CallsDurationPerformanceChart title="Hours Performance" data={rankings.hour} gradientId="performanceHour" xTickFormatter={(v) => `${v ?? ""}`} /></article>
       </section>
 
-      <SectionTitle id="General" eyebrow="General" title={`General Charts in ${CompanyPeriodLabel}` } collapsed={isSectionCollapsed("General")} onToggle={() => toggleSection("General")} />
+      <SectionTitle id="General" eyebrow="General" title={`General Charts in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("General")} onToggle={() => toggleSection("General")} />
       <section id="General-content" className={`chart-grid dashboard-chart-grid general-chart-grid ${isSectionCollapsed("General") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card general-mobile-type wide">
           <h3>Radio Type per Month</h3>
-          <p>Total radios {formatNumber(mobileTypeByMonth.reduce((sum, row) => sum + Number(row.total ?? 0), 0))}</p>
+          <p>Total radios {formatNumber(mobileTypeByMonth.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
           <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.total }, ...mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))]} />
           <ResponsiveContainer width="100%" height={340}>
             <BarChart data={mobileTypeByMonth} margin={{ left: 0, right: 0, top: 14, bottom: 0 }} barCategoryGap="12%" barGap={2}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
               <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={52} tickMargin={8} tickFormatter={shortMonthLabel} />
-              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.28)]} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.28)]} />
               <Tooltip content={(props) => <MobileTypeTooltip {...props} mobileTypes={mobileTypes} />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar
-                dataKey="total"
-                name="Total radios"
-                maxBarSize={72}
-                shape={(props: any) => <MobileTypeOverlayBarShape {...props} mobileTypes={mobileTypes} />}
-              >
-                <LabelList dataKey="total" content={() => null} />
-              </Bar>
+              <Bar dataKey="total" name="Total radios" maxBarSize={72} shape={(props: any) => <MobileTypeOverlayBarShape {...props} mobileTypes={mobileTypes} />}><LabelList dataKey="total" content={() => null} /></Bar>
             </BarChart>
           </ResponsiveContainer>
         </article>
       </section>
 
       <SectionTitle id="Charts" eyebrow="Top 10" title={`Top 10 per Calls in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Charts")} onToggle={() => toggleSection("Charts")} />
-
       <section id="Charts-content" className={`chart-grid top-10-row ${isSectionCollapsed("Charts") ? "section-content-collapsed" : ""}`}>
-          <article className="chart-card">
-            <h3>Top Companies by Calls</h3>
-            <ResponsiveContainer width="100%" height={340}>
-              <BarChart layout="vertical" data={rankings.company.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
-                <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
-                <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
-                <YAxis type="category" dataKey="name" width={130} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(value) => truncateLabel(value, 18)} interval={0} />
-                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => formatNumber(value)} />
-                <Bar dataKey="calls" fill={CHART_COLORS.usedGreen}>
-                  <LabelList dataKey="calls" content={RightValueLabel} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.usedGreen }]} />
-          </article>
-          <article className="chart-card">
-            <h3>Top Base Stations by Calls</h3>
-            <ResponsiveContainer width="100%" height={340}>
-              <BarChart layout="vertical" data={rankings.station.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
-                <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
-                <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
-                <YAxis type="category" dataKey="name" width={140} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(value) => truncateLabel(value, 18)} interval={0} />
-                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => formatNumber(value)} />
-                <Bar dataKey="calls" fill={CHART_COLORS.duration}>
-                  <LabelList dataKey="calls" content={RightValueLabel} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.duration }]} />
-          </article>
-          <article className="chart-card">
-            <h3>Top Talkgroups by Calls</h3>
-            <ResponsiveContainer width="100%" height={340}>
-              <BarChart layout="vertical" data={rankings.talkgroup.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
-                <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
-                <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
-                <YAxis type="category" dataKey="name" width={140} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(value) => truncateLabel(value, 18)} interval={0} />
-                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => formatNumber(value)} />
-                <Bar dataKey="calls" fill={CHART_COLORS.calls}>
-                  <LabelList dataKey="calls" content={RightValueLabel} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.calls }]} />
-          </article>
-      </section>
-
-
-      <SectionTitle
-        id="users"
-        eyebrow="Utilization deck"
-        title={`Top radios and employee utilization in ${CompanyPeriodLabel}`}
-        text="Rank the busiest radios and users by calls and duration for operations review."
-        collapsed={isSectionCollapsed("users")}
-        onToggle={() => toggleSection("users")}
-        actions={(
-          <>
-            <ExportButton kind="xlsx" label="XLSX" onClick={exportUtilizationXlsx} />
-            <ExportButton kind="pdf" label="PDF" onClick={exportUtilizationPdf} />
-          </>
-        )}
-      />
-      <section id="users-content" className={`quality-grid ${isSectionCollapsed("users") ? "section-content-collapsed" : ""}`}>
-        <article className="table-card">
-          <h3>Top Radios</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Radio ID &amp; Alias</th>
-                <th>Employee Name</th>
-                <th>Company</th>
-                <th>Total Calls</th>
-                <th>Total Duration</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topRadioUsers.map((item) => (
-                <tr key={`${item.radioId}-${item.radioAlias}-${item.employeeName}-${item.company}`}>
-                  <td>{item.radioId} - {item.radioAlias}</td>
-                  <td>{item.employeeName}</td>
-                  <td>{item.company}</td>
-                  <td>{formatNumber(item.calls)}</td>
-                  <td>{secondsToClock(item.durationSeconds)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <article className="chart-card">
+          <h3>Top Companies by Calls</h3>
+          <ResponsiveContainer width="100%" height={340}>
+            <BarChart layout="vertical" data={rankings.company.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
+              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" width={130} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 18)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Bar dataKey="calls" fill={CHART_COLORS.usedGreen}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.usedGreen }]} />
         </article>
-        <article className="table-card">
-          <h3>Top Users</h3>
-          <table><tbody>{rankings.user.slice(0, 10).map((item) => <tr key={item.name}><td>{item.name}</td><td>{formatNumber(item.calls)}</td><td>{secondsToClock(item.durationSeconds)}</td></tr>)}</tbody></table>
+        <article className="chart-card">
+          <h3>Top Base Stations by Calls</h3>
+          <ResponsiveContainer width="100%" height={340}>
+            <BarChart layout="vertical" data={rankings.station.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
+              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" width={140} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 18)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Bar dataKey="calls" fill={CHART_COLORS.duration}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.duration }]} />
+        </article>
+        <article className="chart-card">
+          <h3>Top Talkgroups by Calls</h3>
+          <ResponsiveContainer width="100%" height={340}>
+            <BarChart layout="vertical" data={rankings.talkgroup.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
+              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" width={140} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 18)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Bar dataKey="calls" fill={CHART_COLORS.calls}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.calls }]} />
         </article>
       </section>
 
-      <SectionTitle
-        id="records"
-        eyebrow="Source records"
-        title={`Filtered Calls Register in ${CompanyPeriodLabel}`}
-        text="Paged at 50 rows per page for browser performance. Exports include every filtered row."
-        collapsed={isSectionCollapsed("records")}
-        onToggle={() => toggleSection("records")}
-        actions={(
-          <>
-            {/* <ExportButton kind="csv" label="CSV" onClick={exportRows} /> */}
-            <ExportButton kind="xlsx" label="XLSX" onClick={exportRowsXlsx} />
-            <ExportButton kind="pdf" label="PDF" onClick={exportRowsPdfPage} />
-          </>
-        )}
-      />
+      <SectionTitle id="users" eyebrow="Behavior deck" title={`Radio & User Behavior in ${CompanyPeriodLabel}`} text="Identify heavy users, high-use radios, multi-talkgroup activity, and cross-region behavior." collapsed={isSectionCollapsed("users")} onToggle={() => toggleSection("users")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportUtilizationXlsx} /><ExportButton kind="pdf" label="PDF" onClick={exportUtilizationPdf} /></>} />
+      <section id="users-content" className={`behavior-grid ${isSectionCollapsed("users") ? "section-content-collapsed" : ""}`}>
+        <article className="table-card">
+          <h3>Radio Behavior Insights</h3>
+          <div className="records-scroll small no-scroll-table fixed-row-table">
+            <table>
+              <thead><tr><th>Radio ID</th><th>Alias</th><th>Company</th><th>Calls</th><th>Duration</th><th>Avg Duration</th><th>Talkgroups</th><th>Base Stations</th><th>Users</th><th>Regions</th></tr></thead>
+              <tbody>{radioBehaviorRows.map((item) => <tr key={item.radioId}><td>{item.radioId}</td><td>{item.alias}</td><td>{item.company}</td><td>{formatNumber(item.calls)}</td><td>{secondsToClock(item.durationSeconds)}</td><td>{secondsToClock(item.averageDuration)}</td><td>{formatNumber(item.talkgroups)}</td><td>{formatNumber(item.stations)}</td><td>{formatNumber(item.users)}</td><td>{formatNumber(item.regions)}</td></tr>)}</tbody>
+            </table>
+          </div>
+        </article>
+        <article className="table-card">
+          <h3>User Behavior Insights</h3>
+          <div className="records-scroll small no-scroll-table fixed-row-table">
+            <table>
+              <thead><tr><th>User</th><th>Calls</th><th>Duration</th><th>Avg Duration</th><th>Radios</th><th>Talkgroups</th><th>Regions</th><th>Companies</th></tr></thead>
+              <tbody>{userBehaviorRows.map((item) => <tr key={item.name}><td>{item.name}</td><td>{formatNumber(item.calls)}</td><td>{secondsToClock(item.durationSeconds)}</td><td>{secondsToClock(item.averageDuration)}</td><td>{formatNumber(item.radios)}</td><td>{formatNumber(item.talkgroups)}</td><td>{formatNumber(item.regions)}</td><td>{formatNumber(item.companies)}</td></tr>)}</tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <SectionTitle id="records" eyebrow="Source records" title={`Filtered Calls Register in selected period (${CompanyPeriodLabel})`} text="Fixed-height rows are shown without table scrolling. Exports include every filtered row." collapsed={isSectionCollapsed("records")} onToggle={() => toggleSection("records")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportRowsXlsx} /><ExportButton kind="pdf" label="PDF" onClick={exportRowsPdfPage} /></>} />
       <section id="records-content" className={`records-card ${isSectionCollapsed("records") ? "section-content-collapsed" : ""}`}>
-        <div className="records-scroll">
-          <table>
+        <div className="records-scroll records-scroll-fixed-register fixed-row-table">
+          <table className="filtered-register-table">
+            <colgroup>
+              <col className="col-sn" />
+              <col className="col-radio-id" />
+              <col className="col-radio-alias" />
+              <col className="col-radio-type" />
+              <col className="col-employee-name" />
+              <col className="col-employee-id" />
+              <col className="col-region" />
+              <col className="col-company" />
+              <col className="col-talkgroup" />
+              <col className="col-start" />
+              <col className="col-end" />
+              <col className="col-duration" />
+              <col className="col-base-station" />
+            </colgroup>
             <thead><tr><th>SN</th><th>Radio ID</th><th>Radio Alias</th><th>Radio Type</th><th>Employee Name</th><th>Employee ID</th><th>Region</th><th>Company</th><th>Talkgroup Alias</th><th>Start Time</th><th>End Time</th><th>Duration (s)</th><th>Base Station</th></tr></thead>
             <tbody>
               {pagedRecords.map((record, index) => (
                 <tr key={`${record.radioId}-${index}`}>
-                  <td>{(page - 1) * 50 + index + 1}</td>
-                  <td>{record.radioId}</td>
-                  <td>{record.radioAlias}</td>
-                  <td>{record.mobileType}</td>
-                  <td>{record.employeeName}</td>
-                  <td>{record.employeeId}</td>
-                  <td>{record.region}</td>
-                  <td>{record.company}</td>
-                  <td>{record.talkgroup}</td>
-                  <td>{record.startTime}</td>
-                  <td>{record.endTime}</td>
-                  <td>{formatNumber(record.durationSeconds)}</td>
-                  <td>{record.baseStation}</td>
+                  <td>{(page - 1) * 50 + index + 1}</td><td>{record.radioId}</td><td>{record.radioAlias}</td><td>{record.mobileType}</td>
+                  <td>{record.employeeName}</td><td>{record.employeeId}</td><td>{record.region}</td><td>{record.company}</td>
+                  <td>{record.talkgroup}</td><td>{record.startTime}</td><td>{record.endTime}</td>
+                  <td>{formatNumber(record.durationSeconds)}</td><td>{record.baseStation}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <div className="pager">
-          <button className="button" disabled={page <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>Previous</button>
+          <button className="button" disabled={page <= 1} onClick={() => setPage((c) => Math.max(1, c - 1))}>Previous</button>
           <span>Page {formatNumber(page)} of {formatNumber(pageCount)} - showing {formatNumber(pagedRecords.length)} rows</span>
-          <button className="button" disabled={page >= pageCount} onClick={() => setPage((current) => Math.min(pageCount, current + 1))}>Next</button>
+          <button className="button" disabled={page >= pageCount} onClick={() => setPage((c) => Math.min(pageCount, c + 1))}>Next</button>
         </div>
       </section>
+
+      {isAddingMoreCdr && (
+        <div className="loading-overlay" role="status" aria-live="polite">
+          <div className="loading-card">
+            <Activity size={28} />
+            <strong>Merging additional CDR region...</strong>
+            <span>The dashboard will refresh once the new records are added.</span>
+          </div>
+        </div>
+      )}
+      {error && <div className="toast error">{error}</div>}
     </main>
   );
 }
