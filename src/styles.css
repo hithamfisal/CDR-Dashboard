@@ -1,28 +1,1017 @@
 :root {
-  --bg: #071118;
-  --panel: #0f1b24;
-  --panel-2: #142533;
-  --line: #263846;
-  --text: #edf6fa;
-  --muted: #9fb1bc;
-  --blue: #37a6d9;
-  --amber: #f0b84f;
+  --bg: #071824;
+  --bg-2: #0b2130;
+  --panel: rgba(13, 35, 50, 0.88);
+  --panel-strong: rgba(16, 45, 64, 0.96);
+  --card: rgba(17, 43, 60, 0.92);
+  --text: #f8fcff;
+  --muted: #a8becf;
+  --line: rgba(151, 188, 210, 0.22);
+  --blue: #0078d4;
+  --blue-soft: #6ec9ff;
+  --cyan: #00a6a6;
+  --amber: #ffb000;
   --green: #65c18c;
-  --red: #f1776b;
+  --red: #d95f5f;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--text);
-  font-family: Inter, system-ui, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(0, 120, 212, 0.34), transparent 32rem),
+    radial-gradient(circle at top right, rgba(0, 166, 166, 0.28), transparent 32rem),
+    linear-gradient(135deg, #06131e 0%, #0a1e2c 45%, #092437 100%);
+  min-height: 100vh;
 }
-button, select, input { font: inherit; }
-button, label { cursor: pointer; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+
+.upload-shell,
+.app-shell {
+  min-height: 100vh;
+  padding: clamp(20px, 3vw, 38px);
+  background:
+    linear-gradient(135deg, rgba(4, 17, 27, 0.3), rgba(4, 17, 27, 0.08)),
+    transparent;
+}
+
+.upload-grid {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 0.95fr;
+  gap: clamp(22px, 4vw, 52px);
+  align-items: center;
+  min-height: calc(100vh - 76px);
+}
+.upload-copy {
+  padding: clamp(20px, 4vw, 46px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(7, 24, 36, 0.72), rgba(15, 47, 67, 0.5));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+.eyebrow,
+.choice-eyebrow,
+.section-title p,
+.workbook-card span {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--blue-soft);
+}
+.upload-copy h1 {
+  margin: 0;
+  max-width: 760px;
+  font-size: clamp(38px, 6vw, 78px);
+  line-height: .95;
+  letter-spacing: -0.06em;
+}
+.lead,
+.upload-copy p,
+.choice-card p,
+.workbook-choice-card p,
+.section-title span,
+.workbook-card p,
+.metric-card span,
+.chart-card p,
+.warning-list li {
+  color: var(--muted);
+}
+.lead { font-size: clamp(16px, 2vw, 21px); line-height: 1.7; }
+
+.workbook-choice-panel {
+  position: relative;
+  padding: 82px 24px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(8, 28, 42, 0.82);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+.upload-theme-toggle { position: absolute; top: 22px; right: 22px; }
+.workbook-choice-card,
+.choice-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-height: 190px;
+  padding: 22px;
+  color: var(--text);
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(0, 120, 212, 0.13), rgba(20, 37, 51, 0.92));
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+  overflow: hidden;
+}
+.workbook-choice-card:hover,
+.choice-card:hover { transform: translateY(-3px); border-color: rgba(110, 201, 255, 0.55); }
+.workbook-choice-card input,
+.button input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.workbook-choice-card.empty { opacity: .62; cursor: not-allowed; }
+.choice-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  color: var(--blue-soft);
+  border: 1px solid rgba(110, 201, 255, .35);
+  border-radius: 20px;
+  background: rgba(110, 201, 255, .1);
+}
+.workbook-choice-card strong { font-size: clamp(20px, 2.4vw, 30px); line-height: 1.1; }
+.workbook-choice-card p { margin: 0; font-size: 13px; line-height: 1.6; }
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 2000;
+  max-width: min(760px, calc(100vw - 32px));
+  padding: 13px 18px;
+  border-radius: 14px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.toast.error { border-color: rgba(217, 95, 95, .45); color: #ffd7d7; }
+
+.topbar,
+.section-nav,
+.hero-panel,
+.metric-card,
+.chart-card,
+.table-card,
+.filter-panel,
+.workbook-card,
+.warning-list,
+.export-menu,
+.multi-select-dropdown,
+.modal-panel {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: var(--radius-md);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, .22);
+  backdrop-filter: blur(16px);
+  margin-top: 20px !important;
+}
+
+/* TOPBAR: Forced onto one line, with invisible horizontal scroll if needed */
+.topbar {
+  position: sticky;
+  top: 14px;
+  z-index: 200;
+  display: flex;
+  flex-wrap: nowrap !important;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 18px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.topbar::-webkit-scrollbar { display: none; }
+
+.brand-block { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: center; white-space: nowrap; flex-shrink: 0; }
+.brand-block img { grid-row: span 2; width: 54px; height: 54px; object-fit: contain; }
+.brand-block p { margin: 0; color: var(--muted); font-weight: 700; }
+.brand-block h1 { margin: 0; font-size: clamp(18px, 2vw, 28px); letter-spacing: -.03em; }
+
+.topbar-actions { 
+  display: flex; 
+  flex-wrap: nowrap !important; 
+  gap: 8px; 
+  align-items: center; 
+  justify-content: flex-end; 
+  flex: 1 1 auto; 
+  min-width: 0; 
+}
+.brand-logo { max-width: 76px; max-height: 38px; object-fit: contain; padding: 4px; border-radius: 10px; background: rgba(255,255,255,.08); flex-shrink: 0; }
+
+/* BUTTON: Fit content precisely to stop them stretching wide */
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 14px;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .07);
+  text-decoration: none;
+  overflow: hidden;
+  flex: 0 0 auto !important;
+  width: fit-content !important;
+  white-space: nowrap !important;
+}
+
+/* This kills the invisible physical width of file inputs inside your label buttons */
+.button input[type="file"] {
+  display: none !important;
+}
+
+.button:hover { border-color: rgba(110, 201, 255, .5); background: rgba(110, 201, 255, .12); }
+.button.primary { background: linear-gradient(135deg, var(--blue), #00a6d6); border-color: transparent; font-weight: 800; }
+.button.small { min-height: 34px; padding: 7px 11px; font-size: 12px; }
+.theme-toggle { color: var(--amber); border-color: rgba(255,176,0,.38); background: rgba(255,176,0,.1); }
+
+/* SECTION NAV: Height auto and proper sticky positioning to prevent overlap */
+.section-nav {
+  position: sticky;
+  top: 85px; 
+  z-index: 190;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 24px;
+  padding: 10px;
+  height: auto;
+  min-height: 46px;
+  box-sizing: border-box;
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.section-nav button {
+  color: var(--muted);
+  border: 5px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  padding: 8px 12px;
+}
+.section-nav button:hover { color: var(--text); border-color: var(--line); background: rgba(255,255,255,.06); }
+
+.hero-panel { display: grid; grid-template-columns: 1fr auto; gap: 20px; padding: clamp(20px, 3vw, 32px); margin-bottom: 18px; }
+.hero-main h2 { margin: 0; font-size: clamp(34px, 5vw, 66px); letter-spacing: -.055em; }
+.workbook-card { min-width: 0; padding: 18px; }
+.workbook-card h3 { margin: 4px 0; }
+.cdr-sources-list::-webkit-scrollbar,
+.table-wrap::-webkit-scrollbar,
+.multi-select-dropdown::-webkit-scrollbar { width: 9px; height: 9px; }
+.cdr-sources-list::-webkit-scrollbar-thumb,
+.table-wrap::-webkit-scrollbar-thumb,
+.multi-select-dropdown::-webkit-scrollbar-thumb { background: rgba(110,201,255,.28); border-radius: 999px; }
+
+.metrics-grid,
+.chart-grid,
+.filter-grid,
+.kpi-grid,
+.ranking-grid,
+.summary-grid {
+  display: grid;
+  gap: 16px;
+}
+.metrics-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 18px 0; }
+.chart-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 18px 0; }
+.metric-card,
+.chart-card,
+.table-card,
+.filter-panel { padding: 18px; }
+.metric-card { display: flex; justify-content: space-between; align-items: center; min-height: 118px; }
+.metric-card strong { display: block; margin-top: 8px; font-size: clamp(26px, 3vw, 42px); letter-spacing: -.04em; }
+.metric-card.blue { border-color: rgba(0,120,212,.38); }
+.metric-card.amber { border-color: rgba(255,176,0,.38); }
+.metric-card.green { border-color: rgba(101,193,140,.38); }
+.metric-card.red { border-color: rgba(217,95,95,.38); }
+
+.section-title { display: flex; justify-content: space-between; gap: 16px; align-items: flex-end; margin: 30px 0 14px; scroll-margin-top: 150px; }
+.section-title h2 { margin: 0; font-size: clamp(24px, 3vw, 38px); letter-spacing: -.04em; }
+.section-title-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.section-title-collapsed + .section-body { display: none; }
+.chart-card h3,
+.table-card h3 { margin: 0 0 12px; }
+.chart-card { min-height: 380px; }
+.chart-card .recharts-responsive-container { min-height: 300px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.custom-tooltip { display: grid; gap: 4px; padding: 10px 12px; background: #102331; border: 1px solid #2f5d73; border-radius: 12px; color: #f8fcff; box-shadow: var(--shadow); }
+
+.filter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.filter-field { display: flex; flex-direction: column; gap: 6px; }
+.filter-field > span { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.filter-field input,
+.filter-field select,
+.multi-select-trigger {
+  width: 100%;
+  min-height: 42px;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255,255,255,.07);
+  padding: 9px 11px;
+}
+.multi-select-trigger { display: flex; justify-content: space-between; align-items: center; text-align: left; }
+.multi-select-dropdown { position: fixed; z-index: 3000; max-height: 280px; overflow: auto; padding: 8px; }
+.multi-select-option { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 8px; color: var(--text); }
+.multi-select-option:hover { background: rgba(110,201,255,.1); }
+.multi-select-clear { width: 100%; margin-bottom: 6px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: rgba(255,255,255,.04); }
+
+.table-wrap { width: 100%; overflow: auto; border-radius: 14px; border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; min-width: 860px; }
+th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { position: sticky; top: 0; z-index: 1; color: var(--blue-soft); background: rgba(10, 31, 46, .96); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+td { color: var(--text); font-size: 13px; }
+tr:hover td { background: rgba(110,201,255,.05); }
+.pagination { display: flex; justify-content: flex-end; gap: 8px; align-items: center; margin-top: 12px; color: var(--muted); }
+.warning-list { padding: 14px 18px; margin: 16px 0; border-color: rgba(255,176,0,.38); }
+.warning-list ul { margin: 8px 0 0; padding-left: 20px; }
+
+.export-menu { position: absolute; z-index: 100; padding: 8px; display: grid; gap: 6px; }
+.quick-card-export { margin-right: 6px; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 5000; display: grid; place-items: center; padding: 20px; background: rgba(0,0,0,.55); }
+.modal-panel { width: min(860px, 100%); max-height: min(760px, 90vh); overflow: auto; padding: 24px; }
+
+.se-theme {
+  --bg: #f3f9ff;
+  --bg-2: #eaf6ff;
+  --panel: rgba(255, 255, 255, 0.86);
+  --panel-strong: rgba(255, 255, 255, 0.96);
+  --card: rgba(255, 255, 255, 0.92);
+  --text: #092033;
+  --muted: #516779;
+  --line: rgba(0, 120, 255, 0.16);
+  --blue: #0078ff;
+  --blue-soft: #0087c7;
+  --cyan: #00a7d8;
+  --amber: #c67a00;
+  --green: #008f66;
+  --red: #c64747;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(0, 120, 255, 0.16), transparent 32rem),
+    radial-gradient(circle at top right, rgba(0, 201, 139, 0.12), transparent 32rem),
+    linear-gradient(135deg, #f7fbff 0%, #eef8ff 48%, #f7fff9 100%);
+}
+body:has(.se-theme) {
+  background:
+    radial-gradient(circle at top left, rgba(0, 120, 255, 0.16), transparent 32rem),
+    radial-gradient(circle at top right, rgba(0, 201, 139, 0.12), transparent 32rem),
+    linear-gradient(135deg, #f7fbff 0%, #eef8ff 48%, #f7fff9 100%);
+}
+.se-theme .upload-copy,
+.se-theme .workbook-choice-panel,
+.se-theme .topbar,
+.se-theme .section-nav,
+.se-theme .hero-panel,
+.se-theme .metric-card,
+.se-theme .chart-card,
+.se-theme .table-card,
+.se-theme .filter-panel,
+.se-theme .workbook-card,
+.se-theme .warning-list,
+.se-theme .multi-select-dropdown,
+.se-theme .modal-panel {
+  background: var(--panel);
+  box-shadow: 0 22px 65px rgba(24, 78, 119, .12);
+}
+.se-theme .upload-copy,
+.se-theme .workbook-choice-card { background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(239,248,255,.92)); }
+.se-theme .workbook-choice-card:hover { border-color: rgba(0,120,255,.34); }
+.se-theme .choice-icon { background: rgba(0,120,255,.08); color: #0087c7; border-color: rgba(0,120,255,.22); }
+.se-theme .button { background: rgba(0,120,255,.06); }
+.se-theme .button.primary { color: #fff; background: linear-gradient(135deg, #0078ff, #00a7d8); }
+.se-theme th { background: rgba(241, 249, 255, .98); }
+.se-theme tr:hover td { background: rgba(0,120,255,.04); }
+.se-theme .custom-tooltip { background: #ffffff; color: #092033; border-color: rgba(0,120,255,.18); }
+
+@media (max-width: 1180px) {
+  .upload-grid,
+  .hero-panel { grid-template-columns: 1fr; }
+  .metrics-grid,
+  .chart-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .upload-shell,
+  .app-shell { padding-top: 10px; }
+  .metrics-grid,
+  .chart-grid,
+  .filter-grid { grid-template-columns: 1fr; }
+  .section-title { align-items: flex-start; flex-direction: column; }
+  .topbar-actions { justify-content: flex-start; }
+  .brand-logo { display: none; }
+}
+
+/* Wider upload grid to fit 4 tiles */
+.upload-grid-wide {
+  grid-template-columns: 1fr 1.1fr;
+}
+.workbook-choice-panel.three-tile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 74px 22px 22px;
+  min-height: 540px;
+}
+.workbook-choice-panel.three-tile .cdr-choice-card {
+  grid-column: span 2;
+  border-color: rgba(240, 184, 79, 0.42);
+  background: linear-gradient(135deg, rgba(240, 184, 79, 0.16), rgba(20, 37, 51, 0.92));
+}
+.workbook-choice-panel.three-tile .previous-choice-card {
+  grid-column: span 2;
+}
+
+/* Fleetmap tiles: smaller, two-up at top of panel */
+.fleetmap-choice-card {
+  min-height: 138px;
+  padding: 16px;
+}
+.fleetmap-choice-card .choice-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+}
+.fleetmap-choice-card strong {
+  font-size: clamp(18px, 2vw, 22px);
+}
+.fleetmap-choice-card p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.fleetmap-choice-card.loaded {
+  border-color: rgba(101, 193, 140, 0.5);
+  background: linear-gradient(135deg, rgba(101, 193, 140, 0.14), rgba(20, 37, 51, 0.92));
+}
+.fleetmap-choice-card.loaded .choice-icon {
+  border-color: rgba(101, 193, 140, 0.55);
+  background: rgba(101, 193, 140, 0.16);
+  color: var(--green);
+}
+.fleetmap-choice-card.loaded .choice-eyebrow {
+  color: var(--green);
+}
+
+/* "Add Region" button in topbar */
+.add-region-button {
+  border-color: rgba(240, 184, 79, 0.46);
+  background: rgba(240, 184, 79, 0.12);
+  color: var(--amber);
+}
+.add-region-button:hover {
+  background: rgba(240, 184, 79, 0.22);
+  border-color: var(--amber);
+}
+
+/* Workbook card — list of merged CDR sources */
+.cdr-sources-list {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  max-height: 110px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+}
+.cdr-sources-list li {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.cdr-sources-list strong {
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text);
+}
+.fleetmap-status {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--green);
+  border: 1px solid rgba(101, 193, 140, 0.3);
+  border-radius: 6px;
+  background: rgba(101, 193, 140, 0.08);
+}
+
+/* Light theme adjustments */
+.se-theme .fleetmap-choice-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(239,248,255,0.92));
+}
+.se-theme .fleetmap-choice-card.loaded {
+  background: linear-gradient(135deg, rgba(0,201,139,0.12), rgba(255,255,255,0.96));
+  border-color: rgba(0,201,139,0.4);
+}
+.se-theme .cdr-sources-list {
+  background: rgba(0,120,255,0.04);
+  border-color: rgba(0,120,255,0.16);
+}
+.se-theme .add-region-button {
+  background: rgba(0,167,216,0.12);
+  border-color: rgba(0,167,216,0.36);
+  color: #0087c7;
+}
+
+/* Mobile fallback for the upload screen */
+@media (max-width: 1180px) {
+  .upload-grid-wide { grid-template-columns: 1fr; }
+  .workbook-choice-panel.three-tile { grid-template-columns: 1fr; }
+  .workbook-choice-panel.three-tile .cdr-choice-card,
+  .workbook-choice-panel.three-tile .previous-choice-card {
+    grid-column: span 1;
+  }
+}
+
+/* ============================================================
+   Dashboard layout restoration patch
+   Restores the original dark command-center formatting for:
+   filters, KPI/stat tiles, chart grids, table borders, register,
+   and utility sections used by App.fixed.tsx.
+   ============================================================ */
 
 .app-shell {
+  --dash-bg: #061621;
+  --dash-panel: rgba(9, 28, 40, 0.92);
+  --dash-panel-2: rgba(11, 34, 48, 0.96);
+  --dash-border: rgba(90, 142, 166, 0.34);
+  --dash-border-strong: rgba(101, 193, 218, 0.42);
+  --dash-grid: rgba(125, 164, 184, 0.18);
+  --dash-header: rgba(3, 17, 26, 0.92);
+  --dash-yellow: #ffd200;
+  --dash-green: #8fd34f;
+  --dash-blue: #00a3ff;
+  --dash-glow: 0 0 0 1px rgba(0, 210, 255, 0.08), 0 18px 45px rgba(0, 0, 0, 0.36);
+  width: min(1920px, 100%);
+  margin: 0 auto;
+  color: #eaf7ff;
+  background:
+    radial-gradient(circle at 12% 4%, rgba(0, 120, 180, 0.22), transparent 28rem),
+    radial-gradient(circle at 96% 18%, rgba(0, 135, 115, 0.18), transparent 32rem),
+    linear-gradient(180deg, #06131d 0%, #071923 42%, #041118 100%);
+}
+
+.app-shell.se-theme {
+  color: #eaf7ff;
+  background:
+    radial-gradient(circle at 12% 4%, rgba(0, 120, 180, 0.22), transparent 28rem),
+    radial-gradient(circle at 96% 18%, rgba(0, 135, 115, 0.18), transparent 32rem),
+    linear-gradient(180deg, #06131d 0%, #071923 42%, #041118 100%);
+}
+
+.app-shell .topbar,
+.app-shell .section-nav,
+.app-shell .hero-panel,
+.app-shell .workbook-card,
+.app-shell .filters-panel,
+.app-shell .summary-card,
+.app-shell .chart-card,
+.app-shell .table-card,
+.app-shell .records-card,
+.app-shell .warning-strip {
+  border: 1px solid var(--dash-border);
+  background:
+    linear-gradient(180deg, rgba(15, 44, 61, 0.94), rgba(5, 20, 30, 0.96));
+  box-shadow: var(--dash-glow);
+}
+
+.app-shell .topbar {
+  top: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(4, 20, 31, 0.97), rgba(8, 37, 53, 0.94));
+}
+.app-shell .brand-block img { width: 42px; height: 42px; }
+.app-shell .brand-block h1 { font-size: clamp(18px, 1.8vw, 25px); color: #f4fbff; }
+.app-shell .brand-block p { font-size: 11px; color: #8fc6df; }
+.app-shell .brand-logo { max-width: 52px; max-height: 30px; background: rgba(255, 255, 255, 0.12); }
+
+.app-shell .button {
+  min-height: 30px;
+  padding: 6px 11px;
+  border-radius: 6px;
+  border-color: rgba(84, 136, 160, 0.42);
+  background: linear-gradient(180deg, rgba(20, 60, 78, 0.82), rgba(7, 26, 38, 0.88));
+  color: #eaf8ff;
+  font-weight: 700;
+  font-size: 12px;
+}
+.app-shell .button:hover { border-color: rgba(0, 198, 255, 0.68); background: rgba(0, 139, 196, 0.22); }
+.app-shell .button.primary { background: linear-gradient(180deg, #18a8ff, #0075bd); color: white; }
+.app-shell .theme-toggle { color: #ffd200; border-color: rgba(255, 210, 0, 0.48); }
+
+.app-shell .section-nav {
+  top: 78px;
+  margin: 10px 0 24px;
+  padding: 7px;
+  border-radius: 8px;
+  gap: 5px;
+  background: rgba(5, 20, 30, 0.86);
+}
+.app-shell .section-nav button {
+  padding: 6px 10px;
+  border-radius: 5px;
+  color: #8ab5c9;
+  font-size: 11px;
+  font-weight: 800;
+}
+.app-shell .section-nav button:hover { color: #ffffff; background: rgba(0, 163, 255, 0.18); border-color: rgba(0, 163, 255, 0.35); }
+
+.app-shell .hero-panel {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  align-items: stretch;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background:
+    linear-gradient(115deg, rgba(9, 34, 50, 0.96), rgba(5, 21, 31, 0.92)),
+    radial-gradient(circle at 78% 25%, rgba(0, 204, 170, 0.14), transparent 24rem);
+}
+.app-shell .hero-main h2 {
+  font-size: clamp(38px, 5.2vw, 74px);
+  color: #f8fdff;
+  text-shadow: 0 0 24px rgba(0, 180, 255, 0.16);
+}
+.app-shell .workbook-card {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  border-radius: 9px;
+  padding: 15px;
+}
+.app-shell .workbook-card strong { overflow-wrap: anywhere; color: #fff; }
+
+.app-shell .warning-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-color: rgba(255, 210, 0, 0.55);
+  color: #ffe88a;
+  background: rgba(110, 76, 0, 0.28);
+}
+
+.app-shell .filters-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.8fr) repeat(3, minmax(110px, 0.75fr)) minmax(160px, 1fr) minmax(190px, 1.3fr) minmax(170px, 1fr) auto auto;
+  gap: 8px;
+  align-items: end;
+  margin: 10px 0 12px;
+  padding: 10px;
+  border-radius: 9px;
+}
+.app-shell .search-box,
+.app-shell .filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.app-shell .search-box > span,
+.app-shell .filter-field > span {
+  color: #91b9ca;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.app-shell .search-box {
+  position: relative;
+}
+.app-shell .search-box svg {
+  position: absolute;
+  left: 9px;
+  bottom: 8px;
+  color: #65c9ff;
+  pointer-events: none;
+}
+.app-shell .search-box input,
+.app-shell .multi-select-trigger,
+.app-shell .filter-field input,
+.app-shell .filter-field select {
+  height: 32px;
+  min-height: 32px;
+  border-radius: 5px;
+  border: 1px solid rgba(89, 139, 163, 0.42);
+  background: rgba(2, 14, 23, 0.78);
+  color: #f3fbff;
+  padding: 6px 9px;
+  font-size: 12px;
+}
+.app-shell .search-box input { padding-left: 31px; }
+.app-shell .multi-select-trigger { justify-content: space-between; }
+.app-shell .filter-count {
+  align-self: center;
+  white-space: nowrap;
+  color: #95c2d5;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+.summary-card {
+  min-height: 56px;
+  padding: 7px 9px;
+  border-radius: 5px;
+  overflow: hidden;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(14, 38, 52, 0.98), rgba(3, 16, 24, 0.98));
+}
+.summary-card span {
+  display: block;
+  margin: -7px -9px 6px;
+  padding: 4px 6px;
+  color: #07131b;
+  font-size: 10px;
+  line-height: 1.15;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+.summary-card strong {
+  display: block;
+  color: #ffffff;
+  font-size: clamp(13px, 1.2vw, 18px);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.summary-card.yellow { border-color: rgba(255, 210, 0, 0.65); }
+.summary-card.yellow span { background: linear-gradient(180deg, #fff15d, #e5bb00); }
+.summary-card.green { border-color: rgba(143, 211, 79, 0.62); }
+.summary-card.green span { background: linear-gradient(180deg, #b9f06c, #6fb62e); }
+
+.section-title {
+  align-items: center;
+  margin: 18px 0 8px;
+  padding: 0 2px;
+  scroll-margin-top: 132px;
+}
+.section-title h2 {
+  color: #ffffff;
+  font-size: clamp(18px, 1.9vw, 27px);
+  letter-spacing: -0.02em;
+}
+.section-title p { color: #77d8ff; }
+.section-title span { color: #8eb4c4; font-size: 12px; }
+.section-content-collapsed { display: none !important; }
+
+.kpi-grid,
+.chart-grid,
+.quality-grid {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+.kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.kpi-grid .kpi-table { grid-column: 1 / -1; }
+.dashboard-chart-grid,
+.performance-chart-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.top-10-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.quality-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); }
+.chart-card.wide,
+.monthly-Company-card,
+.general-mobile-type { grid-column: 1 / -1; }
+
+.chart-card,
+.table-card,
+.records-card {
+  position: relative;
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 0;
+  overflow: hidden;
+}
+.chart-card::before,
+.table-card::before,
+.records-card::before,
+.summary-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(0, 205, 255, 0.12), transparent 34%, rgba(0, 190, 120, 0.06));
+}
+.chart-card h3,
+.table-card h3 {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+}
+.chart-card p {
+  position: relative;
+  z-index: 1;
+  margin: -2px 0 8px;
+  color: #94bbcc;
+  font-size: 12px;
+}
+.chart-card .recharts-responsive-container { position: relative; z-index: 1; min-height: 260px; }
+.chart-legend,
+.company-color-legend {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 11px;
+  margin: 7px 0;
+  color: #b5d3df;
+  font-size: 11px;
+}
+.chart-legend i,
+.company-color-legend i,
+.chart-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 5px;
+  border-radius: 2px;
+  background: currentColor;
+}
+.chart-legend span,
+.company-color-legend span { display: inline-flex; align-items: center; }
+.Company-pie-layout {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.pie-legend { flex: 1; align-content: center; }
+
+.table-card table,
+.records-card table,
+.kpi-table table,
+.quality-grid table {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid rgba(91, 143, 166, 0.44);
+  background: rgba(3, 15, 23, 0.62);
+}
+.table-card th,
+.table-card td,
+.records-card th,
+.records-card td,
+.kpi-table th,
+.kpi-table td,
+.quality-grid th,
+.quality-grid td {
+  border: 1px solid rgba(75, 123, 147, 0.38);
+  padding: 6px 7px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+.table-card th,
+.records-card th,
+.kpi-table th,
+.quality-grid th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  color: #dff8ff;
+  background: linear-gradient(180deg, rgba(13, 48, 67, 0.98), rgba(6, 28, 41, 0.98));
+  font-weight: 900;
+  text-transform: none;
+  letter-spacing: .02em;
+}
+.table-card td,
+.records-card td,
+.kpi-table td,
+.quality-grid td { color: #d8edf5; }
+.table-card tbody tr:nth-child(even) td,
+.records-card tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.025); }
+.table-card tbody tr:hover td,
+.records-card tbody tr:hover td { background: rgba(0, 163, 255, 0.10); }
+
+.records-scroll,
+.table-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow: auto;
+  border: 1px solid rgba(70, 122, 146, 0.32);
+  border-radius: 5px;
+  background: rgba(2, 14, 22, 0.58);
+}
+.records-scroll.small { max-height: 320px; }
+.records-card .records-scroll { max-height: 1120px; }
+.records-card {
+  margin-bottom: 20px;
+}
+.records-card table { min-width: 1500px; }
+.records-card th:first-child,
+.records-card td:first-child { text-align: center; }
+.pager {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  color: #a8c8d7;
+  font-size: 12px;
+}
+.pager .button:disabled { opacity: .45; cursor: not-allowed; }
+
+.multi-select-dropdown {
+  border: 1px solid rgba(95, 151, 176, 0.58);
+  border-radius: 7px;
+  background: rgba(5, 21, 31, 0.98);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+  color: #eaf8ff;
+}
+.multi-select-option:hover { background: rgba(0, 163, 255, 0.16); }
+.custom-tooltip {
+  background: rgba(4, 18, 28, 0.98) !important;
+  border: 1px solid rgba(0, 190, 255, 0.42) !important;
+  color: #effbff !important;
+}
+
+.app-shell.se-theme .topbar,
+.app-shell.se-theme .section-nav,
+.app-shell.se-theme .hero-panel,
+.app-shell.se-theme .workbook-card,
+.app-shell.se-theme .filters-panel,
+.app-shell.se-theme .summary-card,
+.app-shell.se-theme .chart-card,
+.app-shell.se-theme .table-card,
+.app-shell.se-theme .records-card,
+.app-shell.se-theme .warning-strip {
+  background: linear-gradient(180deg, rgba(15, 44, 61, 0.94), rgba(5, 20, 30, 0.96));
+  border-color: var(--dash-border);
+  box-shadow: var(--dash-glow);
+}
+.app-shell.se-theme .button { background: linear-gradient(180deg, rgba(20, 60, 78, 0.82), rgba(7, 26, 38, 0.88)); color: #eaf8ff; }
+.app-shell.se-theme th { background: linear-gradient(180deg, rgba(13, 48, 67, 0.98), rgba(6, 28, 41, 0.98)); color: #dff8ff; }
+.app-shell.se-theme td { color: #d8edf5; }
+
+@media (max-width: 1480px) {
+  .summary-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dashboard-chart-grid,
+  .performance-chart-grid,
+  .top-10-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1180px) {
+  .app-shell .filters-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .kpi-grid,
+  .dashboard-chart-grid,
+  .performance-chart-grid,
+  .top-10-row,
+  .quality-grid { grid-template-columns: 1fr; }
+  .app-shell .hero-panel { grid-template-columns: 1fr; }
+  .chart-card.wide,
+  .monthly-Company-card,
+  .general-mobile-type,
+  .kpi-grid .kpi-table { grid-column: auto; }
+}
+@media (max-width: 720px) {
+  .app-shell .filters-panel { grid-template-columns: 1fr; }
+  .summary-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary-card strong { font-size: 13px; }
+  .Company-pie-layout { flex-direction: column; }
+}
+
+/* ============================================================
+   PNG background theme + upload-home layout restoration
+   dark-background-theme  => /assets/h.png
+   light-background-theme => /assets/light.png
+   ============================================================ */
+
+.app-shell.dark-background-theme,
+.upload-shell.dark-background-theme {
+  color: #eaf7ff;
+}
+
+.app-shell.dark-background-theme {
   min-height: 100vh;
   padding: 18px clamp(14px, 3vw, 38px) 48px;
   background:
@@ -33,144 +1022,7 @@ button, label { cursor: pointer; }
     var(--bg);
 }
 
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  background: rgba(15, 27, 36, 0.92);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 18px 46px rgba(0,0,0,0.22);
-}
-.topbar p, .eyebrow {
-  margin: 0 0 4px;
-  color: var(--amber);
-  font-family: "Roboto Condensed", sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 12px;
-}
-.topbar h1 {
-  margin: 0;
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: clamp(24px, 3vw, 38px);
-}
-.brand-block {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: 14px;
-  align-items: center;
-}
-.brand-block img {
-  grid-row: span 2;
-  width: 70px;
-  max-height: 52px;
-  object-fit: contain;
-}
-.brand-logo {
-  height: 40px;
-  max-width: 82px;
-  object-fit: contain;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.9);
-  padding: 3px;
-}
-.topbar-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.button {
-  height: 40px;
-  border: 1px solid var(--line);
-  background: #102231;
-  color: var(--text);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 14px;
-  font-weight: 700;
-  border-radius: 999px;
-  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
-}
-.button svg {
-  color: currentColor;
-  flex-shrink: 0;
-}
-.button:hover {
-  transform: translateY(-2px);
-  border-color: rgba(165, 243, 252, 0.65);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.34);
-}
-.button.primary {
-  border-color: var(--blue);
-  background: var(--blue);
-  color: #061017;
-}
-.button.small {
-  height: 32px;
-  padding: 0 11px;
-  font-size: 12px;
-}
-.button:disabled {
-  cursor: not-allowed;
-  opacity: 0.58;
-  transform: none;
-  box-shadow: none;
-}
-.export-button,
-.quick-card-export {
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(15, 23, 42, 0.56);
-  color: #dffafe;
-  backdrop-filter: blur(14px);
-  gap: 7px;
-  font-weight: 850;
-}
-.export-button-xlsx { border-color: rgba(101, 193, 140, 0.42); }
-.export-button-ppt { border-color: rgba(240, 184, 79, 0.48); }
-.export-button-pdf { border-color: rgba(241, 119, 107, 0.48); }
-.export-button-view { border-color: rgba(55, 166, 217, 0.48); }
-.export-button-csv { border-color: rgba(196, 151, 255, 0.46); }
-.export-button-png,
-.quick-card-export { border-color: rgba(93, 183, 183, 0.48); }
-.export-button:hover,
-.quick-card-export:hover {
-  background: rgba(2, 6, 23, 0.62);
-  box-shadow: 0 14px 32px rgba(55, 166, 217, 0.18);
-}
-.button input, .workbook-choice-card input { display: none; }
-
-.section-nav {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 12px 0 16px;
-}
-.section-nav button {
-  color: var(--muted);
-  font: inherit;
-  border: 1px solid var(--line);
-  background: rgba(15,27,36,0.72);
-  padding: 9px 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  border-radius: 999px;
-  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
-}
-.section-nav button:hover {
-  color: var(--text);
-  border-color: var(--blue);
-  transform: translateY(-1px);
-}
-
-.upload-shell {
+.upload-shell.dark-background-theme {
   min-height: 100vh;
   display: grid;
   place-items: center;
@@ -182,1352 +1034,2891 @@ button, label { cursor: pointer; }
     radial-gradient(circle at 72% 8%, rgba(240,184,79,0.16), transparent 30%),
     var(--bg);
 }
-.upload-grid {
-  width: min(1180px, 100%);
-  display: grid;
-  grid-template-columns: 1fr 0.9fr;
-  gap: 24px;
+
+.app-shell.light-background-theme {
+  min-height: 100vh;
+  padding: 18px clamp(14px, 3vw, 38px) 48px;
+  color: #092033;
+  background:
+    linear-gradient(rgba(255,255,255,0.50), rgba(255,255,255,0.78)),
+    url("/assets/light.png") center top / cover fixed,
+    linear-gradient(120deg, rgba(0,120,255,0.08), transparent 32%),
+    radial-gradient(circle at 78% 0%, rgba(0,201,139,0.08), transparent 28%),
+    #f7fbff;
 }
-.upload-copy, .workbook-choice-panel {
-  border: 1px solid var(--line);
-  background: rgba(15,27,36,0.9);
-  box-shadow: 0 28px 70px rgba(0,0,0,0.28);
-}
-.upload-copy { padding: clamp(28px, 5vw, 64px); }
-.upload-copy h1 {
-  margin: 0;
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: clamp(48px, 7vw, 92px);
-  line-height: 0.9;
-  max-width: 760px;
-}
-.lead {
-  max-width: 680px;
-  color: var(--muted);
-  line-height: 1.8;
-  font-size: 17px;
-}
-.upload-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 28px;
-}
-.upload-pills span {
-  border: 1px solid var(--line);
-  background: var(--panel-2);
-  color: var(--muted);
-  padding: 10px 12px;
-}
-.workbook-choice-panel {
-  min-height: 430px;
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
-  align-content: center;
-  gap: 16px;
-  padding: 74px 24px 24px;
-}
-.workbook-choice-card {
-  width: 100%;
-  min-height: 168px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: linear-gradient(135deg, rgba(20, 37, 51, 0.92), rgba(15, 27, 36, 0.78));
-  color: var(--text);
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  column-gap: 18px;
-  row-gap: 6px;
-  padding: 22px;
-  text-align: left;
-  border-radius: 18px;
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-}
-.workbook-choice-card:hover:not(:disabled) {
-  transform: translateY(-3px);
-  border-color: rgba(55,166,217,0.58);
-  box-shadow: 0 22px 46px rgba(55,166,217,0.16);
-}
-.workbook-choice-card:disabled {
-  cursor: not-allowed;
-}
-.choice-icon {
-  grid-row: span 3;
-  width: 76px;
-  height: 76px;
+
+.upload-shell.light-background-theme {
+  min-height: 100vh;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(240,184,79,0.38);
-  border-radius: 22px;
-  background: rgba(240,184,79,0.12);
-  color: var(--amber);
-}
-.previous-choice-card .choice-icon {
-  border-color: rgba(55,166,217,0.42);
-  background: rgba(55,166,217,0.12);
-  color: var(--blue);
-}
-.previous-choice-card.empty .choice-icon {
-  border-color: rgba(159,177,188,0.28);
-  background: rgba(159,177,188,0.08);
-  color: var(--muted);
-}
-.choice-eyebrow {
-  color: var(--amber);
-  font-size: 11px;
-  font-weight: 850;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-.workbook-choice-card strong {
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: clamp(24px, 2.7vw, 34px);
-  line-height: 1.05;
-  overflow-wrap: anywhere;
-}
-.workbook-choice-card p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.hero-panel {
-  display: grid;
-  grid-template-columns: 1.5fr 0.5fr;
-  gap: 18px;
-}
-.hero-main, .workbook-card, .filter-panel, .metric-card, .chart-card, .quality-card, .table-card, .records-card, .section-title {
-  border: 1px solid var(--line);
-  background: rgba(15,27,36,0.9);
-  box-shadow: 0 18px 48px rgba(0,0,0,0.18);
-}
-.hero-main {
-  padding: clamp(26px, 4vw, 52px);
+  padding: clamp(18px, 5vw, 64px);
+  color: #092033;
   background:
-    linear-gradient(120deg, rgba(55,166,217,0.18), transparent 42%),
-    var(--panel);
-}
-.hero-main h2 {
-  margin: 0;
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: clamp(44px, 6vw, 82px);
-  line-height: 0.9;
-}
-.hero-main p { color: var(--muted); line-height: 1.7; max-width: 780px; }
-.hero-insights {
-  margin-top: 28px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-.hero-insights span {
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.04);
-  padding: 13px;
-  color: var(--muted);
-}
-.hero-insights strong { display: block; color: var(--text); margin-bottom: 4px; }
-.workbook-card {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-}
-.workbook-card svg { color: var(--green); }
-.workbook-card span { color: var(--muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.18em; }
-.workbook-card strong { font-family: "Roboto Condensed", sans-serif; font-size: 28px; overflow-wrap: anywhere; }
-.workbook-card p { color: var(--muted); line-height: 1.6; }
-
-.warning-strip {
-  margin-top: 16px;
-  border: 1px solid rgba(240,184,79,0.45);
-  background: rgba(240,184,79,0.1);
-  color: #ffe2a7;
-  padding: 13px;
-  display: flex;
-  gap: 10px;
+    linear-gradient(rgba(255,255,255,0.46), rgba(255,255,255,0.78)),
+    url("/assets/light.png") center / cover,
+    linear-gradient(120deg, rgba(0,120,255,0.08), transparent 34%),
+    radial-gradient(circle at 72% 8%, rgba(0,201,139,0.08), transparent 30%),
+    #f7fbff;
 }
 
-.filter-panel {
-  margin: 18px 0;
-  padding: 16px;
-  position: sticky;
-  top: 86px;
-  z-index: 10;
-}
-.filter-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  color: var(--muted);
-  margin-bottom: 12px;
-}
-.filter-head div { display: flex; align-items: center; gap: 8px; color: var(--text); }
-.filters {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr)) minmax(220px, 1.2fr) auto;
-  gap: 10px;
-}
-.filter-control,
-.search-box {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 6px;
-}
-.filter-control span,
-.search-box > span {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.filters select, .search-box > div {
-  min-height: 42px;
-  min-width: 0;
-  border: 1px solid var(--line);
-  background: #09151e;
-  color: var(--text);
-  padding: 8px 11px;
-}
-.filter-control small {
-  color: var(--amber);
-  font-size: 11px;
-}
-.dropdown-filter {
-  position: relative;
-}
-.dropdown-trigger {
-  min-height: 42px;
-  width: 100%;
-  border: 1px solid var(--line);
-  background: #09151e;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 8px 11px;
-  text-align: left;
-}
-.dropdown-trigger.active {
-  border-color: var(--blue);
-  box-shadow: inset 3px 0 0 var(--blue);
-}
-.dropdown-trigger b {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dropdown-menu {
-  position: absolute;
-  z-index: 30;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  max-height: 280px;
-  overflow: auto;
-  border: 1px solid var(--line);
-  background: #0b1720;
-  box-shadow: 0 20px 46px rgba(0,0,0,0.35);
-  padding: 8px;
-}
-.dropdown-clear,
-.dropdown-option {
-  width: 100%;
-  min-height: 34px;
-  border: 0;
-  background: transparent;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 7px 8px;
-  text-align: left;
-}
-.dropdown-clear {
-  color: var(--amber);
-  font-weight: 800;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 6px;
-}
-.dropdown-option:hover,
-.dropdown-clear:hover {
-  background: rgba(55,166,217,0.12);
-}
-.dropdown-option input {
-  accent-color: var(--blue);
-}
-.dropdown-option span {
-  color: var(--text);
-  font-size: 13px;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 500;
-}
-.search-box > div { display: flex; align-items: center; gap: 8px; min-height: 42px; }
-.search-box input {
-  width: 100%;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--text);
+body:has(.dark-background-theme),
+body:has(.light-background-theme) {
+  background: #071118;
 }
 
-.filters-panel {
-  display: grid;
-  grid-template-columns: 220px 110px 92px 124px minmax(220px, 1.15fr) minmax(300px, 1.55fr) minmax(230px, 1.15fr) auto auto;
-  gap: 12px;
-  align-items: end;
-  margin: 16px auto 22px;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.72);
-  box-shadow: 0 18px 50px rgba(0,0,0,0.26);
-  backdrop-filter: blur(18px);
-}
-.filters-panel .search-box,
-.filter-field {
-  display: grid;
-  gap: 7px;
-  color: #94a3b8;
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-.filters-panel .search-box {
-  position: relative;
-}
-.filters-panel .search-box.search-compact {
-  min-width: 190px;
-  max-width: 240px;
-}
-.filters-panel .search-box svg {
-  position: absolute;
-  left: 13px;
-  bottom: 13px;
-  color: #67e8f9;
-}
-.filters-panel .search-box input {
-  width: 100%;
-  height: 44px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 15px;
-  background: rgba(2, 6, 23, 0.44);
-  color: #e2e8f0;
-  outline: none;
-  padding: 0 14px 0 40px;
-}
-.multi-select-filter {
-  position: relative;
-  min-width: 0;
-}
-.multi-select-filter.filter-compact {
-  min-width: 92px;
-  max-width: 128px;
-}
-.multi-select-filter.filter-wide {
-  min-width: 210px;
-}
-.multi-select-filter.filter-company {
-  min-width: 230px;
-}
-.multi-select-filter.filter-xwide {
-  min-width: 300px;
-}
-.multi-select-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  height: 44px;
-  padding: 7px 10px;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 8px;
-  color: #e2e8f0;
-  font-size: 13px;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-}
-.multi-select-trigger:hover {
-  border-color: rgba(34, 211, 238, 0.45);
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.08);
-}
-.multi-select-value {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.multi-select-dropdown {
-  position: fixed;
-  min-width: 200px;
-  max-height: 280px;
-  overflow-y: auto;
-  background: #0d1b2e;
-  border: 1px solid rgba(34, 211, 238, 0.25);
-  border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
-  z-index: 9999;
-  padding: 6px 0;
-}
-.multi-select-clear {
-  display: block;
-  width: calc(100% - 16px);
-  margin: 0 8px 4px;
-  padding: 4px 8px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  border-radius: 6px;
-  color: #f87171;
-  font-size: 12px;
-  cursor: pointer;
-  text-align: left;
-}
-.multi-select-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 13px;
-  color: #cbd5e1;
-  transition: background 0.1s;
-}
-.multi-select-option:hover {
-  background: rgba(34, 211, 238, 0.08);
-}
-.multi-select-option input[type="checkbox"] {
-  accent-color: #22d3ee;
-  width: 14px;
-  height: 14px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.filter-count {
-  align-self: end;
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  color: #22d3ee;
-  font-size: 12px;
-  font-weight: 900;
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+/* Keep the dashboard cards readable on both PNG backgrounds. */
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .section-nav,
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .workbook-card,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .summary-card,
+.app-shell.light-background-theme .chart-card,
+.app-shell.light-background-theme .table-card,
+.app-shell.light-background-theme .records-card,
+.app-shell.light-background-theme .warning-strip {
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(235,247,255,0.88));
+  border-color: rgba(0, 120, 180, 0.20);
+  box-shadow: 0 18px 42px rgba(24, 78, 119, 0.16);
 }
 
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-top: 16px;
-}
-.kpi-table {
-  grid-column: span 2;
-  justify-self: stretch;
-  width: 100%;
-  max-width: 100%;
-}
-.records-scroll.small {
-  max-height: 450px;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-.kpi-table table {
-  width: 100%;
-  min-width: 0;
-  table-layout: fixed;
-  border: 1px solid var(--line);
-}
-.kpi-table th,
-.kpi-table td {
-  border: 1px solid var(--line);
-  padding: 8px 7px;
-  text-align: center;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  vertical-align: middle;
-}
-.kpi-table th {
-  background: rgba(55, 166, 217, 0.1);
-  color: var(--text);
-  font-size: 11px;
-  line-height: 1.25;
-}
-.kpi-table td {
-  font-size: 12px;
-  line-height: 1.35;
-  font-variant-numeric: tabular-nums;
-}
-.kpi-table th:first-child,
-.kpi-table td:first-child {
-  text-align: center;
-  width: 20%;
-}
-.kpi-table th:not(:first-child),
-.kpi-table td:not(:first-child) {
-  width: 10%;
+.app-shell.light-background-theme .chart-card h3,
+.app-shell.light-background-theme .table-card h3,
+.app-shell.light-background-theme .hero-main h2,
+.app-shell.light-background-theme .brand-block h1,
+.app-shell.light-background-theme .workbook-card strong {
+  color: #092033;
 }
 
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
-}
-.metric-card {
-  min-height: 166px;
-  padding: 18px;
-  position: relative;
-  overflow: hidden;
-}
-.metric-card:before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
-  background: var(--blue);
-}
-.metric-card.green:before { background: var(--green); }
-.metric-card.amber:before { background: var(--amber); }
-.metric-card.red:before { background: var(--red); }
-.metric-card span {
-  display: block;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 11px;
-}
-.metric-card strong {
-  display: block;
-  margin-top: 12px;
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: clamp(26px, 2.7vw, 36px);
-  line-height: 1;
-}
-.metric-card svg {
-  position: absolute;
-  right: 16px;
-  top: 18px;
-  color: var(--blue);
-}
-.metric-card p {
-  margin: 26px 0 0;
-  color: var(--muted);
-  line-height: 1.5;
+.app-shell.light-background-theme td,
+.app-shell.light-background-theme .chart-card p,
+.app-shell.light-background-theme .filter-count,
+.app-shell.light-background-theme .brand-block p {
+  color: #315568;
 }
 
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(150px, 1fr));
-  gap: 12px;
-  margin: 16px 0 20px;
-}
-.summary-card {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  min-height: 104px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 8px;
-  overflow: hidden;
-  text-align: center;
-  color: var(--text);
-  background: rgba(15, 23, 42, 0.72);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.18);
-}
-.summary-card.wide {
-  grid-column: span 2;
-}
-.summary-card span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 34px;
-  padding: 7px 8px;
-  background: linear-gradient(135deg, #ffc000, #f0b84f);
-  color: #061018;
-  font-weight: 900;
-  line-height: 1.1;
-}
-.summary-card.green span {
-  background: linear-gradient(135deg, #a9d18e, #65c18c);
-}
-.summary-card strong {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  padding: 14px 10px;
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: clamp(22px, 2vw, 30px);
-  line-height: 1.1;
-  overflow-wrap: anywhere;
+.app-shell.light-background-theme th {
+  background: rgba(230, 244, 255, .98);
+  color: #006fae;
 }
 
-.section-title {
-  margin-top: 26px;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px;
-  scroll-margin-top: 112px;
+.app-shell.light-background-theme .button {
+  color: #083047;
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(0,120,180,0.25);
 }
-.section-title p {
-  margin: 0;
-  color: var(--amber);
-  font-family: "Roboto Condensed", sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 12px;
-}
-.section-title h2 {
-  margin: 6px 0;
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: clamp(28px, 4vw, 44px);
-}
-.section-title span { color: var(--muted); line-height: 1.7; }
-.section-title-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-}
-.section-top-button {
-  border-color: rgba(93, 183, 183, 0.42);
-  color: #dffafe;
-}
-.section-toggle svg {
-  transition: transform 0.18s ease;
-}
-.section-title-collapsed .section-toggle svg {
-  transform: rotate(-90deg);
-}
-.section-content-collapsed {
-  display: none !important;
-}
+.app-shell.light-background-theme .button.primary { color: #fff; background: linear-gradient(135deg, #0078ff, #00a7d8); }
+.app-shell.light-background-theme .theme-toggle { color: #0078c8; border-color: rgba(0,120,200,0.34); }
 
-.chart-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-top: 16px;
-}
-.dashboard-chart-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.company-chart-grid {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-.company-talkgroups,
-.company-radios,
-.company-radio-type {
-  grid-column: span 2;
-}
-.performance-chart-grid {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-.performance-region { order: 1; grid-column: span 2; }
-.performance-month { order: 2; grid-column: span 2; }
-.performance-company { order: 3; grid-column: span 2; }
-.performance-talkgroup { order: 4; grid-column: span 2; }
-.performance-basestation { order: 5; grid-column: span 2; }
-.performance-hour { order: 6; grid-column: span 2; }
-.general-chart-grid {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-.general-mobile-type { grid-column: 1 / -1; }
-.top-10-row {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.dashboard-chart-grid .chart-card.wide {
-  grid-column: 1 / -1;
-}
-.regional-row {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: 16px;
-}
-.chart-card {
-  position: relative;
-  padding: 18px;
-  min-width: 0;
-  background: linear-gradient(180deg, rgba(16, 31, 42, 0.96), rgba(12, 23, 32, 0.96));
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  box-shadow: 0 18px 48px rgba(0,0,0,0.22);
-}
-.table-card {
-  position: relative;
-}
-.quick-card-export {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 5;
-  padding: 5px 9px;
-  font-size: 10px;
-}
-.quick-card-export-xlsx {
-  right: 82px;
-  border-color: rgba(101, 193, 140, 0.52);
-}
-.quick-card-export svg {
-  width: 13px;
-  height: 13px;
-}
-.chart-card.wide { grid-column: span 2; }
-.chart-card h3, .quality-card h3, .table-card h3 {
-  margin: 0 0 8px;
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: 24px;
-  line-height: 1.15;
-  color: var(--text);
-  text-align: left;
-  letter-spacing: 0;
-}
-.chart-card p {
-  text-align: left;
-}
-.chart-card .recharts-wrapper,
-.chart-card .recharts-surface {
-  overflow: visible;
-}
-.chart-card-head {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.chart-card-head h3 {
-  grid-column: 2;
-  margin: 0;
-}
-.chart-card-head .button,
-.chart-export-actions {
-  grid-column: 3;
-  justify-self: end;
-}
-.chart-export-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: flex-end;
-}
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 7px 12px;
-  margin-top: 10px;
-  padding: 8px 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255,255,255,0.035);
-}
-.chart-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.2;
-}
-.chart-legend i {
-  width: 11px;
-  height: 11px;
-  flex: 0 0 auto;
-  border-radius: 3px;
-}
-.custom-tooltip {
-  display: grid;
-  gap: 5px;
-  min-width: 180px;
-  padding: 10px 12px;
-  border: 1px solid #2b4252;
-  border-radius: 8px;
-  background: #0f1b24;
-  color: #edf6fa;
-  box-shadow: 0 14px 32px rgba(0,0,0,0.28);
-}
-.custom-tooltip strong {
-  color: #fff;
-}
-.custom-tooltip span {
-  color: var(--muted);
-  font-size: 12px;
-}
-.chart-legend.pie-legend {
-  flex: 1 1 36%;
-  max-width: 42%;
-  max-height: 278px;
-  overflow: auto;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  margin-top: 0;
-  padding: 9px;
-}
-.chart-legend.pie-legend span {
-  width: 100%;
-  align-items: flex-start;
-  font-size: 10px;
-  overflow-wrap: anywhere;
-}
-.chart-legend.kpi-total-avg-legend {
-  justify-content: flex-start;
-  max-height: none;
-  overflow: visible;
-}
-.chart-legend.kpi-total-avg-legend span {
-  white-space: nowrap;
-  overflow-wrap: normal;
-}
-.monthly-department-card {
-  background: linear-gradient(180deg, rgba(16, 31, 42, 0.96), rgba(12, 23, 32, 0.96));
-}
-.monthly-department-card h3 {
-  text-align: center;
-  font-size: 24px;
-  letter-spacing: 0;
-}
-.company-color-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 14px;
-  margin: -4px 0 8px;
-}
-.company-color-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-.company-color-legend i {
-  width: 11px;
-  height: 11px;
-  border-radius: 3px;
-}
-.monthly-kpi-card {
-  background: linear-gradient(180deg, rgba(16, 31, 42, 0.96), rgba(12, 23, 32, 0.96));
-}
-.monthly-kpi-card h3,
-.monthly-kpi-card p {
-  color: var(--text);
-  text-align: left;
-}
-.monthly-kpi-card h3 {
-  margin-bottom: 4px;
-  font-size: 24px;
-}
-.monthly-kpi-card p {
-  margin: 0 0 6px;
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--muted);
-}
-.month-line-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 16px;
-  margin-top: -10px;
-  padding: 8px 12px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.month-line-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 700;
-}
-.month-line-legend i {
-  width: 18px;
-  height: 5px;
-  border-radius: 999px;
-}
-.chart-note {
-  margin: -6px 0 0;
-  color: var(--muted);
-  text-align: center;
-  font-size: 12px;
-}
-.radio-month-card {
-  display: grid;
-  grid-template-columns: minmax(250px, 1.25fr) minmax(150px, 0.75fr);
+/* Upload screen layout requested by user:
+   1) theme button alone at top of the upload box
+   2) Master and Fixed Fleetmap in the same row
+   3) New Analysis and Continue Work in the same row */
+.workbook-choice-panel.three-tile {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "theme theme"
+    "master fixed"
+    "new previous";
   align-items: stretch;
   gap: 12px;
-  min-height: 380px;
-  overflow: hidden;
+  padding: 18px 22px 22px;
+  min-height: auto;
 }
-.radio-month-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  align-content: start;
-  align-self: stretch;
-  gap: 3px;
-  min-width: 0;
-  max-height: none;
-  overflow: hidden;
-}
-.radio-month-item {
-  display: grid;
-  grid-template-columns: 10px minmax(0, 1fr);
-  align-items: center;
-  gap: 5px;
-  min-height: 21px;
-  padding: 3px 5px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.035);
-  color: var(--muted);
-  font-size: 9px;
-  min-width: 0;
-}
-.legend-swatch {
-  width: 8px;
-  height: 8px;
+
+.workbook-choice-panel.three-tile .upload-theme-toggle {
+  grid-area: theme;
+  position: static;
+  justify-self: end;
+  width: auto;
+  min-height: 34px;
+  padding: 7px 11px;
   border-radius: 999px;
-}
-.radio-month-item .month-name {
-  color: var(--text);
-  font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.department-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-}
-.department-card {
-  min-height: 350px;
-  background: linear-gradient(180deg, rgba(16, 31, 42, 0.96), rgba(12, 23, 32, 0.96));
-}
-.Company-card {
-  min-height: 350px;
-  background: linear-gradient(180deg, rgba(16, 31, 42, 0.96), rgba(12, 23, 32, 0.96));
-}
-.department-card.blue,
-.department-card.red { background: linear-gradient(180deg, rgba(16, 31, 42, 0.96), rgba(12, 23, 32, 0.96)); }
-.department-card h3,
-.Company-card h3 {
-  min-height: 0;
-  margin-bottom: 4px;
-  text-align: left;
-  text-decoration: none;
-}
-.department-card p,
-.Company-card p {
-  margin: 0 0 5px;
-  color: var(--amber);
-  font-weight: 800;
-  text-align: left;
-}
-.department-pie-layout,
-.Company-pie-layout {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-width: 0;
-  overflow: hidden;
-}
-.department-legend {
-  flex: 1;
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-.department-legend span {
-  display: grid;
-  grid-template-columns: 10px minmax(0, 1fr);
-  align-items: center;
-  gap: 7px;
-  color: var(--muted);
   font-size: 12px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-.department-legend i {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
 }
 
-.quality-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 16px;
+.workbook-choice-panel.three-tile .fleetmap-choice-card:nth-of-type(1) { grid-area: master; }
+.workbook-choice-panel.three-tile .fleetmap-choice-card:nth-of-type(2) { grid-area: fixed; }
+.workbook-choice-panel.three-tile .cdr-choice-card { grid-area: new; grid-column: auto; }
+.workbook-choice-panel.three-tile .previous-choice-card { grid-area: previous; grid-column: auto; }
+
+.workbook-choice-panel.three-tile .workbook-choice-card {
+  min-height: 176px;
 }
-.quality-card, .table-card { padding: 18px; }
-.quality-card > strong {
-  font-family: "Roboto Condensed", sans-serif;
-  font-size: 54px;
-  color: var(--green);
-}
-.quality-card p {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 9px;
-  color: var(--muted);
-}
-.table-card table, .records-card table, .export-capture-table table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid rgba(148, 163, 184, 0.48);
-}
-.table-card th,
-.table-card td,
-.records-card th,
-.records-card td,
-.export-capture-table th,
-.export-capture-table td {
-  border: 1px solid rgba(148, 163, 184, 0.48);
-  padding: 7px 8px;
-  text-align: center;
-}
-.table-card th,
-.records-card th,
-.kpi-table th {
-  text-align: center;
-}
-.table-card td:nth-child(n+2), .records-card td { text-align: center; font-variant-numeric: tabular-nums; }
-.table-card tr:nth-child(even), .records-card tr:nth-child(even) { background: rgba(255,255,255,0.03); }
-.export-capture-table th,
-.export-capture-table td {
-  color: #0f172a;
-  background: #ffffff;
-}
-.export-capture-table th {
-  font-weight: 800;
-  background: #eef5fb;
-}
-.records-card {
-  margin-top: 16px;
-  padding: 0;
-}
-.records-scroll {
-  max-height: none;
-  overflow-x: auto;
-  overflow-y: visible;
-}
-.records-card thead {
-  background: #fff200;
-  color: #050505;
-  text-transform: uppercase;
-  font-size: 11px;
-  letter-spacing: 0;
-}
-.records-card th {
-  white-space: nowrap;
-  font-weight: 900;
-}
-.records-card td {
-  color: var(--text);
-  font-size: 12px;
-  line-height: 1.25;
-  white-space: nowrap;
-}
-.records-card table {
-  min-width: 1460px;
-}
-.pager {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-}
-.pager .button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+.workbook-choice-panel.three-tile .fleetmap-choice-card {
+  min-height: 150px;
 }
 
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: 24px;
-  transform: translateX(-50%);
-  border: 1px solid var(--red);
-  background: #2a1516;
-  color: #ffd8d4;
-  padding: 12px 16px;
+.upload-shell.light-background-theme .upload-copy,
+.upload-shell.light-background-theme .workbook-choice-panel,
+.upload-shell.light-background-theme .workbook-choice-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(239,248,255,0.86));
+  color: #092033;
+  border-color: rgba(0,120,180,0.18);
+  box-shadow: 0 22px 60px rgba(24,78,119,0.16);
 }
-
-.theme-toggle {
-  white-space: nowrap;
-}
-.upload-theme-toggle {
-  position: absolute;
-  top: 22px;
-  right: 22px;
-  z-index: 10;
-}
-
-.se-theme {
-  --bg: #f7fbff;
-  --panel: #ffffff;
-  --panel-2: #f0f8ff;
-  --line: #d6e8f5;
-  --text: #0b2739;
-  --muted: #5a7183;
-  --blue: #0078ff;
-  --amber: #00a7d8;
-  --green: #00c98b;
-  --red: #d85454;
-  color: var(--text);
-}
-.app-shell.se-theme,
-.upload-shell.se-theme {
-  position: relative;
-  overflow-x: hidden;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.82), rgba(244,250,255,0.94) 48%, rgba(255,255,255,0.98)),
-    radial-gradient(circle at 88% 20%, rgba(0,120,255,0.16), transparent 28%),
-    radial-gradient(circle at 8% 10%, rgba(0,201,139,0.16), transparent 30%),
-    var(--bg);
-}
-.se-theme:before,
-.se-theme:after {
-  content: "";
-  position: fixed;
-  pointer-events: none;
-  z-index: 0;
-}
-.se-theme:before {
-  left: -20vw;
-  top: -6vh;
-  width: 92vw;
-  height: 45vh;
-  border-radius: 0 0 58% 48%;
-  background: linear-gradient(105deg, rgba(0,219,144,0.86) 0%, rgba(24,198,225,0.72) 36%, rgba(0,126,255,0.96) 78%);
-  filter: blur(0.3px);
-  transform: rotate(-10deg) skewX(-13deg);
-  opacity: 0.9;
-}
-.se-theme:after {
-  right: -18vw;
-  top: 15vh;
-  width: 50vw;
-  height: 70vh;
-  border-radius: 58% 0 0 72%;
-  background: radial-gradient(circle at 36% 32%, rgba(255,255,255,0.7), rgba(0,146,255,0.4) 38%, rgba(0,126,255,0.88) 78%);
-  transform: rotate(12deg);
-  opacity: 0.72;
-}
-.se-theme > * {
-  position: relative;
-  z-index: 1;
-}
-.se-theme .topbar,
-.se-theme .hero-main,
-.se-theme .workbook-card,
-.se-theme .filter-panel,
-.se-theme .metric-card,
-.se-theme .chart-card,
-.se-theme .quality-card,
-.se-theme .table-card,
-.se-theme .records-card,
-.se-theme .section-title,
-.se-theme .upload-copy,
-.se-theme .workbook-choice-panel {
-  background: rgba(255, 255, 255, 0.84);
-  border-color: rgba(0, 120, 255, 0.14);
-  box-shadow: 0 18px 52px rgba(13, 73, 118, 0.12);
-  backdrop-filter: blur(18px);
-}
-.se-theme .workbook-choice-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(239,248,255,0.92));
-  border-color: rgba(0, 120, 255, 0.16);
-}
-.se-theme .topbar {
-  background: rgba(255,255,255,0.9);
-}
-.se-theme .topbar p,
-.se-theme .eyebrow,
-.se-theme .section-title p {
-  color: #0087c7;
-}
-.se-theme .button {
-  background: rgba(255,255,255,0.8);
-  color: #0b4267;
-  border-color: rgba(0,120,255,0.22);
-}
-.se-theme .button.primary {
-  color: #ffffff;
-  border-color: #0078ff;
-  background: linear-gradient(135deg, #0078ff, #00bde3);
-  box-shadow: 0 14px 32px rgba(0, 120, 255, 0.2);
-}
-.se-theme .button:hover {
-  background: #ffffff;
-  border-color: rgba(0, 201, 139, 0.46);
-  box-shadow: 0 14px 32px rgba(0, 120, 255, 0.16);
-}
-.se-theme .export-button,
-.se-theme .quick-card-export {
-  background: rgba(255,255,255,0.88);
-  color: #0b4267;
-}
-.se-theme .section-top-button {
-  color: #0b4267;
-  border-color: rgba(0,120,255,0.24);
-}
-.se-theme .section-nav button {
-  color: #4a6578;
-  border-color: rgba(0,120,255,0.15);
-  background: rgba(255,255,255,0.74);
-}
-.se-theme .section-nav button:hover {
-  color: #0058b8;
-  border-color: rgba(0,120,255,0.48);
-  background: #ffffff;
-}
-.se-theme .filters-panel {
-  background: rgba(255,255,255,0.84);
-  border-color: rgba(0,120,255,0.16);
-  box-shadow: 0 18px 52px rgba(13, 73, 118, 0.1);
-}
-.se-theme .filters-panel .search-box,
-.se-theme .filter-field {
-  color: #4a6578;
-}
-.se-theme .filters-panel .search-box input,
-.se-theme .multi-select-trigger {
-  color: #0b2739;
-  background: rgba(247, 251, 255, 0.94);
-  border-color: rgba(0,120,255,0.18);
-}
-.se-theme .multi-select-dropdown {
-  background: #ffffff;
-  border-color: rgba(0,120,255,0.24);
-  box-shadow: 0 16px 40px rgba(13, 73, 118, 0.24);
-}
-.se-theme .multi-select-option {
-  color: #0b2739;
-}
-.se-theme .multi-select-option:hover {
-  background: rgba(0,120,255,0.08);
-}
-.se-theme .summary-card {
-  background: rgba(255,255,255,0.86);
-  border-color: rgba(0,120,255,0.16);
-  box-shadow: 0 16px 40px rgba(13, 73, 118, 0.1);
-}
-.se-theme .summary-card span {
-  color: #ffffff;
-  background: linear-gradient(135deg, #0078ff, #00bde3);
-}
-.se-theme .summary-card.green span {
-  background: linear-gradient(135deg, #00c98b, #00a7d8);
-}
-.se-theme .chart-card h3,
-.se-theme .quality-card h3,
-.se-theme .table-card h3,
-.se-theme .monthly-kpi-card h3,
-.se-theme .monthly-kpi-card p,
-.se-theme .department-card h3,
-.se-theme .Company-card h3 {
-  color: var(--text);
-}
-.se-theme .chart-card p,
-.se-theme .department-card p,
-.se-theme .Company-card p,
-.se-theme .section-title span,
-.se-theme .chart-legend span,
-.se-theme .company-color-legend span,
-.se-theme .radio-month-item,
-.se-theme .records-card td,
-.se-theme .table-card td {
-  color: var(--muted);
-}
-.se-theme .chart-legend,
-.se-theme .month-line-legend {
-  background: rgba(247,251,255,0.86);
-  border-color: rgba(0,120,255,0.14);
-}
-.se-theme .records-card thead {
-  background: linear-gradient(135deg, #0078ff, #00bde3);
-  color: #ffffff;
-}
-.se-theme .records-card td,
-.se-theme .table-card td,
-.se-theme .kpi-table td {
-  color: #0b2739;
-}
-.se-theme .table-card tr:nth-child(even),
-.se-theme .records-card tr:nth-child(even) {
-  background: rgba(0, 120, 255, 0.035);
-}
-.se-theme .brand-logo,
-.se-theme .brand-block img {
-  border-color: rgba(0,120,255,0.12);
-  background: rgba(255,255,255,0.92);
-}
+.upload-shell.light-background-theme .upload-copy h1,
+.upload-shell.light-background-theme .workbook-choice-card strong { color: #092033; }
+.upload-shell.light-background-theme .upload-copy .lead,
+.upload-shell.light-background-theme .workbook-choice-card p { color: #315568; }
+.upload-shell.light-background-theme .choice-eyebrow { color: #0078c8; }
+.upload-shell.light-background-theme .button { color: #083047; background: rgba(255,255,255,0.76); }
 
 @media (max-width: 1180px) {
-  .metrics-grid { grid-template-columns: repeat(3, 1fr); }
-  .summary-cards { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
-  .summary-card.wide { grid-column: span 1; }
-  .hero-panel, .upload-grid, .quality-grid, .kpi-grid, .department-grid { grid-template-columns: 1fr; }
-  .dashboard-chart-grid, .performance-chart-grid, .top-10-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .kpi-table { grid-column: span 1; }
-  .hero-insights { grid-template-columns: repeat(2, 1fr); }
-  .filters { grid-template-columns: repeat(2, 1fr); }
-  .filters-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .filters-panel .search-box { grid-column: span 2; }
-  .filter-count { justify-self: start; }
+  .workbook-choice-panel.three-tile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "theme theme"
+      "master fixed"
+      "new previous";
+  }
 }
 
 @media (max-width: 720px) {
-  .app-shell { padding: 10px 10px 36px; }
-  .topbar { position: static; align-items: stretch; flex-direction: column; }
-  .topbar-actions { display: grid; grid-template-columns: 1fr; }
-  .section-title { grid-template-columns: 1fr; }
-  .section-title-actions { justify-content: flex-start; }
-  .filter-panel { position: static; }
-  .metrics-grid, .chart-grid, .filters, .hero-insights, .regional-row, .performance-chart-grid, .top-10-row { grid-template-columns: 1fr; }
-  .summary-cards { grid-template-columns: 1fr 1fr; }
-  .filters-panel,
-  .filters-panel .search-box { grid-template-columns: 1fr; grid-column: span 1; }
-  .chart-card.wide { grid-column: span 1; }
-  .dashboard-chart-grid,
-  .dashboard-chart-grid .chart-card.wide,
-  .performance-chart-grid .chart-card { grid-column: span 1; }
-  .radio-month-card { grid-template-columns: 1fr; }
-  .radio-month-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .Company-pie-layout { flex-direction: column; }
-  .chart-legend.pie-legend { max-width: 100%; width: 100%; max-height: 250px; }
-  .workbook-choice-card { grid-template-columns: 1fr; text-align: center; justify-items: center; }
-  .choice-icon { grid-row: auto; }
-  .upload-copy h1 { font-size: 46px; }
+  .app-shell.dark-background-theme,
+  .app-shell.light-background-theme {
+    padding: 14px 10px 36px;
+    background-attachment: scroll;
+  }
+  .workbook-choice-panel.three-tile {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "theme"
+      "master"
+      "fixed"
+      "new"
+      "previous";
+    padding: 14px;
+  }
+  .workbook-choice-panel.three-tile .upload-theme-toggle {
+    justify-self: stretch;
+    justify-content: center;
+  }
+}
+
+/* ============================================================
+   Foreground protection for BOTH PNG themes
+   Prevents h.png/light.png diagonal shapes from visually washing over
+   dashboard headers, filters, workbook panel, and summary stat cards.
+   ============================================================ */
+
+.app-shell.dark-background-theme,
+.app-shell.light-background-theme {
+  isolation: isolate;
+  background-blend-mode: normal, normal, normal, normal, normal;
+}
+
+.app-shell.dark-background-theme > *,
+.app-shell.light-background-theme > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Core top dashboard surfaces: make them real foreground panels. */
+.app-shell.dark-background-theme .topbar,
+.app-shell.dark-background-theme .section-nav,
+.app-shell.dark-background-theme .hero-panel,
+.app-shell.dark-background-theme .filters-panel,
+.app-shell.dark-background-theme .workbook-card,
+.app-shell.dark-background-theme .summary-card,
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .section-nav,
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .workbook-card,
+.app-shell.light-background-theme .summary-card {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+  background-clip: padding-box;
+}
+
+.app-shell.dark-background-theme .topbar,
+.app-shell.dark-background-theme .section-nav {
+  background: linear-gradient(180deg, rgba(5, 20, 31, 0.98), rgba(8, 30, 43, 0.96)) !important;
+  border: 1px solid rgba(109, 181, 214, 0.38) !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255,255,255,0.035) inset !important;
+}
+
+.app-shell.dark-background-theme .hero-panel,
+.app-shell.dark-background-theme .filters-panel,
+.app-shell.dark-background-theme .workbook-card {
+  background: linear-gradient(180deg, rgba(7, 26, 39, 0.97), rgba(4, 18, 28, 0.96)) !important;
+  border: 1px solid rgba(91, 155, 185, 0.40) !important;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.36), 0 0 0 1px rgba(255,255,255,0.03) inset !important;
+}
+
+.app-shell.dark-background-theme .summary-card {
+  background: linear-gradient(180deg, rgba(10, 34, 48, 0.99), rgba(4, 18, 28, 0.98)) !important;
+  border: 1px solid rgba(91, 155, 185, 0.42) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255,255,255,0.025) !important;
+}
+
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .section-nav {
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,249,255,0.96)) !important;
+  border: 1px solid rgba(0, 115, 176, 0.24) !important;
+  box-shadow: 0 18px 42px rgba(17, 86, 128, 0.18), inset 0 0 0 1px rgba(255,255,255,0.76) !important;
+}
+
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .workbook-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(237,248,255,0.94)) !important;
+  border: 1px solid rgba(0, 115, 176, 0.24) !important;
+  box-shadow: 0 20px 46px rgba(17, 86, 128, 0.16), inset 0 0 0 1px rgba(255,255,255,0.70) !important;
+}
+
+.app-shell.light-background-theme .summary-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(233,247,255,0.97)) !important;
+  border: 1px solid rgba(0, 115, 176, 0.24) !important;
+  box-shadow: 0 12px 28px rgba(17, 86, 128, 0.14), inset 0 0 0 1px rgba(255,255,255,0.72) !important;
+}
+
+/* Disable decorative card overlays specifically on the top stat cards;
+   this is the visible 'shadow over items' in the header/stat area. */
+.app-shell.dark-background-theme .summary-card::before,
+.app-shell.light-background-theme .summary-card::before,
+.app-shell.dark-background-theme .hero-panel::before,
+.app-shell.light-background-theme .hero-panel::before,
+.app-shell.dark-background-theme .workbook-card::before,
+.app-shell.light-background-theme .workbook-card::before {
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* Ensure text and controls sit above the panel surface. */
+.app-shell.dark-background-theme .topbar *,
+.app-shell.dark-background-theme .section-nav *,
+.app-shell.dark-background-theme .hero-panel *,
+.app-shell.dark-background-theme .filters-panel *,
+.app-shell.dark-background-theme .workbook-card *,
+.app-shell.dark-background-theme .summary-card *,
+.app-shell.light-background-theme .topbar *,
+.app-shell.light-background-theme .section-nav *,
+.app-shell.light-background-theme .hero-panel *,
+.app-shell.light-background-theme .filters-panel *,
+.app-shell.light-background-theme .workbook-card *,
+.app-shell.light-background-theme .summary-card * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Light theme contrast corrections for stat cards and filter controls. */
+.app-shell.light-background-theme .hero-main h2,
+.app-shell.light-background-theme .summary-card strong,
+.app-shell.light-background-theme .workbook-card strong,
+.app-shell.light-background-theme .brand-block h1 {
+  color: #062033 !important;
+  text-shadow: none !important;
+}
+
+.app-shell.light-background-theme .summary-card,
+.app-shell.light-background-theme .summary-card p,
+.app-shell.light-background-theme .summary-card small,
+.app-shell.light-background-theme .workbook-card p,
+.app-shell.light-background-theme .workbook-card span,
+.app-shell.light-background-theme .filter-count {
+  color: #294c5f !important;
+}
+
+.app-shell.light-background-theme .search-box input,
+.app-shell.light-background-theme .multi-select-trigger,
+.app-shell.light-background-theme .filter-field input,
+.app-shell.light-background-theme .filter-field select {
+  background: rgba(255,255,255,0.94) !important;
+  color: #092033 !important;
+  border-color: rgba(0, 115, 176, 0.28) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.app-shell.dark-background-theme .search-box input,
+.app-shell.dark-background-theme .multi-select-trigger,
+.app-shell.dark-background-theme .filter-field input,
+.app-shell.dark-background-theme .filter-field select {
+  background: rgba(2, 14, 23, 0.94) !important;
+  color: #f3fbff !important;
+  border-color: rgba(89, 139, 163, 0.54) !important;
+}
+
+/* Preserve colored summary headers but stop them from becoming transparent. */
+.app-shell.dark-background-theme .summary-card.yellow span,
+.app-shell.light-background-theme .summary-card.yellow span {
+  background: linear-gradient(180deg, #fff15d, #e5bb00) !important;
+  color: #10202a !important;
+}
+.app-shell.dark-background-theme .summary-card.green span,
+.app-shell.light-background-theme .summary-card.green span {
+  background: linear-gradient(180deg, #b9f06c, #42bd66) !important;
+  color: #10202a !important;
+}
+
+/* Keep sticky header/nav above the background and above hero content. */
+.app-shell.dark-background-theme .topbar,
+.app-shell.light-background-theme .topbar { z-index: 200 !important; }
+.app-shell.dark-background-theme .section-nav,
+.app-shell.light-background-theme .section-nav { z-index: 190 !important; }
+
+/* ============================================================
+   FINAL THEME CLEANUP PATCH
+   Purpose:
+   1) Remove all decorative ::before card overlays
+   2) Stop background image / gradient wash from bleeding into cards
+   3) Force clean light panels and deep navy dark panels
+   4) Fix inherited dark colors when light-background-theme is active
+   Place this block at the VERY END of styles.css
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. Global theme variables for app-shell and upload-shell
+   ------------------------------------------------------------ */
+.app-shell.dark-background-theme,
+.upload-shell.dark-background-theme {
+  --theme-page-bg: #071118;
+  --theme-panel-bg: #071c2a;
+  --theme-panel-bg-strong: #092536;
+  --theme-card-bg: #081f2f;
+  --theme-card-bg-soft: #0b2a3d;
+  --theme-text: #f4fbff;
+  --theme-muted: #a8c8d8;
+  --theme-border: rgba(116, 181, 214, 0.36);
+  --theme-border-strong: rgba(116, 181, 214, 0.52);
+  --theme-shadow: 0 22px 52px rgba(0, 0, 0, 0.42);
+}
+
+.app-shell.light-background-theme,
+.upload-shell.light-background-theme {
+  --theme-page-bg: #f5f9fc;
+  --theme-panel-bg: #ffffff;
+  --theme-panel-bg-strong: #f8fcff;
+  --theme-card-bg: #ffffff;
+  --theme-card-bg-soft: #f4f9fd;
+  --theme-text: #092033;
+  --theme-muted: #3f6174;
+  --theme-border: rgba(0, 100, 150, 0.20);
+  --theme-border-strong: rgba(0, 100, 150, 0.32);
+  --theme-shadow: 0 18px 42px rgba(17, 86, 128, 0.14);
+}
+
+/* ------------------------------------------------------------
+   2. Completely remove decorative overlays from dashboard cards
+   This is the main fix for the color wash.
+   ------------------------------------------------------------ */
+.app-shell .chart-card::before,
+.app-shell .table-card::before,
+.app-shell .records-card::before,
+.app-shell .summary-card::before,
+.app-shell .hero-panel::before,
+.app-shell .workbook-card::before,
+.app-shell .metric-card::before,
+.app-shell .filter-panel::before,
+.app-shell .filters-panel::before,
+.app-shell .warning-strip::before,
+.app-shell .topbar::before,
+.app-shell .section-nav::before,
+.upload-shell .upload-copy::before,
+.upload-shell .workbook-choice-panel::before,
+.upload-shell .workbook-choice-card::before,
+.upload-shell .choice-card::before {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  background: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+/* ------------------------------------------------------------
+   3. Keep background images behind everything only
+   ------------------------------------------------------------ */
+.app-shell.dark-background-theme,
+.app-shell.light-background-theme,
+.upload-shell.dark-background-theme,
+.upload-shell.light-background-theme {
+  isolation: isolate !important;
+  background-blend-mode: normal !important;
+}
+
+.app-shell.dark-background-theme > *,
+.app-shell.light-background-theme > *,
+.upload-shell.dark-background-theme > *,
+.upload-shell.light-background-theme > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------
+   4. Force clean opaque cards / panels in both themes
+   ------------------------------------------------------------ */
+.app-shell.dark-background-theme .topbar,
+.app-shell.dark-background-theme .section-nav,
+.app-shell.dark-background-theme .hero-panel,
+.app-shell.dark-background-theme .workbook-card,
+.app-shell.dark-background-theme .filters-panel,
+.app-shell.dark-background-theme .filter-panel,
+.app-shell.dark-background-theme .summary-card,
+.app-shell.dark-background-theme .metric-card,
+.app-shell.dark-background-theme .chart-card,
+.app-shell.dark-background-theme .table-card,
+.app-shell.dark-background-theme .records-card,
+.app-shell.dark-background-theme .warning-strip,
+.app-shell.dark-background-theme .multi-select-dropdown,
+.app-shell.dark-background-theme .modal-panel {
+  background: var(--theme-card-bg) !important;
+  background-image: none !important;
+  color: var(--theme-text) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-clip: padding-box !important;
+}
+
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .section-nav,
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .workbook-card,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .filter-panel,
+.app-shell.light-background-theme .summary-card,
+.app-shell.light-background-theme .metric-card,
+.app-shell.light-background-theme .chart-card,
+.app-shell.light-background-theme .table-card,
+.app-shell.light-background-theme .records-card,
+.app-shell.light-background-theme .warning-strip,
+.app-shell.light-background-theme .multi-select-dropdown,
+.app-shell.light-background-theme .modal-panel {
+  background: var(--theme-card-bg) !important;
+  background-image: none !important;
+  color: var(--theme-text) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-clip: padding-box !important;
+}
+
+/* ------------------------------------------------------------
+   5. Upload screen clean cards
+   ------------------------------------------------------------ */
+.upload-shell.dark-background-theme .upload-copy,
+.upload-shell.dark-background-theme .workbook-choice-panel,
+.upload-shell.dark-background-theme .workbook-choice-card,
+.upload-shell.dark-background-theme .choice-card {
+  background: var(--theme-card-bg) !important;
+  background-image: none !important;
+  color: var(--theme-text) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.upload-shell.light-background-theme .upload-copy,
+.upload-shell.light-background-theme .workbook-choice-panel,
+.upload-shell.light-background-theme .workbook-choice-card,
+.upload-shell.light-background-theme .choice-card {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #092033 !important;
+  border: 1px solid rgba(0, 100, 150, 0.20) !important;
+  box-shadow: 0 18px 42px rgba(17, 86, 128, 0.14) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ------------------------------------------------------------
+   6. Force text contrast in light theme
+   Prevents old dark-theme values from surviving.
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme,
+.app-shell.light-background-theme *,
+.upload-shell.light-background-theme,
+.upload-shell.light-background-theme * {
+  color-scheme: light !important;
+}
+
+.app-shell.light-background-theme h1,
+.app-shell.light-background-theme h2,
+.app-shell.light-background-theme h3,
+.app-shell.light-background-theme h4,
+.app-shell.light-background-theme strong,
+.app-shell.light-background-theme .brand-block h1,
+.app-shell.light-background-theme .hero-main h2,
+.app-shell.light-background-theme .summary-card strong,
+.app-shell.light-background-theme .workbook-card strong,
+.upload-shell.light-background-theme h1,
+.upload-shell.light-background-theme h2,
+.upload-shell.light-background-theme h3,
+.upload-shell.light-background-theme strong,
+.upload-shell.light-background-theme .workbook-choice-card strong {
+  color: #092033 !important;
+  text-shadow: none !important;
+}
+
+.app-shell.light-background-theme p,
+.app-shell.light-background-theme span,
+.app-shell.light-background-theme small,
+.app-shell.light-background-theme li,
+.app-shell.light-background-theme td,
+.app-shell.light-background-theme label,
+.app-shell.light-background-theme .brand-block p,
+.app-shell.light-background-theme .chart-card p,
+.app-shell.light-background-theme .workbook-card p,
+.app-shell.light-background-theme .filter-count,
+.app-shell.light-background-theme .section-title span,
+.upload-shell.light-background-theme p,
+.upload-shell.light-background-theme span,
+.upload-shell.light-background-theme small,
+.upload-shell.light-background-theme li,
+.upload-shell.light-background-theme .lead,
+.upload-shell.light-background-theme .workbook-choice-card p {
+  color: #3f6174 !important;
+}
+
+/* ------------------------------------------------------------
+   7. Force text contrast in dark theme
+   ------------------------------------------------------------ */
+.app-shell.dark-background-theme h1,
+.app-shell.dark-background-theme h2,
+.app-shell.dark-background-theme h3,
+.app-shell.dark-background-theme h4,
+.app-shell.dark-background-theme strong,
+.app-shell.dark-background-theme .brand-block h1,
+.app-shell.dark-background-theme .hero-main h2,
+.app-shell.dark-background-theme .summary-card strong,
+.app-shell.dark-background-theme .workbook-card strong,
+.upload-shell.dark-background-theme h1,
+.upload-shell.dark-background-theme h2,
+.upload-shell.dark-background-theme h3,
+.upload-shell.dark-background-theme strong,
+.upload-shell.dark-background-theme .workbook-choice-card strong {
+  color: #f4fbff !important;
+}
+
+.app-shell.dark-background-theme p,
+.app-shell.dark-background-theme span,
+.app-shell.dark-background-theme small,
+.app-shell.dark-background-theme li,
+.app-shell.dark-background-theme td,
+.app-shell.dark-background-theme label,
+.app-shell.dark-background-theme .brand-block p,
+.app-shell.dark-background-theme .chart-card p,
+.app-shell.dark-background-theme .workbook-card p,
+.app-shell.dark-background-theme .filter-count,
+.app-shell.dark-background-theme .section-title span,
+.upload-shell.dark-background-theme p,
+.upload-shell.dark-background-theme span,
+.upload-shell.dark-background-theme small,
+.upload-shell.dark-background-theme li,
+.upload-shell.dark-background-theme .lead,
+.upload-shell.dark-background-theme .workbook-choice-card p {
+  color: #a8c8d8 !important;
+}
+
+/* ------------------------------------------------------------
+   8. Inputs, selects, multi-selects, and buttons
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme input,
+.app-shell.light-background-theme select,
+.app-shell.light-background-theme textarea,
+.app-shell.light-background-theme .multi-select-trigger,
+.upload-shell.light-background-theme input,
+.upload-shell.light-background-theme select,
+.upload-shell.light-background-theme textarea,
+.upload-shell.light-background-theme .multi-select-trigger {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #092033 !important;
+  border: 1px solid rgba(0, 100, 150, 0.26) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.dark-background-theme input,
+.app-shell.dark-background-theme select,
+.app-shell.dark-background-theme textarea,
+.app-shell.dark-background-theme .multi-select-trigger,
+.upload-shell.dark-background-theme input,
+.upload-shell.dark-background-theme select,
+.upload-shell.dark-background-theme textarea,
+.upload-shell.dark-background-theme .multi-select-trigger {
+  background: #061824 !important;
+  background-image: none !important;
+  color: #f4fbff !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.light-background-theme .button,
+.upload-shell.light-background-theme .button {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #083047 !important;
+  border: 1px solid rgba(0, 100, 150, 0.26) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.dark-background-theme .button,
+.upload-shell.dark-background-theme .button {
+  background: #092536 !important;
+  background-image: none !important;
+  color: #f4fbff !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.light-background-theme .button.primary,
+.upload-shell.light-background-theme .button.primary,
+.app-shell.dark-background-theme .button.primary,
+.upload-shell.dark-background-theme .button.primary {
+  color: #ffffff !important;
+  background: #0078d4 !important;
+  background-image: none !important;
+  border-color: #0078d4 !important;
+}
+
+/* ------------------------------------------------------------
+   9. Tables
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme table,
+.app-shell.light-background-theme .table-wrap,
+.app-shell.light-background-theme .records-scroll {
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: rgba(0, 100, 150, 0.20) !important;
+}
+
+.app-shell.light-background-theme th {
+  background: #eef7fc !important;
+  background-image: none !important;
+  color: #005f93 !important;
+  border-color: rgba(0, 100, 150, 0.22) !important;
+}
+
+.app-shell.light-background-theme td {
+  background: #ffffff !important;
+  color: #18394d !important;
+  border-color: rgba(0, 100, 150, 0.16) !important;
+}
+
+.app-shell.light-background-theme tbody tr:nth-child(even) td {
+  background: #f7fbfe !important;
+}
+
+.app-shell.light-background-theme tbody tr:hover td {
+  background: #eef7fc !important;
+}
+
+.app-shell.dark-background-theme table,
+.app-shell.dark-background-theme .table-wrap,
+.app-shell.dark-background-theme .records-scroll {
+  background: #061824 !important;
+  background-image: none !important;
+  border-color: rgba(116, 181, 214, 0.30) !important;
+}
+
+.app-shell.dark-background-theme th {
+  background: #092536 !important;
+  background-image: none !important;
+  color: #dff8ff !important;
+  border-color: rgba(116, 181, 214, 0.34) !important;
+}
+
+.app-shell.dark-background-theme td {
+  background: #071c2a !important;
+  color: #d8edf5 !important;
+  border-color: rgba(116, 181, 214, 0.22) !important;
+}
+
+.app-shell.dark-background-theme tbody tr:nth-child(even) td {
+  background: #082131 !important;
+}
+
+.app-shell.dark-background-theme tbody tr:hover td {
+  background: #0b2a3d !important;
+}
+
+/* ------------------------------------------------------------
+   10. Summary-card colored headers stay readable
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme .summary-card.yellow span,
+.app-shell.dark-background-theme .summary-card.yellow span {
+  background: #f2cf21 !important;
+  background-image: none !important;
+  color: #10202a !important;
+}
+
+.app-shell.light-background-theme .summary-card.green span,
+.app-shell.dark-background-theme .summary-card.green span {
+  background: #7ed957 !important;
+  background-image: none !important;
+  color: #10202a !important;
+}
+
+/* ------------------------------------------------------------
+   11. Recharts / SVG label protection
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme .recharts-text,
+.app-shell.light-background-theme .recharts-cartesian-axis-tick-value,
+.app-shell.light-background-theme .recharts-legend-item-text {
+  fill: #3f6174 !important;
+  color: #3f6174 !important;
+}
+
+.app-shell.dark-background-theme .recharts-text,
+.app-shell.dark-background-theme .recharts-cartesian-axis-tick-value,
+.app-shell.dark-background-theme .recharts-legend-item-text {
+  fill: #a8c8d8 !important;
+  color: #a8c8d8 !important;
+}
+
+/* ------------------------------------------------------------
+   12. Tooltips
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme .custom-tooltip {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #092033 !important;
+  border: 1px solid rgba(0, 100, 150, 0.24) !important;
+  box-shadow: 0 14px 32px rgba(17, 86, 128, 0.14) !important;
+}
+
+.app-shell.dark-background-theme .custom-tooltip {
+  background: #071c2a !important;
+  background-image: none !important;
+  color: #f4fbff !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42) !important;
+}
+
+/* ------------------------------------------------------------
+   13. Extra protection against old .se-theme dark override
+   Your file has .app-shell.se-theme rules that force dark colors.
+   This makes light-background-theme win when both classes exist.
+   ------------------------------------------------------------ */
+.app-shell.se-theme.light-background-theme {
+  color: #092033 !important;
+}
+
+.app-shell.se-theme.light-background-theme .topbar,
+.app-shell.se-theme.light-background-theme .section-nav,
+.app-shell.se-theme.light-background-theme .hero-panel,
+.app-shell.se-theme.light-background-theme .workbook-card,
+.app-shell.se-theme.light-background-theme .filters-panel,
+.app-shell.se-theme.light-background-theme .summary-card,
+.app-shell.se-theme.light-background-theme .chart-card,
+.app-shell.se-theme.light-background-theme .table-card,
+.app-shell.se-theme.light-background-theme .records-card,
+.app-shell.se-theme.light-background-theme .warning-strip {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #092033 !important;
+  border-color: rgba(0, 100, 150, 0.20) !important;
+  box-shadow: 0 18px 42px rgba(17, 86, 128, 0.14) !important;
+}
+
+/* ============================================================
+   FINAL SECTION NAV BUTTON STYLE PATCH
+   Makes section navigation buttons visually match the dashboard
+   action buttons while preserving the nav layout.
+   Place after all previous section-nav/button rules.
+   ============================================================ */
+
+.app-shell .section-nav {
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.app-shell .section-nav button,
+.app-shell .section-nav .section-nav-button {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: fit-content !important;
+  min-height: 34px !important;
+  padding: 7px 12px !important;
+  white-space: nowrap !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: transform .16s ease, border-color .16s ease, background-color .16s ease, color .16s ease, box-shadow .16s ease !important;
+}
+
+.app-shell.dark-background-theme .section-nav button,
+.app-shell.dark-background-theme .section-nav .section-nav-button {
+  color: #f4fbff !important;
+  background: #092536 !important;
+  background-image: none !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.dark-background-theme .section-nav button:hover,
+.app-shell.dark-background-theme .section-nav .section-nav-button:hover,
+.app-shell.dark-background-theme .section-nav button:focus-visible,
+.app-shell.dark-background-theme .section-nav .section-nav-button:focus-visible {
+  color: #ffffff !important;
+  background: #0b2f46 !important;
+  border-color: rgba(0, 198, 255, 0.68) !important;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24) !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
+}
+
+.app-shell.light-background-theme .section-nav button,
+.app-shell.light-background-theme .section-nav .section-nav-button {
+  color: #083047 !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(0, 100, 150, 0.26) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.light-background-theme .section-nav button:hover,
+.app-shell.light-background-theme .section-nav .section-nav-button:hover,
+.app-shell.light-background-theme .section-nav button:focus-visible,
+.app-shell.light-background-theme .section-nav .section-nav-button:focus-visible {
+  color: #005f93 !important;
+  background: #eef7fc !important;
+  border-color: rgba(0, 120, 200, 0.42) !important;
+  box-shadow: 0 8px 18px rgba(17, 86, 128, 0.12) !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
+}
+
+.app-shell .section-nav button:active,
+.app-shell .section-nav .section-nav-button:active {
+  transform: translateY(0) !important;
+}
+
+
+/* ============================================================
+   FINAL SECTION NAV SEPARATION PATCH
+   Keeps section navigation as a standalone toolbar above hero.
+   This prevents it from visually attaching to / washing into the
+   hero panel and gives it its own spacing, surface, and stacking.
+   Place at the very end of styles.css.
+   ============================================================ */
+
+.app-shell .section-nav {
+  position: sticky !important;
+  top: 78px !important;
+  z-index: 190 !important;
+
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+
+  width: 100% !important;
+  height: auto !important;
+  min-height: 52px !important;
+  padding: 10px 12px !important;
+
+  /* Important: creates real separation from topbar and hero */
+  margin: 14px 0 26px !important;
+
+  border-radius: 14px !important;
+  overflow: visible !important;
+  background-clip: padding-box !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Prevent the hero from sitting too close to the nav */
+.app-shell .section-nav + .hero-panel {
+  margin-top: 0 !important;
+  margin-bottom: 18px !important;
+}
+
+/* Dark theme standalone nav surface */
+.app-shell.dark-background-theme .section-nav {
+  background: #071c2a !important;
+  background-image: none !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025) !important;
+}
+
+/* Light theme standalone nav surface */
+.app-shell.light-background-theme .section-nav,
+.app-shell.se-theme.light-background-theme .section-nav {
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(0, 100, 150, 0.20) !important;
+  box-shadow:
+    0 16px 36px rgba(17, 86, 128, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72) !important;
+}
+
+/* Make sure no decorative overlay can connect nav visually to hero */
+.app-shell .section-nav::before,
+.app-shell .section-nav::after,
+.app-shell .section-nav + .hero-panel::before,
+.app-shell .section-nav + .hero-panel::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  background: none !important;
+  background-image: none !important;
+  pointer-events: none !important;
+}
+
+/* Keep mobile spacing clean */
+@media (max-width: 720px) {
+  .app-shell .section-nav {
+    top: 8px !important;
+    margin: 12px 0 20px !important;
+    padding: 9px !important;
+    border-radius: 12px !important;
+  }
+
+  .app-shell .section-nav button,
+  .app-shell .section-nav .section-nav-button {
+    flex: 1 1 auto !important;
+    min-width: max-content !important;
+  }
+}
+
+
+/* ============================================================
+   10 dashboard improvements patch
+   Adds hero focus, active section nav, reset filter button,
+   data quality panel, empty/loading states, and export polish.
+   Place at end of styles.css.
+   ============================================================ */
+
+/* 1) Stronger hero number layout */
+.app-shell .hero-main {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  min-height: 100% !important;
+}
+
+.app-shell .hero-main .eyebrow {
+  width: 100% !important;
+  margin: 0 0 10px !important;
+  text-align: center !important;
+  font-size: clamp(14px, 1.3vw, 20px) !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0.16em !important;
+}
+
+.app-shell .hero-main h2 {
+  width: 100% !important;
+  margin: 0 !important;
+  text-align: center !important;
+  font-size: clamp(54px, 7vw, 104px) !important;
+  line-height: 0.9 !important;
+  font-weight: 950 !important;
+}
+
+.app-shell .hero-subtitle {
+  margin: 10px 0 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  font-size: clamp(18px, 2vw, 30px) !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  color: var(--theme-muted) !important;
+}
+
+/* 2) Standalone section nav + active section state */
+.app-shell .section-nav {
+  margin: 18px 0 18px !important;
+  padding: 10px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.app-shell .section-nav-button {
+  min-height: 36px !important;
+  padding: 8px 13px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease !important;
+}
+
+.app-shell .section-nav-button:hover {
+  transform: translateY(-1px) !important;
+}
+
+.app-shell .section-nav-button.active {
+  background: #0078d4 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: #0078d4 !important;
+  box-shadow: 0 10px 24px rgba(0, 120, 212, 0.28) !important;
+}
+
+/* 3) Clear reset filter action */
+.app-shell .reset-filter-button {
+  border-color: rgba(217, 95, 95, 0.45) !important;
+  color: #d95f5f !important;
+  font-weight: 900 !important;
+}
+
+.app-shell .reset-filter-button:hover {
+  background: rgba(217, 95, 95, 0.12) !important;
+  border-color: rgba(217, 95, 95, 0.70) !important;
+}
+
+/* 4) Better KPI card context labels */
+.app-shell .summary-card small {
+  position: relative !important;
+  z-index: 2 !important;
+  display: block !important;
+  margin-top: 4px !important;
+  font-size: 10px !important;
+  line-height: 1.1 !important;
+  font-weight: 750 !important;
+  color: var(--theme-muted) !important;
+  opacity: .9 !important;
+}
+
+/* 5) Data quality panel */
+.app-shell .data-quality-panel {
+  display: grid !important;
+  grid-template-columns: minmax(220px, 0.6fr) minmax(0, 2fr) !important;
+  gap: 12px !important;
+  margin: 12px 0 22px !important;
+  padding: 14px !important;
+  border-radius: 18px !important;
+  background: var(--theme-card-bg) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.app-shell .quality-score-card,
+.app-shell .quality-issue {
+  border-radius: 14px !important;
+  padding: 12px 14px !important;
+  background: var(--theme-card-bg-soft) !important;
+  border: 1px solid var(--theme-border) !important;
+}
+
+.app-shell .quality-score-card span,
+.app-shell .quality-issue span {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+  color: var(--theme-muted) !important;
+}
+
+.app-shell .quality-score-card strong {
+  display: block !important;
+  margin-top: 6px !important;
+  font-size: clamp(28px, 3vw, 46px) !important;
+  line-height: 1 !important;
+  color: var(--theme-text) !important;
+}
+
+.app-shell .quality-score-card small,
+.app-shell .quality-issue small {
+  display: block !important;
+  margin-top: 5px !important;
+  font-size: 11px !important;
+  color: var(--theme-muted) !important;
+}
+
+.app-shell .quality-issue-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.app-shell .quality-issue strong {
+  display: block !important;
+  margin-top: 6px !important;
+  font-size: clamp(18px, 2vw, 28px) !important;
+  color: var(--theme-text) !important;
+}
+
+/* 6) Loading overlay for parsing/merging/export-heavy flows */
+.loading-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 24px !important;
+  background: rgba(0, 0, 0, 0.46) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.loading-card {
+  display: grid !important;
+  gap: 10px !important;
+  justify-items: center !important;
+  width: min(420px, 100%) !important;
+  padding: 24px 30px !important;
+  border-radius: 22px !important;
+  background: var(--theme-card-bg, #071c2a) !important;
+  color: var(--theme-text, #f4fbff) !important;
+  border: 1px solid var(--theme-border, rgba(116,181,214,.36)) !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.38) !important;
+  text-align: center !important;
+}
+
+.loading-card strong {
+  color: var(--theme-text, #f4fbff) !important;
+  font-size: 18px !important;
+}
+
+.loading-card span {
+  color: var(--theme-muted, #a8c8d8) !important;
+  font-size: 13px !important;
+}
+
+/* 7) Empty state for zero filtered records */
+.app-shell .empty-state {
+  min-height: 220px !important;
+  display: grid !important;
+  place-items: center !important;
+  align-content: center !important;
+  gap: 8px !important;
+  margin: 12px 0 20px !important;
+  text-align: center !important;
+  border-radius: 20px !important;
+  background: var(--theme-card-bg) !important;
+  border: 1px dashed var(--theme-border-strong) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.app-shell .empty-state strong {
+  color: var(--theme-text) !important;
+  font-size: 22px !important;
+}
+
+.app-shell .empty-state span,
+.app-shell .empty-state svg {
+  color: var(--theme-muted) !important;
+}
+
+/* 8) Export button grouping polish without changing export functions */
+.app-shell .section-title-actions {
+  gap: 6px !important;
+}
+
+.app-shell .export-button {
+  min-width: 58px !important;
+  justify-content: center !important;
+}
+
+.app-shell .section-title-actions:has(.export-button) {
+  padding: 5px !important;
+  border-radius: 999px !important;
+  background: rgba(0, 120, 212, 0.07) !important;
+  border: 1px solid var(--theme-border) !important;
+}
+
+/* 9) Chart readability improvements */
+.app-shell .chart-card {
+  min-height: 400px !important;
+}
+
+.app-shell .chart-card .recharts-wrapper text {
+  paint-order: stroke !important;
+}
+
+.app-shell.light-background-theme .chart-card .recharts-wrapper text {
+  fill: #3f6174 !important;
+}
+
+.app-shell.dark-background-theme .chart-card .recharts-wrapper text {
+  fill: #a8c8d8 !important;
+}
+
+/* 10) Professional responsive behavior */
+@media (max-width: 1180px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell .quality-issue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell .hero-main h2 {
+    font-size: clamp(42px, 16vw, 70px) !important;
+  }
+
+  .app-shell .section-nav {
+    position: sticky !important;
+    top: 72px !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .app-shell .section-nav-button {
+    flex: 0 0 auto !important;
+  }
+
+  .app-shell .quality-issue-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   Global button hover / active polish
+   Applies to all dashboard, upload, nav, export, theme and reset buttons
+   ============================================================ */
+
+.app-shell button,
+.upload-shell button,
+.app-shell .button,
+.upload-shell .button,
+.app-shell .section-nav-button,
+.upload-shell .section-nav-button,
+.app-shell .theme-toggle,
+.upload-shell .theme-toggle,
+.app-shell .reset-filter-button,
+.upload-shell .reset-filter-button,
+.app-shell .quick-card-export,
+.upload-shell .quick-card-export,
+.app-shell .export-menu button,
+.upload-shell .export-menu button,
+.app-shell label.button,
+.upload-shell label.button {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease !important;
+}
+
+.app-shell button:hover:not(:disabled),
+.upload-shell button:hover:not(:disabled),
+.app-shell .button:hover:not(:disabled),
+.upload-shell .button:hover:not(:disabled),
+.app-shell label.button:hover,
+.upload-shell label.button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 26px rgba(0, 120, 212, 0.22) !important;
+}
+
+.app-shell button:active:not(:disabled),
+.upload-shell button:active:not(:disabled),
+.app-shell .button:active:not(:disabled),
+.upload-shell .button:active:not(:disabled),
+.app-shell label.button:active,
+.upload-shell label.button:active {
+  transform: translateY(0) scale(0.98) !important;
+  box-shadow: 0 6px 16px rgba(0, 120, 212, 0.16) !important;
+}
+
+.app-shell button:focus-visible,
+.upload-shell button:focus-visible,
+.app-shell .button:focus-visible,
+.upload-shell .button:focus-visible,
+.app-shell label.button:focus-within,
+.upload-shell label.button:focus-within {
+  outline: 3px solid rgba(0, 120, 212, 0.34) !important;
+  outline-offset: 2px !important;
+}
+
+/* Light theme button hover */
+.app-shell.light-background-theme button:hover:not(:disabled),
+.upload-shell.light-background-theme button:hover:not(:disabled),
+.app-shell.light-background-theme .button:hover:not(:disabled),
+.upload-shell.light-background-theme .button:hover:not(:disabled),
+.app-shell.light-background-theme label.button:hover,
+.upload-shell.light-background-theme label.button:hover {
+  background: #eaf6ff !important;
+  color: #06324c !important;
+  border-color: rgba(0, 120, 212, 0.46) !important;
+  box-shadow: 0 12px 28px rgba(0, 120, 212, 0.20) !important;
+}
+
+/* Dark theme button hover */
+.app-shell.dark-background-theme button:hover:not(:disabled),
+.upload-shell.dark-background-theme button:hover:not(:disabled),
+.app-shell.dark-background-theme .button:hover:not(:disabled),
+.upload-shell.dark-background-theme .button:hover:not(:disabled),
+.app-shell.dark-background-theme label.button:hover,
+.upload-shell.dark-background-theme label.button:hover {
+  background: #0d3550 !important;
+  color: #ffffff !important;
+  border-color: rgba(110, 201, 255, 0.62) !important;
+  box-shadow: 0 12px 28px rgba(0, 120, 212, 0.26) !important;
+}
+
+/* Primary buttons keep their blue identity */
+.app-shell .button.primary:hover:not(:disabled),
+.upload-shell .button.primary:hover:not(:disabled),
+.app-shell button.primary:hover:not(:disabled),
+.upload-shell button.primary:hover:not(:disabled) {
+  background: #006fc4 !important;
+  color: #ffffff !important;
+  border-color: #006fc4 !important;
+  box-shadow: 0 14px 30px rgba(0, 120, 212, 0.34) !important;
+}
+
+/* Section navigation hover */
+.app-shell .section-nav-button:hover:not(:disabled) {
+  background: rgba(0, 120, 212, 0.14) !important;
+  color: var(--theme-text, #ffffff) !important;
+  border-color: rgba(0, 120, 212, 0.42) !important;
+}
+
+.app-shell.light-background-theme .section-nav-button:hover:not(:disabled) {
+  background: #e8f5ff !important;
+  color: #005f93 !important;
+  border-color: rgba(0, 120, 212, 0.40) !important;
+}
+
+.app-shell.dark-background-theme .section-nav-button:hover:not(:disabled) {
+  background: #0d3550 !important;
+  color: #ffffff !important;
+  border-color: rgba(110, 201, 255, 0.62) !important;
+}
+
+/* Active section nav must remain stronger than hover */
+.app-shell .section-nav-button.active,
+.app-shell .section-nav-button.active:hover {
+  background: #0078d4 !important;
+  color: #ffffff !important;
+  border-color: #0078d4 !important;
+  box-shadow: 0 10px 24px rgba(0, 120, 212, 0.30) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Theme toggle hover */
+.app-shell .theme-toggle:hover:not(:disabled),
+.upload-shell .theme-toggle:hover:not(:disabled) {
+  background: rgba(255, 176, 0, 0.16) !important;
+  color: #ffb000 !important;
+  border-color: rgba(255, 176, 0, 0.54) !important;
+  box-shadow: 0 12px 26px rgba(255, 176, 0, 0.18) !important;
+}
+
+/* Reset / danger-style hover */
+.app-shell .reset-filter-button:hover:not(:disabled),
+.upload-shell .reset-filter-button:hover:not(:disabled) {
+  background: rgba(217, 95, 95, 0.14) !important;
+  color: #d95f5f !important;
+  border-color: rgba(217, 95, 95, 0.52) !important;
+  box-shadow: 0 12px 26px rgba(217, 95, 95, 0.16) !important;
+}
+
+/* Disabled buttons */
+.app-shell button:disabled,
+.upload-shell button:disabled,
+.app-shell .button:disabled,
+.upload-shell .button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.48 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+
+/* ============================================================
+   Summary cards perfect arrangement
+   First row: Calls → Regions → Companies → Radios → Talkgroups → Base Stations
+   ============================================================ */
+
+.summary-cards.summary-cards-arranged {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+}
+
+.summary-cards-arranged .summary-card {
+  min-height: 74px !important;
+}
+
+.summary-cards-arranged .summary-card-primary {
+  border-color: rgba(0, 120, 212, 0.56) !important;
+  box-shadow: 0 16px 36px rgba(0, 120, 212, 0.18) !important;
+}
+
+.summary-cards-arranged .summary-card small {
+  display: block !important;
+  margin-top: 5px !important;
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+  font-weight: 800 !important;
+  color: var(--theme-muted) !important;
+  opacity: 0.95 !important;
+}
+
+@media (max-width: 1480px) {
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ============================================================
+   Summary cards: 5 cards per row
+   Desktop: 5 per row
+   Large tablet: 4 per row
+   Tablet: 3 per row
+   Mobile: 2 per row
+   Small mobile: 1 per row
+   ============================================================ */
+
+.summary-cards,
+.summary-cards.summary-cards-arranged {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.summary-cards-arranged .summary-card,
+.summary-cards .summary-card {
+  min-width: 0 !important;
+}
+
+@media (max-width: 1480px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   New data sections: network utilization, region performance,
+   traffic intensity heatmap, talkgroup efficiency, behavior tables
+   ============================================================ */
+
+.network-utilization-section,
+.region-performance-section,
+.traffic-intensity-section,
+.talkgroup-efficiency-section,
+.behavior-grid {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 18px;
+}
+
+.network-utilization-cards,
+.traffic-intensity-cards {
+  margin: 0 !important;
+}
+
+.wide-table-card {
+  width: 100%;
+  min-width: 0;
+}
+
+.wide-table-card table,
+.behavior-grid table,
+.busy-heatmap-table {
+  min-width: 980px;
+}
+
+.behavior-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.heatmap-scroll {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow: auto;
+  border: 1px solid var(--theme-border, rgba(116, 181, 214, 0.30));
+  border-radius: 8px;
+  background: var(--theme-card-bg, rgba(3, 15, 23, 0.62));
+}
+
+.busy-heatmap-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.busy-heatmap-table th,
+.busy-heatmap-table td {
+  text-align: center !important;
+  white-space: nowrap;
+}
+
+.busy-heatmap-table td:first-child,
+.busy-heatmap-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  text-align: left !important;
+  min-width: 150px;
+}
+
+.busy-heat-cell {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  min-height: 24px;
+  padding: 4px 7px;
+  border-radius: 7px;
+  font-weight: 900;
+  color: #ffffff !important;
+  background: #0078d4 !important;
+  box-shadow: 0 6px 16px rgba(0, 120, 212, 0.22);
+}
+
+.app-shell.light-background-theme .busy-heatmap-table td:first-child,
+.app-shell.light-background-theme .busy-heatmap-table th:first-child {
+  background: #eef7fc !important;
+  color: #092033 !important;
+}
+
+.app-shell.dark-background-theme .busy-heatmap-table td:first-child,
+.app-shell.dark-background-theme .busy-heatmap-table th:first-child {
+  background: #092536 !important;
+  color: #f4fbff !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .summary-card,
+.app-shell.light-background-theme .traffic-intensity-section .summary-card,
+.app-shell.light-background-theme .region-performance-section .table-card,
+.app-shell.light-background-theme .talkgroup-efficiency-section .table-card,
+.app-shell.light-background-theme .behavior-grid .table-card {
+  background: #ffffff !important;
+  color: #092033 !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .summary-card,
+.app-shell.dark-background-theme .traffic-intensity-section .summary-card,
+.app-shell.dark-background-theme .region-performance-section .table-card,
+.app-shell.dark-background-theme .talkgroup-efficiency-section .table-card,
+.app-shell.dark-background-theme .behavior-grid .table-card {
+  background: #071c2a !important;
+  color: #f4fbff !important;
+}
+
+@media (max-width: 1180px) {
+  .behavior-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ============================================================
+   Table row-height and no-scroll refinements
+   Applies to:
+   - Talkgroup Efficiency Matrix
+   - Radio Behavior Insights
+   - User Behavior Insights
+   - Filtered Calls Register in selected period
+   ============================================================ */
+
+/* Show the full matrix/table area without an inner scroll box. */
+.app-shell .talkgroup-efficiency-section .no-scroll-table,
+.app-shell .behavior-grid .no-scroll-table,
+.app-shell .records-scroll-fixed-register {
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  border-radius: 8px !important;
+}
+
+/* Fit these tables into their cards instead of forcing horizontal scrolling. */
+.app-shell .talkgroup-efficiency-section .no-scroll-table table,
+.app-shell .behavior-grid .no-scroll-table table,
+.app-shell .records-scroll-fixed-register table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+
+/* Fixed clean row height. Long values are kept on one line with ellipsis. */
+.app-shell .fixed-row-table th,
+.app-shell .fixed-row-table td {
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  padding: 7px 8px !important;
+  line-height: 1.15 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Give key text columns a little more room in fixed-layout mode. */
+.app-shell .talkgroup-efficiency-section .fixed-row-table th:first-child,
+.app-shell .talkgroup-efficiency-section .fixed-row-table td:first-child,
+.app-shell .behavior-grid .fixed-row-table th:first-child,
+.app-shell .behavior-grid .fixed-row-table td:first-child,
+.app-shell .records-scroll-fixed-register th:nth-child(3),
+.app-shell .records-scroll-fixed-register td:nth-child(3),
+.app-shell .records-scroll-fixed-register th:nth-child(5),
+.app-shell .records-scroll-fixed-register td:nth-child(5),
+.app-shell .records-scroll-fixed-register th:nth-child(9),
+.app-shell .records-scroll-fixed-register td:nth-child(9) {
+  width: 14% !important;
+}
+
+/* Keep the register compact enough to fit without scroll. */
+.app-shell .records-scroll-fixed-register th,
+.app-shell .records-scroll-fixed-register td {
+  font-size: 10px !important;
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}
+
+/* Company inactive table now intentionally shows every company, including zero inactive. */
+.app-shell .network-utilization-section .table-card table td:nth-child(2),
+.app-shell .network-utilization-section .table-card table th:nth-child(2) {
+  text-align: right !important;
+}
+
+
+/* ============================================================
+   Filtered Calls Register column-width refinement
+   Keeps small fields compact while the table fills the full card.
+   ============================================================ */
+
+.app-shell .records-scroll-fixed-register {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: visible !important;
+}
+
+.app-shell .records-scroll-fixed-register .filtered-register-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+/* Compact fields */
+.app-shell .filtered-register-table .col-sn { width: 3.2% !important; }
+.app-shell .filtered-register-table .col-radio-id { width: 6.2% !important; }
+.app-shell .filtered-register-table .col-employee-id { width: 6.2% !important; }
+.app-shell .filtered-register-table .col-region { width: 6.8% !important; }
+.app-shell .filtered-register-table .col-duration { width: 6.2% !important; }
+
+/* Medium fields */
+.app-shell .filtered-register-table .col-radio-type { width: 8.4% !important; }
+.app-shell .filtered-register-table .col-start { width: 8.5% !important; }
+.app-shell .filtered-register-table .col-end { width: 8.5% !important; }
+.app-shell .filtered-register-table .col-base-station { width: 8.5% !important; }
+
+/* Wider descriptive fields */
+.app-shell .filtered-register-table .col-radio-alias { width: 9.4% !important; }
+.app-shell .filtered-register-table .col-employee-name { width: 10.2% !important; }
+.app-shell .filtered-register-table .col-company { width: 9.7% !important; }
+.app-shell .filtered-register-table .col-talkgroup { width: 8.2% !important; }
+
+/* Override earlier generic 14% column rule for this specific register table. */
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(3),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(3),
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(5),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(5),
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(9),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(9) {
+  width: auto !important;
+}
+
+.app-shell .filtered-register-table th,
+.app-shell .filtered-register-table td {
+  box-sizing: border-box !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 6px 7px !important;
+  line-height: 1.15 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Align small numeric fields cleanly. */
+.app-shell .filtered-register-table th:nth-child(1),
+.app-shell .filtered-register-table td:nth-child(1),
+.app-shell .filtered-register-table th:nth-child(12),
+.app-shell .filtered-register-table td:nth-child(12) {
+  text-align: center !important;
+}
+
+/* Slightly smaller register text only on narrower screens so all columns remain visible. */
+@media (max-width: 1440px) {
+  .app-shell .filtered-register-table th,
+  .app-shell .filtered-register-table td {
+    font-size: 9.5px !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .app-shell .records-scroll-fixed-register {
+    overflow-x: auto !important;
+  }
+  .app-shell .records-scroll-fixed-register .filtered-register-table {
+    min-width: 1100px !important;
+  }
+}
+
+/* ============================================================
+   Filtered Calls Register: center all fields
+   Keeps previous optimized column widths, but centers every
+   header and body cell in the selected-period register table.
+   ============================================================ */
+
+.app-shell .records-card table,
+.app-shell .filtered-register-table,
+.app-shell .records-card .filtered-register-table {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.app-shell .records-card th,
+.app-shell .records-card td,
+.app-shell .filtered-register-table th,
+.app-shell .filtered-register-table td,
+.app-shell .records-card .filtered-register-table th,
+.app-shell .records-card .filtered-register-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.app-shell .records-card td *,
+.app-shell .filtered-register-table td * {
+  text-align: center !important;
+}
+
+.app-shell .records-card td,
+.app-shell .filtered-register-table td {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ============================================================
+   Filtered Calls Register: wider Base Station column
+   Keeps all fields centered, but gives Base Station enough room
+   to display complete/near-complete values while table fills width.
+   ============================================================ */
+
+.app-shell .records-scroll-fixed-register .filtered-register-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+/* Rebalanced 13-column register layout = 100% total width */
+.app-shell .filtered-register-table .col-sn { width: 3% !important; }
+.app-shell .filtered-register-table .col-radio-id { width: 5.6% !important; }
+.app-shell .filtered-register-table .col-radio-alias { width: 8.4% !important; }
+.app-shell .filtered-register-table .col-radio-type { width: 6.8% !important; }
+.app-shell .filtered-register-table .col-employee-name { width: 9.6% !important; }
+.app-shell .filtered-register-table .col-employee-id { width: 5.6% !important; }
+.app-shell .filtered-register-table .col-region { width: 5.8% !important; }
+.app-shell .filtered-register-table .col-company { width: 8.8% !important; }
+.app-shell .filtered-register-table .col-talkgroup { width: 9% !important; }
+.app-shell .filtered-register-table .col-start { width: 7.2% !important; }
+.app-shell .filtered-register-table .col-end { width: 7.2% !important; }
+.app-shell .filtered-register-table .col-duration { width: 5.2% !important; }
+.app-shell .filtered-register-table .col-base-station { width: 17.8% !important; }
+
+/* Base Station needs a little more readable space than compact fields. */
+.app-shell .filtered-register-table th:nth-child(13),
+.app-shell .filtered-register-table td:nth-child(13) {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  font-size: 10.5px !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Keep headers and values centered after the width change. */
+.app-shell .filtered-register-table th,
+.app-shell .filtered-register-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* On smaller screens, allow horizontal scroll instead of crushing Base Station. */
+@media (max-width: 1360px) {
+  .app-shell .records-scroll-fixed-register {
+    overflow-x: auto !important;
+  }
+  .app-shell .records-scroll-fixed-register .filtered-register-table {
+    min-width: 1280px !important;
+  }
+}
+
+/* ============================================================
+   Filtered Calls Register: no cut values, no wrap, auto width
+   Radio Type + Base Station get readable width.
+   Table fills the card, and only uses horizontal scroll if needed.
+   ============================================================ */
+
+.app-shell .records-scroll-fixed-register {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.app-shell .records-scroll-fixed-register .filtered-register-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
+/* No wrapping and no ellipsis/cutting for the selected-period register. */
+.app-shell .records-scroll-fixed-register .filtered-register-table th,
+.app-shell .records-scroll-fixed-register .filtered-register-table td {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 6px 9px !important;
+  line-height: 1.15 !important;
+  box-sizing: border-box !important;
+}
+
+/* Auto-fit column minimums. Small fields stay compact; long fields get enough space. */
+.app-shell .filtered-register-table .col-sn { width: 48px !important; min-width: 48px !important; }
+.app-shell .filtered-register-table .col-radio-id { width: 96px !important; min-width: 96px !important; }
+.app-shell .filtered-register-table .col-radio-alias { width: 160px !important; min-width: 160px !important; }
+.app-shell .filtered-register-table .col-radio-type { width: 230px !important; min-width: 230px !important; }
+.app-shell .filtered-register-table .col-employee-name { width: 170px !important; min-width: 170px !important; }
+.app-shell .filtered-register-table .col-employee-id { width: 110px !important; min-width: 110px !important; }
+.app-shell .filtered-register-table .col-region { width: 115px !important; min-width: 115px !important; }
+.app-shell .filtered-register-table .col-company { width: 210px !important; min-width: 210px !important; }
+.app-shell .filtered-register-table .col-talkgroup { width: 180px !important; min-width: 180px !important; }
+.app-shell .filtered-register-table .col-start { width: 150px !important; min-width: 150px !important; }
+.app-shell .filtered-register-table .col-end { width: 150px !important; min-width: 150px !important; }
+.app-shell .filtered-register-table .col-duration { width: 105px !important; min-width: 105px !important; }
+.app-shell .filtered-register-table .col-base-station { width: 300px !important; min-width: 300px !important; }
+
+/* Keep Radio Type and Base Station extra readable. */
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(4),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(4),
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(13),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(13) {
+  font-size: 10.5px !important;
+  letter-spacing: -0.01em !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+/* Make the horizontal scrollbar easier to use when the register exceeds screen width. */
+.app-shell .records-scroll-fixed-register::-webkit-scrollbar {
+  height: 10px !important;
+}
+
+.app-shell .records-scroll-fixed-register::-webkit-scrollbar-thumb {
+  border-radius: 999px !important;
+  background: rgba(0, 120, 212, 0.35) !important;
+}
+
+.app-shell.dark-background-theme .records-scroll-fixed-register::-webkit-scrollbar-thumb {
+  background: rgba(116, 181, 214, 0.45) !important;
+}
+
+.app-shell.light-background-theme .records-scroll-fixed-register::-webkit-scrollbar-thumb {
+  background: rgba(0, 100, 150, 0.32) !important;
+}
+
+
+/* ============================================================
+   FINAL: Register auto-fit inside card
+   User request: no horizontal scrolling, no wrapping.
+   This uses fixed-layout percentage columns + compact text so the
+   register fills the available card width instead of exceeding it.
+   ============================================================ */
+
+.app-shell .records-scroll-fixed-register {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+
+.app-shell .records-scroll-fixed-register .filtered-register-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell .records-scroll-fixed-register .filtered-register-table th,
+.app-shell .records-scroll-fixed-register .filtered-register-table td {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  padding: 5px 3px !important;
+  line-height: 1.08 !important;
+  box-sizing: border-box !important;
+  font-size: clamp(7px, 0.46vw, 10px) !important;
+  letter-spacing: -0.045em !important;
+}
+
+/* 13-column layout = 100%. Small fields are compact, long fields get priority. */
+.app-shell .filtered-register-table .col-sn { width: 2.7% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-radio-id { width: 4.7% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-radio-alias { width: 7.7% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-radio-type { width: 12.2% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-employee-name { width: 7.8% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-employee-id { width: 4.8% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-region { width: 5.1% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-company { width: 8.9% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-talkgroup { width: 7.9% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-start { width: 7.3% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-end { width: 7.3% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-duration { width: 4.3% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-base-station { width: 19.3% !important; min-width: 0 !important; }
+
+/* Important long-value columns stay slightly more readable. */
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(4),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(4),
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(13),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(13) {
+  font-size: clamp(6.6px, 0.44vw, 9.6px) !important;
+  letter-spacing: -0.06em !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+}
+
+/* Remove earlier responsive scroll/min-width overrides for the register. */
+@media (max-width: 1360px), (max-width: 1180px) {
+  .app-shell .records-scroll-fixed-register {
+    overflow-x: hidden !important;
+  }
+  .app-shell .records-scroll-fixed-register .filtered-register-table {
+    min-width: 0 !important;
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+}
+
+/* Ultra-compact fallback for laptop/tablet widths while still avoiding scroll/wrap. */
+@media (max-width: 1280px) {
+  .app-shell .records-scroll-fixed-register .filtered-register-table th,
+  .app-shell .records-scroll-fixed-register .filtered-register-table td {
+    font-size: clamp(6px, 0.52vw, 8px) !important;
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+    letter-spacing: -0.075em !important;
+  }
+}
+
+
+/* ============================================================
+   Fix search field label/icon wrapping
+   Keeps "Search Radio / User" in one line
+   ============================================================ */
+
+.app-shell .search-box > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  width: max-content !important;
+  max-width: 100% !important;
+}
+
+.app-shell .search-box {
+  min-width: 260px !important;
+}
+
+.app-shell .filters-panel {
+  align-items: end !important;
+}
+
+/* ============================================================
+   Filter count alignment
+   Keeps "124,175 from 124,175 · 100.0%" vertically centered
+   and inline with the filter boxes.
+   ============================================================ */
+
+.app-shell .filters-panel {
+  align-items: end !important;
+}
+
+.app-shell .filter-count {
+  align-self: end !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  border-radius: 999px !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell.light-background-theme .filter-count {
+  background: rgba(255, 255, 255, 0.86) !important;
+  border: 1px solid rgba(0, 100, 150, 0.22) !important;
+  color: #294c5f !important;
+}
+
+.app-shell.dark-background-theme .filter-count {
+  background: rgba(9, 37, 54, 0.92) !important;
+  border: 1px solid rgba(116, 181, 214, 0.30) !important;
+  color: #a8c8d8 !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .filter-count {
+    justify-self: start !important;
+    width: fit-content !important;
+  }
+}
+
+/* ============================================================
+   Section nav stability fix
+   Keeps the section navigation in normal page flow above the hero
+   instead of moving/sticking while the page scrolls.
+   ============================================================ */
+
+.app-shell .section-nav,
+.app-shell.dark-background-theme .section-nav,
+.app-shell.light-background-theme .section-nav,
+.app-shell.se-theme.light-background-theme .section-nav {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: 5 !important;
+  transform: none !important;
+  margin: 14px 0 22px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Make sure the hero starts cleanly below the nav. */
+.app-shell .section-nav + .hero-panel,
+.app-shell.dark-background-theme .section-nav + .hero-panel,
+.app-shell.light-background-theme .section-nav + .hero-panel {
+  margin-top: 0 !important;
+}
+
+/* Keep nav buttons stable inside the non-sticky toolbar. */
+.app-shell .section-nav .section-nav-button,
+.app-shell .section-nav button {
+  position: relative !important;
+  top: auto !important;
+  transform: none !important;
+}
+
+/* ============================================================
+   Professional summary-card color system
+   Purpose: replace random yellow/green usage with a consistent
+   operational color language across dashboard cards.
+
+   Color meaning:
+   Blue   = volume / totals
+   Purple = coverage / categories
+   Green  = active / good utilization
+   Amber  = peak / attention / busiest
+   Red    = inactive / risk
+   Cyan   = duration / traffic intensity
+   ============================================================ */
+
+.app-shell {
+  --card-blue: #0078d4;
+  --card-blue-soft: rgba(0, 120, 212, 0.14);
+  --card-purple: #6f5bd5;
+  --card-purple-soft: rgba(111, 91, 213, 0.14);
+  --card-green: #16a34a;
+  --card-green-soft: rgba(22, 163, 74, 0.14);
+  --card-amber: #f59e0b;
+  --card-amber-soft: rgba(245, 158, 11, 0.16);
+  --card-red: #dc2626;
+  --card-red-soft: rgba(220, 38, 38, 0.14);
+  --card-cyan: #0891b2;
+  --card-cyan-soft: rgba(8, 145, 178, 0.14);
+}
+
+/* Base summary-card system surface */
+.app-shell .summary-card {
+  position: relative !important;
+  border-left: 5px solid var(--system-card-color, var(--card-blue)) !important;
+  border-color: color-mix(in srgb, var(--system-card-color, var(--card-blue)) 44%, transparent) !important;
+  background:
+    linear-gradient(180deg, var(--system-card-soft, var(--card-blue-soft)), transparent 58%),
+    var(--theme-card-bg, #071c2a) !important;
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.app-shell.light-background-theme .summary-card {
+  background:
+    linear-gradient(180deg, var(--system-card-soft, var(--card-blue-soft)), transparent 62%),
+    #ffffff !important;
+  box-shadow:
+    0 12px 28px rgba(17, 86, 128, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86) !important;
+}
+
+/* Header strip inherits the card meaning color */
+.app-shell .summary-card > span:first-child,
+.app-shell .summary-card.yellow > span:first-child,
+.app-shell .summary-card.green > span:first-child,
+.app-shell.dark-background-theme .summary-card.yellow span,
+.app-shell.light-background-theme .summary-card.yellow span,
+.app-shell.dark-background-theme .summary-card.green span,
+.app-shell.light-background-theme .summary-card.green span {
+  background: var(--system-card-color, var(--card-blue)) !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+.app-shell .summary-card strong {
+  color: var(--theme-text, #f4fbff) !important;
+}
+
+.app-shell.light-background-theme .summary-card strong {
+  color: #092033 !important;
+}
+
+.app-shell .summary-card small {
+  color: var(--theme-muted, #a8c8d8) !important;
+}
+
+/* Main summary arrangement: 5-column color language */
+.app-shell .summary-cards-arranged .summary-card:nth-child(1) {
+  --system-card-color: var(--card-blue);
+  --system-card-soft: var(--card-blue-soft);
+}
+
+/* Coverage / category cards */
+.app-shell .summary-cards-arranged .summary-card:nth-child(2),
+.app-shell .summary-cards-arranged .summary-card:nth-child(3),
+.app-shell .summary-cards-arranged .summary-card:nth-child(5),
+.app-shell .summary-cards-arranged .summary-card:nth-child(6) {
+  --system-card-color: var(--card-purple);
+  --system-card-soft: var(--card-purple-soft);
+}
+
+/* Active resources */
+.app-shell .summary-cards-arranged .summary-card:nth-child(4),
+.app-shell .summary-cards-arranged .summary-card:nth-child(10),
+.app-shell .summary-cards-arranged .summary-card:nth-child(17),
+.app-shell .summary-cards-arranged .summary-card:nth-child(20),
+.app-shell .summary-cards-arranged .summary-card:nth-child(22) {
+  --system-card-color: var(--card-green);
+  --system-card-soft: var(--card-green-soft);
+}
+
+/* Duration and traffic cards */
+.app-shell .summary-cards-arranged .summary-card:nth-child(7),
+.app-shell .summary-cards-arranged .summary-card:nth-child(8),
+.app-shell .summary-cards-arranged .summary-card:nth-child(9),
+.app-shell .summary-cards-arranged .summary-card:nth-child(26),
+.app-shell .summary-cards-arranged .summary-card:nth-child(27),
+.app-shell .summary-cards-arranged .summary-card:nth-child(28) {
+  --system-card-color: var(--card-cyan);
+  --system-card-soft: var(--card-cyan-soft);
+}
+
+/* Peak / busiest cards */
+.app-shell .summary-cards-arranged .summary-card:nth-child(11),
+.app-shell .summary-cards-arranged .summary-card:nth-child(12),
+.app-shell .summary-cards-arranged .summary-card:nth-child(13),
+.app-shell .summary-cards-arranged .summary-card:nth-child(14),
+.app-shell .summary-cards-arranged .summary-card:nth-child(15),
+.app-shell .summary-cards-arranged .summary-card:nth-child(16),
+.app-shell .summary-cards-arranged .summary-card:nth-child(18),
+.app-shell .summary-cards-arranged .summary-card:nth-child(19),
+.app-shell .summary-cards-arranged .summary-card:nth-child(21),
+.app-shell .summary-cards-arranged .summary-card:nth-child(23),
+.app-shell .summary-cards-arranged .summary-card:nth-child(24),
+.app-shell .summary-cards-arranged .summary-card:nth-child(25) {
+  --system-card-color: var(--card-amber);
+  --system-card-soft: var(--card-amber-soft);
+}
+
+/* Network utilization cards */
+.app-shell .network-utilization-cards .summary-card:nth-child(1) {
+  --system-card-color: var(--card-purple);
+  --system-card-soft: var(--card-purple-soft);
+}
+.app-shell .network-utilization-cards .summary-card:nth-child(2),
+.app-shell .network-utilization-cards .summary-card:nth-child(4) {
+  --system-card-color: var(--card-green);
+  --system-card-soft: var(--card-green-soft);
+}
+.app-shell .network-utilization-cards .summary-card:nth-child(3) {
+  --system-card-color: var(--card-red);
+  --system-card-soft: var(--card-red-soft);
+}
+.app-shell .network-utilization-cards .summary-card:nth-child(5) {
+  --system-card-color: var(--card-cyan);
+  --system-card-soft: var(--card-cyan-soft);
+}
+
+/* Traffic-intensity cards */
+.app-shell .traffic-intensity-cards .summary-card:nth-child(1),
+.app-shell .traffic-intensity-cards .summary-card:nth-child(2) {
+  --system-card-color: var(--card-amber);
+  --system-card-soft: var(--card-amber-soft);
+}
+.app-shell .traffic-intensity-cards .summary-card:nth-child(3),
+.app-shell .traffic-intensity-cards .summary-card:nth-child(4),
+.app-shell .traffic-intensity-cards .summary-card:nth-child(5) {
+  --system-card-color: var(--card-cyan);
+  --system-card-soft: var(--card-cyan-soft);
+}
+
+/* Hover makes the system color visible but still professional */
+.app-shell .summary-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: var(--system-card-color, var(--card-blue)) !important;
+  box-shadow:
+    0 18px 38px color-mix(in srgb, var(--system-card-color, var(--card-blue)) 18%, transparent),
+    0 14px 34px rgba(0, 0, 0, 0.20) !important;
+}
+
+/* Fallback for browsers that do not support color-mix fully */
+@supports not (color: color-mix(in srgb, red 50%, white)) {
+  .app-shell .summary-card {
+    border-color: var(--system-card-color, #0078d4) !important;
+  }
+}
+
+
+/* ============================================================
+   NON-SEMANTIC CARD COLOR SYSTEM
+   Purpose: card colors are now a repeated visual palette by
+   position, not by topic/metric meaning.
+   Place after all previous summary-card color rules.
+   ============================================================ */
+
+.app-shell .summary-cards {
+  --card-palette-1: #0078d4;
+  --card-palette-2: #00a6a6;
+  --card-palette-3: #6f5bd5;
+  --card-palette-4: #ffb000;
+  --card-palette-5: #65c18c;
+  --card-palette-6: #d95f5f;
+}
+
+/* Reset old topic/semantic coloring so every card follows only position. */
+.app-shell .summary-cards .summary-card,
+.app-shell .summary-cards .summary-card.yellow,
+.app-shell .summary-cards .summary-card.green,
+.app-shell .summary-cards .summary-card.blue,
+.app-shell .summary-cards .summary-card.red,
+.app-shell .summary-cards .summary-card.amber,
+.app-shell .summary-cards .summary-card.cyan,
+.app-shell .summary-cards .summary-card.purple {
+  --summary-accent: var(--card-palette-1);
+  border-color: color-mix(in srgb, var(--summary-accent) 46%, transparent) !important;
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.20),
+    inset 0 0 0 1px color-mix(in srgb, var(--summary-accent) 18%, transparent) !important;
+}
+
+/* Repeating visual palette: 1 to 6, then repeat. */
+.app-shell .summary-cards .summary-card:nth-child(6n + 1) { --summary-accent: var(--card-palette-1); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 2) { --summary-accent: var(--card-palette-2); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 3) { --summary-accent: var(--card-palette-3); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 4) { --summary-accent: var(--card-palette-4); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 5) { --summary-accent: var(--card-palette-5); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 6) { --summary-accent: var(--card-palette-6); }
+
+/* Card surface: light and dark both get the same ordered accent language. */
+.app-shell.dark-background-theme .summary-cards .summary-card {
+  background:
+    linear-gradient(180deg, rgba(9, 32, 48, 0.98), rgba(4, 18, 28, 0.98)) !important;
+  border-left: 5px solid var(--summary-accent) !important;
+}
+
+.app-shell.light-background-theme .summary-cards .summary-card,
+.app-shell.se-theme.light-background-theme .summary-cards .summary-card {
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f6fbff 100%) !important;
+  border-left: 5px solid var(--summary-accent) !important;
+  box-shadow:
+    0 12px 26px rgba(17, 86, 128, 0.12),
+    inset 0 0 0 1px rgba(255,255,255,0.80) !important;
+}
+
+/* Header strip: position-based accent, not topic-based classes. */
+.app-shell .summary-cards .summary-card > span,
+.app-shell .summary-cards .summary-card.yellow > span,
+.app-shell .summary-cards .summary-card.green > span,
+.app-shell .summary-cards .summary-card.blue > span,
+.app-shell .summary-cards .summary-card.red > span,
+.app-shell .summary-cards .summary-card.amber > span,
+.app-shell .summary-cards .summary-card.cyan > span,
+.app-shell .summary-cards .summary-card.purple > span {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--summary-accent) 82%, #ffffff 18%),
+    var(--summary-accent)
+  ) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.24) !important;
+}
+
+/* Strong number uses neutral text; accent remains on border/header only. */
+.app-shell.dark-background-theme .summary-cards .summary-card strong {
+  color: #f8fdff !important;
+}
+
+.app-shell.light-background-theme .summary-cards .summary-card strong,
+.app-shell.se-theme.light-background-theme .summary-cards .summary-card strong {
+  color: #092033 !important;
+}
+
+.app-shell .summary-cards .summary-card small,
+.app-shell .summary-cards .summary-card p {
+  color: var(--theme-muted) !important;
+}
+
+/* Subtle hover follows the same ordered accent. */
+.app-shell .summary-cards .summary-card:hover {
+  border-color: var(--summary-accent) !important;
+  transform: translateY(-2px);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.app-shell.dark-background-theme .summary-cards .summary-card:hover {
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.34),
+    0 0 0 1px color-mix(in srgb, var(--summary-accent) 30%, transparent) inset !important;
+}
+
+.app-shell.light-background-theme .summary-cards .summary-card:hover,
+.app-shell.se-theme.light-background-theme .summary-cards .summary-card:hover {
+  box-shadow:
+    0 18px 38px rgba(17, 86, 128, 0.16),
+    0 0 0 1px color-mix(in srgb, var(--summary-accent) 24%, transparent) inset !important;
+}
+
+/* ============================================================
+   FINAL FIX: Search Radio / User label must stay one line
+   Works with this JSX structure:
+   <label class="search-box search-compact">
+     <span>Search Radio / User</span>
+     <Search />
+     <input />
+   </label>
+   ============================================================ */
+
+.app-shell .filters-panel > .search-box.search-compact {
+  min-width: 300px !important;
+  max-width: none !important;
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto 32px !important;
+  align-items: end !important;
+  gap: 5px !important;
+  overflow: visible !important;
+}
+
+.app-shell .filters-panel > .search-box.search-compact > span {
+  display: block !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  line-height: 1 !important;
+  font-size: 10px !important;
+  letter-spacing: 0.06em !important;
+  text-align: left !important;
+}
+
+.app-shell .filters-panel > .search-box.search-compact > svg {
+  position: absolute !important;
+  left: 9px !important;
+  bottom: 8px !important;
+  top: auto !important;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  flex: 0 0 16px !important;
+  pointer-events: none !important;
+}
+
+.app-shell .filters-panel > .search-box.search-compact > input {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding-left: 31px !important;
+}
+
+/* Give the first filter column enough width so the label cannot split. */
+.app-shell .filters-panel {
+  grid-template-columns:
+    minmax(300px, 2fr)
+    repeat(3, minmax(92px, 0.62fr))
+    minmax(135px, 0.9fr)
+    minmax(170px, 1.15fr)
+    minmax(145px, 1fr)
+    auto
+    auto !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .filters-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell .filters-panel > .search-box.search-compact {
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell .filters-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell .filters-panel > .search-box.search-compact > span {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* ============================================================
+   Align Data Quality cards with the summary cards above
+   Makes the quality score + issue cards use the same 5-card row grid.
+   ============================================================ */
+
+.app-shell .data-quality-panel {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 12px 0 22px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-shell .data-quality-panel .quality-issue-grid {
+  display: contents !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card,
+.app-shell .data-quality-panel .quality-issue {
+  min-width: 0 !important;
+  min-height: 74px !important;
+  width: 100% !important;
+  display: grid !important;
+  align-content: center !important;
+  justify-items: center !important;
+  text-align: center !important;
+  padding: 9px 10px !important;
+  border-radius: 5px !important;
+  overflow: hidden !important;
+  background: var(--theme-card-bg) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card span,
+.app-shell .data-quality-panel .quality-issue span,
+.app-shell .data-quality-panel .quality-score-card strong,
+.app-shell .data-quality-panel .quality-issue strong,
+.app-shell .data-quality-panel .quality-score-card small,
+.app-shell .data-quality-panel .quality-issue small {
+  max-width: 100% !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card span,
+.app-shell .data-quality-panel .quality-issue span {
+  margin: -9px -10px 6px !important;
+  padding: 4px 6px !important;
+  width: calc(100% + 20px) !important;
+  line-height: 1.15 !important;
+  font-size: 10px !important;
+  color: #07131b !important;
+  background: #e8f3fb !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card strong,
+.app-shell .data-quality-panel .quality-issue strong {
+  margin-top: 0 !important;
+  font-size: clamp(14px, 1.3vw, 20px) !important;
+  line-height: 1.1 !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card small,
+.app-shell .data-quality-panel .quality-issue small {
+  margin-top: 4px !important;
+  font-size: 10px !important;
+  line-height: 1.1 !important;
+}
+
+@media (max-width: 1480px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   Hero call icon beside Live workbook profile block
+   Uses /assets/call.png from the public assets folder.
+   ============================================================ */
+
+.app-shell .hero-main.hero-main-with-icon {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: clamp(16px, 2.4vw, 34px) !important;
+  text-align: left !important;
+  min-height: 100% !important;
+}
+
+.app-shell .hero-call-icon {
+  flex: 0 0 auto !important;
+  width: 150px !important;
+  height: 150px !important;
+  object-fit: contain !important;
+  display: block !important;
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.20)) !important;
+}
+
+.app-shell .hero-profile-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  min-width: 0 !important;
+}
+
+.app-shell .hero-profile-copy .eyebrow,
+.app-shell .hero-profile-copy h2,
+.app-shell .hero-profile-copy .hero-subtitle {
+  width: auto !important;
+  text-align: left !important;
+}
+
+.app-shell .hero-profile-copy .eyebrow {
+  margin: 0 0 8px !important;
+}
+
+.app-shell .hero-profile-copy h2 {
+  margin: 0 !important;
+  line-height: 0.92 !important;
+}
+
+.app-shell .hero-profile-copy .hero-subtitle {
+  margin: 8px 0 0 !important;
+}
+
+.app-shell.light-background-theme .hero-call-icon {
+  filter: drop-shadow(0 14px 24px rgba(17, 86, 128, 0.16)) !important;
+}
+
+@media (max-width: 720px) {
+  .app-shell .hero-main.hero-main-with-icon {
+    flex-direction: column !important;
+    gap: 12px !important;
+    text-align: center !important;
+  }
+}
+
+  .app-shell .hero-profile-copy {
+    align-items: center !important;
+  }
+
+  .app-shell .hero-profile-copy .eyebrow,
+  .app-shell .hero-profile-copy h2,
+  .app-shell .hero-profile-copy .hero-subtitle {
+    text-align: center !important;
+  }
+
+  /* ============================================================
+   Hero call icon + workbook profile centered as one group
+   ============================================================ */
+
+.app-shell .hero-main {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.app-shell .hero-call-content {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 28px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+.app-shell .hero-call-icon {
+  flex: 0 0 auto !important;
+  width: 150px !important;
+  height: 150px !important;
+  object-fit: contain !important;
+}
+
+.app-shell .hero-call-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: auto !important;
+}
+
+.app-shell .hero-call-text .eyebrow,
+.app-shell .hero-call-text h2,
+.app-shell .hero-call-text .hero-subtitle {
+  width: auto !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: center !important;
+}
+
+.app-shell .hero-call-text .eyebrow {
+  margin: 0 0 8px !important;
+}
+
+.app-shell .hero-call-text h2 {
+  margin: 0 0 6px !important;
+  line-height: 0.95 !important;
+}
+
+.app-shell .hero-call-text .hero-subtitle {
+  margin: 0 !important;
+}
+
+/* ============================================================
+   Compact wider workbook profile card inside hero
+   Goal: wider right container + fewer vertical gaps + shorter hero.
+   ============================================================ */
+
+.app-shell .hero-panel {
+  grid-template-columns: minmax(0, 1fr) minmax(460px, 620px) !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 12px 16px !important;
+  min-height: auto !important;
+}
+
+.app-shell .workbook-card.workbook-card-compact {
+  display: flex !important;
+  flex-direction: column !important;
+  align-content: stretch !important;
+  gap: 5px !important;
+  min-width: 460px !important;
+  max-width: 620px !important;
+  width: 100% !important;
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+.app-shell .workbook-card-compact .workbook-card-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+
+.app-shell .workbook-card-compact .workbook-card-header svg {
+  flex: 0 0 auto !important;
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.app-shell .workbook-card-compact .workbook-card-title {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+}
+
+.app-shell .workbook-card-compact .workbook-card-title span {
+  margin: 0 !important;
+  line-height: 1 !important;
+  font-size: 10px !important;
+}
+
+.app-shell .workbook-card-compact .workbook-card-title strong {
+  display: block !important;
+  margin: 0 !important;
+  line-height: 1.15 !important;
+  font-size: clamp(14px, 1.05vw, 18px) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .workbook-card-compact .workbook-card-meta {
+  margin: 0 !important;
+  line-height: 1.18 !important;
+  font-size: 11px !important;
+}
+
+.app-shell .workbook-card-compact .cdr-sources-list,
+.app-shell .workbook-card-compact .cdr-sources-list-compact {
+  margin: 2px 0 0 !important;
+  padding: 4px 7px !important;
+  display: grid !important;
+  gap: 1px !important;
+  max-height: none !important;
+  overflow: visible !important;
+  border-radius: 6px !important;
+}
+
+.app-shell .workbook-card-compact .cdr-sources-list li,
+.app-shell .workbook-card-compact .cdr-sources-list-compact li {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.18 !important;
+  font-size: 10.5px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .workbook-card-compact .cdr-sources-list strong {
+  font-size: 10.5px !important;
+  line-height: 1.18 !important;
+}
+
+.app-shell .workbook-card-compact .fleetmap-status,
+.app-shell .workbook-card-compact .fleetmap-status-compact {
+  margin: 2px 0 0 !important;
+  padding: 4px 7px !important;
+  line-height: 1.15 !important;
+  font-size: 10.5px !important;
+  border-radius: 6px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Reduce the hero left block vertical pressure so the overall hero becomes shorter. */
+.app-shell .hero-main.hero-main-with-icon {
+  min-height: 0 !important;
+}
+
+.app-shell .hero-profile-copy .eyebrow {
+  margin-bottom: 5px !important;
+}
+
+.app-shell .hero-profile-copy .hero-subtitle {
+  margin-top: 5px !important;
+}
+
+/* Medium screens: keep the workbook readable, then stack only when necessary. */
+@media (max-width: 1180px) {
+  .app-shell .hero-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell .workbook-card.workbook-card-compact {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
 }
