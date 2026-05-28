@@ -3788,137 +3788,307 @@ body:has(.light-background-theme) {
 .app-shell .hero-call-text .hero-subtitle {
   margin: 0 !important;
 }
+/* ============================================================
+   Performance KPI section header/export polish
+   Ensures Performance section uses same header, collapse, top,
+   and export button rhythm as the KPI section.
+   ============================================================ */
+.app-shell #Performance.section-title {
+  margin-top: 22px !important;
+}
+
+.app-shell #Performance .section-title-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.app-shell #Performance-content.performance-chart-grid {
+  margin-top: 0 !important;
+}
 
 /* ============================================================
-   Compact wider workbook profile card inside hero
-   Goal: wider right container + fewer vertical gaps + shorter hero.
+   FINAL DARK THEME BACKGROUND IMAGE FIX
+   Forces the dashboard dark theme to use /assets/dark.png.
+   Place dark.png in: public/assets/dark.png
    ============================================================ */
 
-.app-shell .hero-panel {
-  grid-template-columns: minmax(0, 1fr) minmax(460px, 620px) !important;
+html:has(.app-shell.dark-background-theme),
+body:has(.app-shell.dark-background-theme) {
+  background: #071118 !important;
+}
+
+.app-shell.dark-background-theme {
+  min-height: 100vh !important;
+  color: #eaf7ff !important;
+  background-color: #071118 !important;
+  background-image:
+    linear-gradient(rgba(7, 17, 24, 0.72), rgba(7, 17, 24, 0.86)),
+    url("/assets/dark.png") !important;
+  background-position: center top, center top !important;
+  background-size: cover, cover !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-attachment: fixed, fixed !important;
+  background-blend-mode: normal, normal !important;
+}
+
+.upload-shell.dark-background-theme {
+  min-height: 100vh !important;
+  color: #eaf7ff !important;
+  background-color: #071118 !important;
+  background-image:
+    linear-gradient(rgba(7, 17, 24, 0.68), rgba(7, 17, 24, 0.86)),
+    url("/assets/dark.png") !important;
+  background-position: center center, center center !important;
+  background-size: cover, cover !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-attachment: fixed, fixed !important;
+  background-blend-mode: normal, normal !important;
+}
+
+@media (max-width: 720px) {
+  .app-shell.dark-background-theme,
+  .upload-shell.dark-background-theme {
+    background-attachment: scroll, scroll !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL FIX: Make dark.png use the exact same background sizing
+   behavior as light.png on dashboard and upload screens.
+   Place dark.png in public/assets/dark.png
+   ============================================================ */
+
+html:has(.app-shell.dark-background-theme),
+body:has(.app-shell.dark-background-theme),
+html:has(.upload-shell.dark-background-theme),
+body:has(.upload-shell.dark-background-theme) {
+  background: #071118 !important;
+}
+
+.app-shell.dark-background-theme {
+  min-height: 100vh !important;
+  color: #eaf7ff !important;
+  background:
+    linear-gradient(rgba(7, 17, 24, 0.50), rgba(7, 17, 24, 0.78)),
+    url("/assets/dark.png") center top / cover fixed,
+    linear-gradient(120deg, rgba(55, 166, 217, 0.08), transparent 32%),
+    radial-gradient(circle at 78% 0%, rgba(240, 184, 79, 0.08), transparent 28%),
+    #071118 !important;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important;
+  background-blend-mode: normal, normal, normal, normal, normal !important;
+}
+
+.upload-shell.dark-background-theme {
+  min-height: 100vh !important;
+  color: #eaf7ff !important;
+  background:
+    linear-gradient(rgba(7, 17, 24, 0.50), rgba(7, 17, 24, 0.78)),
+    url("/assets/dark.png") center / cover,
+    linear-gradient(120deg, rgba(55, 166, 217, 0.08), transparent 34%),
+    radial-gradient(circle at 72% 8%, rgba(240, 184, 79, 0.08), transparent 30%),
+    #071118 !important;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important;
+  background-blend-mode: normal, normal, normal, normal, normal !important;
+}
+
+@media (max-width: 720px) {
+  .app-shell.dark-background-theme {
+    background:
+      linear-gradient(rgba(7, 17, 24, 0.50), rgba(7, 17, 24, 0.78)),
+      url("/assets/dark.png") center top / cover scroll,
+      linear-gradient(120deg, rgba(55, 166, 217, 0.08), transparent 32%),
+      radial-gradient(circle at 78% 0%, rgba(240, 184, 79, 0.08), transparent 28%),
+      #071118 !important;
+  }
+
+  .upload-shell.dark-background-theme {
+    background:
+      linear-gradient(rgba(7, 17, 24, 0.50), rgba(7, 17, 24, 0.78)),
+      url("/assets/dark.png") center / cover scroll,
+      linear-gradient(120deg, rgba(55, 166, 217, 0.08), transparent 34%),
+      radial-gradient(circle at 72% 8%, rgba(240, 184, 79, 0.08), transparent 30%),
+      #071118 !important;
+  }
+}
+
+
+/* ============================================================
+   Upload/Home screen 100% zoom fit patch
+   Goal: reduce vertical height and keep the home screen readable
+   without scrolling on normal laptop/desktop screens.
+   Dashboard layout is not affected.
+   ============================================================ */
+
+.upload-shell.dark-background-theme,
+.upload-shell.light-background-theme {
+  min-height: 100vh !important;
+  padding: clamp(12px, 2.2vw, 28px) !important;
   align-items: center !important;
-  gap: 16px !important;
-  padding: 12px 16px !important;
+  overflow-x: hidden !important;
+}
+
+.upload-shell .upload-grid,
+.upload-shell .upload-grid-wide {
+  width: min(1380px, 100%) !important;
+  min-height: calc(100vh - 56px) !important;
+  align-items: center !important;
+  gap: clamp(16px, 2.8vw, 34px) !important;
+}
+
+.upload-shell .upload-copy {
+  padding: clamp(18px, 3vw, 34px) !important;
+  border-radius: 22px !important;
+}
+
+.upload-shell .upload-copy .eyebrow,
+.upload-shell .choice-eyebrow {
+  font-size: clamp(10px, 0.78vw, 12px) !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.13em !important;
+  margin-bottom: 8px !important;
+}
+
+.upload-shell .upload-copy h1 {
+  max-width: 720px !important;
+  font-size: clamp(34px, 4.5vw, 64px) !important;
+  line-height: 0.94 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.upload-shell .upload-copy .lead,
+.upload-shell .upload-copy p.lead {
+  max-width: 760px !important;
+  margin-top: 14px !important;
+  margin-bottom: 0 !important;
+  font-size: clamp(14px, 1.35vw, 18px) !important;
+  line-height: 1.55 !important;
+}
+
+.upload-shell .workbook-choice-panel.three-tile {
+  gap: 10px !important;
+  padding: 14px 18px 18px !important;
   min-height: auto !important;
+  align-content: center !important;
 }
 
-.app-shell .workbook-card.workbook-card-compact {
-  display: flex !important;
-  flex-direction: column !important;
-  align-content: stretch !important;
-  gap: 5px !important;
-  min-width: 460px !important;
-  max-width: 620px !important;
-  width: 100% !important;
-  padding: 10px 14px !important;
-  border-radius: 10px !important;
-  min-height: 0 !important;
-  height: auto !important;
-}
-
-.app-shell .workbook-card-compact .workbook-card-header {
-  display: flex !important;
-  align-items: center !important;
-  gap: 9px !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-}
-
-.app-shell .workbook-card-compact .workbook-card-header svg {
-  flex: 0 0 auto !important;
-  width: 22px !important;
-  height: 22px !important;
-}
-
-.app-shell .workbook-card-compact .workbook-card-title {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 1px !important;
-  min-width: 0 !important;
-}
-
-.app-shell .workbook-card-compact .workbook-card-title span {
-  margin: 0 !important;
-  line-height: 1 !important;
-  font-size: 10px !important;
-}
-
-.app-shell .workbook-card-compact .workbook-card-title strong {
-  display: block !important;
-  margin: 0 !important;
-  line-height: 1.15 !important;
-  font-size: clamp(14px, 1.05vw, 18px) !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-.app-shell .workbook-card-compact .workbook-card-meta {
-  margin: 0 !important;
-  line-height: 1.18 !important;
+.upload-shell .workbook-choice-panel.three-tile .upload-theme-toggle {
+  min-height: 30px !important;
+  padding: 6px 10px !important;
   font-size: 11px !important;
 }
 
-.app-shell .workbook-card-compact .cdr-sources-list,
-.app-shell .workbook-card-compact .cdr-sources-list-compact {
-  margin: 2px 0 0 !important;
-  padding: 4px 7px !important;
-  display: grid !important;
-  gap: 1px !important;
-  max-height: none !important;
-  overflow: visible !important;
-  border-radius: 6px !important;
+.upload-shell .workbook-choice-panel.three-tile .workbook-choice-card,
+.upload-shell .workbook-choice-panel.three-tile .choice-card {
+  min-height: 138px !important;
+  padding: 14px !important;
+  gap: 6px !important;
+  border-radius: 18px !important;
 }
 
-.app-shell .workbook-card-compact .cdr-sources-list li,
-.app-shell .workbook-card-compact .cdr-sources-list-compact li {
+.upload-shell .workbook-choice-panel.three-tile .fleetmap-choice-card {
+  min-height: 116px !important;
+}
+
+.upload-shell .workbook-choice-card .choice-icon,
+.upload-shell .choice-card .choice-icon {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 14px !important;
+}
+
+.upload-shell .workbook-choice-card strong,
+.upload-shell .choice-card strong {
+  font-size: clamp(16px, 1.55vw, 22px) !important;
+  line-height: 1.08 !important;
+}
+
+.upload-shell .workbook-choice-card p,
+.upload-shell .choice-card p {
+  font-size: clamp(11px, 0.95vw, 13px) !important;
+  line-height: 1.38 !important;
   margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1.18 !important;
+}
+
+.upload-shell .fleetmap-status {
+  margin-top: 4px !important;
+  padding: 4px 8px !important;
   font-size: 10.5px !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  line-height: 1.2 !important;
 }
 
-.app-shell .workbook-card-compact .cdr-sources-list strong {
-  font-size: 10.5px !important;
-  line-height: 1.18 !important;
-}
-
-.app-shell .workbook-card-compact .fleetmap-status,
-.app-shell .workbook-card-compact .fleetmap-status-compact {
-  margin: 2px 0 0 !important;
-  padding: 4px 7px !important;
-  line-height: 1.15 !important;
-  font-size: 10.5px !important;
-  border-radius: 6px !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-/* Reduce the hero left block vertical pressure so the overall hero becomes shorter. */
-.app-shell .hero-main.hero-main-with-icon {
-  min-height: 0 !important;
-}
-
-.app-shell .hero-profile-copy .eyebrow {
-  margin-bottom: 5px !important;
-}
-
-.app-shell .hero-profile-copy .hero-subtitle {
-  margin-top: 5px !important;
-}
-
-/* Medium screens: keep the workbook readable, then stack only when necessary. */
-@media (max-width: 1180px) {
-  .app-shell .hero-panel {
-    grid-template-columns: 1fr !important;
+/* Medium laptop height safety: compress a little more when height is limited. */
+@media (max-height: 780px) and (min-width: 900px) {
+  .upload-shell.dark-background-theme,
+  .upload-shell.light-background-theme {
+    padding: 10px 22px !important;
   }
 
-  .app-shell .workbook-card.workbook-card-compact {
-    min-width: 0 !important;
-    max-width: 100% !important;
+  .upload-shell .upload-grid,
+  .upload-shell .upload-grid-wide {
+    min-height: calc(100vh - 28px) !important;
+    gap: 18px !important;
+  }
+
+  .upload-shell .upload-copy {
+    padding: 20px 24px !important;
+  }
+
+  .upload-shell .upload-copy h1 {
+    font-size: clamp(30px, 4vw, 54px) !important;
+  }
+
+  .upload-shell .upload-copy .lead,
+  .upload-shell .upload-copy p.lead {
+    font-size: 14px !important;
+    line-height: 1.42 !important;
+    margin-top: 10px !important;
+  }
+
+  .upload-shell .workbook-choice-panel.three-tile .workbook-choice-card,
+  .upload-shell .workbook-choice-panel.three-tile .choice-card {
+    min-height: 112px !important;
+    padding: 12px !important;
+  }
+
+  .upload-shell .workbook-choice-card .choice-icon,
+  .upload-shell .choice-card .choice-icon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .upload-shell .workbook-choice-card strong,
+  .upload-shell .choice-card strong {
+    font-size: 17px !important;
+  }
+
+  .upload-shell .workbook-choice-card p,
+  .upload-shell .choice-card p {
+    font-size: 11.5px !important;
+    line-height: 1.28 !important;
+  }
+}
+
+/* Small/mobile screens still use a normal scroll-friendly single column. */
+@media (max-width: 720px) {
+  .upload-shell.dark-background-theme,
+  .upload-shell.light-background-theme {
+    display: block !important;
+    min-height: 100vh !important;
+    padding: 14px 10px 28px !important;
+    overflow-y: auto !important;
+  }
+
+  .upload-shell .upload-grid,
+  .upload-shell .upload-grid-wide {
+    min-height: auto !important;
+    gap: 14px !important;
+  }
+
+  .upload-shell .upload-copy h1 {
+    font-size: clamp(30px, 11vw, 46px) !important;
   }
 }

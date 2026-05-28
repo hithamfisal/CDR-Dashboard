@@ -1404,6 +1404,12 @@ export default function App() {
   const monthlyKpiChartRef = useRef<HTMLElement | null>(null);
   const kpiTotalAvgChartRef = useRef<HTMLElement | null>(null);
   const monthlyCompanyChartRef = useRef<HTMLElement | null>(null);
+  const performanceRegionChartRef = useRef<HTMLElement | null>(null);
+  const performanceMonthChartRef = useRef<HTMLElement | null>(null);
+  const performanceCompanyChartRef = useRef<HTMLElement | null>(null);
+  const performanceTalkgroupChartRef = useRef<HTMLElement | null>(null);
+  const performanceStationChartRef = useRef<HTMLElement | null>(null);
+  const performanceHourChartRef = useRef<HTMLElement | null>(null);
 
   // Load saved fleetmaps on mount
   useEffect(() => {
@@ -1858,6 +1864,36 @@ export default function App() {
     { title: "KPI Total Avg. Duration", ref: kpiTotalAvgChartRef },
   ], []);
 
+  const performanceExportItems = useMemo(() => [
+    { title: "Regions Performance", ref: performanceRegionChartRef },
+    { title: "Monthly Performance", ref: performanceMonthChartRef },
+    { title: "Companies Performance", ref: performanceCompanyChartRef },
+    { title: "Talkgroups Performance", ref: performanceTalkgroupChartRef },
+    { title: "Base Stations Performance", ref: performanceStationChartRef },
+    { title: "Hours Performance", ref: performanceHourChartRef },
+  ], []);
+
+  const performanceExportTables = useMemo(() => {
+    const toRows = (rows: Ranking[]) => rows.map((row) => [
+      row.name,
+      row.calls,
+      row.durationSeconds,
+      secondsToClock(row.durationSeconds),
+      row.trafficHours,
+      row.radios,
+      row.calls ? row.durationSeconds / row.calls : 0,
+    ]);
+    const headers = ["Name", "Calls", "Duration Seconds", "Duration", "Traffic Hours", "Active Radios", "Avg Duration / Call"];
+    return [
+      { sheetName: "Regions", title: "Regions Performance", headers, rows: toRows(rankings.region) },
+      { sheetName: "Months", title: "Monthly Performance", headers, rows: toRows(rankings.month) },
+      { sheetName: "Companies", title: "Companies Performance", headers, rows: toRows(rankings.company) },
+      { sheetName: "Talkgroups", title: "Talkgroups Performance", headers, rows: toRows(rankings.talkgroup.slice(0, 12)) },
+      { sheetName: "Base Stations", title: "Base Stations Performance", headers, rows: toRows(rankings.station.slice(0, 12)) },
+      { sheetName: "Hours", title: "Hours Performance", headers, rows: toRows(rankings.hour) },
+    ];
+  }, [rankings.company, rankings.hour, rankings.month, rankings.region, rankings.station, rankings.talkgroup]);
+
   const kpiTableHeaders = ["Call Source","Talk groups in use","No. of Calls","Duration (Sec)","Duration (hh:mm:ss)","Total No. of Users activated","Call Performed by (No. of Users)","KPI (Avg. Duration per User per Company) in sec","KPI"];
 
   const kpiExportTableRows = useMemo(() => [
@@ -1972,6 +2008,85 @@ export default function App() {
       await pptx.writeFile({ fileName: "kpi-table-and-charts.pptx" });
     })();
   }, [captureKpiChartImages, exportTitle, kpiExportTableRows]);
+
+  const capturePerformanceChartImages = useCallback(async () => {
+    const charts = await Promise.all(performanceExportItems.map(async (item) => {
+      const element = item.ref.current;
+      if (!element) throw new Error(`${item.title} is not ready yet.`);
+      return { title: exportTitle(item.title), image: await captureElementPng(element, "#0f1b24") };
+    }));
+    return charts;
+  }, [exportTitle, performanceExportItems]);
+
+  const exportPerformanceXlsx = useCallback(() => {
+    void (async () => {
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "CDR Dashboard";
+      const border = { top: { style: "thin" as const }, left: { style: "thin" as const }, bottom: { style: "thin" as const }, right: { style: "thin" as const } };
+      const headerFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FF37A6D9" } };
+      performanceExportTables.forEach((table) => {
+        const sheet = workbook.addWorksheet(table.sheetName.slice(0, 31), { views: [{ showGridLines: false }] });
+        sheet.addRow([exportTitle(table.title)]);
+        sheet.mergeCells(1, 1, 1, table.headers.length);
+        sheet.addRow(table.headers);
+        table.rows.forEach((row) => sheet.addRow(row));
+        sheet.columns = table.headers.map((header, index) => ({
+          width: Math.min(34, Math.max(14, header.length + 2, ...table.rows.map((row) => `${row[index] ?? ""}`.length + 2))),
+        }));
+        sheet.eachRow((row, rn) => {
+          row.height = rn <= 2 ? 24 : 20;
+          row.eachCell((cell) => {
+            cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+            cell.border = border;
+            if (rn <= 2) {
+              cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+              cell.fill = headerFill;
+            }
+          });
+        });
+      });
+      const buffer = await workbook.xlsx.writeBuffer();
+      downloadBlob("performance-charts-data.xlsx", new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+    })();
+  }, [exportTitle, performanceExportTables]);
+
+  const exportPerformancePdf = useCallback(() => {
+    void (async () => {
+      const charts = await capturePerformanceChartImages();
+      const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 24;
+      charts.forEach((chart, index) => {
+        if (index) pdf.addPage("a4", "landscape");
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(16);
+        pdf.text(chart.title, pageWidth / 2, 28, { align: "center" });
+        const props = pdf.getImageProperties(chart.image);
+        const maxWidth = pageWidth - margin * 2;
+        const maxHeight = pageHeight - margin * 2 - 24;
+        const ratio = Math.min(maxWidth / props.width, maxHeight / props.height);
+        pdf.addImage(chart.image, "PNG", (pageWidth - props.width * ratio) / 2, 48 + (maxHeight - props.height * ratio) / 2, props.width * ratio, props.height * ratio);
+      });
+      pdf.save("performance-charts.pdf");
+    })();
+  }, [capturePerformanceChartImages]);
+
+  const exportPerformancePpt = useCallback(() => {
+    void (async () => {
+      const charts = await capturePerformanceChartImages();
+      const pptx = new pptxgen();
+      pptx.layout = "LAYOUT_WIDE";
+      pptx.author = "CDR Dashboard";
+      charts.forEach((chart) => {
+        const slide = pptx.addSlide();
+        slide.background = { color: "0F1B24" };
+        slide.addText(chart.title, { x: 0.3, y: 0.18, w: 12.7, h: 0.38, fontSize: 18, bold: true, align: "center", color: "EDF6FA" });
+        slide.addImage({ data: chart.image, x: 0.35, y: 0.72, w: 12.65, h: 6.35 });
+      });
+      await pptx.writeFile({ fileName: "performance-charts.pptx" });
+    })();
+  }, [capturePerformanceChartImages]);
 
   const CompanyRows = useMemo(() => {
     const map = new Map<string, { calls: number; durationSeconds: number; talkgroupsUsed: Set<string>; callingUsers: Set<string>; totalTalkgroups: Set<string>; totalUsers: Set<string> }>();
@@ -2458,24 +2573,20 @@ export default function App() {
             <p className="hero-subtitle">calls under analysis</p>
           </div>
         </div>
-        <div className="workbook-card workbook-card-compact">
-          <div className="workbook-card-header">
-            <ShieldCheck size={22} />
-            <div className="workbook-card-title">
-              <span>Workbook</span>
-              <strong>{data.fileName}</strong>
-            </div>
-          </div>
-          <p className="workbook-card-meta">{formatNumber(data.rawRows)} records - loaded {data.loadedAt}</p>
+        <div className="workbook-card">
+          <ShieldCheck size={28} />
+          <span>Workbook</span>
+          <strong>{data.fileName}</strong>
+          <p>{formatNumber(data.rawRows)} records - loaded {data.loadedAt}</p>
           {data.cdrSources.length > 1 && (
-            <ul className="cdr-sources-list cdr-sources-list-compact">
+            <ul className="cdr-sources-list">
               {data.cdrSources.map((src, i) => (
                 <li key={`${src.fileName}-${i}`}><strong>{src.fileName}</strong> — {formatNumber(src.recordCount)} rows</li>
               ))}
             </ul>
           )}
           {(masterFleetmap.meta || fixedFleetmap.meta) && (
-            <p className="fleetmap-status fleetmap-status-compact">
+            <p className="fleetmap-status">
               Fleetmap: {masterFleetmap.meta ? `Master (${formatNumber(masterFleetmap.records.length)})` : "—"}
               {" + "}
               {fixedFleetmap.meta ? `Fixed (${formatNumber(fixedFleetmap.records.length)})` : "—"}
@@ -2785,14 +2896,26 @@ export default function App() {
         </article>
       </section>
 
-      <SectionTitle id="Performance" eyebrow="Performance" title={`Calls & Duration Performance in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Performance")} onToggle={() => toggleSection("Performance")} />
+      <SectionTitle
+        id="Performance"
+        eyebrow="Performance"
+        title={`Calls & Duration Performance in ${CompanyPeriodLabel}`}
+        text="Performance KPI charts with calls, duration, and average duration per operational dimension."
+        collapsed={isSectionCollapsed("Performance")}
+        onToggle={() => toggleSection("Performance")}
+        actions={<>
+          <ExportButton kind="xlsx" label="XLSX" onClick={exportPerformanceXlsx} />
+          <ExportButton kind="ppt" label="PPT" onClick={exportPerformancePpt} />
+          <ExportButton kind="pdf" label="PDF" onClick={exportPerformancePdf} />
+        </>}
+      />
       <section id="Performance-content" className={`chart-grid performance-chart-grid ${isSectionCollapsed("Performance") ? "section-content-collapsed" : ""}`}>
-        <article className="chart-card performance-region"><CallsDurationPerformanceChart title="Regions Performance" data={rankings.region} gradientId="performanceRegion" /></article>
-        <article className="chart-card performance-month"><CallsDurationPerformanceChart title="Monthly Performance" data={rankings.month} gradientId="performanceMonth" xTickFormatter={shortMonthLabel} /></article>
-        <article className="chart-card performance-company"><CallsDurationPerformanceChart title="Companies Performance" data={rankings.company} gradientId="performanceCompany" /></article>
-        <article className="chart-card performance-talkgroup"><CallsDurationPerformanceChart title="Talkgroups Performance" data={rankings.talkgroup.slice(0, 12)} gradientId="performanceTalkgroup" /></article>
-        <article className="chart-card performance-basestation"><CallsDurationPerformanceChart title="Base Stations Performance" data={rankings.station.slice(0, 12)} gradientId="performanceStation" /></article>
-        <article className="chart-card performance-hour"><CallsDurationPerformanceChart title="Hours Performance" data={rankings.hour} gradientId="performanceHour" xTickFormatter={(v) => `${v ?? ""}`} /></article>
+        <article className="chart-card performance-region" ref={performanceRegionChartRef}><CallsDurationPerformanceChart title="Regions Performance" data={rankings.region} gradientId="performanceRegion" /></article>
+        <article className="chart-card performance-month" ref={performanceMonthChartRef}><CallsDurationPerformanceChart title="Monthly Performance" data={rankings.month} gradientId="performanceMonth" xTickFormatter={shortMonthLabel} /></article>
+        <article className="chart-card performance-company" ref={performanceCompanyChartRef}><CallsDurationPerformanceChart title="Companies Performance" data={rankings.company} gradientId="performanceCompany" /></article>
+        <article className="chart-card performance-talkgroup" ref={performanceTalkgroupChartRef}><CallsDurationPerformanceChart title="Talkgroups Performance" data={rankings.talkgroup.slice(0, 12)} gradientId="performanceTalkgroup" /></article>
+        <article className="chart-card performance-basestation" ref={performanceStationChartRef}><CallsDurationPerformanceChart title="Base Stations Performance" data={rankings.station.slice(0, 12)} gradientId="performanceStation" /></article>
+        <article className="chart-card performance-hour" ref={performanceHourChartRef}><CallsDurationPerformanceChart title="Hours Performance" data={rankings.hour} gradientId="performanceHour" xTickFormatter={(v) => `${v ?? ""}`} /></article>
       </section>
 
       <SectionTitle id="General" eyebrow="General" title={`General Charts in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("General")} onToggle={() => toggleSection("General")} />
