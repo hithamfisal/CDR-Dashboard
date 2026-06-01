@@ -2859,18 +2859,16 @@ export default function App() {
   return (
     <main className={`app-shell ${themeClass(theme)} active-tab-${activeTab}`}>
       <header className="topbar followup-style-topbar">
-        <div className="followup-header-logos">
-          <img src="/assets/se.png" alt="Saudi Energy" />
-          <span className="logo-divider" />
-          <img src="/assets/nglogo.png" alt="National Grid" />
+        <div className="followup-header-badge followup-header-badge-left">
+          <img src="/assets/nascologo.png" alt="NASCO" />
         </div>
 
         <div className="followup-dashboard-title">
           <h1>CDR TRAFFIC DASHBOARD</h1>
         </div>
 
-        <div className="followup-header-badge">
-          <img src="/assets/nascologo.png" alt="NASCO" />
+        <div className="followup-header-se" aria-label="Saudi Energy">
+          <img src="/assets/se.png" alt="Saudi Energy" />
         </div>
 
         <div className="followup-header-actions">

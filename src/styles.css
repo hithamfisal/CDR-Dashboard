@@ -8160,3 +8160,70 @@ html:has(.dark-background-theme) {
     padding: 14px 28px !important;
   }
 }
+
+.followup-header-badge-left {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  justify-self: start !important;
+  display: grid !important;
+}
+
+.followup-header-se {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  justify-self: end !important;
+  width: min(260px, 24vw) !important;
+  min-width: 170px !important;
+  min-height: 122px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 14px 18px !important;
+  border-radius: 30px !important;
+  border: 1px solid rgba(34, 211, 238, 0.28) !important;
+  background:
+    radial-gradient(circle at 82% 12%, rgba(20, 184, 166, 0.24), transparent 38%),
+    linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(2, 13, 28, 0.34)) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.08), 0 22px 48px rgba(0, 0, 0, 0.18) !important;
+}
+
+.followup-header-se img {
+  width: min(220px, 100%) !important;
+  max-height: 132px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 16px 28px rgba(14, 165, 233, 0.24)) !important;
+}
+
+.app-shell.light-background-theme .followup-header-se {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(20, 184, 166, 0.20), transparent 38%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(230, 246, 255, 0.78)) !important;
+  border-color: rgba(0, 120, 212, 0.20) !important;
+}
+
+@media (max-width: 1180px) {
+  .followup-header-badge-left,
+  .followup-header-se {
+    grid-column: 1 !important;
+    justify-self: center !important;
+  }
+
+  .followup-header-badge-left {
+    display: grid !important;
+  }
+
+  .followup-header-se {
+    width: min(360px, 100%) !important;
+    min-height: 92px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .followup-header-se {
+    min-width: 0 !important;
+    min-height: 78px !important;
+  }
+
+  .followup-header-se img {
+    max-height: 84px !important;
+  }
+}
