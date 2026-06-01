@@ -2858,6 +2858,7 @@ export default function App() {
 
   return (
     <main className={`app-shell ${themeClass(theme)} active-tab-${activeTab}`}>
+      <section className="cdr-command-shell">
       <header className="topbar followup-style-topbar">
         <div className="followup-header-badge followup-header-badge-left">
           <img src="/assets/nascologo.png" alt="NASCO" />
@@ -2959,6 +2960,8 @@ export default function App() {
         <MultiSelectFilter className="filter-wide" label="Talkgroup" value={filters.talkgroup} options={options.talkgroup} optionLabels={talkgroupLabels} onChange={(talkgroup) => { setFilters((c) => ({ ...c, talkgroup })); setPage(1); }} />
         <button className="button reset-filter-button" onClick={() => { setFilters(EMPTY_FILTERS); setPage(1); }}><X size={16} /> Reset Filters</button>
         <span className="filter-count">{formatNumber(filtered.length)} from {formatNumber(records.length)} · {formatPercent(filteredShare)}</span>
+      </section>
+
       </section>
 
       <section id="reportsTabPanel" className="reports-tab-panel">
