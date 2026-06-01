@@ -1197,7 +1197,7 @@ function csvEscape(value: unknown) {
 }
 
 function downloadText(fileName: string, text: string) {
-  const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
+  const blob = new Blob(["\ufeff", text], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url; link.download = fileName;
@@ -1254,6 +1254,32 @@ function escapeXml(value: unknown) {
 
 function htmlEscape(value: unknown) {
   return `${value ?? ""}`.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+const ARABIC_TEXT_RE = /[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]/;
+
+function hasArabicText(value: unknown) {
+  return ARABIC_TEXT_RE.test(`${value ?? ""}`);
+}
+
+function pdfExportText(pdf: jsPDF, value: unknown) {
+  const text = `${value ?? ""}`;
+  return hasArabicText(text) && typeof (pdf as unknown as { processArabic?: (txt: string) => string }).processArabic === "function"
+    ? (pdf as unknown as { processArabic: (txt: string) => string }).processArabic(text)
+    : text;
+}
+
+function pdfText(pdf: jsPDF, value: unknown, x: number, y: number, options?: Parameters<jsPDF["text"]>[3]) {
+  pdf.text(pdfExportText(pdf, value), x, y, options);
+}
+
+function pptTextOptions<T extends Record<string, unknown>>(value: unknown, options: T): T & { fontFace: string; lang: string; rtlMode?: boolean } {
+  return {
+    ...options,
+    fontFace: "Arial",
+    lang: hasArabicText(value) ? "ar-SA" : "en-US",
+    ...(hasArabicText(value) ? { rtlMode: true } : {}),
+  };
 }
 
 function excelColumnName(index: number) {
@@ -2350,7 +2376,7 @@ export default function App() {
         const rowHeight = Math.min(30, (pageHeight - 76) / Math.max(1, kpiExportTableRows.length));
         let y = 52;
         pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
-        pdf.text(exportTitle("KPI Measurements"), pageWidth / 2, 28, { align: "center" });
+        pdfText(pdf, exportTitle("KPI Measurements"), pageWidth / 2, 28, { align: "center" });
         kpiExportTableRows.forEach((row, ri) => {
           let x = margin;
           row.forEach((cell, ci) => {
@@ -2358,7 +2384,7 @@ export default function App() {
             pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff");
             pdf.rect(x, y, width, rowHeight, "FD");
             pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 6.5 : 7); pdf.setTextColor(0, 0, 0);
-            pdf.text(String(cell), x + width / 2, y + rowHeight / 2 + 2.5, { align: "center", maxWidth: width - 4 });
+            pdfText(pdf, cell, x + width / 2, y + rowHeight / 2 + 2.5, { align: "center", maxWidth: width - 4 });
             x += width;
           });
           y += rowHeight;
@@ -2367,7 +2393,7 @@ export default function App() {
       const addImagePage = (title: string, image: string, firstPage = false) => {
         if (!firstPage) pdf.addPage("a4", "landscape");
         pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
-        pdf.text(title, pageWidth / 2, 28, { align: "center" });
+        pdfText(pdf, title, pageWidth / 2, 28, { align: "center" });
         const props = pdf.getImageProperties(image);
         const maxWidth = pageWidth - margin * 2; const maxHeight = pageHeight - margin * 2 - 24;
         const ratio = Math.min(maxWidth / props.width, maxHeight / props.height);
@@ -2383,16 +2409,16 @@ export default function App() {
     void (async () => {
       const charts = await captureKpiChartImages();
       const pptx = new pptxgen();
-      pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard";
+      pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard"; pptx.rtlMode = true;
       const tableSlide = pptx.addSlide();
       tableSlide.background = { color: "FFFFFF" };
-      tableSlide.addText(exportTitle("KPI Measurements"), { x: 0.3, y: 0.18, w: 12.7, h: 0.36, fontSize: 18, bold: true, align: "center", color: "111111" });
-      const pptTableRows = kpiExportTableRows.map((row, ri) => row.map((cell) => ({ text: String(cell), options: { bold: ri === 0, fill: { color: ri === 0 ? "FFF200" : "FFFFFF" }, color: "111111" } })));
+      tableSlide.addText(exportTitle("KPI Measurements"), pptTextOptions(exportTitle("KPI Measurements"), { x: 0.3, y: 0.18, w: 12.7, h: 0.36, fontSize: 18, bold: true, align: "center", color: "111111" }));
+      const pptTableRows = kpiExportTableRows.map((row, ri) => row.map((cell) => ({ text: String(cell), options: pptTextOptions(cell, { bold: ri === 0, fill: { color: ri === 0 ? "FFF200" : "FFFFFF" }, color: "111111" }) })));
       tableSlide.addTable(pptTableRows, { x: 0.18, y: 0.7, w: 12.98, h: 6.25, fontFace: "Arial", fontSize: 5.7, color: "111111", margin: 0.02, align: "center", valign: "mid", border: { type: "solid", color: "111111", pt: 0.5 }, fill: { color: "FFFFFF" }, autoFit: false, colW: [1.45, 0.86, 0.75, 0.86, 1.02, 1.08, 1.08, 1.45, 0.55], rowH: kpiExportTableRows.map((_, i) => i === 0 ? 0.58 : 0.38), bold: false, fit: "shrink" });
       const addImageSlide = (title: string, image: string) => {
         const slide = pptx.addSlide();
         slide.background = { color: "0F1B24" };
-        slide.addText(title, { x: 0.3, y: 0.18, w: 12.7, h: 0.38, fontSize: 18, bold: true, align: "center", color: "EDF6FA" });
+        slide.addText(title, pptTextOptions(title, { x: 0.3, y: 0.18, w: 12.7, h: 0.38, fontSize: 18, bold: true, align: "center", color: "EDF6FA" }));
         slide.addImage({ data: image, x: 0.35, y: 0.72, w: 12.65, h: 6.35 });
       };
       charts.forEach((chart) => addImageSlide(chart.title, chart.image));
@@ -2546,7 +2572,7 @@ export default function App() {
     const allRows = [recordExportHeaders, ...rows];
     let y = 44; const rowHeight = 10;
     pdf.setFont("helvetica", "bold"); pdf.setFontSize(14);
-    pdf.text(`${exportTitle("Filtered Calls Register")} - Page ${page}`, pageWidth / 2, 24, { align: "center" });
+    pdfText(pdf, `${exportTitle("Filtered Calls Register")} - Page ${page}`, pageWidth / 2, 24, { align: "center" });
     allRows.forEach((row, ri) => {
       let x = margin;
       row.forEach((cell, ci) => {
@@ -2554,7 +2580,7 @@ export default function App() {
         pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff");
         pdf.rect(x, y, width, rowHeight, "FD");
         pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 4.5 : 4.7); pdf.setTextColor(0, 0, 0);
-        pdf.text(String(cell), x + width / 2, y + 7, { align: "center", maxWidth: width - 2 });
+        pdfText(pdf, cell, x + width / 2, y + 7, { align: "center", maxWidth: width - 2 });
         x += width;
       });
       y += rowHeight;
@@ -2588,7 +2614,7 @@ export default function App() {
     const pageWidth = pdf.internal.pageSize.getWidth(); const margin = 24;
     const drawTable = (title: string, headers: string[], rows: (string | number)[][], startY: number, widths: number[]) => {
       pdf.setFont("helvetica", "bold"); pdf.setFontSize(13);
-      pdf.text(title, pageWidth / 2, startY, { align: "center" });
+      pdfText(pdf, title, pageWidth / 2, startY, { align: "center" });
       let y = startY + 16;
       const tableW = widths.reduce((s, w) => s + w, 0); const startX = (pageWidth - tableW) / 2; const rowHeight = 18;
       [headers, ...rows].forEach((row, ri) => {
@@ -2598,7 +2624,7 @@ export default function App() {
           pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff");
           pdf.rect(x, y, width, rowHeight, "FD");
           pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 7 : 7.5); pdf.setTextColor(0, 0, 0);
-          pdf.text(String(cell), x + width / 2, y + 12, { align: "center", maxWidth: width - 4 });
+          pdfText(pdf, cell, x + width / 2, y + 12, { align: "center", maxWidth: width - 4 });
           x += width;
         });
         y += rowHeight;
@@ -2606,7 +2632,7 @@ export default function App() {
       return y;
     };
     pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
-    pdf.text(exportTitle("Top radios and employee utilization"), pageWidth / 2, 26, { align: "center" });
+    pdfText(pdf, exportTitle("Top radios and employee utilization"), pageWidth / 2, 26, { align: "center" });
     const nextY = drawTable("Top Radios", ["Radio ID & Alias", "Employee Name", "Company", "Total Calls", "Total Duration"], topRadioUsers.map((item) => [`${item.radioId} - ${item.radioAlias}`, item.employeeName, item.company, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), 52, [170, 160, 130, 80, 95]);
     drawTable("Top Users", ["User", "Total Calls", "Total Duration"], rankings.user.slice(0, 10).map((item) => [item.name, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), nextY + 28, [360, 95, 110]);
     pdf.save("top-radios-users.pdf");
@@ -2723,10 +2749,10 @@ export default function App() {
         if (fill) { pdf.setFillColor(fill); pdf.rect(x, cy, w, h, "F"); }
         pdf.setDrawColor(0); pdf.rect(x, cy, w, h);
         pdf.setFont("helvetica", bold ? "bold" : "normal"); pdf.setFontSize(8);
-        pdf.text(String(text), x + w / 2, cy + h / 2 + 3, { align: "center", maxWidth: w - 4 });
+        pdfText(pdf, text, x + w / 2, cy + h / 2 + 3, { align: "center", maxWidth: w - 4 });
       };
       pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
-      pdf.text(exportTitle("Calls and Duration per Company"), pageWidth / 2, 30, { align: "center" });
+      pdfText(pdf, exportTitle("Calls and Duration per Company"), pageWidth / 2, 30, { align: "center" });
       drawCell("Period", startX, y, cellW, rowH, "#fff200", true);
       companies.forEach((c, i) => drawCell(c, startX + cellW + i * cellW * 2, y, cellW * 2, rowH, "#fff200", true));
       y += rowH;
@@ -2757,14 +2783,14 @@ export default function App() {
   const exportMonthlyCompanyPpt = useCallback(() => {
     void (async () => {
       const { companies, periodType, rows, totals } = monthlyCompanyPivot;
-      const pptx = new pptxgen(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard";
+      const pptx = new pptxgen(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard"; pptx.rtlMode = true;
       const tableSlide = pptx.addSlide();
-      tableSlide.addText(exportTitle("Calls and Duration per Company - Table"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" });
+      tableSlide.addText(exportTitle("Calls and Duration per Company - Table"), pptTextOptions(exportTitle("Calls and Duration per Company - Table"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" }));
       const pptRows = [["Period", ...companies.flatMap((c) => [`${c} Calls`, `${c} Duration`])], ...rows.map((r) => [r.label, ...r.values.flatMap((v) => [formatNumber(v.calls), formatNumber(v.durationSeconds)])]), ["Total", ...companies.flatMap((c) => { const t = totals.get(c) ?? { calls: 0, durationSeconds: 0 }; return [formatNumber(t.calls), formatNumber(t.durationSeconds)]; })]];
       const tableX = 0.2; const tableY = 0.7; const tableW = 12.93; const colW = tableW / Math.max(1, pptRows[0].length); const rowH = Math.min(0.42, 6.45 / Math.max(1, pptRows.length));
-      pptRows.forEach((row, ri) => { row.forEach((cell, ci) => { const isH = ri === 0 || ri === pptRows.length - 1; tableSlide.addShape(pptx.ShapeType.rect, { x: tableX + ci * colW, y: tableY + ri * rowH, w: colW, h: rowH, fill: { color: isH ? "FFF200" : "FFFFFF" }, line: { color: "111111", width: 0.5 } }); tableSlide.addText(cell, { x: tableX + ci * colW + 0.01, y: tableY + ri * rowH + 0.02, w: colW - 0.02, h: rowH - 0.04, fontSize: ri === 0 ? 5.7 : 6.3, bold: isH, align: "center", valign: "mid", color: "111111", fit: "shrink", margin: 0 }); }); });
+      pptRows.forEach((row, ri) => { row.forEach((cell, ci) => { const isH = ri === 0 || ri === pptRows.length - 1; tableSlide.addShape(pptx.ShapeType.rect, { x: tableX + ci * colW, y: tableY + ri * rowH, w: colW, h: rowH, fill: { color: isH ? "FFF200" : "FFFFFF" }, line: { color: "111111", width: 0.5 } }); tableSlide.addText(cell, pptTextOptions(cell, { x: tableX + ci * colW + 0.01, y: tableY + ri * rowH + 0.02, w: colW - 0.02, h: rowH - 0.04, fontSize: ri === 0 ? 5.7 : 6.3, bold: isH, align: "center", valign: "mid", color: "111111", fit: "shrink", margin: 0 })); }); });
       const chartSlide = pptx.addSlide();
-      chartSlide.addText(exportTitle("Calls and Duration per Company - Chart"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" });
+      chartSlide.addText(exportTitle("Calls and Duration per Company - Chart"), pptTextOptions(exportTitle("Calls and Duration per Company - Chart"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" }));
       chartSlide.addChart("bar", [{ name: "Calls", labels: monthlyCompanyChartData.map((r) => r.category), values: monthlyCompanyChartData.map((r) => r.calls) }, { name: "Duration Seconds", labels: monthlyCompanyChartData.map((r) => r.category), values: monthlyCompanyChartData.map((r) => r.durationSeconds) }], { x: 0.45, y: 0.75, w: 12.4, h: 6.25, showLegend: true, showTitle: false, catAxisLabelRotate: 270, valAxisLabelColor: "111111", catAxisLabelColor: "111111", chartColors: ["2D86B4", "8FD0E8"] });
       await pptx.writeFile({ fileName: "calls-duration-per-company.pptx" });
     })();
