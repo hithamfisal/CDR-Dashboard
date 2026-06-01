@@ -8520,3 +8520,45 @@ html:has(.dark-background-theme) {
   background: transparent !important;
   box-shadow: none !important;
 }
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar {
+  border: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar::before,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar::after,
+.app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar::before,
+.app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar::after,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar::before,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar::after,
+.app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar::before,
+.app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar::after {
+  display: none !important;
+  content: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-shell .cdr-command-shell {
+  min-height: 540px !important;
+  background-position: center 58% !important;
+}
+
+.app-shell.active-tab-overview .cdr-command-shell {
+  min-height: 640px !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell {
+  background-position: center 58% !important;
+}
