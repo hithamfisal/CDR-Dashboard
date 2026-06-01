@@ -8503,3 +8503,20 @@ html:has(.dark-background-theme) {
     radial-gradient(circle at 86% 82%, rgba(20, 184, 166, 0.12), transparent 28%),
     linear-gradient(90deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.04) 62%, rgba(255, 255, 255, 0.22)) !important;
 }
+
+/* Header items sit directly on the command-shell image, without an inner rectangle. */
+.cdr-command-shell .followup-style-topbar {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.cdr-command-shell .followup-style-topbar::before,
+.cdr-command-shell .followup-style-topbar::after {
+  display: none !important;
+  content: none !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
