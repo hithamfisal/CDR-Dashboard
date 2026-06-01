@@ -3789,306 +3789,4374 @@ body:has(.light-background-theme) {
   margin: 0 !important;
 }
 /* ============================================================
-   Performance KPI section header/export polish
-   Ensures Performance section uses same header, collapse, top,
-   and export button rhythm as the KPI section.
-   ============================================================ */
-.app-shell #Performance.section-title {
-  margin-top: 22px !important;
-}
-
-.app-shell #Performance .section-title-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 8px !important;
-  flex-wrap: wrap !important;
-}
-
-.app-shell #Performance-content.performance-chart-grid {
-  margin-top: 0 !important;
-}
-
-/* ============================================================
-   FINAL DARK THEME BACKGROUND IMAGE FIX
-   Forces the dashboard dark theme to use /assets/dark.png.
-   Place dark.png in: public/assets/dark.png
+   Home screen: raw system call log upload option
+   Adds a fifth upload card for direct calllog CSV/XLSX exports.
    ============================================================ */
 
-html:has(.app-shell.dark-background-theme),
-body:has(.app-shell.dark-background-theme) {
-  background: #071118 !important;
+.workbook-choice-panel.three-tile {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-areas:
+    "theme theme"
+    "master fixed"
+    "new raw"
+    "previous previous" !important;
+  gap: 12px !important;
 }
 
-.app-shell.dark-background-theme {
-  min-height: 100vh !important;
-  color: #eaf7ff !important;
-  background-color: #071118 !important;
-  background-image:
-    linear-gradient(rgba(7, 17, 24, 0.72), rgba(7, 17, 24, 0.86)),
-    url("/assets/dark.png") !important;
-  background-position: center top, center top !important;
-  background-size: cover, cover !important;
-  background-repeat: no-repeat, no-repeat !important;
-  background-attachment: fixed, fixed !important;
-  background-blend-mode: normal, normal !important;
+.workbook-choice-panel.three-tile .raw-system-choice-card {
+  grid-area: raw !important;
+  grid-column: auto !important;
+  border-color: rgba(0, 166, 166, 0.38) !important;
 }
 
-.upload-shell.dark-background-theme {
-  min-height: 100vh !important;
-  color: #eaf7ff !important;
-  background-color: #071118 !important;
-  background-image:
-    linear-gradient(rgba(7, 17, 24, 0.68), rgba(7, 17, 24, 0.86)),
-    url("/assets/dark.png") !important;
-  background-position: center center, center center !important;
-  background-size: cover, cover !important;
-  background-repeat: no-repeat, no-repeat !important;
-  background-attachment: fixed, fixed !important;
-  background-blend-mode: normal, normal !important;
+.workbook-choice-panel.three-tile .raw-system-choice-card .choice-icon {
+  color: var(--cyan) !important;
+  border-color: rgba(0, 166, 166, 0.35) !important;
+  background: rgba(0, 166, 166, 0.10) !important;
+}
+
+.workbook-choice-panel.three-tile .raw-system-choice-card .choice-eyebrow {
+  color: var(--cyan) !important;
+}
+
+.upload-shell.light-background-theme .raw-system-choice-card,
+.se-theme .raw-system-choice-card {
+  border-color: rgba(0, 135, 185, 0.28) !important;
+}
+
+.upload-shell.light-background-theme .raw-system-choice-card .choice-icon,
+.se-theme .raw-system-choice-card .choice-icon {
+  color: #0078c8 !important;
+  border-color: rgba(0, 120, 200, 0.26) !important;
+  background: rgba(0, 120, 200, 0.08) !important;
 }
 
 @media (max-width: 720px) {
-  .app-shell.dark-background-theme,
-  .upload-shell.dark-background-theme {
-    background-attachment: scroll, scroll !important;
+  .workbook-choice-panel.three-tile {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "theme"
+      "master"
+      "fixed"
+      "new"
+      "raw"
+      "previous" !important;
+  }
+}
+
+/* ============================================================
+   Inactive Radios tables: force count column visible
+   ============================================================ */
+
+.app-shell .network-utilization-section .inactive-radio-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:first-child,
+.app-shell .network-utilization-section .inactive-radio-table td:first-child {
+  width: 72% !important;
+  text-align: left !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:nth-child(2),
+.app-shell .network-utilization-section .inactive-radio-table td:nth-child(2),
+.app-shell .network-utilization-section .inactive-radio-table .inactive-count-header,
+.app-shell .network-utilization-section .inactive-radio-table .inactive-count-cell {
+  width: 28% !important;
+  min-width: 120px !important;
+  text-align: center !important;
+  color: inherit !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .inactive-radio-table .inactive-count-header {
+  color: #006fae !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .inactive-radio-table .inactive-count-cell {
+  color: #092033 !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .inactive-radio-table .inactive-count-header {
+  color: #dff8ff !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .inactive-radio-table .inactive-count-cell {
+  color: #f4fbff !important;
+}
+
+/* ============================================================
+   Inactive Radios tables: add Active Radios column
+   ============================================================ */
+
+.app-shell .network-utilization-section .inactive-radio-table {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:first-child,
+.app-shell .network-utilization-section .inactive-radio-table td:first-child {
+  width: 56% !important;
+  text-align: left !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:nth-child(2),
+.app-shell .network-utilization-section .inactive-radio-table td:nth-child(2),
+.app-shell .network-utilization-section .inactive-radio-table .inactive-count-header,
+.app-shell .network-utilization-section .inactive-radio-table .inactive-count-cell {
+  width: 22% !important;
+  min-width: 105px !important;
+  text-align: center !important;
+  color: inherit !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:nth-child(3),
+.app-shell .network-utilization-section .inactive-radio-table td:nth-child(3),
+.app-shell .network-utilization-section .inactive-radio-table .active-count-header,
+.app-shell .network-utilization-section .inactive-radio-table .active-count-cell {
+  width: 22% !important;
+  min-width: 105px !important;
+  text-align: center !important;
+  color: inherit !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .inactive-radio-table .active-count-header {
+  color: #008f66 !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .inactive-radio-table .active-count-cell {
+  color: #092033 !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .inactive-radio-table .active-count-header {
+  color: #7adfa5 !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .inactive-radio-table .active-count-cell {
+  color: #f4fbff !important;
+}
+
+/* ============================================================
+   Unmatched Fleetmap Report
+   Shows raw Caller Numbers that do not match Master/Fixed fleetmap
+   ============================================================ */
+
+.app-shell .unmatched-fleetmap-report-section {
+  margin: 0 0 16px !important;
+}
+
+.app-shell .unmatched-fleetmap-report-card {
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.app-shell .unmatched-fleetmap-report-card .table-note {
+  margin: 0 0 10px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: var(--theme-muted, #3f6174) !important;
+}
+
+.app-shell .unmatched-fleetmap-table-wrap {
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.app-shell .unmatched-fleetmap-table {
+  width: 100% !important;
+  min-width: 1180px !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell .unmatched-fleetmap-table th,
+.app-shell .unmatched-fleetmap-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  height: 32px !important;
+  padding: 7px 8px !important;
+  font-size: 12px !important;
+}
+
+.app-shell .unmatched-fleetmap-table th:nth-child(1),
+.app-shell .unmatched-fleetmap-table td:nth-child(1) { width: 120px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(2),
+.app-shell .unmatched-fleetmap-table td:nth-child(2) { width: 170px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(3),
+.app-shell .unmatched-fleetmap-table td:nth-child(3) { width: 150px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(4),
+.app-shell .unmatched-fleetmap-table td:nth-child(4) { width: 80px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(5),
+.app-shell .unmatched-fleetmap-table td:nth-child(5) { width: 120px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(6),
+.app-shell .unmatched-fleetmap-table td:nth-child(6) { width: 170px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(7),
+.app-shell .unmatched-fleetmap-table td:nth-child(7) { width: 170px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(8),
+.app-shell .unmatched-fleetmap-table td:nth-child(8) { width: 190px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(9),
+.app-shell .unmatched-fleetmap-table td:nth-child(9) { width: 250px !important; }
+
+/* ============================================================
+   Tabular dashboard interface
+   Converts long dashboard sections into clean dashboard tabs.
+   ============================================================ */
+
+.dashboard-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 14px 0 16px !important;
+  padding: 8px !important;
+  border-radius: 16px !important;
+  background: var(--theme-card-bg, rgba(8, 31, 47, 0.98)) !important;
+  border: 1px solid var(--theme-border, rgba(116, 181, 214, 0.34)) !important;
+  box-shadow: var(--theme-shadow, 0 18px 42px rgba(0, 0, 0, 0.30)) !important;
+  position: relative !important;
+  z-index: 20 !important;
+}
+
+.dashboard-tab {
+  min-height: 38px !important;
+  padding: 8px 14px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--theme-border, rgba(116, 181, 214, 0.34)) !important;
+  background: transparent !important;
+  color: var(--theme-muted, #a8c8d8) !important;
+  font-weight: 850 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  transition: transform .16s ease, background .16s ease, color .16s ease, border-color .16s ease, box-shadow .16s ease !important;
+}
+
+.dashboard-tab:hover {
+  color: var(--theme-text, #f4fbff) !important;
+  background: rgba(0, 120, 212, 0.14) !important;
+  border-color: rgba(0, 163, 255, 0.55) !important;
+  transform: translateY(-1px) !important;
+}
+
+.dashboard-tab.active {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0078d4, #00a7d8) !important;
+  border-color: #008ddc !important;
+  box-shadow: 0 12px 28px rgba(0, 120, 212, 0.32) !important;
+}
+
+.app-shell.light-background-theme .dashboard-tabs {
+  background: #ffffff !important;
+  border-color: rgba(0, 100, 150, 0.20) !important;
+  box-shadow: 0 18px 42px rgba(17, 86, 128, 0.14) !important;
+}
+
+.app-shell.light-background-theme .dashboard-tab {
+  color: #3f6174 !important;
+  border-color: rgba(0, 100, 150, 0.22) !important;
+}
+
+.app-shell.light-background-theme .dashboard-tab:hover {
+  color: #092033 !important;
+  background: rgba(0, 120, 212, 0.08) !important;
+}
+
+.app-shell.light-background-theme .dashboard-tab.active {
+  color: #ffffff !important;
+}
+
+/* Hide all tab-specific content by default once the tab system is active. */
+.app-shell[class*="active-tab-"] > #command,
+.app-shell[class*="active-tab-"] > .summary-cards-arranged,
+.app-shell[class*="active-tab-"] > .data-quality-panel,
+.app-shell[class*="active-tab-"] > #reportsTabPanel,
+.app-shell[class*="active-tab-"] > #networkUtilization,
+.app-shell[class*="active-tab-"] > #networkUtilization-content,
+.app-shell[class*="active-tab-"] > #unmatchedFleetmap,
+.app-shell[class*="active-tab-"] > #unmatchedFleetmap-content,
+.app-shell[class*="active-tab-"] > #regionPerformance,
+.app-shell[class*="active-tab-"] > #regionPerformance-content,
+.app-shell[class*="active-tab-"] > #trafficIntensity,
+.app-shell[class*="active-tab-"] > #trafficIntensity-content,
+.app-shell[class*="active-tab-"] > #talkgroupEfficiency,
+.app-shell[class*="active-tab-"] > #talkgroupEfficiency-content,
+.app-shell[class*="active-tab-"] > #kpi,
+.app-shell[class*="active-tab-"] > #kpi-content,
+.app-shell[class*="active-tab-"] > #Company,
+.app-shell[class*="active-tab-"] > #Company-content,
+.app-shell[class*="active-tab-"] > #Performance,
+.app-shell[class*="active-tab-"] > #Performance-content,
+.app-shell[class*="active-tab-"] > #General,
+.app-shell[class*="active-tab-"] > #General-content,
+.app-shell[class*="active-tab-"] > #Charts,
+.app-shell[class*="active-tab-"] > #Charts-content,
+.app-shell[class*="active-tab-"] > #users,
+.app-shell[class*="active-tab-"] > #users-content,
+.app-shell[class*="active-tab-"] > #records,
+.app-shell[class*="active-tab-"] > #records-content {
+  display: none !important;
+}
+
+/* Overview & Records tab */
+.app-shell.active-tab-overview > #command {
+  display: grid !important;
+}
+.app-shell.active-tab-overview > .summary-cards-arranged {
+  display: grid !important;
+}
+.app-shell.active-tab-overview > .data-quality-panel {
+  display: grid !important;
+}
+.app-shell.active-tab-overview > #records {
+  display: flex !important;
+}
+.app-shell.active-tab-overview > #records-content:not(.section-content-collapsed) {
+  display: block !important;
+}
+
+/* Fleet Activation tab */
+.app-shell.active-tab-fleet > #networkUtilization,
+.app-shell.active-tab-fleet > #unmatchedFleetmap {
+  display: flex !important;
+}
+.app-shell.active-tab-fleet > #networkUtilization-content:not(.section-content-collapsed),
+.app-shell.active-tab-fleet > #unmatchedFleetmap-content:not(.section-content-collapsed) {
+  display: block !important;
+}
+
+/* Region & Traffic tab */
+.app-shell.active-tab-region > #regionPerformance,
+.app-shell.active-tab-region > #trafficIntensity {
+  display: flex !important;
+}
+.app-shell.active-tab-region > #regionPerformance-content:not(.section-content-collapsed),
+.app-shell.active-tab-region > #trafficIntensity-content:not(.section-content-collapsed) {
+  display: block !important;
+}
+
+/* Company, Talkgroup & Users tab */
+.app-shell.active-tab-company > #talkgroupEfficiency,
+.app-shell.active-tab-company > #Company,
+.app-shell.active-tab-company > #Charts,
+.app-shell.active-tab-company > #users {
+  display: flex !important;
+}
+.app-shell.active-tab-company > #talkgroupEfficiency-content:not(.section-content-collapsed) {
+  display: block !important;
+}
+.app-shell.active-tab-company > #Company-content:not(.section-content-collapsed),
+.app-shell.active-tab-company > #Charts-content:not(.section-content-collapsed),
+.app-shell.active-tab-company > #users-content:not(.section-content-collapsed) {
+  display: grid !important;
+}
+
+/* Performance KPI tab */
+.app-shell.active-tab-kpi > #kpi,
+.app-shell.active-tab-kpi > #Performance,
+.app-shell.active-tab-kpi > #General {
+  display: flex !important;
+}
+.app-shell.active-tab-kpi > #kpi-content:not(.section-content-collapsed),
+.app-shell.active-tab-kpi > #Performance-content:not(.section-content-collapsed),
+.app-shell.active-tab-kpi > #General-content:not(.section-content-collapsed) {
+  display: grid !important;
+}
+
+
+/* Reports tab */
+.app-shell.active-tab-reports > #reportsTabPanel {
+  display: block !important;
+}
+
+.reports-tab-panel {
+  margin: 14px 0 18px !important;
+}
+
+.export-center-card {
+  padding: 18px !important;
+}
+
+.export-center-card h3 {
+  margin: 0 0 8px !important;
+}
+
+.export-center-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  align-items: center !important;
+  margin-top: 14px !important;
+}
+
+/* Keep filters as the global control strip for all tabs. */
+.app-shell[class*="active-tab-"] > .filters-panel {
+  display: grid !important;
+}
+
+/* Smooth selected panel entrance. */
+.app-shell[class*="active-tab-"] > #command,
+.app-shell[class*="active-tab-"] > .summary-cards-arranged,
+.app-shell[class*="active-tab-"] > .data-quality-panel,
+.app-shell[class*="active-tab-"] > #reportsTabPanel,
+.app-shell[class*="active-tab-"] > [id$="-content"] {
+  animation: dashboardTabFadeIn .18s ease both;
+}
+
+@keyframes dashboardTabFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 920px) {
+  .dashboard-tabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+  }
+
+  .dashboard-tab {
+    flex: 0 0 auto !important;
+  }
+}
+
+/* ============================================================
+   Section title arrow collapse control
+   Replaces right-side Collapse/Expand text buttons with a compact
+   arrow beside the title.
+   ============================================================ */
+
+.section-title-heading {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+}
+
+.section-title-arrow {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--theme-border, rgba(116, 181, 214, 0.34)) !important;
+  background: rgba(0, 120, 212, 0.10) !important;
+  color: var(--theme-text, #f4fbff) !important;
+  padding: 0 !important;
+  margin-top: 2px !important;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease !important;
+}
+
+.section-title-arrow:hover {
+  background: rgba(0, 120, 212, 0.18) !important;
+  border-color: rgba(0, 163, 255, 0.52) !important;
+  transform: translateY(-1px) !important;
+}
+
+.section-title-arrow svg {
+  transition: transform .18s ease !important;
+}
+
+.section-title-collapsed .section-title-arrow svg {
+  transform: rotate(-90deg) !important;
+}
+
+.app-shell.light-background-theme .section-title-arrow {
+  background: rgba(0, 120, 212, 0.08) !important;
+  color: #092033 !important;
+  border-color: rgba(0, 100, 150, 0.22) !important;
+}
+
+
+/* Grouped tab labels can be longer, so keep them compact and readable. */
+.dashboard-tab {
+  font-size: 12px !important;
+  padding-inline: 13px !important;
+}
+
+@media (max-width: 1180px) {
+  .dashboard-tab {
+    font-size: 11px !important;
+    padding-inline: 11px !important;
   }
 }
 
 
 /* ============================================================
-   FINAL FIX: Make dark.png use the exact same background sizing
-   behavior as light.png on dashboard and upload screens.
-   Place dark.png in public/assets/dark.png
+   Compact + wider hero workbook information card
+   - wider right-side container
+   - removes tall empty gaps
+   - keeps workbook lines in one row where possible
+   - reduces overall hero height
    ============================================================ */
+
+.app-shell .hero-panel {
+  grid-template-columns: minmax(0, 1fr) minmax(520px, 680px) !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 12px 16px !important;
+  min-height: unset !important;
+  margin-bottom: 10px !important;
+}
+
+.app-shell .hero-main,
+.app-shell .hero-main.hero-main-with-icon {
+  min-height: 150px !important;
+  align-self: stretch !important;
+}
+
+.app-shell .workbook-card {
+  width: 100% !important;
+  max-width: 680px !important;
+  min-width: 520px !important;
+  min-height: unset !important;
+  align-self: center !important;
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr) !important;
+  grid-template-areas:
+    "icon label"
+    "icon title"
+    "meta meta"
+    "sources sources"
+    "fleet fleet" !important;
+  align-content: center !important;
+  align-items: center !important;
+  column-gap: 10px !important;
+  row-gap: 2px !important;
+  padding: 10px 14px !important;
+  margin-top: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.app-shell .workbook-card > svg {
+  grid-area: icon !important;
+  width: 28px !important;
+  height: 28px !important;
+  align-self: center !important;
+  margin: 0 !important;
+}
+
+.app-shell .workbook-card > span {
+  grid-area: label !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  font-size: 10px !important;
+  letter-spacing: 0.12em !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .workbook-card > strong {
+  grid-area: title !important;
+  display: block !important;
+  margin: 0 !important;
+  line-height: 1.12 !important;
+  font-size: clamp(13px, 1vw, 16px) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .workbook-card > p:not(.fleetmap-status) {
+  grid-area: meta !important;
+  margin: 4px 0 0 !important;
+  line-height: 1.15 !important;
+  font-size: 11px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .workbook-card .cdr-sources-list {
+  grid-area: sources !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  max-height: none !important;
+  margin: 5px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+.app-shell .workbook-card .cdr-sources-list li {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  max-width: 50% !important;
+  margin: 0 !important;
+  padding: 4px 8px !important;
+  border: 1px solid var(--theme-border, rgba(116, 181, 214, 0.28)) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  font-size: 10.5px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .workbook-card .cdr-sources-list li strong {
+  display: inline !important;
+  min-width: 0 !important;
+  margin-right: 3px !important;
+  font-size: 10.5px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .workbook-card .fleetmap-status {
+  grid-area: fleet !important;
+  width: 100% !important;
+  margin: 5px 0 0 !important;
+  padding: 4px 8px !important;
+  line-height: 1 !important;
+  font-size: 10.5px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell.light-background-theme .workbook-card .cdr-sources-list li {
+  background: rgba(0, 120, 180, 0.045) !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .hero-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell .workbook-card {
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell .workbook-card .cdr-sources-list {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+  }
+
+  .app-shell .workbook-card .cdr-sources-list li {
+    max-width: 100% !important;
+  }
+}
+
+/* ============================================================
+   Summary cards: force 6 cards per row on desktop
+   ============================================================ */
+.summary-cards,
+.summary-cards.summary-cards-arranged {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+@media (max-width: 1600px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   Summary cards custom row layout
+   Row 1: first 7 cards
+   Row 2: next 7 cards
+   Row 3: next 5 cards
+   Row 4: next 6 cards
+   Uses 210 virtual columns so 7 / 5 / 6 rows can align cleanly.
+   ============================================================ */
+
+.summary-cards,
+.summary-cards.summary-cards-arranged {
+  display: grid !important;
+  grid-template-columns: repeat(210, minmax(0, 1fr)) !important;
+  grid-auto-flow: row dense !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+}
+
+/* Cards 1-14: 7 cards per row */
+.summary-cards > .summary-card:nth-child(-n + 14),
+.summary-cards.summary-cards-arranged > .summary-card:nth-child(-n + 14) {
+  grid-column: span 30 !important;
+}
+
+/* Cards 15-19: 5 cards in row 3 */
+.summary-cards > .summary-card:nth-child(n + 15):nth-child(-n + 19),
+.summary-cards.summary-cards-arranged > .summary-card:nth-child(n + 15):nth-child(-n + 19) {
+  grid-column: span 42 !important;
+}
+
+/* Cards 20-25: 6 cards in row 4 */
+.summary-cards > .summary-card:nth-child(n + 20):nth-child(-n + 25),
+.summary-cards.summary-cards-arranged > .summary-card:nth-child(n + 20):nth-child(-n + 25) {
+  grid-column: span 35 !important;
+}
+
+/* Any extra cards after 25 continue as 6 per row */
+.summary-cards > .summary-card:nth-child(n + 26),
+.summary-cards.summary-cards-arranged > .summary-card:nth-child(n + 26) {
+  grid-column: span 35 !important;
+}
+
+.summary-cards .summary-card,
+.summary-cards.summary-cards-arranged .summary-card {
+  min-width: 0 !important;
+  min-height: 64px !important;
+  padding: 7px 8px !important;
+}
+
+/* Keep compact labels/values so 7 cards do not become too tall */
+.summary-cards .summary-card span,
+.summary-cards.summary-cards-arranged .summary-card span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 9px !important;
+  line-height: 1.05 !important;
+}
+
+.summary-cards .summary-card strong,
+.summary-cards.summary-cards-arranged .summary-card strong {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: clamp(12px, 0.95vw, 18px) !important;
+  line-height: 1.05 !important;
+}
+
+/* Responsive fallback: simple grid for smaller screens */
+@media (max-width: 1600px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  .summary-cards > .summary-card,
+  .summary-cards.summary-cards-arranged > .summary-card {
+    grid-column: auto !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL FIX: Summary cards custom rows using FLEX, not GRID
+   This avoids the "one card per row" issue caused by grid overrides.
+   Row 1: first 7 cards
+   Row 2: next 7 cards
+   Row 3: next 5 cards
+   Row 4: next 6 cards
+   ============================================================ */
+
+.summary-cards,
+.summary-cards.summary-cards-arranged {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  grid-template-columns: none !important;
+  grid-auto-flow: unset !important;
+}
+
+/* Reset any previous grid-column spans */
+.summary-cards > .summary-card,
+.summary-cards.summary-cards-arranged > .summary-card {
+  grid-column: auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Row 1 + Row 2: first 14 cards = 7 per row */
+.summary-cards > .summary-card:nth-child(-n + 14),
+.summary-cards.summary-cards-arranged > .summary-card:nth-child(-n + 14) {
+  flex: 0 0 calc((100% - 48px) / 7) !important;
+  max-width: calc((100% - 48px) / 7) !important;
+}
+
+/* Row 3: cards 15 to 19 = 5 per row */
+.summary-cards > .summary-card:nth-child(n + 15):nth-child(-n + 19),
+.summary-cards.summary-cards-arranged > .summary-card:nth-child(n + 15):nth-child(-n + 19) {
+  flex: 0 0 calc((100% - 32px) / 5) !important;
+  max-width: calc((100% - 32px) / 5) !important;
+}
+
+/* Row 4: cards 20 to 25 = 6 per row */
+.summary-cards > .summary-card:nth-child(n + 20):nth-child(-n + 25),
+.summary-cards.summary-cards-arranged > .summary-card:nth-child(n + 20):nth-child(-n + 25) {
+  flex: 0 0 calc((100% - 40px) / 6) !important;
+  max-width: calc((100% - 40px) / 6) !important;
+}
+
+/* Extra cards after 25 continue as 6 per row */
+.summary-cards > .summary-card:nth-child(n + 26),
+.summary-cards.summary-cards-arranged > .summary-card:nth-child(n + 26) {
+  flex: 0 0 calc((100% - 40px) / 6) !important;
+  max-width: calc((100% - 40px) / 6) !important;
+}
+
+/* Compact height so 7 cards still look clean */
+.summary-cards .summary-card,
+.summary-cards.summary-cards-arranged .summary-card {
+  min-height: 62px !important;
+  padding: 7px 8px !important;
+}
+
+.summary-cards .summary-card span,
+.summary-cards.summary-cards-arranged .summary-card span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 8.8px !important;
+  line-height: 1.05 !important;
+}
+
+.summary-cards .summary-card strong,
+.summary-cards.summary-cards-arranged .summary-card strong {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: clamp(12px, 0.9vw, 17px) !important;
+  line-height: 1.05 !important;
+}
+
+/* Laptop fallback */
+@media (max-width: 1600px) {
+  .summary-cards > .summary-card,
+  .summary-cards.summary-cards-arranged > .summary-card {
+    flex: 0 0 calc((100% - 32px) / 5) !important;
+    max-width: calc((100% - 32px) / 5) !important;
+  }
+}
+
+/* Medium fallback */
+@media (max-width: 1280px) {
+  .summary-cards > .summary-card,
+  .summary-cards.summary-cards-arranged > .summary-card {
+    flex: 0 0 calc((100% - 24px) / 4) !important;
+    max-width: calc((100% - 24px) / 4) !important;
+  }
+}
+
+/* Tablet fallback */
+@media (max-width: 980px) {
+  .summary-cards > .summary-card,
+  .summary-cards.summary-cards-arranged > .summary-card {
+    flex: 0 0 calc((100% - 16px) / 3) !important;
+    max-width: calc((100% - 16px) / 3) !important;
+  }
+}
+
+/* Mobile fallback */
+@media (max-width: 720px) {
+  .summary-cards > .summary-card,
+  .summary-cards.summary-cards-arranged > .summary-card {
+    flex: 0 0 calc((100% - 8px) / 2) !important;
+    max-width: calc((100% - 8px) / 2) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .summary-cards > .summary-card,
+  .summary-cards.summary-cards-arranged > .summary-card {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL FIX: Manual summary card rows
+   Row wrappers are now in TSX, so layout cannot collapse to one card per row.
+   ============================================================ */
+
+.summary-cards.summary-cards-manual-rows,
+.summary-cards-arranged.summary-cards-manual-rows {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 10px 0 14px !important;
+  grid-template-columns: none !important;
+  grid-auto-flow: unset !important;
+}
+
+.summary-cards-manual-rows .summary-card-row {
+  display: grid !important;
+  gap: 8px !important;
+  width: 100% !important;
+  align-items: stretch !important;
+}
+
+.summary-cards-manual-rows .summary-card-row-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+.summary-cards-manual-rows .summary-card-row-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+.summary-cards-manual-rows .summary-card-row-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+
+.summary-cards-manual-rows .summary-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 62px !important;
+  padding: 7px 8px !important;
+  grid-column: auto !important;
+  flex: none !important;
+}
+
+.summary-cards-manual-rows .summary-card span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 8.8px !important;
+  line-height: 1.05 !important;
+}
+
+.summary-cards-manual-rows .summary-card strong {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: clamp(12px, 0.9vw, 17px) !important;
+  line-height: 1.05 !important;
+}
+
+.summary-cards-manual-rows .summary-card small {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 9px !important;
+  line-height: 1.05 !important;
+  margin-top: 3px !important;
+}
+
+/* Normal laptop fallback */
+@media (max-width: 1600px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Medium fallback */
+@media (max-width: 1280px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Tablet fallback */
+@media (max-width: 980px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile fallback */
+@media (max-width: 720px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL EXACT SUMMARY CARD ROWS
+   Keep exact rows on desktop:
+   Row 1 = 7 cards
+   Row 2 = 7 cards
+   Row 3 = 5 cards
+   Row 4 = 6 cards
+   No desktop fallback to 5 cards.
+   ============================================================ */
+
+.summary-cards.summary-cards-manual-rows,
+.summary-cards-arranged.summary-cards-manual-rows {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 10px 0 14px !important;
+  grid-template-columns: none !important;
+  grid-auto-flow: unset !important;
+}
+
+.summary-cards-manual-rows .summary-card-row {
+  display: grid !important;
+  gap: 8px !important;
+  width: 100% !important;
+  align-items: stretch !important;
+}
+
+.summary-cards-manual-rows .summary-card-row-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+.summary-cards-manual-rows .summary-card-row-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+.summary-cards-manual-rows .summary-card-row-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+
+.summary-cards-manual-rows .summary-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 58px !important;
+  padding: 6px 7px !important;
+  grid-column: auto !important;
+  flex: none !important;
+}
+
+.summary-cards-manual-rows .summary-card span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 8.2px !important;
+  line-height: 1.05 !important;
+}
+
+.summary-cards-manual-rows .summary-card strong {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: clamp(11px, 0.82vw, 16px) !important;
+  line-height: 1.05 !important;
+}
+
+.summary-cards-manual-rows .summary-card small {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 8.2px !important;
+  line-height: 1.05 !important;
+  margin-top: 3px !important;
+}
+
+/* Only change layout on real tablet/mobile sizes */
+@media (max-width: 980px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   Summary cards reduced-width compact layout
+   Keeps exact rows but reduces card visual width/height pressure.
+   Row 1 = 7 cards
+   Row 2 = 7 cards
+   Row 3 = 5 cards
+   Row 4 = 6 cards
+   ============================================================ */
+
+.summary-cards.summary-cards-manual-rows,
+.summary-cards-arranged.summary-cards-manual-rows {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+  width: 100% !important;
+  margin: 8px 0 12px !important;
+  grid-template-columns: none !important;
+}
+
+.summary-cards-manual-rows .summary-card-row {
+  display: grid !important;
+  width: 100% !important;
+  gap: 7px !important;
+  align-items: stretch !important;
+}
+
+/* 7 cards per row with reduced spacing */
+.summary-cards-manual-rows .summary-card-row-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+/* 6 cards per row */
+.summary-cards-manual-rows .summary-card-row-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+/* 5 cards per row */
+.summary-cards-manual-rows .summary-card-row-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+
+/* Reduced card body */
+.summary-cards-manual-rows .summary-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: 54px !important;
+  padding: 5px 6px !important;
+  border-radius: 8px !important;
+  grid-column: auto !important;
+  flex: none !important;
+}
+
+/* Smaller colored header band */
+.summary-cards-manual-rows .summary-card span {
+  margin: -5px -6px 4px !important;
+  padding: 3px 4px !important;
+  font-size: 7.8px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.015em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Compact values */
+.summary-cards-manual-rows .summary-card strong {
+  font-size: clamp(10.5px, 0.72vw, 15px) !important;
+  line-height: 1.02 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Compact subtitles */
+.summary-cards-manual-rows .summary-card small {
+  display: block !important;
+  margin-top: 2px !important;
+  font-size: 7.8px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* On very wide screens, keep rows from feeling oversized by centering content area */
+@media (min-width: 1700px) {
+  .summary-cards.summary-cards-manual-rows,
+  .summary-cards-arranged.summary-cards-manual-rows {
+    max-width: 1780px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* Only fallback on real tablet/mobile sizes */
+@media (max-width: 980px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .summary-cards-manual-rows .summary-card-row-7,
+  .summary-cards-manual-rows .summary-card-row-6,
+  .summary-cards-manual-rows .summary-card-row-5 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   Summary cards: 10 cards in first row, then balanced rows
+   Row 1 = 10 cards
+   Row 2 = 8 cards
+   Row 3 = 7 cards
+   ============================================================ */
+
+.summary-cards.summary-cards-10-layout,
+.summary-cards-arranged.summary-cards-10-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  width: 100% !important;
+  margin: 8px 0 12px !important;
+  grid-template-columns: none !important;
+  grid-auto-flow: unset !important;
+}
+
+.summary-cards-10-layout .summary-card-row {
+  display: grid !important;
+  width: 100% !important;
+  gap: 6px !important;
+  align-items: stretch !important;
+}
+
+.summary-cards-10-layout .summary-card-row-10 {
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+}
+
+.summary-cards-10-layout .summary-card-row-8 {
+  grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+}
+
+.summary-cards-10-layout .summary-card-row-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+.summary-cards-10-layout .summary-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: 50px !important;
+  padding: 4px 5px !important;
+  border-radius: 7px !important;
+  grid-column: auto !important;
+  flex: none !important;
+}
+
+.summary-cards-10-layout .summary-card span {
+  margin: -4px -5px 3px !important;
+  padding: 2px 3px !important;
+  font-size: 7px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.summary-cards-10-layout .summary-card strong {
+  font-size: clamp(9.5px, 0.62vw, 13px) !important;
+  line-height: 1.02 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.summary-cards-10-layout .summary-card small {
+  display: block !important;
+  margin-top: 2px !important;
+  font-size: 7px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Laptop fallback */
+@media (max-width: 1600px) {
+  .summary-cards-10-layout .summary-card-row-10,
+  .summary-cards-10-layout .summary-card-row-8,
+  .summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Medium fallback */
+@media (max-width: 1280px) {
+  .summary-cards-10-layout .summary-card-row-10,
+  .summary-cards-10-layout .summary-card-row-8,
+  .summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Tablet fallback */
+@media (max-width: 980px) {
+  .summary-cards-10-layout .summary-card-row-10,
+  .summary-cards-10-layout .summary-card-row-8,
+  .summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile fallback */
+@media (max-width: 720px) {
+  .summary-cards-10-layout .summary-card-row-10,
+  .summary-cards-10-layout .summary-card-row-8,
+  .summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .summary-cards-10-layout .summary-card-row-10,
+  .summary-cards-10-layout .summary-card-row-8,
+  .summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL OVERRIDE: Force 10 cards in first row on desktop
+   The previous 1600px fallback caused 5 cards per row.
+   This block must stay at the very end of styles.css.
+   ============================================================ */
+
+.app-shell .summary-cards.summary-cards-10-layout,
+.app-shell .summary-cards-arranged.summary-cards-10-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 8px 0 12px !important;
+  grid-template-columns: none !important;
+  grid-auto-flow: unset !important;
+}
+
+.app-shell .summary-cards-10-layout .summary-card-row {
+  display: grid !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  gap: 6px !important;
+  align-items: stretch !important;
+}
+
+.app-shell .summary-cards-10-layout .summary-card-row-10 {
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+}
+
+.app-shell .summary-cards-10-layout .summary-card-row-8 {
+  grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+}
+
+.app-shell .summary-cards-10-layout .summary-card-row-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+.app-shell .summary-cards-10-layout .summary-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  padding: 4px 5px !important;
+  border-radius: 7px !important;
+  grid-column: auto !important;
+  flex: none !important;
+}
+
+.app-shell .summary-cards-10-layout .summary-card span {
+  margin: -4px -5px 3px !important;
+  padding: 2px 3px !important;
+  font-size: 6.8px !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .summary-cards-10-layout .summary-card strong {
+  font-size: clamp(9px, 0.58vw, 12.5px) !important;
+  line-height: 1.02 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .summary-cards-10-layout .summary-card small {
+  display: block !important;
+  margin-top: 2px !important;
+  font-size: 6.8px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Keep 10 / 8 / 7 until tablet width. */
+@media (min-width: 981px) {
+  .app-shell .summary-cards-10-layout .summary-card-row-10 {
+    grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell .summary-cards-10-layout .summary-card-row-8 {
+    grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell .summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Tablet fallback only */
+@media (max-width: 980px) {
+  .app-shell .summary-cards-10-layout .summary-card-row-10,
+  .app-shell .summary-cards-10-layout .summary-card-row-8,
+  .app-shell .summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile fallback */
+@media (max-width: 720px) {
+  .app-shell .summary-cards-10-layout .summary-card-row-10,
+  .app-shell .summary-cards-10-layout .summary-card-row-8,
+  .app-shell .summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .app-shell .summary-cards-10-layout .summary-card-row-10,
+  .app-shell .summary-cards-10-layout .summary-card-row-8,
+  .app-shell .summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   Behavior insight tables: updated compact columns
+   Radio table removes Users/Regions.
+   User table removes Companies/Regions and adds Base Stations.
+   ============================================================ */
+
+.behavior-grid .table-card table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+
+.behavior-grid .table-card th,
+.behavior-grid .table-card td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.behavior-grid .table-card td:first-child,
+.behavior-grid .table-card th:first-child {
+  text-align: left !important;
+}
+
+
+/* ============================================================
+   User Behavior Insights: wide User column, compact metric columns
+   ============================================================ */
+
+.user-behavior-table-card table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+
+.user-behavior-table-card col.user-col {
+  width: 40% !important;
+}
+
+.user-behavior-table-card col.compact-col {
+  width: 9% !important;
+}
+
+.user-behavior-table-card col.duration-col {
+  width: 12% !important;
+}
+
+.user-behavior-table-card th,
+.user-behavior-table-card td {
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.user-behavior-table-card th:first-child,
+.user-behavior-table-card td:first-child {
+  text-align: left !important;
+  padding-left: 10px !important;
+}
+
+.user-behavior-table-card td:first-child {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.user-behavior-table-card th:not(:first-child),
+.user-behavior-table-card td:not(:first-child) {
+  width: auto !important;
+}
+
+
+/* ============================================================
+   Home upload screen: compact polished top intro + arranged upload panel
+   ============================================================ */
+
+.upload-grid.upload-grid-stacked {
+  width: min(1320px, 100%) !important;
+  min-height: calc(100vh - 44px) !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto 1fr !important;
+  align-content: center !important;
+  align-items: stretch !important;
+  gap: 14px !important;
+  margin: 0 auto !important;
+}
+
+.upload-copy.upload-copy-compact {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: auto !important;
+  padding: clamp(14px, 2vw, 22px) clamp(18px, 3vw, 34px) !important;
+  text-align: center !important;
+  border-radius: 24px !important;
+}
+
+.upload-copy.upload-copy-compact .eyebrow,
+.upload-copy.upload-copy-compact .lead {
+  display: none !important;
+}
+
+.upload-copy.upload-copy-compact h1 {
+  max-width: 1120px !important;
+  margin: 0 auto !important;
+  font-size: clamp(30px, 4.2vw, 58px) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.045em !important;
+  text-align: center !important;
+}
+
+.workbook-choice-panel.upload-choice-panel-polished,
+.workbook-choice-panel.three-tile.upload-choice-panel-polished {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-auto-rows: minmax(132px, auto) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: auto !important;
+  padding: 62px 18px 18px !important;
+  border-radius: 24px !important;
+  align-items: stretch !important;
+}
+
+.upload-choice-panel-polished .upload-theme-toggle {
+  top: 16px !important;
+  right: 18px !important;
+}
+
+.upload-choice-panel-polished .workbook-choice-card {
+  min-height: 132px !important;
+  padding: 16px !important;
+  gap: 7px !important;
+  border-radius: 18px !important;
+  justify-content: flex-start !important;
+}
+
+.upload-choice-panel-polished .fleetmap-choice-card,
+.upload-choice-panel-polished .cdr-choice-card,
+.upload-choice-panel-polished .raw-system-choice-card,
+.upload-choice-panel-polished .previous-choice-card {
+  grid-column: auto !important;
+}
+
+.upload-choice-panel-polished .choice-icon {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 15px !important;
+}
+
+.upload-choice-panel-polished .choice-icon svg {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.upload-choice-panel-polished .choice-eyebrow {
+  margin: 0 !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+}
+
+.upload-choice-panel-polished .workbook-choice-card strong {
+  font-size: clamp(15px, 1.35vw, 21px) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.upload-choice-panel-polished .workbook-choice-card p {
+  margin: 0 !important;
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
+}
+
+.upload-choice-panel-polished .cdr-choice-card,
+.upload-choice-panel-polished .raw-system-choice-card {
+  border-color: rgba(0, 166, 166, 0.36) !important;
+}
+
+.upload-choice-panel-polished .previous-choice-card {
+  border-color: rgba(255, 176, 0, 0.34) !important;
+}
+
+@media (max-width: 1180px) {
+  .workbook-choice-panel.upload-choice-panel-polished,
+  .workbook-choice-panel.three-tile.upload-choice-panel-polished {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .upload-grid.upload-grid-stacked {
+    align-content: start !important;
+    min-height: auto !important;
+    gap: 12px !important;
+  }
+
+  .upload-copy.upload-copy-compact h1 {
+    font-size: clamp(28px, 8vw, 42px) !important;
+  }
+
+  .workbook-choice-panel.upload-choice-panel-polished,
+  .workbook-choice-panel.three-tile.upload-choice-panel-polished {
+    grid-template-columns: 1fr !important;
+    padding: 58px 14px 14px !important;
+  }
+}
+
+/* Short laptop compression */
+@media (min-width: 900px) and (max-height: 780px) {
+  .upload-grid.upload-grid-stacked {
+    gap: 10px !important;
+  }
+
+  .upload-copy.upload-copy-compact {
+    padding: 12px 24px !important;
+  }
+
+  .upload-copy.upload-copy-compact h1 {
+    font-size: clamp(28px, 3.4vw, 46px) !important;
+  }
+
+  .workbook-choice-panel.upload-choice-panel-polished,
+  .workbook-choice-panel.three-tile.upload-choice-panel-polished {
+    grid-auto-rows: minmax(118px, auto) !important;
+    padding: 56px 16px 16px !important;
+  }
+
+  .upload-choice-panel-polished .workbook-choice-card {
+    min-height: 118px !important;
+    padding: 13px !important;
+  }
+
+  .upload-choice-panel-polished .choice-icon {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  .upload-choice-panel-polished .workbook-choice-card p {
+    font-size: 10.5px !important;
+    line-height: 1.25 !important;
+  }
+}
+
+
+/* ============================================================
+   Home upload screen: title + rectangular theme button + 5 upload cards together
+   ============================================================ */
+
+.upload-copy.upload-copy-with-theme {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  text-align: center !important;
+}
+
+.upload-copy.upload-copy-with-theme h1 {
+  justify-self: center !important;
+  text-align: center !important;
+}
+
+.upload-theme-toggle-inline {
+  position: static !important;
+  justify-self: end !important;
+  min-height: 42px !important;
+  padding: 10px 16px !important;
+  border-radius: 12px !important;
+  width: auto !important;
+  white-space: nowrap !important;
+  font-size: 13px !important;
+}
+
+/* The theme button is now inside the title box, so the upload panel no longer needs top button space. */
+.workbook-choice-panel.upload-choice-panel-polished,
+.workbook-choice-panel.three-tile.upload-choice-panel-polished {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  grid-auto-rows: minmax(142px, auto) !important;
+  padding: 18px !important;
+  gap: 12px !important;
+}
+
+/* Keep all five cards together as equal upload/action tiles. */
+.upload-choice-panel-polished .fleetmap-choice-card,
+.upload-choice-panel-polished .cdr-choice-card,
+.upload-choice-panel-polished .raw-system-choice-card,
+.upload-choice-panel-polished .previous-choice-card {
+  grid-column: auto !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: 142px !important;
+}
+
+/* Slightly tighter card content to fit five cards nicely. */
+.upload-choice-panel-polished .workbook-choice-card {
+  padding: 14px !important;
+  gap: 6px !important;
+}
+
+.upload-choice-panel-polished .choice-icon {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 14px !important;
+}
+
+.upload-choice-panel-polished .choice-icon svg {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+.upload-choice-panel-polished .workbook-choice-card strong {
+  font-size: clamp(14px, 1.05vw, 18px) !important;
+  line-height: 1.08 !important;
+}
+
+.upload-choice-panel-polished .workbook-choice-card p {
+  font-size: 10.5px !important;
+  line-height: 1.28 !important;
+}
+
+/* Large laptop: 3 + 2 cards */
+@media (max-width: 1320px) {
+  .workbook-choice-panel.upload-choice-panel-polished,
+  .workbook-choice-panel.three-tile.upload-choice-panel-polished {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Tablet: 2 columns */
+@media (max-width: 920px) {
+  .workbook-choice-panel.upload-choice-panel-polished,
+  .workbook-choice-panel.three-tile.upload-choice-panel-polished {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .upload-copy.upload-copy-with-theme {
+    grid-template-columns: 1fr !important;
+  }
+
+  .upload-theme-toggle-inline {
+    justify-self: center !important;
+  }
+}
+
+/* Mobile: 1 column */
+@media (max-width: 620px) {
+  .workbook-choice-panel.upload-choice-panel-polished,
+  .workbook-choice-panel.three-tile.upload-choice-panel-polished {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   Home screen redesign: Follow-Up style upload interface
+   ============================================================ */
+
+.upload-shell .followup-upload-shell {
+  width: min(1280px, 100%) !important;
+  min-height: calc(100vh - 44px) !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.followup-upload-card {
+  position: relative !important;
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr) !important;
+  gap: clamp(22px, 3vw, 44px) !important;
+  padding: clamp(22px, 3vw, 38px) !important;
+  border: 1px solid rgba(34, 211, 238, 0.35) !important;
+  border-radius: 24px !important;
+  background: linear-gradient(135deg, rgba(2, 13, 28, 0.94), rgba(6, 24, 43, 0.92)) !important;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.36), inset 0 1px rgba(255, 255, 255, 0.05) !important;
+  overflow: hidden !important;
+}
+
+.followup-upload-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 12px !important;
+  border: 1px dashed rgba(96, 165, 250, 0.28) !important;
+  border-radius: 18px !important;
+  pointer-events: none !important;
+}
+
+.followup-theme-button {
+  position: absolute !important;
+  top: 22px !important;
+  right: 22px !important;
+  z-index: 5 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 36px !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 176, 0, 0.45) !important;
+  background: rgba(255, 176, 0, 0.12) !important;
+  color: #ffd166 !important;
+  font-weight: 900 !important;
+  font-size: 12px !important;
+}
+
+.followup-upload-left {
+  position: relative !important;
+  z-index: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  padding: 18px 10px 12px !important;
+}
+
+.followup-eyebrow {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 0 18px !important;
+  color: #8ee9ff !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+}
+
+.followup-upload-left h1 {
+  max-width: 560px !important;
+  margin: 0 !important;
+  color: #f8fbff !important;
+  font-size: clamp(46px, 5.4vw, 78px) !important;
+  line-height: 0.96 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.followup-lead {
+  max-width: 650px !important;
+  margin: 18px 0 26px !important;
+  color: rgba(221, 235, 255, 0.78) !important;
+  font-size: clamp(15px, 1.5vw, 18px) !important;
+  line-height: 1.65 !important;
+}
+
+.followup-primary-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  align-items: center !important;
+  margin-bottom: 18px !important;
+}
+
+.followup-action-button {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  min-height: 42px !important;
+  padding: 10px 15px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(59, 130, 246, 0.18) !important;
+  background: rgba(15, 23, 42, 0.55) !important;
+  color: #e9f4ff !important;
+  font-weight: 900 !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+
+.followup-action-button input,
+.followup-mini-card input {
+  position: absolute !important;
+  inset: 0 !important;
+  opacity: 0 !important;
+  cursor: pointer !important;
+}
+
+.followup-primary-upload {
+  color: #03131f !important;
+  background: linear-gradient(135deg, #2dd4ff, #60a5fa) !important;
+  border-color: transparent !important;
+  box-shadow: 0 16px 34px rgba(45, 212, 255, 0.23) !important;
+}
+
+.followup-action-button:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.followup-drop-note {
+  margin: 6px 0 12px !important;
+  color: rgba(199, 216, 235, 0.72) !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.followup-mini-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  max-width: 620px !important;
+}
+
+.followup-mini-card {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 58px !important;
+  padding: 11px 13px !important;
+  border: 1px solid rgba(96, 165, 250, 0.22) !important;
+  border-radius: 12px !important;
+  background: rgba(15, 23, 42, 0.48) !important;
+  color: #dff7ff !important;
+  overflow: hidden !important;
+}
+
+.followup-mini-card svg {
+  color: #22d3ee !important;
+  flex: 0 0 auto !important;
+}
+
+.followup-mini-card strong,
+.followup-mini-card span {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.followup-mini-card strong {
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+.followup-mini-card span {
+  margin-top: 2px !important;
+  color: rgba(214, 232, 246, 0.72) !important;
+  font-size: 10.5px !important;
+  line-height: 1.2 !important;
+}
+
+.followup-mini-card.loaded {
+  border-color: rgba(74, 222, 128, 0.46) !important;
+  background: rgba(20, 83, 45, 0.22) !important;
+}
+
+.followup-mini-card.loaded svg {
+  color: #86efac !important;
+}
+
+.followup-upload-visual {
+  position: relative !important;
+  z-index: 1 !important;
+  min-height: 500px !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(96, 165, 250, 0.26) !important;
+  background: linear-gradient(160deg, #082f64, #0f172a) !important;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35) !important;
+}
+
+.followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  opacity: 0.78 !important;
+  filter: saturate(1.1) contrast(1.02) !important;
+}
+
+.followup-upload-visual::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background:
+    linear-gradient(105deg, rgba(0, 194, 255, 0.82), transparent 34%),
+    linear-gradient(145deg, transparent 54%, rgba(20, 184, 166, 0.82) 54%, transparent 76%) !important;
+  mix-blend-mode: screen !important;
+  pointer-events: none !important;
+}
+
+.followup-ready-card {
+  position: absolute !important;
+  left: 28px !important;
+  right: 28px !important;
+  bottom: 26px !important;
+  z-index: 2 !important;
+  padding: 18px 20px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(34, 211, 238, 0.32) !important;
+  background: rgba(2, 13, 28, 0.88) !important;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32) !important;
+}
+
+.followup-ready-card span {
+  display: block !important;
+  margin-bottom: 7px !important;
+  color: #67e8f9 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.1em !important;
+}
+
+.followup-ready-card strong {
+  display: block !important;
+  color: #ffffff !important;
+  font-size: clamp(22px, 2.4vw, 31px) !important;
+  line-height: 1.1 !important;
+}
+
+.followup-ready-card p {
+  margin: 7px 0 0 !important;
+  color: rgba(221, 235, 255, 0.78) !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-card {
+  background: linear-gradient(135deg, rgba(248, 252, 255, 0.92), rgba(232, 246, 255, 0.9)) !important;
+  border-color: rgba(0, 120, 212, 0.22) !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-left h1 {
+  color: #082033 !important;
+}
+
+.upload-shell.light-background-theme .followup-lead,
+.upload-shell.light-background-theme .followup-drop-note {
+  color: #3f6174 !important;
+}
+
+.upload-shell.light-background-theme .followup-action-button,
+.upload-shell.light-background-theme .followup-mini-card {
+  background: rgba(255, 255, 255, 0.82) !important;
+  color: #082033 !important;
+}
+
+@media (max-width: 1120px) {
+  .followup-upload-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .followup-upload-visual {
+    min-height: 280px !important;
+  }
+
+  .followup-upload-left h1 {
+    max-width: 900px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .upload-shell .followup-upload-shell {
+    min-height: auto !important;
+    place-items: start !important;
+  }
+
+  .followup-upload-card {
+    padding: 18px !important;
+  }
+
+  .followup-theme-button {
+    position: static !important;
+    width: fit-content !important;
+    margin-left: auto !important;
+    margin-bottom: 14px !important;
+  }
+
+  .followup-upload-left {
+    padding: 0 !important;
+  }
+
+  .followup-upload-left h1 {
+    font-size: clamp(38px, 11vw, 54px) !important;
+  }
+
+  .followup-primary-actions,
+  .followup-mini-grid {
+    grid-template-columns: 1fr !important;
+    display: grid !important;
+  }
+
+  .followup-action-button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+
+/* ============================================================
+   Theme-based hero visual image
+   ============================================================ */
+
+.followup-upload-visual img {
+  transition: opacity 0.25s ease, filter 0.25s ease !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  opacity: 0.84 !important;
+  filter: saturate(1.02) contrast(1.04) brightness(0.96) !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual img {
+  opacity: 0.8 !important;
+  filter: saturate(1.08) contrast(1.01) brightness(1.02) !important;
+}
+
+
+/* ============================================================
+   FINAL FIX: dark.png fit behavior for home + dashboard
+   Prevents dark.png from appearing zoomed/cropped compared with light.png.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* Dashboard dark background: show the full dark.png clearly */
+html:has(.app-shell.dark-background-theme),
+body:has(.app-shell.dark-background-theme) {
+  background-color: #06131e !important;
+  background-image: url("/assets/dark.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* Upload/home dark background: same full-screen fit */
+html:has(.upload-shell.dark-background-theme),
+body:has(.upload-shell.dark-background-theme) {
+  background-color: #06131e !important;
+  background-image: url("/assets/dark.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* Shells should not zoom or override the image with another large background */
+.app-shell.dark-background-theme,
+.upload-shell.dark-background-theme {
+  background-color: transparent !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+}
+
+/* Right-side home visual: dark image should fit inside the card, not crop/zoom */
+.upload-shell.dark-background-theme .followup-upload-visual {
+  background:
+    linear-gradient(160deg, rgba(2, 13, 28, 0.92), rgba(8, 27, 43, 0.86)),
+    #06131e !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  opacity: 0.96 !important;
+  filter: saturate(1.02) contrast(1.03) brightness(0.98) !important;
+  background-color: #06131e !important;
+}
+
+/* Light image can remain cover because it already looks correct */
+.upload-shell.light-background-theme .followup-upload-visual img {
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+/* Keep dark overlay softer so dark.png stays visible and not muddy */
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  opacity: 0.35 !important;
+  mix-blend-mode: screen !important;
+}
+
+/* Mobile: avoid fixed-background rendering issues */
+@media (max-width: 900px) {
+  html:has(.app-shell.dark-background-theme),
+  body:has(.app-shell.dark-background-theme),
+  html:has(.upload-shell.dark-background-theme),
+  body:has(.upload-shell.dark-background-theme) {
+    background-attachment: scroll !important;
+    background-size: 100% 100% !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL FIX: light.png and dark.png same behavior
+   Both themes use full-screen 100% 100% image fitting.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* Dashboard light background: same behavior as dark */
+html:has(.app-shell.light-background-theme),
+body:has(.app-shell.light-background-theme) {
+  background-color: #f5f9fc !important;
+  background-image: url("/assets/light.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* Home/upload light background: same behavior as dark */
+html:has(.upload-shell.light-background-theme),
+body:has(.upload-shell.light-background-theme) {
+  background-color: #f5f9fc !important;
+  background-image: url("/assets/light.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* Shells should not override the page-level background image */
+.app-shell.light-background-theme,
+.upload-shell.light-background-theme {
+  background-color: transparent !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+}
+
+/* Home right-side visual: light image also uses contain, same as dark */
+.upload-shell.light-background-theme .followup-upload-visual {
+  background:
+    linear-gradient(160deg, rgba(248, 252, 255, 0.72), rgba(229, 244, 255, 0.66)),
+    #f5f9fc !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  opacity: 0.96 !important;
+  filter: saturate(1.02) contrast(1.02) brightness(1.01) !important;
+  background-color: #f5f9fc !important;
+}
+
+/* Keep light overlay soft so light.png stays clear */
+.upload-shell.light-background-theme .followup-upload-visual::after {
+  opacity: 0.35 !important;
+  mix-blend-mode: multiply !important;
+}
+
+/* Mobile: avoid fixed-background rendering issues for both themes */
+@media (max-width: 900px) {
+  html:has(.app-shell.light-background-theme),
+  body:has(.app-shell.light-background-theme),
+  html:has(.upload-shell.light-background-theme),
+  body:has(.upload-shell.light-background-theme) {
+    background-attachment: scroll !important;
+    background-size: 100% 100% !important;
+  }
+}
+
+
+/* ============================================================
+   Home upload screen refinement:
+   - Title justified into 2 lines
+   - CDR / Raw / Continue buttons kept in one row
+   - Charts & Reports mini card removed in TSX
+   ============================================================ */
+
+.followup-upload-left h1 {
+  display: grid !important;
+  gap: 0 !important;
+  max-width: 620px !important;
+  text-align: left !important;
+}
+
+.followup-upload-left h1 span {
+  display: block !important;
+  width: 100% !important;
+}
+
+.followup-primary-actions {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+  max-width: 720px !important;
+  width: 100% !important;
+}
+
+.followup-action-button {
+  width: 100% !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.followup-action-button span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* With Charts & Reports removed, keep only Master + Fixed in a clean 2-card row. */
+.followup-mini-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  max-width: 520px !important;
+}
+
+/* Laptop compression */
+@media (max-width: 1180px) {
+  .followup-primary-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Tablet/mobile can stack if there is not enough width */
+@media (max-width: 760px) {
+  .followup-upload-left h1 {
+    text-align: center !important;
+    max-width: 100% !important;
+  }
+
+  .followup-primary-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .followup-mini-grid {
+    grid-template-columns: 1fr !important;
+    max-width: 100% !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL OVERRIDE: Light and Dark themes use the SAME full-screen image fit
+   Put this at the VERY END of styles.css
+   ============================================================ */
+
+/* ---------- Dashboard + Home page-level background images ---------- */
+html:has(.app-shell.light-background-theme),
+body:has(.app-shell.light-background-theme),
+html:has(.upload-shell.light-background-theme),
+body:has(.upload-shell.light-background-theme) {
+  background-color: #f5f9fc !important;
+  background-image: url("/assets/light.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
 
 html:has(.app-shell.dark-background-theme),
 body:has(.app-shell.dark-background-theme),
 html:has(.upload-shell.dark-background-theme),
 body:has(.upload-shell.dark-background-theme) {
-  background: #071118 !important;
+  background-color: #06131e !important;
+  background-image: url("/assets/dark.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
 }
 
-.app-shell.dark-background-theme {
-  min-height: 100vh !important;
-  color: #eaf7ff !important;
-  background:
-    linear-gradient(rgba(7, 17, 24, 0.50), rgba(7, 17, 24, 0.78)),
-    url("/assets/dark.png") center top / cover fixed,
-    linear-gradient(120deg, rgba(55, 166, 217, 0.08), transparent 32%),
-    radial-gradient(circle at 78% 0%, rgba(240, 184, 79, 0.08), transparent 28%),
-    #071118 !important;
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important;
-  background-blend-mode: normal, normal, normal, normal, normal !important;
-}
-
+/* ---------- Shells should not add their own conflicting large backgrounds ---------- */
+.app-shell.light-background-theme,
+.upload-shell.light-background-theme,
+.app-shell.dark-background-theme,
 .upload-shell.dark-background-theme {
+  background: transparent !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
   min-height: 100vh !important;
-  color: #eaf7ff !important;
-  background:
-    linear-gradient(rgba(7, 17, 24, 0.50), rgba(7, 17, 24, 0.78)),
-    url("/assets/dark.png") center / cover,
-    linear-gradient(120deg, rgba(55, 166, 217, 0.08), transparent 34%),
-    radial-gradient(circle at 72% 8%, rgba(240, 184, 79, 0.08), transparent 30%),
-    #071118 !important;
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important;
-  background-blend-mode: normal, normal, normal, normal, normal !important;
 }
 
-@media (max-width: 720px) {
-  .app-shell.dark-background-theme {
-    background:
-      linear-gradient(rgba(7, 17, 24, 0.50), rgba(7, 17, 24, 0.78)),
-      url("/assets/dark.png") center top / cover scroll,
-      linear-gradient(120deg, rgba(55, 166, 217, 0.08), transparent 32%),
-      radial-gradient(circle at 78% 0%, rgba(240, 184, 79, 0.08), transparent 28%),
-      #071118 !important;
-  }
+/* ---------- Home right-side hero visual: both themes behave exactly the same ---------- */
+.upload-shell.light-background-theme .followup-upload-visual,
+.upload-shell.dark-background-theme .followup-upload-visual {
+  background: transparent !important;
+}
 
-  .upload-shell.dark-background-theme {
-    background:
-      linear-gradient(rgba(7, 17, 24, 0.50), rgba(7, 17, 24, 0.78)),
-      url("/assets/dark.png") center / cover scroll,
-      linear-gradient(120deg, rgba(55, 166, 217, 0.08), transparent 34%),
-      radial-gradient(circle at 72% 8%, rgba(240, 184, 79, 0.08), transparent 30%),
-      #071118 !important;
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block !important;
+  opacity: 0.96 !important;
+}
+
+/* Theme-specific gentle image tuning only, same geometry */
+.upload-shell.light-background-theme .followup-upload-visual img {
+  filter: saturate(1.02) contrast(1.01) brightness(1.01) !important;
+  background-color: #f5f9fc !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  filter: saturate(1.02) contrast(1.03) brightness(0.98) !important;
+  background-color: #06131e !important;
+}
+
+/* Keep overlays equally soft so neither theme looks cropped or muddy */
+.upload-shell.light-background-theme .followup-upload-visual::after,
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  opacity: 0.28 !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual::after {
+  mix-blend-mode: multiply !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  mix-blend-mode: screen !important;
+}
+
+/* ---------- Mobile fallback to avoid browser fixed-background issues ---------- */
+@media (max-width: 900px) {
+  html:has(.app-shell.light-background-theme),
+  body:has(.app-shell.light-background-theme),
+  html:has(.upload-shell.light-background-theme),
+  body:has(.upload-shell.light-background-theme),
+  html:has(.app-shell.dark-background-theme),
+  body:has(.app-shell.dark-background-theme),
+  html:has(.upload-shell.dark-background-theme),
+  body:has(.upload-shell.dark-background-theme) {
+    background-attachment: scroll !important;
+    background-size: 100% 100% !important;
   }
 }
 
 
 /* ============================================================
-   Upload/Home screen 100% zoom fit patch
-   Goal: reduce vertical height and keep the home screen readable
-   without scrolling on normal laptop/desktop screens.
-   Dashboard layout is not affected.
+   FINAL BACKGROUND FIX
+   Light and dark images now use the same fixed viewport layer.
+   This prevents light.png from stretching differently when the
+   page has a scrollbar or different document height.
+   Keep this block at the VERY END of styles.css.
    ============================================================ */
 
+/* Stop body/html from stretching the image by document height */
+html,
+body {
+  min-height: 100% !important;
+}
+
+body:has(.upload-shell.light-background-theme),
+body:has(.app-shell.light-background-theme),
+body:has(.upload-shell.dark-background-theme),
+body:has(.app-shell.dark-background-theme),
+html:has(.upload-shell.light-background-theme),
+html:has(.app-shell.light-background-theme),
+html:has(.upload-shell.dark-background-theme),
+html:has(.app-shell.dark-background-theme) {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+/* Both shells become transparent over the fixed viewport image */
+.upload-shell.light-background-theme,
 .upload-shell.dark-background-theme,
-.upload-shell.light-background-theme {
-  min-height: 100vh !important;
-  padding: clamp(12px, 2.2vw, 28px) !important;
+.app-shell.light-background-theme,
+.app-shell.dark-background-theme {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 100dvh !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Fixed background image layer for both home and dashboard */
+.upload-shell.light-background-theme::before,
+.upload-shell.dark-background-theme::before,
+.app-shell.light-background-theme::before,
+.app-shell.dark-background-theme::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100vw 100dvh !important;
+  pointer-events: none !important;
+  transform: translateZ(0) !important;
+}
+
+.upload-shell.light-background-theme::before,
+.app-shell.light-background-theme::before {
+  background-image: url("/assets/light.png") !important;
+  background-color: #f5f9fc !important;
+}
+
+.upload-shell.dark-background-theme::before,
+.app-shell.dark-background-theme::before {
+  background-image: url("/assets/dark.png") !important;
+  background-color: #06131e !important;
+}
+
+/* Optional gentle tint layer: same geometry, different color only */
+.upload-shell.light-background-theme::after,
+.app-shell.light-background-theme::after,
+.upload-shell.dark-background-theme::after,
+.app-shell.dark-background-theme::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  pointer-events: none !important;
+}
+
+.upload-shell.light-background-theme::after,
+.app-shell.light-background-theme::after {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.upload-shell.dark-background-theme::after,
+.app-shell.dark-background-theme::after {
+  background: rgba(0, 8, 18, 0.10) !important;
+}
+
+/* Home screen card should start at the same vertical position in both themes */
+.upload-shell .followup-upload-shell {
+  min-height: calc(100dvh - 44px) !important;
   align-items: center !important;
+  justify-items: center !important;
+}
+
+/* Right-side visual uses the same exact image geometry in both themes */
+.upload-shell.light-background-theme .followup-upload-visual,
+.upload-shell.dark-background-theme .followup-upload-visual {
+  background: rgba(2, 13, 28, 0.12) !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block !important;
+  opacity: 0.96 !important;
+}
+
+/* Same overlay geometry for both; only blend differs */
+.upload-shell.light-background-theme .followup-upload-visual::after,
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  inset: 0 !important;
+  opacity: 0.26 !important;
+}
+
+/* Prevent old body background rules from reappearing through nested elements */
+body:has(.light-background-theme) .upload-shell,
+body:has(.dark-background-theme) .upload-shell,
+body:has(.light-background-theme) .app-shell,
+body:has(.dark-background-theme) .app-shell {
+  background-image: none !important;
+}
+
+/* Mobile: fixed layer still uses viewport height */
+@media (max-width: 900px) {
+  .upload-shell.light-background-theme::before,
+  .upload-shell.dark-background-theme::before,
+  .app-shell.light-background-theme::before,
+  .app-shell.dark-background-theme::before {
+    background-size: 100vw 100dvh !important;
+    background-position: center center !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL THEME BACKGROUND ALIGNMENT
+   Light and dark backgrounds use the same viewport geometry.
+   Light is corrected to match dark visual framing.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* Remove all earlier body/html background image behavior */
+html,
+body,
+body:has(.light-background-theme),
+body:has(.dark-background-theme),
+html:has(.light-background-theme),
+html:has(.dark-background-theme) {
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-position: center top !important;
+  background-size: cover !important;
+}
+
+/* Both shells are transparent and use the same fixed pseudo-layer */
+.upload-shell.light-background-theme,
+.upload-shell.dark-background-theme,
+.app-shell.light-background-theme,
+.app-shell.dark-background-theme {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  background: transparent !important;
+  background-image: none !important;
   overflow-x: hidden !important;
 }
 
-.upload-shell .upload-grid,
-.upload-shell .upload-grid-wide {
-  width: min(1380px, 100%) !important;
-  min-height: calc(100vh - 56px) !important;
-  align-items: center !important;
-  gap: clamp(16px, 2.8vw, 34px) !important;
+/* Common image layer: same position, same size, same viewport */
+.upload-shell.light-background-theme::before,
+.upload-shell.dark-background-theme::before,
+.app-shell.light-background-theme::before,
+.app-shell.dark-background-theme::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background-repeat: no-repeat !important;
+  background-position: center top !important;
+  background-size: cover !important;
+  pointer-events: none !important;
+  transform-origin: center top !important;
 }
 
-.upload-shell .upload-copy {
-  padding: clamp(18px, 3vw, 34px) !important;
-  border-radius: 22px !important;
+/* Dark reference framing */
+.upload-shell.dark-background-theme::before,
+.app-shell.dark-background-theme::before {
+  background-image: url("/assets/dark.png") !important;
+  background-color: #06131e !important;
+  transform: none !important;
 }
 
-.upload-shell .upload-copy .eyebrow,
-.upload-shell .choice-eyebrow {
-  font-size: clamp(10px, 0.78vw, 12px) !important;
-  line-height: 1.1 !important;
-  letter-spacing: 0.13em !important;
-  margin-bottom: 8px !important;
+/* Light corrected to use the same apparent framing as dark */
+.upload-shell.light-background-theme::before,
+.app-shell.light-background-theme::before {
+  background-image: url("/assets/light.png") !important;
+  background-color: #f5f9fc !important;
+  /*
+    Correction because light.png artwork sits visually lower/larger than dark.png.
+    This shifts the light artwork upward and scales it slightly so it frames like dark.png.
+  */
+  transform: translateY(-34px) scale(1.035) !important;
 }
 
-.upload-shell .upload-copy h1 {
-  max-width: 720px !important;
-  font-size: clamp(34px, 4.5vw, 64px) !important;
-  line-height: 0.94 !important;
-  letter-spacing: -0.055em !important;
+/* Tint layer only; does not affect geometry */
+.upload-shell.light-background-theme::after,
+.upload-shell.dark-background-theme::after,
+.app-shell.light-background-theme::after,
+.app-shell.dark-background-theme::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  pointer-events: none !important;
 }
 
-.upload-shell .upload-copy .lead,
-.upload-shell .upload-copy p.lead {
-  max-width: 760px !important;
-  margin-top: 14px !important;
-  margin-bottom: 0 !important;
-  font-size: clamp(14px, 1.35vw, 18px) !important;
-  line-height: 1.55 !important;
+.upload-shell.light-background-theme::after,
+.app-shell.light-background-theme::after {
+  background: rgba(255, 255, 255, 0.02) !important;
 }
 
-.upload-shell .workbook-choice-panel.three-tile {
-  gap: 10px !important;
-  padding: 14px 18px 18px !important;
-  min-height: auto !important;
-  align-content: center !important;
+.upload-shell.dark-background-theme::after,
+.app-shell.dark-background-theme::after {
+  background: rgba(0, 8, 18, 0.08) !important;
 }
 
-.upload-shell .workbook-choice-panel.three-tile .upload-theme-toggle {
-  min-height: 30px !important;
-  padding: 6px 10px !important;
-  font-size: 11px !important;
+/* Keep the home right-side image using same geometry for both */
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+  display: block !important;
 }
 
-.upload-shell .workbook-choice-panel.three-tile .workbook-choice-card,
-.upload-shell .workbook-choice-panel.three-tile .choice-card {
-  min-height: 138px !important;
-  padding: 14px !important;
-  gap: 6px !important;
-  border-radius: 18px !important;
+/* Light visual image correction mirrors the page background correction */
+.upload-shell.light-background-theme .followup-upload-visual img {
+  transform: translateY(-3%) scale(1.035) !important;
+  transform-origin: center top !important;
 }
 
-.upload-shell .workbook-choice-panel.three-tile .fleetmap-choice-card {
-  min-height: 116px !important;
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  transform: none !important;
 }
 
-.upload-shell .workbook-choice-card .choice-icon,
-.upload-shell .choice-card .choice-icon {
-  width: 50px !important;
-  height: 50px !important;
-  border-radius: 14px !important;
+/* If image appears too high/low later, adjust ONLY these two values:
+   translateY(-34px) for page background
+   translateY(-3%) for right-side visual image
+*/
+
+/* Smaller screens: remove correction so the image does not over-crop */
+@media (max-width: 900px) {
+  .upload-shell.light-background-theme::before,
+  .app-shell.light-background-theme::before {
+    transform: none !important;
+  }
+
+  .upload-shell.light-background-theme .followup-upload-visual img {
+    transform: none !important;
+  }
 }
 
-.upload-shell .workbook-choice-card strong,
-.upload-shell .choice-card strong {
-  font-size: clamp(16px, 1.55vw, 22px) !important;
+
+/* ============================================================
+   FINAL THEME RULE: same logos/shapes position, color changes only
+   Both light and dark themes use ONE shared background artwork.
+   This guarantees the logo and shapes stay in the exact same place.
+   Only the overlay/tint changes by theme.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/*
+   IMPORTANT:
+   Use one shared image for both themes.
+   Recommended: use the image with the correct logo/shape placement.
+   If you prefer light.png as the master artwork, change both URLs below
+   from "/assets/dark.png" to "/assets/light.png".
+*/
+
+html,
+body,
+body:has(.light-background-theme),
+body:has(.dark-background-theme),
+html:has(.light-background-theme),
+html:has(.dark-background-theme) {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+.upload-shell.light-background-theme,
+.upload-shell.dark-background-theme,
+.app-shell.light-background-theme,
+.app-shell.dark-background-theme {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  background: transparent !important;
+  background-image: none !important;
+  overflow-x: hidden !important;
+}
+
+/* SAME artwork, SAME position, SAME dimensions for both themes */
+.upload-shell.light-background-theme::before,
+.upload-shell.dark-background-theme::before,
+.app-shell.light-background-theme::before,
+.app-shell.dark-background-theme::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background-image: url("/assets/dark.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center top !important;
+  background-size: cover !important;
+  pointer-events: none !important;
+  transform: none !important;
+  transform-origin: center top !important;
+}
+
+/* Only the color/tint changes */
+.upload-shell.light-background-theme::after,
+.app-shell.light-background-theme::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(245,250,255,0.66)),
+    rgba(255,255,255,0.48) !important;
+  mix-blend-mode: screen !important;
+}
+
+.upload-shell.dark-background-theme::after,
+.app-shell.dark-background-theme::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(180deg, rgba(0,8,18,0.10), rgba(0,8,18,0.24)),
+    rgba(0,8,18,0.10) !important;
+  mix-blend-mode: multiply !important;
+}
+
+/* Home right-side visual also uses same image placement in both themes */
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  content: url("/assets/dark.png") !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+  display: block !important;
+  transform: none !important;
+}
+
+/* Color treatment only for the right-side visual */
+.upload-shell.light-background-theme .followup-upload-visual img {
+  opacity: 0.72 !important;
+  filter: brightness(1.35) saturate(0.95) contrast(0.92) !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  opacity: 0.92 !important;
+  filter: brightness(0.96) saturate(1.04) contrast(1.04) !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual::after {
+  opacity: 0.18 !important;
+  mix-blend-mode: screen !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  opacity: 0.28 !important;
+  mix-blend-mode: screen !important;
+}
+
+/* Keep cards readable while background geometry remains identical */
+.upload-shell.light-background-theme .followup-upload-card,
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .summary-card,
+.app-shell.light-background-theme .chart-card,
+.app-shell.light-background-theme .table-card,
+.app-shell.light-background-theme .records-card {
+  background-color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-card,
+.app-shell.dark-background-theme .hero-panel,
+.app-shell.dark-background-theme .topbar,
+.app-shell.dark-background-theme .filters-panel,
+.app-shell.dark-background-theme .summary-card,
+.app-shell.dark-background-theme .chart-card,
+.app-shell.dark-background-theme .table-card,
+.app-shell.dark-background-theme .records-card {
+  background-color: rgba(2, 13, 28, 0.80) !important;
+}
+
+/* Mobile keeps the same artwork geometry */
+@media (max-width: 900px) {
+  .upload-shell.light-background-theme::before,
+  .upload-shell.dark-background-theme::before,
+  .app-shell.light-background-theme::before,
+  .app-shell.dark-background-theme::before {
+    background-position: center top !important;
+    background-size: cover !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL STAT CARD FONT FIX
+   Bigger readable fonts while keeping no wrap and avoiding cut.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* Give stat cards enough height for larger text but still compact */
+.app-shell .summary-cards-10-layout .summary-card,
+.app-shell .summary-cards-manual-rows .summary-card,
+.app-shell .summary-cards .summary-card {
+  min-height: 62px !important;
+  padding: 6px 7px !important;
+  container-type: inline-size !important;
+  overflow: visible !important;
+}
+
+/* Header label: bigger but still one line */
+.app-shell .summary-cards-10-layout .summary-card span,
+.app-shell .summary-cards-manual-rows .summary-card span,
+.app-shell .summary-cards .summary-card span {
+  margin: -6px -7px 5px !important;
+  padding: 4px 5px !important;
+  font-size: clamp(8.8px, 0.56vw, 11px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Main value: maximum practical size for 10-card rows */
+.app-shell .summary-cards-10-layout .summary-card strong,
+.app-shell .summary-cards-manual-rows .summary-card strong,
+.app-shell .summary-cards .summary-card strong {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: clamp(15px, 1.05vw, 23px) !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  text-align: center !important;
+}
+
+/* Subtitle: larger and readable */
+.app-shell .summary-cards-10-layout .summary-card small,
+.app-shell .summary-cards-manual-rows .summary-card small,
+.app-shell .summary-cards .summary-card small {
+  display: block !important;
+  margin-top: 3px !important;
+  font-size: clamp(8.2px, 0.52vw, 10.5px) !important;
+  line-height: 1.05 !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Since :contains is not supported in browsers, use position-based protection for long text cards.
+   In the 10 / 8 / 7 layout, most long labels start from row 2 onward. */
+.app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card strong,
+.app-shell .summary-cards-10-layout .summary-card-row-7 .summary-card strong {
+  font-size: clamp(13px, 0.86vw, 19px) !important;
+  letter-spacing: -0.035em !important;
+}
+
+/* Very long station/talkgroup/week text protection */
+.app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card:nth-child(6) strong,
+.app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card:nth-child(7) strong,
+.app-shell .summary-cards-10-layout .summary-card-row-7 .summary-card:nth-child(1) strong,
+.app-shell .summary-cards-10-layout .summary-card-row-7 .summary-card:nth-child(2) strong {
+  font-size: clamp(12px, 0.74vw, 17px) !important;
+  letter-spacing: -0.045em !important;
+}
+
+/* Numeric-heavy first row can be larger */
+.app-shell .summary-cards-10-layout .summary-card-row-10 .summary-card strong {
+  font-size: clamp(16px, 1.08vw, 24px) !important;
+}
+
+/* Keep 10-card layout but allow more visual room by tightening gaps */
+.app-shell .summary-cards-10-layout {
+  gap: 7px !important;
+}
+
+.app-shell .summary-cards-10-layout .summary-card-row {
+  gap: 7px !important;
+}
+
+/* On wider screens, enlarge more */
+@media (min-width: 1700px) {
+  .app-shell .summary-cards-10-layout .summary-card strong,
+  .app-shell .summary-cards-manual-rows .summary-card strong,
+  .app-shell .summary-cards .summary-card strong {
+    font-size: clamp(17px, 1.12vw, 26px) !important;
+  }
+
+  .app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card strong,
+  .app-shell .summary-cards-10-layout .summary-card-row-7 .summary-card strong {
+    font-size: clamp(14px, 0.9vw, 21px) !important;
+  }
+}
+
+/* On normal laptops, keep readable but prevent overflow */
+@media (max-width: 1450px) {
+  .app-shell .summary-cards-10-layout .summary-card strong {
+    font-size: clamp(12.5px, 0.86vw, 18px) !important;
+  }
+
+  .app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card strong,
+  .app-shell .summary-cards-10-layout .summary-card-row-7 .summary-card strong {
+    font-size: clamp(11.5px, 0.76vw, 16px) !important;
+  }
+
+  .app-shell .summary-cards-10-layout .summary-card span {
+    font-size: clamp(7.8px, 0.48vw, 9.5px) !important;
+  }
+
+  .app-shell .summary-cards-10-layout .summary-card small {
+    font-size: clamp(7.8px, 0.48vw, 9.5px) !important;
+  }
+}
+
+
+/* ============================================================
+   Filtered Calls Register: larger readable text, no wrap
+   Keeps table compact while making values easier to read.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+.app-shell .records-card,
+.app-shell .records-card .records-scroll,
+.app-shell .records-card .table-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.app-shell .records-card table,
+.app-shell table.filtered-register-table,
+.app-shell .records-table,
+.app-shell .records-scroll table {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+/* Larger header text */
+.app-shell .records-card th,
+.app-shell .records-scroll th,
+.app-shell .filtered-register-table th,
+.app-shell .records-table th {
+  font-size: clamp(9.5px, 0.62vw, 12px) !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.035em !important;
+  padding: 6px 5px !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Larger body text */
+.app-shell .records-card td,
+.app-shell .records-scroll td,
+.app-shell .filtered-register-table td,
+.app-shell .records-table td {
+  font-size: clamp(10px, 0.66vw, 13px) !important;
+  line-height: 1.08 !important;
+  font-weight: 750 !important;
+  padding: 6px 5px !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Fixed compact row height */
+.app-shell .records-card tr,
+.app-shell .records-scroll tr,
+.app-shell .filtered-register-table tr,
+.app-shell .records-table tr {
+  height: 34px !important;
+  max-height: 34px !important;
+}
+
+/* Make important text columns slightly larger but still no wrap */
+.app-shell .records-card td:nth-child(2),
+.app-shell .records-card td:nth-child(3),
+.app-shell .records-card td:nth-child(5),
+.app-shell .records-card td:nth-child(8),
+.app-shell .records-card td:nth-child(9),
+.app-shell .records-card td:nth-child(13),
+.app-shell .records-scroll td:nth-child(2),
+.app-shell .records-scroll td:nth-child(3),
+.app-shell .records-scroll td:nth-child(5),
+.app-shell .records-scroll td:nth-child(8),
+.app-shell .records-scroll td:nth-child(9),
+.app-shell .records-scroll td:nth-child(13) {
+  font-size: clamp(9.5px, 0.6vw, 12.5px) !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Numeric / short columns can be stronger and compact */
+.app-shell .records-card td:nth-child(1),
+.app-shell .records-card td:nth-child(6),
+.app-shell .records-card td:nth-child(7),
+.app-shell .records-card td:nth-child(10),
+.app-shell .records-card td:nth-child(11),
+.app-shell .records-card td:nth-child(12),
+.app-shell .records-scroll td:nth-child(1),
+.app-shell .records-scroll td:nth-child(6),
+.app-shell .records-scroll td:nth-child(7),
+.app-shell .records-scroll td:nth-child(10),
+.app-shell .records-scroll td:nth-child(11),
+.app-shell .records-scroll td:nth-child(12) {
+  font-size: clamp(10px, 0.66vw, 13.5px) !important;
+  font-weight: 850 !important;
+}
+
+/* Column width balance for the register table */
+.app-shell .records-card table th:nth-child(1),
+.app-shell .records-card table td:nth-child(1),
+.app-shell .records-scroll table th:nth-child(1),
+.app-shell .records-scroll table td:nth-child(1) {
+  width: 3.2% !important;
+}
+
+.app-shell .records-card table th:nth-child(2),
+.app-shell .records-card table td:nth-child(2),
+.app-shell .records-scroll table th:nth-child(2),
+.app-shell .records-scroll table td:nth-child(2) {
+  width: 7.2% !important;
+}
+
+.app-shell .records-card table th:nth-child(3),
+.app-shell .records-card table td:nth-child(3),
+.app-shell .records-scroll table th:nth-child(3),
+.app-shell .records-scroll table td:nth-child(3) {
+  width: 8.2% !important;
+}
+
+.app-shell .records-card table th:nth-child(4),
+.app-shell .records-card table td:nth-child(4),
+.app-shell .records-scroll table th:nth-child(4),
+.app-shell .records-scroll table td:nth-child(4) {
+  width: 7.8% !important;
+}
+
+.app-shell .records-card table th:nth-child(5),
+.app-shell .records-card table td:nth-child(5),
+.app-shell .records-scroll table th:nth-child(5),
+.app-shell .records-scroll table td:nth-child(5) {
+  width: 10.5% !important;
+}
+
+.app-shell .records-card table th:nth-child(6),
+.app-shell .records-card table td:nth-child(6),
+.app-shell .records-scroll table th:nth-child(6),
+.app-shell .records-scroll table td:nth-child(6) {
+  width: 6.2% !important;
+}
+
+.app-shell .records-card table th:nth-child(7),
+.app-shell .records-card table td:nth-child(7),
+.app-shell .records-scroll table th:nth-child(7),
+.app-shell .records-scroll table td:nth-child(7) {
+  width: 5.6% !important;
+}
+
+.app-shell .records-card table th:nth-child(8),
+.app-shell .records-card table td:nth-child(8),
+.app-shell .records-scroll table th:nth-child(8),
+.app-shell .records-scroll table td:nth-child(8) {
+  width: 8.8% !important;
+}
+
+.app-shell .records-card table th:nth-child(9),
+.app-shell .records-card table td:nth-child(9),
+.app-shell .records-scroll table th:nth-child(9),
+.app-shell .records-scroll table td:nth-child(9) {
+  width: 10.2% !important;
+}
+
+.app-shell .records-card table th:nth-child(10),
+.app-shell .records-card table td:nth-child(10),
+.app-shell .records-scroll table th:nth-child(10),
+.app-shell .records-scroll table td:nth-child(10),
+.app-shell .records-card table th:nth-child(11),
+.app-shell .records-card table td:nth-child(11),
+.app-shell .records-scroll table th:nth-child(11),
+.app-shell .records-scroll table td:nth-child(11) {
+  width: 8.4% !important;
+}
+
+.app-shell .records-card table th:nth-child(12),
+.app-shell .records-card table td:nth-child(12),
+.app-shell .records-scroll table th:nth-child(12),
+.app-shell .records-scroll table td:nth-child(12) {
+  width: 6.2% !important;
+}
+
+/* Base Station gets the widest remaining space */
+.app-shell .records-card table th:nth-child(13),
+.app-shell .records-card table td:nth-child(13),
+.app-shell .records-scroll table th:nth-child(13),
+.app-shell .records-scroll table td:nth-child(13) {
+  width: 10.1% !important;
+}
+
+/* On wide screens, increase register text more */
+@media (min-width: 1700px) {
+  .app-shell .records-card td,
+  .app-shell .records-scroll td,
+  .app-shell .filtered-register-table td,
+  .app-shell .records-table td {
+    font-size: clamp(11px, 0.72vw, 14.5px) !important;
+  }
+
+  .app-shell .records-card th,
+  .app-shell .records-scroll th,
+  .app-shell .filtered-register-table th,
+  .app-shell .records-table th {
+    font-size: clamp(10px, 0.66vw, 13px) !important;
+  }
+}
+
+/* On smaller laptops, reduce slightly to avoid wrapping/cut */
+@media (max-width: 1450px) {
+  .app-shell .records-card td,
+  .app-shell .records-scroll td,
+  .app-shell .filtered-register-table td,
+  .app-shell .records-table td {
+    font-size: clamp(8.5px, 0.58vw, 11px) !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+
+  .app-shell .records-card th,
+  .app-shell .records-scroll th,
+  .app-shell .filtered-register-table th,
+  .app-shell .records-table th {
+    font-size: clamp(8px, 0.52vw, 10px) !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+}
+
+
+/* ============================================================
+   Fix Peak Base Station overflowing outside the stat card
+   Keeps it inside the box without wrapping.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* General safety: stat values must stay inside their cards */
+.app-shell .summary-card,
+.app-shell .summary-card * {
+  box-sizing: border-box !important;
+}
+
+.app-shell .summary-card {
+  overflow: hidden !important;
+}
+
+/* Peak Base Station is the 7th card in row 2 of the 10 / 8 / 7 layout */
+.app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card:nth-child(7) strong {
+  display: block !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  font-size: clamp(9px, 0.58vw, 13px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.06em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 0 2px !important;
+}
+
+/* Also protect Peak Talkgroup because it can be long too */
+.app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card:nth-child(6) strong {
+  display: block !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  font-size: clamp(9.5px, 0.62vw, 14px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.045em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 0 2px !important;
+}
+
+/* Wider screens can show slightly larger text while staying inside */
+@media (min-width: 1700px) {
+  .app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card:nth-child(7) strong {
+    font-size: clamp(10.5px, 0.66vw, 15px) !important;
+  }
+
+  .app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card:nth-child(6) strong {
+    font-size: clamp(11px, 0.7vw, 16px) !important;
+  }
+}
+
+/* Smaller laptops need stronger protection */
+@media (max-width: 1450px) {
+  .app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card:nth-child(7) strong {
+    font-size: clamp(8px, 0.52vw, 11px) !important;
+    letter-spacing: -0.075em !important;
+  }
+
+  .app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card:nth-child(6) strong {
+    font-size: clamp(8.5px, 0.56vw, 12px) !important;
+  }
+}
+
+
+/* ============================================================
+   Table headers: fit inside columns
+   Applies to:
+   - KPI Measurements
+   - Radio Behavior Insights
+   - User Behavior Insights
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* Shared table-header protection */
+.app-shell .kpi-grid table,
+.app-shell .kpi-table table,
+.app-shell .behavior-grid table,
+.app-shell .table-card table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.app-shell .kpi-grid th,
+.app-shell .kpi-table th,
+.app-shell .behavior-grid th {
+  max-width: 100% !important;
+  padding: 6px 5px !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: clamp(8.5px, 0.55vw, 11px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Body cells follow the same width discipline */
+.app-shell .kpi-grid td,
+.app-shell .kpi-table td,
+.app-shell .behavior-grid td {
+  max-width: 100% !important;
+  padding: 6px 5px !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* KPI Measurements: compact header fit */
+.app-shell .kpi-grid th,
+.app-shell .kpi-grid td,
+.app-shell .kpi-table th,
+.app-shell .kpi-table td {
+  font-size: clamp(8.5px, 0.55vw, 11px) !important;
+}
+
+/* Radio Behavior Insights: balance columns after Users/Regions removal */
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(1),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(1) {
+  width: 10% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(2),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(2) {
+  width: 18% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(3),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(3) {
+  width: 18% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(4),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(4) {
+  width: 8% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(5),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(5),
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(6),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(6) {
+  width: 11% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(7),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(7),
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(8),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(8) {
+  width: 12% !important;
+}
+
+/* User Behavior Insights: wide user column, compact headers */
+.user-behavior-table-card col.user-col {
+  width: 42% !important;
+}
+
+.user-behavior-table-card col.compact-col {
+  width: 8.5% !important;
+}
+
+.user-behavior-table-card col.duration-col {
+  width: 12% !important;
+}
+
+.user-behavior-table-card th {
+  font-size: clamp(8px, 0.5vw, 10px) !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+  letter-spacing: 0.01em !important;
+}
+
+.user-behavior-table-card td {
+  font-size: clamp(9px, 0.58vw, 12px) !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+/* Let the User column be readable and the rest fit tightly */
+.user-behavior-table-card th:first-child,
+.user-behavior-table-card td:first-child {
+  text-align: left !important;
+  padding-left: 9px !important;
+}
+
+/* Specific long headers: make them smaller so they fit */
+.user-behavior-table-card th:nth-child(4),
+.user-behavior-table-card th:nth-child(6),
+.user-behavior-table-card th:nth-child(7),
+.behavior-grid .table-card:not(.user-behavior-table-card) th:nth-child(6),
+.behavior-grid .table-card:not(.user-behavior-table-card) th:nth-child(7),
+.behavior-grid .table-card:not(.user-behavior-table-card) th:nth-child(8) {
+  font-size: clamp(7.2px, 0.46vw, 9.2px) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Smaller laptop protection */
+@media (max-width: 1450px) {
+  .app-shell .kpi-grid th,
+  .app-shell .kpi-table th,
+  .app-shell .behavior-grid th {
+    font-size: clamp(7px, 0.48vw, 9px) !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+    letter-spacing: 0 !important;
+  }
+
+  .app-shell .kpi-grid td,
+  .app-shell .kpi-table td,
+  .app-shell .behavior-grid td {
+    font-size: clamp(8px, 0.52vw, 10.5px) !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL TABLE COLUMN DISTRIBUTION
+   Remove wasted space: text columns get room, numeric columns fit tight.
+   Applies to KPI Measurements, Radio Behavior, User Behavior.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* ---------- General behavior table tightening ---------- */
+.app-shell .behavior-grid table,
+.app-shell .kpi-grid table,
+.app-shell .kpi-table table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.app-shell .behavior-grid th,
+.app-shell .behavior-grid td,
+.app-shell .kpi-grid th,
+.app-shell .kpi-grid td,
+.app-shell .kpi-table th,
+.app-shell .kpi-table td {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  vertical-align: middle !important;
+  box-sizing: border-box !important;
+}
+
+/* ============================================================
+   Radio Behavior Insights
+   Columns:
+   1 Radio ID | 2 Alias | 3 Company | 4 Calls | 5 Duration
+   6 Avg Duration | 7 Talkgroups | 8 Base Stations
+   ============================================================ */
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(1),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(1) {
+  width: 9% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(2),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(2) {
+  width: 20% !important;
+  text-align: left !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(3),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(3) {
+  width: 20% !important;
+  text-align: left !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(4),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(4) {
+  width: 7% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(5),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(5) {
+  width: 10% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(6),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(6) {
+  width: 10% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(7),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(7) {
+  width: 10% !important;
+}
+
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(8),
+.behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(8) {
+  width: 14% !important;
+}
+
+/* Compact numeric headers/cells */
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(4),
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(5),
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(6),
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(7),
+.behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(8) {
+  font-size: clamp(7.4px, 0.46vw, 9.8px) !important;
+  letter-spacing: 0 !important;
+  padding-left: 3px !important;
+  padding-right: 3px !important;
+}
+
+/* ============================================================
+   User Behavior Insights
+   Columns:
+   1 User | 2 Calls | 3 Duration | 4 Avg Duration
+   5 Radios | 6 Talkgroups | 7 Base Stations
+   ============================================================ */
+
+.user-behavior-table-card table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+
+/* Override TSX colgroup widths */
+.user-behavior-table-card col.user-col {
+  width: 46% !important;
+}
+
+.user-behavior-table-card col.compact-col {
+  width: 7.5% !important;
+}
+
+.user-behavior-table-card col.duration-col {
+  width: 12% !important;
+}
+
+/* Exact nth-child widths for browsers that don't obey col class strongly */
+.user-behavior-table-card table th:nth-child(1),
+.user-behavior-table-card table td:nth-child(1) {
+  width: 46% !important;
+  text-align: left !important;
+}
+
+.user-behavior-table-card table th:nth-child(2),
+.user-behavior-table-card table td:nth-child(2) {
+  width: 7.5% !important;
+}
+
+.user-behavior-table-card table th:nth-child(3),
+.user-behavior-table-card table td:nth-child(3),
+.user-behavior-table-card table th:nth-child(4),
+.user-behavior-table-card table td:nth-child(4) {
+  width: 12% !important;
+}
+
+.user-behavior-table-card table th:nth-child(5),
+.user-behavior-table-card table td:nth-child(5),
+.user-behavior-table-card table th:nth-child(6),
+.user-behavior-table-card table td:nth-child(6),
+.user-behavior-table-card table th:nth-child(7),
+.user-behavior-table-card table td:nth-child(7) {
+  width: 7.5% !important;
+}
+
+.user-behavior-table-card th:not(:first-child),
+.user-behavior-table-card td:not(:first-child) {
+  text-align: center !important;
+  padding-left: 3px !important;
+  padding-right: 3px !important;
+}
+
+.user-behavior-table-card th:first-child,
+.user-behavior-table-card td:first-child {
+  padding-left: 10px !important;
+  padding-right: 8px !important;
+}
+
+.user-behavior-table-card th:nth-child(5),
+.user-behavior-table-card th:nth-child(6),
+.user-behavior-table-card th:nth-child(7) {
+  font-size: clamp(7px, 0.44vw, 9px) !important;
+  letter-spacing: 0 !important;
+}
+
+/* ============================================================
+   KPI Measurements
+   Give metric/description text more room and numeric fields less room.
+   Works safely even if the KPI table has different column counts.
+   ============================================================ */
+
+/* First column normally contains KPI/metric name */
+.app-shell .kpi-grid table th:nth-child(1),
+.app-shell .kpi-grid table td:nth-child(1),
+.app-shell .kpi-table table th:nth-child(1),
+.app-shell .kpi-table table td:nth-child(1) {
+  width: 30% !important;
+  text-align: left !important;
+  padding-left: 10px !important;
+}
+
+/* Second column often contains value/result */
+.app-shell .kpi-grid table th:nth-child(2),
+.app-shell .kpi-grid table td:nth-child(2),
+.app-shell .kpi-table table th:nth-child(2),
+.app-shell .kpi-table table td:nth-child(2) {
+  width: 15% !important;
+  text-align: center !important;
+}
+
+/* Third column often contains target/status/notes; give it the rest */
+.app-shell .kpi-grid table th:nth-child(3),
+.app-shell .kpi-grid table td:nth-child(3),
+.app-shell .kpi-table table th:nth-child(3),
+.app-shell .kpi-table table td:nth-child(3) {
+  width: 20% !important;
+  text-align: center !important;
+}
+
+/* Fourth and later columns stay compact */
+.app-shell .kpi-grid table th:nth-child(n + 4),
+.app-shell .kpi-grid table td:nth-child(n + 4),
+.app-shell .kpi-table table th:nth-child(n + 4),
+.app-shell .kpi-table table td:nth-child(n + 4) {
+  width: 8.75% !important;
+  text-align: center !important;
+  padding-left: 3px !important;
+  padding-right: 3px !important;
+}
+
+/* Header readability and compact fit */
+.app-shell .kpi-grid th,
+.app-shell .kpi-table th,
+.app-shell .behavior-grid th {
+  line-height: 1 !important;
+  min-height: 28px !important;
+}
+
+/* On wide screens, use remaining space for text columns */
+@media (min-width: 1700px) {
+  .user-behavior-table-card col.user-col,
+  .user-behavior-table-card table th:nth-child(1),
+  .user-behavior-table-card table td:nth-child(1) {
+    width: 48% !important;
+  }
+
+  .behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(2),
+  .behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(2),
+  .behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(3),
+  .behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(3) {
+    width: 21% !important;
+  }
+}
+
+/* Smaller laptops: compress only numeric columns */
+@media (max-width: 1450px) {
+  .behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(2),
+  .behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(2),
+  .behavior-grid .table-card:not(.user-behavior-table-card) table th:nth-child(3),
+  .behavior-grid .table-card:not(.user-behavior-table-card) table td:nth-child(3) {
+    width: 19% !important;
+  }
+
+  .user-behavior-table-card col.user-col,
+  .user-behavior-table-card table th:nth-child(1),
+  .user-behavior-table-card table td:nth-child(1) {
+    width: 44% !important;
+  }
+
+  .user-behavior-table-card th,
+  .user-behavior-table-card td,
+  .behavior-grid .table-card th,
+  .behavior-grid .table-card td {
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL FIX: KPI Measurements + User Behavior column balance
+   - KPI columns no longer waste space
+   - User Behavior user column reduced
+   - Headers fit inside columns without ugly cutting
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* ---------- KPI Measurements exact distribution ---------- */
+.kpi-measurements-table-card .records-scroll,
+.kpi-measurements-table-card .table-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.kpi-measurements-table-card table,
+.kpi-measurements-table {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.kpi-measurements-table col.kpi-source-col { width: 20% !important; }
+.kpi-measurements-table col.kpi-small-col { width: 8% !important; }
+.kpi-measurements-table col.kpi-medium-col { width: 10.5% !important; }
+.kpi-measurements-table col.kpi-wide-col { width: 15% !important; }
+.kpi-measurements-table col.kpi-tiny-col { width: 7% !important; }
+
+/* Fallback nth-child widths if colgroup is overridden */
+.kpi-measurements-table-card table th:nth-child(1),
+.kpi-measurements-table-card table td:nth-child(1) {
+  width: 20% !important;
+  text-align: left !important;
+  padding-left: 10px !important;
+}
+
+.kpi-measurements-table-card table th:nth-child(2),
+.kpi-measurements-table-card table td:nth-child(2),
+.kpi-measurements-table-card table th:nth-child(3),
+.kpi-measurements-table-card table td:nth-child(3) {
+  width: 8% !important;
+}
+
+.kpi-measurements-table-card table th:nth-child(4),
+.kpi-measurements-table-card table td:nth-child(4),
+.kpi-measurements-table-card table th:nth-child(5),
+.kpi-measurements-table-card table td:nth-child(5),
+.kpi-measurements-table-card table th:nth-child(6),
+.kpi-measurements-table-card table td:nth-child(6),
+.kpi-measurements-table-card table th:nth-child(7),
+.kpi-measurements-table-card table td:nth-child(7) {
+  width: 10.5% !important;
+}
+
+.kpi-measurements-table-card table th:nth-child(8),
+.kpi-measurements-table-card table td:nth-child(8) {
+  width: 15% !important;
+}
+
+.kpi-measurements-table-card table th:nth-child(9),
+.kpi-measurements-table-card table td:nth-child(9) {
+  width: 7% !important;
+}
+
+.kpi-measurements-table-card th,
+.kpi-measurements-table-card td {
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 6px 4px !important;
+  box-sizing: border-box !important;
+}
+
+.kpi-measurements-table-card th {
+  font-size: clamp(7.6px, 0.48vw, 9.5px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0 !important;
+  font-weight: 900 !important;
+}
+
+.kpi-measurements-table-card td {
+  font-size: clamp(8.8px, 0.56vw, 11.5px) !important;
   line-height: 1.08 !important;
 }
 
-.upload-shell .workbook-choice-card p,
-.upload-shell .choice-card p {
-  font-size: clamp(11px, 0.95vw, 13px) !important;
-  line-height: 1.38 !important;
+/* ---------- User Behavior Insights rebalanced ---------- */
+.user-behavior-table-card table,
+.user-behavior-table {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.user-behavior-table-card col.user-col { width: 32% !important; }
+.user-behavior-table-card col.compact-col { width: 9% !important; }
+.user-behavior-table-card col.duration-col { width: 12% !important; }
+.user-behavior-table-card col.talkgroup-col { width: 13% !important; }
+.user-behavior-table-card col.station-col { width: 13% !important; }
+
+/* Fallback nth-child widths */
+.user-behavior-table-card table th:nth-child(1),
+.user-behavior-table-card table td:nth-child(1) {
+  width: 32% !important;
+  text-align: left !important;
+  padding-left: 10px !important;
+}
+
+.user-behavior-table-card table th:nth-child(2),
+.user-behavior-table-card table td:nth-child(2),
+.user-behavior-table-card table th:nth-child(5),
+.user-behavior-table-card table td:nth-child(5) {
+  width: 9% !important;
+}
+
+.user-behavior-table-card table th:nth-child(3),
+.user-behavior-table-card table td:nth-child(3),
+.user-behavior-table-card table th:nth-child(4),
+.user-behavior-table-card table td:nth-child(4) {
+  width: 12% !important;
+}
+
+.user-behavior-table-card table th:nth-child(6),
+.user-behavior-table-card table td:nth-child(6),
+.user-behavior-table-card table th:nth-child(7),
+.user-behavior-table-card table td:nth-child(7) {
+  width: 13% !important;
+}
+
+.user-behavior-table-card th,
+.user-behavior-table-card td {
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+  padding: 6px 4px !important;
+}
+
+.user-behavior-table-card th {
+  text-align: center !important;
+  font-size: clamp(7.5px, 0.48vw, 9.8px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0 !important;
+  font-weight: 900 !important;
+}
+
+.user-behavior-table-card td {
+  text-align: center !important;
+  font-size: clamp(8.8px, 0.56vw, 11.5px) !important;
+  line-height: 1.08 !important;
+}
+
+.user-behavior-table-card th:first-child,
+.user-behavior-table-card td:first-child {
+  text-align: left !important;
+}
+
+/* Slightly smaller only for long user behavior headers */
+.user-behavior-table-card th:nth-child(4),
+.user-behavior-table-card th:nth-child(6),
+.user-behavior-table-card th:nth-child(7) {
+  font-size: clamp(7px, 0.44vw, 9px) !important;
+}
+
+/* Allow header tooltips from native title if added later; keep body no-wrap */
+.user-behavior-table-card thead th,
+.kpi-measurements-table-card thead th {
+  min-height: 28px !important;
+}
+
+/* Normal laptop protection */
+@media (max-width: 1450px) {
+  .user-behavior-table-card col.user-col,
+  .user-behavior-table-card table th:nth-child(1),
+  .user-behavior-table-card table td:nth-child(1) {
+    width: 30% !important;
+  }
+
+  .user-behavior-table-card th,
+  .kpi-measurements-table-card th {
+    font-size: clamp(6.8px, 0.44vw, 8.6px) !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+
+  .user-behavior-table-card td,
+  .kpi-measurements-table-card td {
+    font-size: clamp(8px, 0.52vw, 10.5px) !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+}
+
+
+.app-shell .filtered-register-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+
+.app-shell .filtered-register-table .col-sn { width: 3% !important; }
+.app-shell .filtered-register-table .col-radio-id { width: 6.5% !important; }
+.app-shell .filtered-register-table .col-radio-alias { width: 7% !important; }
+.app-shell .filtered-register-table .col-radio-type { width: 6.8% !important; }
+.app-shell .filtered-register-table .col-employee-name { width: 15.8% !important; }
+.app-shell .filtered-register-table .col-employee-id { width: 5.8% !important; }
+.app-shell .filtered-register-table .col-region { width: 4.8% !important; }
+.app-shell .filtered-register-table .col-company { width: 7.4% !important; }
+.app-shell .filtered-register-table .col-talkgroup { width: 9.1% !important; }
+.app-shell .filtered-register-table .col-start { width: 8.1% !important; }
+.app-shell .filtered-register-table .col-end { width: 8.1% !important; }
+.app-shell .filtered-register-table .col-duration { width: 5.2% !important; }
+.app-shell .filtered-register-table .col-base-station { width: 12.4% !important; }
+
+.app-shell .filtered-register-table th,
+.app-shell .filtered-register-table td {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding-left: 3px !important;
+  padding-right: 3px !important;
+}
+
+.app-shell .filtered-register-table th:nth-child(5),
+.app-shell .filtered-register-table td:nth-child(5) {
+  text-align: left !important;
+  padding-left: 8px !important;
+  font-size: clamp(9.5px, 0.62vw, 12.5px) !important;
+}
+
+
+.followup-style-topbar {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(360px, 1fr) auto !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  gap: 16px 18px !important;
+  min-height: 210px !important;
+  padding: 24px 34px 20px !important;
+  border-radius: 30px !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(135deg, rgba(2, 10, 28, 0.92), rgba(5, 25, 54, 0.78)),
+    transparent !important;
+  border: 1px solid rgba(34, 211, 238, 0.28) !important;
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.28) !important;
+}
+
+.followup-style-topbar::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  background:
+    radial-gradient(circle at 18% 65%, rgba(14, 165, 233, 0.22), transparent 34%),
+    linear-gradient(90deg, rgba(2, 6, 23, 0.38), rgba(15, 23, 42, 0.10)) !important;
+  pointer-events: none !important;
+}
+
+.followup-style-topbar > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.followup-style-topbar .brand-block,
+.followup-style-topbar .topbar-actions {
+  display: none !important;
+}
+
+.followup-header-logos {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 18px !important;
+  width: fit-content !important;
+  padding: 10px 20px !important;
+  border-radius: 999px !important;
+  background: rgba(2, 13, 28, 0.62) !important;
+  border: 1px solid rgba(148, 216, 255, 0.16) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.06) !important;
+}
+
+.followup-header-logos img {
+  width: 78px !important;
+  height: 64px !important;
+  object-fit: contain !important;
+}
+
+.followup-header-logos .logo-divider {
+  width: 1px !important;
+  height: 52px !important;
+  background: rgba(148, 216, 255, 0.22) !important;
+}
+
+.followup-dashboard-title {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: center !important;
+  width: min(760px, 100%) !important;
+  min-height: 82px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 12px 34px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(34, 211, 238, 0.28) !important;
+  background: rgba(2, 13, 28, 0.48) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.06) !important;
+}
+
+.followup-dashboard-title h1 {
   margin: 0 !important;
+  color: #ffffff !important;
+  font-size: clamp(32px, 3.2vw, 58px) !important;
+  line-height: 1 !important;
+  font-weight: 1000 !important;
+  letter-spacing: 0.115em !important;
+  font-style: italic !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  text-shadow: 0 10px 34px rgba(0, 0, 0, 0.32) !important;
 }
 
-.upload-shell .fleetmap-status {
-  margin-top: 4px !important;
-  padding: 4px 8px !important;
-  font-size: 10.5px !important;
-  line-height: 1.2 !important;
+.followup-header-badge {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  justify-self: end !important;
+  width: 70px !important;
+  height: 70px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24) !important;
 }
 
-/* Medium laptop height safety: compress a little more when height is limited. */
-@media (max-height: 780px) and (min-width: 900px) {
-  .upload-shell.dark-background-theme,
-  .upload-shell.light-background-theme {
-    padding: 10px 22px !important;
-  }
-
-  .upload-shell .upload-grid,
-  .upload-shell .upload-grid-wide {
-    min-height: calc(100vh - 28px) !important;
-    gap: 18px !important;
-  }
-
-  .upload-shell .upload-copy {
-    padding: 20px 24px !important;
-  }
-
-  .upload-shell .upload-copy h1 {
-    font-size: clamp(30px, 4vw, 54px) !important;
-  }
-
-  .upload-shell .upload-copy .lead,
-  .upload-shell .upload-copy p.lead {
-    font-size: 14px !important;
-    line-height: 1.42 !important;
-    margin-top: 10px !important;
-  }
-
-  .upload-shell .workbook-choice-panel.three-tile .workbook-choice-card,
-  .upload-shell .workbook-choice-panel.three-tile .choice-card {
-    min-height: 112px !important;
-    padding: 12px !important;
-  }
-
-  .upload-shell .workbook-choice-card .choice-icon,
-  .upload-shell .choice-card .choice-icon {
-    width: 44px !important;
-    height: 44px !important;
-  }
-
-  .upload-shell .workbook-choice-card strong,
-  .upload-shell .choice-card strong {
-    font-size: 17px !important;
-  }
-
-  .upload-shell .workbook-choice-card p,
-  .upload-shell .choice-card p {
-    font-size: 11.5px !important;
-    line-height: 1.28 !important;
-  }
+.followup-header-badge img {
+  width: 58px !important;
+  height: 58px !important;
+  object-fit: contain !important;
 }
 
-/* Small/mobile screens still use a normal scroll-friendly single column. */
-@media (max-width: 720px) {
-  .upload-shell.dark-background-theme,
-  .upload-shell.light-background-theme {
-    display: block !important;
-    min-height: 100vh !important;
-    padding: 14px 10px 28px !important;
-    overflow-y: auto !important;
-  }
+.followup-header-actions {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  flex-wrap: wrap !important;
+  padding-top: 4px !important;
+}
 
-  .upload-shell .upload-grid,
-  .upload-shell .upload-grid-wide {
+.followup-header-actions .button {
+  min-height: 58px !important;
+  padding: 14px 24px !important;
+  border-radius: 999px !important;
+  font-size: 19px !important;
+  font-weight: 950 !important;
+  gap: 10px !important;
+  border: 0 !important;
+  background: rgba(2, 13, 28, 0.78) !important;
+  color: #e7f6ff !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.20) !important;
+}
+
+.followup-header-actions .theme-toggle,
+.followup-header-actions .followup-pdf-button {
+  color: #03131f !important;
+  background: linear-gradient(135deg, #2dd4ff, #60a5fa) !important;
+  box-shadow: 0 18px 42px rgba(45, 212, 255, 0.25) !important;
+}
+
+.followup-header-actions .button svg {
+  width: 22px !important;
+  height: 22px !important;
+  stroke-width: 2.4 !important;
+}
+
+.app-shell.light-background-theme .followup-style-topbar {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(230, 246, 255, 0.72)),
+    transparent !important;
+  border-color: rgba(0, 120, 212, 0.20) !important;
+}
+
+.app-shell.light-background-theme .followup-dashboard-title {
+  background: rgba(255, 255, 255, 0.56) !important;
+  border-color: rgba(0, 120, 212, 0.24) !important;
+}
+
+.app-shell.light-background-theme .followup-dashboard-title h1 {
+  color: #092033 !important;
+  text-shadow: none !important;
+}
+
+.app-shell.light-background-theme .followup-header-logos,
+.app-shell.light-background-theme .followup-header-badge {
+  background: rgba(255, 255, 255, 0.70) !important;
+  border-color: rgba(0, 120, 212, 0.18) !important;
+}
+
+.app-shell.light-background-theme .followup-header-actions .button {
+  background: rgba(255, 255, 255, 0.82) !important;
+  color: #092033 !important;
+  border: 1px solid rgba(0, 120, 212, 0.14) !important;
+}
+
+.app-shell.light-background-theme .followup-header-actions .theme-toggle,
+.app-shell.light-background-theme .followup-header-actions .followup-pdf-button {
+  color: #083047 !important;
+  background: linear-gradient(135deg, #2dd4ff, #60a5fa) !important;
+}
+
+@media (max-width: 1180px) {
+  .followup-style-topbar {
+    grid-template-columns: 1fr !important;
     min-height: auto !important;
-    gap: 14px !important;
   }
 
-  .upload-shell .upload-copy h1 {
-    font-size: clamp(30px, 11vw, 46px) !important;
+  .followup-header-logos,
+  .followup-dashboard-title,
+  .followup-header-badge,
+  .followup-header-actions {
+    grid-column: 1 !important;
+    justify-self: center !important;
+  }
+
+  .followup-header-badge {
+    display: none !important;
+  }
+
+  .followup-dashboard-title h1 {
+    white-space: normal !important;
+    font-size: clamp(28px, 5vw, 46px) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .followup-style-topbar {
+    padding: 18px !important;
+    border-radius: 22px !important;
+  }
+
+  .followup-header-actions {
+    gap: 8px !important;
+  }
+
+  .followup-header-actions .button {
+    min-height: 46px !important;
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+  }
+
+  .followup-header-logos img {
+    width: 58px !important;
+    height: 48px !important;
+  }
+}
+
+
+.followup-style-topbar {
+  grid-template-columns: auto minmax(520px, 1.35fr) auto !important;
+}
+
+.followup-dashboard-title {
+  width: min(980px, 100%) !important;
+  min-height: 98px !important;
+  padding: 16px 54px !important;
+  border-radius: 999px !important;
+}
+
+.followup-dashboard-title h1 {
+  font-size: clamp(38px, 3.9vw, 72px) !important;
+  letter-spacing: 0.13em !important;
+}
+
+.followup-header-logos {
+  gap: 14px !important;
+  padding: 10px 18px !important;
+}
+
+.followup-header-logos img {
+  width: 82px !important;
+  height: 66px !important;
+}
+
+.followup-header-badge {
+  width: 82px !important;
+  height: 82px !important;
+  border-radius: 20px !important;
+}
+
+.followup-header-badge img {
+  width: 70px !important;
+  height: 70px !important;
+}
+
+@media (max-width: 1180px) {
+  .followup-style-topbar {
+    grid-template-columns: 1fr !important;
+  }
+
+  .followup-dashboard-title {
+    width: min(900px, 100%) !important;
+    min-height: 82px !important;
+    padding: 14px 28px !important;
   }
 }
