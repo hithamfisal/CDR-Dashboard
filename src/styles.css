@@ -8359,3 +8359,89 @@ html:has(.dark-background-theme) {
     border-radius: 20px !important;
   }
 }
+
+/* Cleaner ticketing-aligned CDR header: plain theme backdrop, no extra logo/title boxes. */
+.cdr-command-shell {
+  background: #041426 !important;
+  border-color: rgba(34, 211, 238, 0.24) !important;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.26) !important;
+}
+
+.cdr-command-shell::before {
+  background:
+    radial-gradient(circle at 18% 58%, rgba(14, 165, 233, 0.18), transparent 34%),
+    radial-gradient(circle at 86% 82%, rgba(20, 184, 166, 0.14), transparent 28%) !important;
+}
+
+.cdr-command-shell .followup-style-topbar {
+  grid-template-columns: auto minmax(420px, 1fr) !important;
+  min-height: 150px !important;
+  gap: 14px 26px !important;
+}
+
+.cdr-command-shell .followup-header-se {
+  display: none !important;
+}
+
+.cdr-command-shell .followup-header-badge,
+.cdr-command-shell .followup-header-badge-left,
+.cdr-command-shell .followup-dashboard-title {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.cdr-command-shell .followup-header-badge-left {
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+.cdr-command-shell .followup-header-badge-left img {
+  width: 82px !important;
+  height: 82px !important;
+  object-fit: contain !important;
+}
+
+.cdr-command-shell .followup-dashboard-title {
+  width: 100% !important;
+  min-height: 84px !important;
+  padding: 0 18px !important;
+}
+
+.cdr-command-shell .followup-dashboard-title h1 {
+  font-size: clamp(34px, 4vw, 68px) !important;
+}
+
+.cdr-command-shell .followup-header-actions {
+  grid-column: 1 / -1 !important;
+  justify-content: center !important;
+  padding-top: 2px !important;
+}
+
+.cdr-command-shell .dashboard-tabs {
+  margin-top: 8px !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell {
+  background: #f2f8fd !important;
+  border-color: rgba(0, 120, 212, 0.18) !important;
+  box-shadow: 0 22px 62px rgba(17, 86, 128, 0.14) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell::before {
+  background:
+    radial-gradient(circle at 18% 58%, rgba(0, 120, 212, 0.12), transparent 34%),
+    radial-gradient(circle at 86% 82%, rgba(20, 184, 166, 0.10), transparent 28%) !important;
+}
+
+@media (max-width: 1180px) {
+  .cdr-command-shell .followup-style-topbar {
+    grid-template-columns: 1fr !important;
+  }
+
+  .cdr-command-shell .followup-header-badge-left,
+  .cdr-command-shell .followup-dashboard-title {
+    justify-self: center !important;
+  }
+}

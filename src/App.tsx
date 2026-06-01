@@ -2868,10 +2868,6 @@ export default function App() {
           <h1>CDR TRAFFIC DASHBOARD</h1>
         </div>
 
-        <div className="followup-header-se" aria-label="Saudi Energy">
-          <img src="/assets/se.png" alt="Saudi Energy" />
-        </div>
-
         <div className="followup-header-actions">
           <button className="button small theme-toggle" type="button" onClick={toggleTheme}>
             <Palette size={18} /> {theme === "light" ? "Dark Theme" : "Light Theme"}
