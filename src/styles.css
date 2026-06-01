@@ -8445,3 +8445,61 @@ html:has(.dark-background-theme) {
     justify-self: center !important;
   }
 }
+
+/* Final placement: plain page background, themed picture only inside the CDR command container. */
+.app-shell.dark-background-theme,
+.app-shell.se-theme.dark-background-theme {
+  background: #020b18 !important;
+}
+
+.app-shell.light-background-theme,
+.app-shell.se-theme.light-background-theme {
+  background: #f3f8fc !important;
+}
+
+.app-shell.dark-background-theme::before,
+.app-shell.dark-background-theme::after,
+.app-shell.light-background-theme::before,
+.app-shell.light-background-theme::after,
+.app-shell.se-theme.dark-background-theme::before,
+.app-shell.se-theme.dark-background-theme::after,
+.app-shell.se-theme.light-background-theme::before,
+.app-shell.se-theme.light-background-theme::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+}
+
+.cdr-command-shell {
+  background:
+    linear-gradient(135deg, rgba(2, 10, 28, 0.88), rgba(0, 34, 74, 0.66)),
+    url("/assets/h.png") center / cover no-repeat !important;
+  border-color: rgba(34, 211, 238, 0.24) !important;
+}
+
+.cdr-command-shell::before {
+  display: block !important;
+  content: "" !important;
+  background:
+    radial-gradient(circle at 18% 58%, rgba(14, 165, 233, 0.22), transparent 34%),
+    radial-gradient(circle at 86% 82%, rgba(20, 184, 166, 0.18), transparent 28%),
+    linear-gradient(90deg, rgba(2, 6, 23, 0.30), rgba(2, 13, 28, 0.04) 62%, rgba(2, 6, 23, 0.28)) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(226, 246, 255, 0.58)),
+    url("/assets/h.png") center / cover no-repeat !important;
+  border-color: rgba(0, 120, 212, 0.18) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell::before,
+.app-shell.se-theme.light-background-theme .cdr-command-shell::before {
+  display: block !important;
+  content: "" !important;
+  background:
+    radial-gradient(circle at 18% 58%, rgba(0, 120, 212, 0.16), transparent 34%),
+    radial-gradient(circle at 86% 82%, rgba(20, 184, 166, 0.12), transparent 28%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.04) 62%, rgba(255, 255, 255, 0.22)) !important;
+}
