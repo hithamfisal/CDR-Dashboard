@@ -8549,16 +8549,27 @@ html:has(.dark-background-theme) {
   background: transparent !important;
 }
 
-.app-shell .cdr-command-shell {
-  min-height: 540px !important;
-  background-position: center 58% !important;
-}
-
+.app-shell .cdr-command-shell,
 .app-shell.active-tab-overview .cdr-command-shell {
-  min-height: 640px !important;
+  min-height: clamp(680px, 42vw, 820px) !important;
+  background-position: center center !important;
 }
 
 .app-shell.light-background-theme .cdr-command-shell,
 .app-shell.se-theme.light-background-theme .cdr-command-shell {
-  background-position: center 58% !important;
+  background-position: center center !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .cdr-command-shell,
+  .app-shell.active-tab-overview .cdr-command-shell {
+    min-height: 620px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell .cdr-command-shell,
+  .app-shell.active-tab-overview .cdr-command-shell {
+    min-height: auto !important;
+  }
 }

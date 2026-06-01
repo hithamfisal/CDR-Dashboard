@@ -2907,6 +2907,24 @@ export default function App() {
         ))}
       </nav>
 
+      <section id="filters" className="filters-panel">
+        <label className="search-box search-compact">
+          <span>Search Radio / User</span>
+          <Search size={16} />
+          <input value={filters.search} onChange={(e) => { setFilters((c) => ({ ...c, search: e.target.value })); setPage(1); }} placeholder="Radio ID, alias, user, employee ID" />
+        </label>
+        <MultiSelectFilter className="filter-compact" label="Region" value={filters.region} options={options.region} onChange={(region) => { setFilters((c) => ({ ...c, region })); setPage(1); }} />
+        <MultiSelectFilter className="filter-compact" label="Year" value={filters.year} options={options.year} onChange={(year) => { setFilters((c) => ({ ...c, year })); setPage(1); }} />
+        <MultiSelectFilter className="filter-compact" label="Month" value={filters.month} options={options.month} onChange={(month) => { setFilters((c) => ({ ...c, month })); setPage(1); }} />
+        <MultiSelectFilter className="filter-company" label="Company" value={filters.company} options={options.company} onChange={(company) => { setFilters((c) => ({ ...c, company })); setPage(1); }} />
+        <MultiSelectFilter className="filter-xwide" label="Base Station" value={filters.baseStation} options={options.baseStation} onChange={(baseStation) => { setFilters((c) => ({ ...c, baseStation })); setPage(1); }} />
+        <MultiSelectFilter className="filter-wide" label="Talkgroup" value={filters.talkgroup} options={options.talkgroup} optionLabels={talkgroupLabels} onChange={(talkgroup) => { setFilters((c) => ({ ...c, talkgroup })); setPage(1); }} />
+        <button className="button reset-filter-button" onClick={() => { setFilters(EMPTY_FILTERS); setPage(1); }}><X size={16} /> Reset Filters</button>
+        <span className="filter-count">{formatNumber(filtered.length)} from {formatNumber(records.length)} - {formatPercent(filteredShare)}</span>
+      </section>
+
+      </section>
+
       <section id="command" className="hero-panel">
         <div className="hero-main hero-main-with-icon">
           <img className="hero-call-icon" src="/assets/call.png" alt="Calls under analysis" />
@@ -2941,24 +2959,6 @@ export default function App() {
       {data.warnings.length > 0 && (
         <div className="warning-strip"><AlertTriangle size={18} /> {data.warnings.join(" ")}</div>
       )}
-
-      <section id="filters" className="filters-panel">
-        <label className="search-box search-compact">
-          <span>Search Radio / User</span>
-          <Search size={16} />
-          <input value={filters.search} onChange={(e) => { setFilters((c) => ({ ...c, search: e.target.value })); setPage(1); }} placeholder="Radio ID, alias, user, employee ID" />
-        </label>
-        <MultiSelectFilter className="filter-compact" label="Region" value={filters.region} options={options.region} onChange={(region) => { setFilters((c) => ({ ...c, region })); setPage(1); }} />
-        <MultiSelectFilter className="filter-compact" label="Year" value={filters.year} options={options.year} onChange={(year) => { setFilters((c) => ({ ...c, year })); setPage(1); }} />
-        <MultiSelectFilter className="filter-compact" label="Month" value={filters.month} options={options.month} onChange={(month) => { setFilters((c) => ({ ...c, month })); setPage(1); }} />
-        <MultiSelectFilter className="filter-company" label="Company" value={filters.company} options={options.company} onChange={(company) => { setFilters((c) => ({ ...c, company })); setPage(1); }} />
-        <MultiSelectFilter className="filter-xwide" label="Base Station" value={filters.baseStation} options={options.baseStation} onChange={(baseStation) => { setFilters((c) => ({ ...c, baseStation })); setPage(1); }} />
-        <MultiSelectFilter className="filter-wide" label="Talkgroup" value={filters.talkgroup} options={options.talkgroup} optionLabels={talkgroupLabels} onChange={(talkgroup) => { setFilters((c) => ({ ...c, talkgroup })); setPage(1); }} />
-        <button className="button reset-filter-button" onClick={() => { setFilters(EMPTY_FILTERS); setPage(1); }}><X size={16} /> Reset Filters</button>
-        <span className="filter-count">{formatNumber(filtered.length)} from {formatNumber(records.length)} · {formatPercent(filteredShare)}</span>
-      </section>
-
-      </section>
 
       <section id="reportsTabPanel" className="reports-tab-panel">
         <article className="table-card export-center-card">
