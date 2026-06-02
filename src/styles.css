@@ -8782,18 +8782,18 @@ html:has(.dark-background-theme) {
   display: none !important;
 }
 
-/* NASCO mark matches the ticketing header placement: large, anchored to the upper-left of the shell. */
+/* NASCO mark matches the ticketing header placement: large, anchored to the shell's upper-left edge. */
 .app-shell .cdr-command-shell .followup-style-topbar {
-  position: relative !important;
+  position: static !important;
 }
 
 .app-shell .cdr-command-shell .followup-header-badge-left {
   position: absolute !important;
-  top: -8px !important;
-  left: -10px !important;
-  z-index: 2 !important;
-  width: 150px !important;
-  height: 150px !important;
+  top: 6px !important;
+  left: 6px !important;
+  z-index: 5 !important;
+  width: 170px !important;
+  height: 170px !important;
   display: grid !important;
   place-items: start !important;
   padding: 0 !important;
@@ -8805,8 +8805,8 @@ html:has(.dark-background-theme) {
 }
 
 .app-shell .cdr-command-shell .followup-header-badge-left img {
-  width: 142px !important;
-  height: 142px !important;
+  width: 166px !important;
+  height: 166px !important;
   object-fit: contain !important;
   object-position: top left !important;
   filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.32)) !important;
