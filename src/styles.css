@@ -8781,3 +8781,50 @@ html:has(.dark-background-theme) {
 .app-shell.active-tab-reports > #command {
   display: none !important;
 }
+
+/* NASCO mark matches the ticketing header placement: large, anchored to the upper-left of the shell. */
+.app-shell .cdr-command-shell .followup-style-topbar {
+  position: relative !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left {
+  position: absolute !important;
+  top: -8px !important;
+  left: -10px !important;
+  z-index: 2 !important;
+  width: 150px !important;
+  height: 150px !important;
+  display: grid !important;
+  place-items: start !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left img {
+  width: 142px !important;
+  height: 142px !important;
+  object-fit: contain !important;
+  object-position: top left !important;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.32)) !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .cdr-command-shell .followup-header-badge-left {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: auto !important;
+    height: auto !important;
+    justify-self: center !important;
+    place-items: center !important;
+  }
+
+  .app-shell .cdr-command-shell .followup-header-badge-left img {
+    width: 86px !important;
+    height: 86px !important;
+  }
+}
