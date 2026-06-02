@@ -2109,8 +2109,19 @@ export default function App() {
 
   const regionHourHeatmap = useMemo(() => {
     const topRegions = regionPerformanceRows.slice(0, 8).map((row) => row.name);
+    const topRegionSet = new Set(topRegions);
+    const hourIndex = new Map(heatmapHours.map((hour, index) => [hour, index]));
+    const counts = new Map<string, number[]>();
+    topRegions.forEach((region) => counts.set(region, Array(heatmapHours.length).fill(0)));
+    filtered.forEach((record) => {
+      if (!topRegionSet.has(record.region)) return;
+      const index = hourIndex.get(record.hour);
+      if (index == null) return;
+      const cells = counts.get(record.region);
+      if (cells) cells[index] += 1;
+    });
     return topRegions.map((region) => {
-      const cells = heatmapHours.map((hour) => filtered.filter((record) => record.region === region && record.hour === hour).length);
+      const cells = counts.get(region) ?? [];
       return { region, cells, total: cells.reduce((sum, value) => sum + value, 0) };
     });
   }, [filtered, heatmapHours, regionPerformanceRows]);
@@ -2515,11 +2526,12 @@ export default function App() {
   }, [CompanyPeriodLabel, metrics, peakHour, topCompany]);
 
   const recordExportHeaders = ["SN", "Radio ID", "Radio Alias", "Mobile Type", "Employee Name", "Employee ID", "Region", "Company", "Talkgroup Alias", "Start Time", "End Time", "Duration (s)", "Caller Base Station"];
-  const filteredRecordRows = useMemo(() => filtered.map((r, i) => [i + 1, r.radioId, r.radioAlias, r.mobileType, r.employeeName, r.employeeId, r.region, r.company, r.talkgroup, r.startTime, r.endTime, r.durationSeconds, r.baseStation]), [filtered]);
+  const buildFilteredRecordRows = useCallback(() => filtered.map((r, i) => [i + 1, r.radioId, r.radioAlias, r.mobileType, r.employeeName, r.employeeId, r.region, r.company, r.talkgroup, r.startTime, r.endTime, r.durationSeconds, r.baseStation]), [filtered]);
 
   const exportRows = useCallback(() => {
-    downloadText("premium-cdr-filtered-records.csv", [[exportTitle("Filtered Calls Register")], [], recordExportHeaders, ...filteredRecordRows].map((r) => r.map(csvEscape).join(",")).join("\n"));
-  }, [exportTitle, filteredRecordRows]);
+    const rows = buildFilteredRecordRows();
+    downloadText("premium-cdr-filtered-records.csv", [[exportTitle("Filtered Calls Register")], [], recordExportHeaders, ...rows].map((r) => r.map(csvEscape).join(",")).join("\n"));
+  }, [buildFilteredRecordRows, exportTitle]);
 
   const exportRowsXlsx = useCallback(() => {
     void (async () => {
@@ -2528,14 +2540,14 @@ export default function App() {
       const border = { top: { style: "thin" as const }, left: { style: "thin" as const }, bottom: { style: "thin" as const }, right: { style: "thin" as const } };
       const headerFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFFFF00" } };
       worksheet.addRow([exportTitle("Filtered Calls Register")]); worksheet.mergeCells(1, 1, 1, recordExportHeaders.length);
-      worksheet.addRow(recordExportHeaders); filteredRecordRows.forEach((r) => worksheet.addRow(r));
+      worksheet.addRow(recordExportHeaders); buildFilteredRecordRows().forEach((r) => worksheet.addRow(r));
       worksheet.eachRow((row, rn) => { row.height = rn <= 2 ? 24 : 18; row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true }; cell.border = border; if (rn <= 2) { cell.font = { bold: true, color: { argb: "FF000000" } }; cell.fill = headerFill; } }); });
       worksheet.columns = [{ width: 8 }, { width: 14 }, { width: 18 }, { width: 24 }, { width: 24 }, { width: 14 }, { width: 14 }, { width: 22 }, { width: 24 }, { width: 22 }, { width: 22 }, { width: 14 }, { width: 26 }];
       worksheet.autoFilter = { from: "A2", to: `${excelColumnName(recordExportHeaders.length)}2` };
       const buffer = await workbook.xlsx.writeBuffer();
       downloadBlob("premium-cdr-filtered-records.xlsx", new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
     })();
-  }, [exportTitle, filteredRecordRows]);
+  }, [buildFilteredRecordRows, exportTitle]);
 
   const exportUnmatchedFleetmapXlsx = useCallback(() => {
     const headers = ["Caller Number", "Caller Alias", "Talkgroup", "Call Count", "Total Duration", "First Seen", "Last Seen", "Base Stations", "Reason"];
@@ -2882,6 +2894,13 @@ export default function App() {
     />
   );
 
+  const showOverviewTab = activeTab === "overview";
+  const showFleetTab = activeTab === "fleet";
+  const showRegionTab = activeTab === "region";
+  const showCompanyTab = activeTab === "company";
+  const showKpiTab = activeTab === "kpi";
+  const showReportsTab = activeTab === "reports";
+
   return (
     <main className={`app-shell ${themeClass(theme)} active-tab-${activeTab}`}>
       <section className="cdr-command-shell">
@@ -2986,6 +3005,7 @@ export default function App() {
         <div className="warning-strip"><AlertTriangle size={18} /> {data.warnings.join(" ")}</div>
       )}
 
+      {showReportsTab && (
       <section id="reportsTabPanel" className="reports-tab-panel">
         <article className="table-card export-center-card">
           <h3>Reports & Export Center</h3>
@@ -3003,7 +3023,10 @@ export default function App() {
           </div>
         </article>
       </section>
+      )}
 
+      {showOverviewTab && (
+      <>
       <section className="summary-cards summary-cards-arranged summary-cards-manual-rows summary-cards-10-layout">
         {/* Row 1: first 10 cards */}
         <div className="summary-card-row summary-card-row-10">
@@ -3067,7 +3090,11 @@ export default function App() {
           <span>Try changing or resetting your filters.</span>
         </div>
       )}
+      </>
+      )}
 
+      {showFleetTab && (
+      <>
       <SectionTitle id="networkUtilization" eyebrow="Fleet activation" title={`Network Utilization & Fleet Activation in ${CompanyPeriodLabel}`} text="Compare registered fleetmap radios against radios that made calls in the filtered period." collapsed={isSectionCollapsed("networkUtilization")} onToggle={() => toggleSection("networkUtilization")} />
       <section id="networkUtilization-content" className={`network-utilization-section ${isSectionCollapsed("networkUtilization") ? "section-content-collapsed" : ""}`}>
         <div className="summary-cards network-utilization-cards">
@@ -3178,7 +3205,11 @@ export default function App() {
           </div>
         </article>
       </section>
+      </>
+      )}
 
+      {showRegionTab && (
+      <>
       <SectionTitle id="regionPerformance" eyebrow="Regional deck" title={`Region Performance in ${CompanyPeriodLabel}`} text="Compare regional calls, duration, traffic, active radios, talkgroups, companies, and peak operating periods." collapsed={isSectionCollapsed("regionPerformance")} onToggle={() => toggleSection("regionPerformance")} />
       <section id="regionPerformance-content" className={`region-performance-section ${isSectionCollapsed("regionPerformance") ? "section-content-collapsed" : ""}`}>
         <article className="table-card wide-table-card">
@@ -3211,7 +3242,11 @@ export default function App() {
           </div>
         </article>
       </section>
+      </>
+      )}
 
+      {showCompanyTab && (
+      <>
       <SectionTitle id="talkgroupEfficiency" eyebrow="Talkgroup deck" title={`Talkgroup Efficiency in ${CompanyPeriodLabel}`} text="Rank talkgroups by traffic, active radios, active users, average duration, and peak operating context." collapsed={isSectionCollapsed("talkgroupEfficiency")} onToggle={() => toggleSection("talkgroupEfficiency")} />
       <section id="talkgroupEfficiency-content" className={`talkgroup-efficiency-section ${isSectionCollapsed("talkgroupEfficiency") ? "section-content-collapsed" : ""}`}>
         <article className="table-card wide-table-card">
@@ -3224,7 +3259,11 @@ export default function App() {
           </div>
         </article>
       </section>
+      </>
+      )}
 
+      {showKpiTab && (
+      <>
       <SectionTitle id="kpi" eyebrow="KPI Metrics" title="KPI Measurements" collapsed={isSectionCollapsed("kpi")} onToggle={() => toggleSection("kpi")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportKpiXlsx} /><ExportButton kind="ppt" label="PPT" onClick={exportKpiPpt} /><ExportButton kind="pdf" label="PDF" onClick={exportKpiPdf} /></>} />
       <section id="kpi-content" className={`kpi-grid ${isSectionCollapsed("kpi") ? "section-content-collapsed" : ""}`}>
         <article className="table-card kpi-table kpi-measurements-table-card">
@@ -3316,7 +3355,11 @@ export default function App() {
           </div>
         </article>
       </section>
+      </>
+      )}
 
+      {showCompanyTab && (
+      <>
       <SectionTitle id="Company" eyebrow="Company deck" title={`Company contribution in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Company")} onToggle={() => toggleSection("Company")} actions={<><ExportButton kind="view" label="View" onClick={openMonthlyCompanyTable} /><ExportButton kind="xlsx" label="XLSX" onClick={exportMonthlyCompanyXlsx} /><ExportButton kind="ppt" label="PPT" onClick={exportMonthlyCompanyPpt} /><ExportButton kind="pdf" label="PDF" onClick={exportMonthlyCompanyPdf} /></>} />
       <section id="Company-content" className={`chart-grid dashboard-chart-grid company-chart-grid ${isSectionCollapsed("Company") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card Company-card company-talkgroups" style={{ minWidth: 0, overflow: "hidden" }}>
@@ -3389,7 +3432,11 @@ export default function App() {
           <ChartLegend items={[{ name: "Duration seconds", color: CHART_COLORS.duration }, { name: "No. of calls", color: CHART_COLORS.callsDeep }]} />
         </article>
       </section>
+      </>
+      )}
 
+      {showKpiTab && (
+      <>
       <SectionTitle id="Performance" eyebrow="Performance" title={`Calls & Duration Performance in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Performance")} onToggle={() => toggleSection("Performance")} />
       <section id="Performance-content" className={`chart-grid performance-chart-grid ${isSectionCollapsed("Performance") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card performance-region"><CallsDurationPerformanceChart title="Regions Performance" data={rankings.region} gradientId="performanceRegion" /></article>
@@ -3417,7 +3464,11 @@ export default function App() {
           </ResponsiveContainer>
         </article>
       </section>
+      </>
+      )}
 
+      {showCompanyTab && (
+      <>
       <SectionTitle id="Charts" eyebrow="Top 10" title={`Top 10 per Calls in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Charts")} onToggle={() => toggleSection("Charts")} />
       <section id="Charts-content" className={`chart-grid top-10-row ${isSectionCollapsed("Charts") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card">
@@ -3491,7 +3542,11 @@ export default function App() {
           </div>
         </article>
       </section>
+      </>
+      )}
 
+      {showOverviewTab && (
+      <>
       <SectionTitle id="records" eyebrow="Source records" title={`Filtered Calls Register in selected period (${CompanyPeriodLabel})`} text="Fixed-height rows are shown without table scrolling. Exports include every filtered row." collapsed={isSectionCollapsed("records")} onToggle={() => toggleSection("records")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportRowsXlsx} /><ExportButton kind="pdf" label="PDF" onClick={exportRowsPdfPage} /></>} />
       <section id="records-content" className={`records-card ${isSectionCollapsed("records") ? "section-content-collapsed" : ""}`}>
         <div className="records-scroll records-scroll-fixed-register fixed-row-table">
@@ -3530,6 +3585,8 @@ export default function App() {
           <button className="button" disabled={page >= pageCount} onClick={() => setPage((c) => Math.min(pageCount, c + 1))}>Next</button>
         </div>
       </section>
+      </>
+      )}
 
       {isAddingMoreCdr && (
         <div className="loading-overlay" role="status" aria-live="polite">
