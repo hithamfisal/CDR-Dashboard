@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #071824;
   --bg-2: #0b2130;
   --panel: rgba(13, 35, 50, 0.88);
@@ -475,7 +475,7 @@ body:has(.se-theme) {
   border-color: var(--amber);
 }
 
-/* Workbook card — list of merged CDR sources */
+/* Workbook card - list of merged CDR sources */
 .cdr-sources-list {
   margin: 8px 0 0;
   padding: 8px 10px;
@@ -2442,7 +2442,7 @@ body:has(.light-background-theme) {
 
 /* ============================================================
    Summary cards perfect arrangement
-   First row: Calls → Regions → Companies → Radios → Talkgroups → Base Stations
+   First row: Calls -> Regions -> Companies -> Radios -> Talkgroups -> Base Stations
    ============================================================ */
 
 .summary-cards.summary-cards-arranged {
@@ -3100,7 +3100,7 @@ body:has(.light-background-theme) {
 
 /* ============================================================
    Filter count alignment
-   Keeps "124,175 from 124,175 · 100.0%" vertically centered
+   Keeps "124,175 from 124,175 - 100.0%" vertically centered
    and inline with the filter boxes.
    ============================================================ */
 
@@ -8826,5 +8826,1470 @@ html:has(.dark-background-theme) {
   .app-shell .cdr-command-shell .followup-header-badge-left img {
     width: 86px !important;
     height: 86px !important;
+  }
+}
+
+/* Reports tab: radio usage report */
+.reports-tab-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.report-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.report-card-header h3 {
+  margin: 0 0 6px;
+}
+
+.report-filter-strip {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 10px 0 14px;
+  padding: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 14px;
+  background: rgba(7, 22, 32, 0.46);
+}
+
+.report-row-count {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 211, 252, 0.34);
+  color: var(--text);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.radio-usage-report-scroll {
+  max-height: 680px !important;
+  overflow: auto !important;
+}
+
+.app-shell .radio-usage-report-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  min-width: 1520px;
+  border-collapse: collapse !important;
+}
+
+.app-shell .radio-usage-report-table th,
+.app-shell .radio-usage-report-table td {
+  border: 1px solid rgba(3, 18, 28, 0.9) !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 7px 6px !important;
+}
+
+.app-shell .radio-usage-report-table th {
+  background: #fff200 !important;
+  color: #00131f !important;
+  font-size: clamp(9px, 0.58vw, 12px) !important;
+  font-weight: 950 !important;
+}
+
+.app-shell .radio-usage-report-table td {
+  background: rgba(239, 248, 255, 0.96) !important;
+  color: #061622 !important;
+  font-size: clamp(9px, 0.58vw, 12px) !important;
+  font-weight: 750 !important;
+}
+
+.app-shell .radio-usage-report-table .report-col-sn { width: 42px; }
+.app-shell .radio-usage-report-table .report-col-radio-id { width: 100px; }
+.app-shell .radio-usage-report-table .report-col-radio-alias { width: 150px; }
+.app-shell .radio-usage-report-table .report-col-radio-type { width: 220px; }
+.app-shell .radio-usage-report-table .report-col-employee-name { width: 210px; }
+.app-shell .radio-usage-report-table .report-col-employee-id { width: 120px; }
+.app-shell .radio-usage-report-table .report-col-region { width: 95px; }
+.app-shell .radio-usage-report-table .report-col-company { width: 210px; }
+.app-shell .radio-usage-report-table .report-col-sector { width: 180px; }
+.app-shell .radio-usage-report-table .report-col-department { width: 190px; }
+.app-shell .radio-usage-report-table .report-col-calls { width: 140px; }
+.app-shell .radio-usage-report-table .report-col-duration { width: 170px; }
+
+.app-shell .radio-usage-report-table td:nth-child(5),
+.app-shell .radio-usage-report-table td:nth-child(8),
+.app-shell .radio-usage-report-table td:nth-child(9),
+.app-shell .radio-usage-report-table td:nth-child(10) {
+  text-align: left !important;
+  padding-left: 10px !important;
+}
+
+@media (max-width: 900px) {
+  .report-card-header {
+    flex-direction: column;
+  }
+
+  .report-filter-strip > * {
+    width: 100%;
+  }
+}
+/* File-type export icons */
+.app-shell .export-button {
+  gap: 8px !important;
+  padding-left: 8px !important;
+}
+
+.app-shell .export-type-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  height: 24px !important;
+  padding: 0 7px !important;
+  border-radius: 8px !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  letter-spacing: .03em !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 6px 14px rgba(0,0,0,.16) !important;
+}
+
+.app-shell .export-type-icon svg,
+.app-shell .export-type-icon b {
+  color: #ffffff !important;
+}
+
+.app-shell .export-type-icon-xlsx { background: linear-gradient(135deg, #14804a, #21a366) !important; }
+.app-shell .export-type-icon-csv { background: linear-gradient(135deg, #0d9488, #14b8a6) !important; }
+.app-shell .export-type-icon-pdf { background: linear-gradient(135deg, #b42318, #ef4444) !important; }
+.app-shell .export-type-icon-ppt { background: linear-gradient(135deg, #c2410c, #f97316) !important; }
+.app-shell .export-type-icon-png { background: linear-gradient(135deg, #2563eb, #38bdf8) !important; }
+.app-shell .export-type-icon-view { background: linear-gradient(135deg, #4f46e5, #8b5cf6) !important; }
+
+.app-shell .export-center-actions .export-button {
+  min-height: 42px !important;
+  justify-content: flex-start !important;
+}
+/* File-shaped export icons matching report formats */
+.app-shell .export-button,
+.app-shell .quick-card-export {
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.app-shell .export-button .file-export-svg,
+.app-shell .quick-card-export .file-export-svg {
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.2)) !important;
+}
+
+.app-shell .section-title-actions .export-button .file-export-svg,
+.app-shell .quick-card-export .file-export-svg {
+  width: 24px !important;
+  height: 24px !important;
+  flex-basis: 24px !important;
+}
+
+.app-shell .file-export-svg .file-page {
+  fill: rgba(255,255,255,.98) !important;
+  stroke: var(--file-color, #38bdf8) !important;
+  stroke-width: 3.5 !important;
+  stroke-linejoin: round !important;
+}
+
+.app-shell .file-export-svg .file-fold {
+  fill: rgba(255,255,255,.72) !important;
+  stroke: var(--file-color, #38bdf8) !important;
+  stroke-width: 3.5 !important;
+  stroke-linejoin: round !important;
+}
+
+.app-shell .file-export-svg .file-ribbon {
+  fill: var(--file-color, #38bdf8) !important;
+}
+
+.app-shell .file-export-svg .file-label {
+  fill: #ffffff !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: -.04em !important;
+}
+
+.app-shell .file-export-svg-ppt .file-label {
+  font-size: 10px !important;
+}
+
+.app-shell .file-export-svg .file-lines,
+.app-shell .file-export-svg .file-grid,
+.app-shell .file-export-svg .file-chart,
+.app-shell .file-export-svg .file-mark {
+  fill: none !important;
+  stroke: var(--file-color, #38bdf8) !important;
+  stroke-width: 3.4 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.app-shell .file-export-svg .file-chart {
+  fill: var(--file-color, #d6421f) !important;
+  stroke-width: 2 !important;
+}
+
+.app-shell .file-export-svg-png .file-page,
+.app-shell .file-export-svg-png .file-fold {
+  --file-color: #2563eb;
+}
+
+.app-shell .file-export-svg-png .file-mark {
+  stroke: #2563eb !important;
+  fill: none !important;
+}
+
+.app-shell .file-export-svg-view {
+  fill: none !important;
+  stroke: #8b5cf6 !important;
+  stroke-width: 4 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.app-shell .export-center-actions .export-button {
+  min-height: 48px !important;
+  padding-left: 10px !important;
+  justify-content: flex-start !important;
+}
+/* Export controls aligned with chart titles */
+.app-shell .chart-card-title-row {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 0 2px !important;
+  position: relative !important;
+  z-index: 4 !important;
+}
+
+.app-shell .chart-card-title-row h3 {
+  margin: 0 !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.app-shell .chart-export-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+}
+
+.app-shell .chart-card > .quick-card-export {
+  display: none !important;
+}
+
+.app-shell .chart-export-actions .quick-card-export {
+  min-width: 0 !important;
+  height: 34px !important;
+  padding: 4px 8px !important;
+  margin: 0 !important;
+}
+
+.app-shell .chart-export-actions .quick-card-export .file-export-svg {
+  width: 24px !important;
+  height: 24px !important;
+  flex: 0 0 24px !important;
+}
+
+/* Keep reset filters fully inside the filter container */
+.app-shell .cdr-command-shell .filters-panel {
+  grid-template-columns:
+    minmax(210px, 240px)
+    minmax(92px, 110px)
+    minmax(92px, 110px)
+    minmax(105px, 120px)
+    minmax(160px, 190px)
+    minmax(180px, 220px)
+    minmax(160px, 190px)
+    minmax(160px, 180px)
+    minmax(260px, 1fr) !important;
+}
+
+.app-shell .cdr-command-shell .reset-filter-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .filter-count {
+  justify-self: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+/* =========================================================
+   Final CDR theme standardization layer
+   Keeps the CDR header aligned with the DMR ticketing style.
+   ========================================================= */
+.app-shell,
+.upload-shell {
+  font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100vh !important;
+  overflow-x: hidden !important;
+  letter-spacing: 0 !important;
+}
+
+.app-shell.dark-background-theme,
+.upload-shell.dark-background-theme {
+  --cdr-page-bg: #020914;
+  --cdr-shell-bg: rgba(3, 18, 31, 0.88);
+  --cdr-panel-bg: rgba(5, 24, 38, 0.88);
+  --cdr-panel-bg-strong: rgba(7, 29, 45, 0.96);
+  --cdr-text: #f5fbff;
+  --cdr-muted: #bdd1df;
+  --cdr-border: rgba(71, 190, 236, 0.34);
+  --cdr-input-bg: rgba(2, 16, 27, 0.88);
+  --cdr-button-bg: rgba(7, 33, 50, 0.94);
+  --cdr-button-text: #f5fbff;
+  --cdr-accent: #25c8f2;
+  --cdr-accent-2: #0b98dc;
+  --cdr-header-image: url("/assets/dark.png");
+  background: var(--cdr-page-bg) !important;
+  color: var(--cdr-text) !important;
+}
+
+.app-shell.light-background-theme,
+.upload-shell.light-background-theme {
+  --cdr-page-bg: #f4f8fb;
+  --cdr-shell-bg: rgba(255, 255, 255, 0.9);
+  --cdr-panel-bg: rgba(255, 255, 255, 0.92);
+  --cdr-panel-bg-strong: rgba(255, 255, 255, 0.98);
+  --cdr-text: #092033;
+  --cdr-muted: #38596d;
+  --cdr-border: rgba(0, 115, 170, 0.28);
+  --cdr-input-bg: rgba(255, 255, 255, 0.94);
+  --cdr-button-bg: rgba(255, 255, 255, 0.92);
+  --cdr-button-text: #092033;
+  --cdr-accent: #0aa6df;
+  --cdr-accent-2: #0074c7;
+  --cdr-header-image: url("/assets/light.png");
+  background: var(--cdr-page-bg) !important;
+  color: var(--cdr-text) !important;
+}
+
+.app-shell *,
+.upload-shell * {
+  letter-spacing: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell .cdr-command-shell {
+  position: relative !important;
+  width: calc(100% - 36px) !important;
+  max-width: none !important;
+  margin: 16px auto 18px !important;
+  padding: 22px 22px 20px !important;
+  border-radius: 30px !important;
+  border: 1px solid var(--cdr-border) !important;
+  overflow: hidden !important;
+  background-image:
+    linear-gradient(90deg, rgba(1, 10, 20, 0.58), rgba(1, 17, 30, 0.34)),
+    var(--cdr-header-image) !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.26) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell {
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0.48), rgba(255,255,255,0.22)),
+    var(--cdr-header-image) !important;
+  box-shadow: 0 18px 38px rgba(15, 77, 112, 0.14) !important;
+}
+
+.app-shell .cdr-command-shell::before,
+.app-shell .cdr-command-shell::after,
+.app-shell .cdr-command-shell .followup-style-topbar::before,
+.app-shell .cdr-command-shell .followup-style-topbar::after {
+  display: none !important;
+  content: none !important;
+}
+
+.app-shell .cdr-command-shell > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.app-shell .cdr-command-shell .followup-style-topbar {
+  display: grid !important;
+  grid-template-columns: 116px minmax(0, 1fr) 116px !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  gap: 14px 18px !important;
+  min-height: 184px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left {
+  grid-column: 1 !important;
+  grid-row: 1 / 3 !important;
+  align-self: start !important;
+  justify-self: start !important;
+  width: 104px !important;
+  height: 104px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left img {
+  width: 104px !important;
+  height: 104px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: center !important;
+  width: 100% !important;
+  max-width: 1060px !important;
+  margin: 8px auto 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title h1 {
+  margin: 0 !important;
+  color: #f7fbff !important;
+  font-size: clamp(2.35rem, 4.35vw, 5.25rem) !important;
+  line-height: 1.02 !important;
+  font-weight: 950 !important;
+  font-style: italic !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 5px 14px rgba(0, 0, 0, 0.42) !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title h1 {
+  color: #092033 !important;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.85), 0 8px 20px rgba(0, 92, 145, 0.18) !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-actions {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+.app-shell .button,
+.upload-shell .button,
+.app-shell .dashboard-tab,
+.app-shell .section-top-button,
+.upload-shell .followup-theme-button {
+  min-width: 0 !important;
+  border: 1px solid var(--cdr-border) !important;
+  border-radius: 999px !important;
+  background: var(--cdr-button-bg) !important;
+  color: var(--cdr-button-text) !important;
+  font-weight: 850 !important;
+  text-shadow: none !important;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.12) !important;
+}
+
+.app-shell .button svg:not(.file-export-svg),
+.upload-shell .button svg:not(.file-export-svg),
+.upload-shell .followup-theme-button svg:not(.file-export-svg) {
+  color: currentColor !important;
+  stroke: currentColor !important;
+  fill: none !important;
+  flex: 0 0 auto !important;
+}
+
+.app-shell .button.primary,
+.app-shell .dashboard-tab.active,
+.app-shell .button:hover,
+.upload-shell .button:hover,
+.upload-shell .followup-theme-button:hover {
+  background: linear-gradient(135deg, var(--cdr-accent), #5bb7ff) !important;
+  color: #02121f !important;
+  border-color: rgba(95, 214, 255, 0.78) !important;
+}
+
+.app-shell .button:disabled,
+.upload-shell .button:disabled {
+  opacity: 0.62 !important;
+  color: var(--cdr-muted) !important;
+  background: rgba(90, 116, 130, 0.24) !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-actions .button {
+  min-height: 54px !important;
+  padding: 0 24px !important;
+  font-size: 1.02rem !important;
+  line-height: 1 !important;
+  gap: 10px !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 12px 0 0 !important;
+  padding: 12px 14px !important;
+  border-radius: 24px !important;
+  border: 1px solid var(--cdr-border) !important;
+  background: rgba(2, 19, 30, 0.72) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs {
+  background: rgba(255,255,255,0.78) !important;
+}
+
+.app-shell .dashboard-tab {
+  height: 44px !important;
+  padding: 0 18px !important;
+  font-size: 0.92rem !important;
+  color: var(--cdr-muted) !important;
+}
+
+.app-shell .dashboard-tab.active {
+  color: #02121f !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel {
+  width: 100% !important;
+  margin: 14px 0 0 !important;
+  padding: 12px !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--cdr-border) !important;
+  background: rgba(2, 18, 29, 0.72) !important;
+  align-items: end !important;
+  gap: 10px !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .filters-panel {
+  background: rgba(255,255,255,0.84) !important;
+}
+
+.app-shell .search-box span,
+.app-shell .filter-field span,
+.app-shell .multi-select-filter > span,
+.app-shell label > span,
+.upload-shell label > span {
+  color: var(--cdr-muted) !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  font-size: 0.78rem !important;
+}
+
+.app-shell .search-box,
+.app-shell .filter-field,
+.app-shell .multi-select-filter {
+  color: var(--cdr-text) !important;
+}
+
+.app-shell input,
+.app-shell select,
+.app-shell textarea,
+.app-shell .multi-select-trigger,
+.upload-shell input,
+.upload-shell select,
+.upload-shell textarea {
+  background: var(--cdr-input-bg) !important;
+  color: var(--cdr-text) !important;
+  border: 1px solid var(--cdr-border) !important;
+  border-radius: 8px !important;
+  font-weight: 650 !important;
+}
+
+.app-shell input::placeholder,
+.upload-shell input::placeholder {
+  color: color-mix(in srgb, var(--cdr-muted) 72%, transparent) !important;
+  opacity: 1 !important;
+}
+
+.app-shell .filter-count {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 40px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--cdr-border) !important;
+  background: rgba(8, 38, 56, 0.8) !important;
+  color: var(--cdr-text) !important;
+  font-weight: 900 !important;
+}
+
+.app-shell.light-background-theme .filter-count {
+  background: rgba(255,255,255,0.92) !important;
+}
+
+.app-shell .hero-panel,
+.app-shell .warning-strip {
+  width: calc(100% - 36px) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  color: var(--cdr-text) !important;
+  background: var(--cdr-panel-bg) !important;
+  border: 1px solid var(--cdr-border) !important;
+}
+
+.app-shell .section-title,
+.app-shell .chart-card,
+.app-shell .table-card,
+.app-shell .records-card,
+.app-shell .summary-card,
+.app-shell .data-table-shell,
+.app-shell .export-center-card {
+  color: var(--cdr-text) !important;
+  background: var(--cdr-panel-bg-strong) !important;
+  border: 1px solid var(--cdr-border) !important;
+}
+
+.app-shell .section-title h2,
+.app-shell .chart-card h3,
+.app-shell .table-card h3,
+.app-shell .records-card h3,
+.app-shell .summary-card strong,
+.app-shell .hero-main h2,
+.app-shell .workbook-card strong {
+  color: var(--cdr-text) !important;
+  font-weight: 900 !important;
+}
+
+.app-shell .section-title p,
+.app-shell .section-title span,
+.app-shell .chart-card p,
+.app-shell .table-note,
+.app-shell .summary-card small,
+.app-shell .workbook-card p,
+.app-shell .workbook-card span {
+  color: var(--cdr-muted) !important;
+  font-weight: 700 !important;
+}
+
+.app-shell table,
+.app-shell .data-table {
+  color: var(--cdr-text) !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell th,
+.app-shell td {
+  border: 1px solid color-mix(in srgb, var(--cdr-border) 72%, transparent) !important;
+  color: var(--cdr-text) !important;
+  font-weight: 650 !important;
+}
+
+.app-shell th {
+  background: color-mix(in srgb, var(--cdr-accent) 22%, var(--cdr-panel-bg-strong)) !important;
+  color: var(--cdr-text) !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+}
+
+.app-shell td {
+  background: color-mix(in srgb, var(--cdr-panel-bg-strong) 92%, transparent) !important;
+  text-align: center !important;
+}
+
+.app-shell .chart-card-title-row {
+  align-items: center !important;
+  gap: 12px !important;
+  margin-bottom: 4px !important;
+}
+
+.app-shell .chart-card-title-row h3 {
+  text-align: left !important;
+}
+
+.app-shell .chart-export-actions,
+.app-shell .section-title-actions,
+.app-shell .export-center-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.app-shell .export-button,
+.app-shell .quick-card-export {
+  min-height: 36px !important;
+  padding: 5px 10px !important;
+  gap: 7px !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .file-export-svg {
+  overflow: visible !important;
+  flex: 0 0 auto !important;
+}
+
+.app-shell .file-export-svg .file-page {
+  fill: #ffffff !important;
+  stroke: var(--file-color, #38bdf8) !important;
+}
+
+.app-shell .file-export-svg .file-label {
+  fill: #ffffff !important;
+  font-weight: 900 !important;
+}
+
+.upload-shell .followup-upload-card {
+  background-image:
+    linear-gradient(90deg, rgba(2, 14, 25, 0.74), rgba(2, 20, 32, 0.46)),
+    var(--cdr-header-image) !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
+  color: var(--cdr-text) !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-card {
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0.7), rgba(255,255,255,0.35)),
+    var(--cdr-header-image) !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell .cdr-command-shell .followup-style-topbar {
+    grid-template-columns: 88px minmax(0, 1fr) !important;
+    min-height: 0 !important;
+  }
+  .app-shell .cdr-command-shell .followup-header-badge-left,
+  .app-shell .cdr-command-shell .followup-header-badge-left img {
+    width: 82px !important;
+    height: 82px !important;
+  }
+  .app-shell .cdr-command-shell .followup-dashboard-title h1 {
+    white-space: normal !important;
+    font-size: clamp(2rem, 7vw, 3.8rem) !important;
+  }
+  .app-shell .cdr-command-shell .followup-header-actions {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell .cdr-command-shell,
+  .app-shell .hero-panel,
+  .app-shell .warning-strip {
+    width: calc(100% - 20px) !important;
+  }
+  .app-shell .cdr-command-shell {
+    padding: 16px 12px !important;
+    border-radius: 22px !important;
+  }
+  .app-shell .cdr-command-shell .followup-style-topbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  .app-shell .cdr-command-shell .followup-header-badge-left {
+    align-self: flex-start !important;
+  }
+  .app-shell .cdr-command-shell .followup-header-actions .button {
+    min-height: 44px !important;
+    padding: 0 14px !important;
+    font-size: 0.92rem !important;
+  }
+}
+
+
+
+/* =========================================================
+   Full-width correction pass
+   ========================================================= */
+html,
+body,
+#root {
+  width: 100% !important;
+  min-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.app-shell,
+.upload-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.app-shell > *,
+.app-shell > section,
+.app-shell > div,
+.app-shell > article,
+.app-shell > nav,
+.app-shell > header {
+  max-width: none !important;
+}
+
+.app-shell .cdr-command-shell,
+.app-shell.active-tab-overview .cdr-command-shell,
+.app-shell .hero-panel,
+.app-shell .warning-strip,
+.app-shell .section-title,
+.app-shell .summary-cards,
+.app-shell .data-quality-panel,
+.app-shell .chart-grid,
+.app-shell .department-grid,
+.app-shell .performance-section,
+.app-shell .reports-tab-panel,
+.app-shell .table-card,
+.app-shell .records-card {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.app-shell .cdr-command-shell {
+  margin-top: 0 !important;
+  margin-bottom: 18px !important;
+  border-left-width: 0 !important;
+  border-right-width: 0 !important;
+  border-radius: 0 0 28px 28px !important;
+  background-image:
+    linear-gradient(90deg, rgba(1, 10, 20, 0.54), rgba(1, 17, 30, 0.28)),
+    var(--cdr-header-image) !important;
+  background-size: cover !important;
+  background-position: center top !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell {
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0.38), rgba(255,255,255,0.18)),
+    var(--cdr-header-image) !important;
+}
+
+.app-shell .hero-panel,
+.app-shell .warning-strip,
+.app-shell .section-title,
+.app-shell .summary-cards,
+.app-shell .data-quality-panel,
+.app-shell .chart-grid,
+.app-shell .department-grid,
+.app-shell .performance-section,
+.app-shell .reports-tab-panel,
+.app-shell .records-card {
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+
+.app-shell .chart-grid,
+.app-shell .department-grid,
+.app-shell .performance-section,
+.app-shell .summary-cards {
+  box-sizing: border-box !important;
+}
+
+.upload-shell.dark-background-theme {
+  background: #020914 !important;
+}
+
+.upload-shell.light-background-theme {
+  background: #f4f8fb !important;
+}
+
+.upload-shell .followup-upload-shell {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 24px !important;
+  background: transparent !important;
+}
+
+.upload-shell .followup-upload-card {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100vh - 48px) !important;
+  margin: 0 !important;
+  border-radius: 26px !important;
+  background-image: none !important;
+  background-color: var(--cdr-panel-bg-strong) !important;
+  color: var(--cdr-text) !important;
+}
+
+.upload-shell .followup-upload-visual {
+  overflow: hidden !important;
+  border-radius: 20px !important;
+  background: #061a2a !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual {
+  background: #eef6fb !important;
+}
+
+.upload-shell .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 420px !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+}
+
+@media (max-width: 760px) {
+  .app-shell .cdr-command-shell,
+  .app-shell .hero-panel,
+  .app-shell .warning-strip,
+  .app-shell .section-title,
+  .app-shell .summary-cards,
+  .app-shell .chart-grid,
+  .app-shell .department-grid,
+  .app-shell .performance-section,
+  .app-shell .reports-tab-panel,
+  .app-shell .records-card {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .upload-shell .followup-upload-shell {
+    padding: 10px !important;
+  }
+
+  .upload-shell .followup-upload-card {
+    min-height: calc(100vh - 20px) !important;
+  }
+}
+
+/* =========================================================
+   Header image placement and filter-row balance
+   ========================================================= */
+.app-shell.dark-background-theme,
+.app-shell.light-background-theme {
+  --cdr-header-image: url("/assets/h.png") !important;
+}
+
+.app-shell .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell {
+  background-image:
+    linear-gradient(90deg, rgba(1, 10, 20, 0.44), rgba(1, 17, 30, 0.16)),
+    var(--cdr-header-image) !important;
+  background-size: 100% 100% !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell {
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06)),
+    var(--cdr-header-image) !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel {
+  display: grid !important;
+  grid-template-columns:
+    minmax(180px, 230px)
+    minmax(90px, 116px)
+    minmax(90px, 116px)
+    minmax(100px, 130px)
+    minmax(160px, 210px)
+    minmax(190px, 240px)
+    minmax(160px, 210px)
+    minmax(132px, 158px)
+    minmax(240px, 1fr) !important;
+  align-items: end !important;
+  overflow: hidden !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > .search-box.search-compact {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 230px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > .search-box.search-compact input {
+  min-width: 0 !important;
+  width: 100% !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .cdr-command-shell .reset-filter-button {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 158px !important;
+  padding-inline: 10px !important;
+}
+
+.app-shell .cdr-command-shell .filter-count {
+  justify-self: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding-inline: 12px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+@media (max-width: 1500px) {
+  .app-shell .cdr-command-shell .filters-panel {
+    grid-template-columns:
+      minmax(160px, 210px)
+      minmax(86px, 108px)
+      minmax(86px, 108px)
+      minmax(96px, 120px)
+      minmax(145px, 185px)
+      minmax(160px, 205px)
+      minmax(145px, 185px)
+      minmax(120px, 145px)
+      minmax(210px, 1fr) !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .app-shell .cdr-command-shell .filters-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .app-shell .cdr-command-shell .filters-panel > .search-box.search-compact,
+  .app-shell .cdr-command-shell .reset-filter-button,
+  .app-shell .cdr-command-shell .filter-count {
+    max-width: none !important;
+  }
+}
+
+/* =========================================================
+   Definitive no-dim full-viewport theme image fix
+   ========================================================= */
+.app-shell .cdr-command-shell,
+.app-shell.dark-background-theme .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme .cdr-command-shell {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  margin-top: 0 !important;
+  padding-left: clamp(18px, 2.4vw, 46px) !important;
+  padding-right: clamp(18px, 2.4vw, 46px) !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-radius: 0 0 28px 28px !important;
+  background-color: transparent !important;
+  background-image: url("/assets/h.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.app-shell .cdr-command-shell::before,
+.app-shell .cdr-command-shell::after,
+.app-shell .cdr-command-shell > .topbar::before,
+.app-shell .cdr-command-shell > .topbar::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  opacity: 0 !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title h1 {
+  color: #ffffff !important;
+  text-shadow: 0 4px 0 rgba(0, 27, 54, 0.55), 0 10px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+.upload-shell .followup-upload-visual {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 440px !important;
+  background: #ffffff !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual {
+  background: #041528 !important;
+}
+
+.upload-shell .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.upload-shell .followup-upload-card {
+  background-image: none !important;
+  background-color: var(--cdr-panel-bg-strong) !important;
+}
+
+/* =========================================================
+   Single real header image layer - no duplicate backgrounds
+   ========================================================= */
+.app-shell .cdr-command-shell,
+.app-shell.dark-background-theme .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme .cdr-command-shell {
+  position: relative !important;
+  isolation: isolate !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  background: transparent !important;
+  background-image: none !important;
+  background-color: transparent !important;
+  overflow: hidden !important;
+}
+
+.app-shell .cdr-command-shell .cdr-command-theme-image {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: fill !important;
+  object-position: center center !important;
+  display: block !important;
+  opacity: 1 !important;
+  filter: none !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+.app-shell .cdr-command-shell::before,
+.app-shell .cdr-command-shell::after,
+.app-shell.dark-background-theme .cdr-command-shell::before,
+.app-shell.dark-background-theme .cdr-command-shell::after,
+.app-shell.light-background-theme .cdr-command-shell::before,
+.app-shell.light-background-theme .cdr-command-shell::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  background-image: none !important;
+}
+
+.app-shell .cdr-command-shell > :not(.cdr-command-theme-image) {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* =========================================================
+   Upload page: one clean h.png only inside the visual box
+   ========================================================= */
+html:has(.upload-shell),
+body:has(.upload-shell),
+body:has(.upload-shell.light-background-theme),
+body:has(.upload-shell.dark-background-theme),
+html:has(.upload-shell.light-background-theme),
+html:has(.upload-shell.dark-background-theme),
+.upload-shell,
+.upload-shell.light-background-theme,
+.upload-shell.dark-background-theme {
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-color: var(--cdr-page-bg, #f4f8fb) !important;
+}
+
+.upload-shell.dark-background-theme {
+  --cdr-page-bg: #020914 !important;
+}
+
+.upload-shell.light-background-theme {
+  --cdr-page-bg: #eef5f9 !important;
+}
+
+.upload-shell::before,
+.upload-shell::after,
+.upload-shell.light-background-theme::before,
+.upload-shell.light-background-theme::after,
+.upload-shell.dark-background-theme::before,
+.upload-shell.dark-background-theme::after,
+.upload-shell .followup-upload-shell::before,
+.upload-shell .followup-upload-shell::after,
+.upload-shell .followup-upload-card::before,
+.upload-shell .followup-upload-card::after,
+.upload-shell .followup-upload-visual::before,
+.upload-shell .followup-upload-visual::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  background-image: none !important;
+  opacity: 0 !important;
+}
+
+.upload-shell .followup-upload-shell {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+.upload-shell .followup-upload-card,
+.upload-shell.light-background-theme .followup-upload-card,
+.upload-shell.dark-background-theme .followup-upload-card {
+  position: relative !important;
+  background-image: none !important;
+  background-color: var(--cdr-panel-bg-strong, #ffffff) !important;
+  overflow: hidden !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-card {
+  background-color: rgba(5, 20, 34, 0.98) !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-card {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+.upload-shell .followup-upload-visual,
+.upload-shell.light-background-theme .followup-upload-visual,
+.upload-shell.dark-background-theme .followup-upload-visual {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  min-height: 430px !important;
+  padding: 0 !important;
+  background-image: none !important;
+  background-color: #f8fbfd !important;
+  border: 1px solid rgba(28, 103, 151, 0.24) !important;
+  border-radius: 20px !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual {
+  background-color: #061a2a !important;
+}
+
+.upload-shell .followup-upload-visual img,
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  content: normal !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+.upload-shell .followup-ready-card,
+.upload-shell.light-background-theme .followup-ready-card,
+.upload-shell.dark-background-theme .followup-ready-card {
+  background: rgba(4, 20, 34, 0.9) !important;
+  border: 1px solid rgba(91, 199, 245, 0.35) !important;
+  color: #f4fbff !important;
+}
+
+.upload-shell .followup-ready-card span,
+.upload-shell .followup-ready-card strong,
+.upload-shell .followup-ready-card p {
+  color: #f4fbff !important;
+  opacity: 1 !important;
+}
+
+.upload-shell .followup-ready-card span {
+  color: #74d7ff !important;
+}
+
+/* Header right-side Saudi Energy logo */
+.app-shell .cdr-command-shell .followup-header-badge-right {
+  grid-column: 3 !important;
+  grid-row: 1 / 3 !important;
+  align-self: start !important;
+  justify-self: end !important;
+  width: 130px !important;
+  height: 108px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-right img {
+  width: 126px !important;
+  height: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  filter: drop-shadow(0 6px 12px rgba(0, 25, 60, 0.22)) !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell .cdr-command-shell .followup-header-badge-right {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    width: 90px !important;
+    height: 78px !important;
+  }
+  .app-shell .cdr-command-shell .followup-header-badge-right img {
+    width: 88px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell .cdr-command-shell .followup-header-badge-right {
+    position: absolute !important;
+    top: 14px !important;
+    right: 14px !important;
+    width: 74px !important;
+    height: 64px !important;
+  }
+  .app-shell .cdr-command-shell .followup-header-badge-right img {
+    width: 72px !important;
+  }
+}
+
+/* Make SE logo mirror NASCO size and placement */
+.app-shell .cdr-command-shell .followup-header-badge-right {
+  grid-column: 3 !important;
+  grid-row: 1 / 3 !important;
+  align-self: start !important;
+  justify-self: end !important;
+  width: 104px !important;
+  height: 104px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-right img {
+  width: 104px !important;
+  height: 104px !important;
+  object-fit: contain !important;
+  object-position: top right !important;
+  display: block !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell .cdr-command-shell .followup-header-badge-right,
+  .app-shell .cdr-command-shell .followup-header-badge-right img {
+    width: 82px !important;
+    height: 82px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell .cdr-command-shell .followup-header-badge-right {
+    top: 16px !important;
+    right: 16px !important;
+  }
+  .app-shell .cdr-command-shell .followup-header-badge-right,
+  .app-shell .cdr-command-shell .followup-header-badge-right img {
+    width: 72px !important;
+    height: 72px !important;
+  }
+}
+
+/* Pin both header logos to the shell corners */
+.app-shell .cdr-command-shell .followup-style-topbar {
+  position: relative !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left,
+.app-shell .cdr-command-shell .followup-header-badge-right {
+  position: absolute !important;
+  top: 0 !important;
+  width: 104px !important;
+  height: 104px !important;
+  z-index: 4 !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left {
+  left: 0 !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-right {
+  right: 0 !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left img,
+.app-shell .cdr-command-shell .followup-header-badge-right img {
+  width: 104px !important;
+  height: 104px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell .cdr-command-shell .followup-header-badge-left,
+  .app-shell .cdr-command-shell .followup-header-badge-right,
+  .app-shell .cdr-command-shell .followup-header-badge-left img,
+  .app-shell .cdr-command-shell .followup-header-badge-right img {
+    width: 82px !important;
+    height: 82px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell .cdr-command-shell .followup-header-badge-left,
+  .app-shell .cdr-command-shell .followup-header-badge-right {
+    top: 0 !important;
+  }
+  .app-shell .cdr-command-shell .followup-header-badge-left,
+  .app-shell .cdr-command-shell .followup-header-badge-right,
+  .app-shell .cdr-command-shell .followup-header-badge-left img,
+  .app-shell .cdr-command-shell .followup-header-badge-right img {
+    width: 72px !important;
+    height: 72px !important;
   }
 }

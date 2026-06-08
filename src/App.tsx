@@ -1,4 +1,4 @@
-import { CSSProperties, ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import { CSSProperties, ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import ExcelJS from "exceljs";
 import html2canvas from "html2canvas";
@@ -14,7 +14,6 @@ import {
   ChevronDown,
   CheckCircle2,
   Clock3,
-  Download,
   Eye,
   FileImage,
   FileSpreadsheet,
@@ -304,7 +303,7 @@ function cleanRawSystemValue(value: unknown, fallback = "") {
 
 function numericText(value: unknown) {
   const text = `${value ?? ""}`
-    .replace(/^﻿/, "")
+    .replace(/^\ufeff/, "")
     .replace(/^,+|,+$/g, "")
     .replace(/	/g, "")
     .trim()
@@ -405,7 +404,7 @@ function parseDate(value: unknown) {
   }
 
   const text = `${value ?? ""}`
-    .replace(/^﻿/, "")
+    .replace(/^\ufeff/, "")
     .replace(/^,+|,+$/g, "")
     .replace(/	/g, "")
     .trim()
@@ -545,7 +544,7 @@ function baseStationOrRadioType(baseStation: string, mobileType: string) {
   return isKnownLabel(baseStation) ? baseStation : (isKnownLabel(mobileType) ? mobileType : "Unknown");
 }
 
-// ─── Fleetmap helpers ────────────────────────────────────────────────
+// Fleetmap helpers
 
 function parseFleetmap(workbook: XLSX.WorkBook, source: "master" | "fixed"): FleetmapRecord[] {
   const preferred = workbook.SheetNames.find((n) => /fleet|master|fixed|lookup/i.test(n));
@@ -577,7 +576,7 @@ function unionFleetmaps(master: FleetmapRecord[], fixed: FleetmapRecord[]): Flee
   return [...map.values()];
 }
 
-// ─── Workbook parser ─────────────────────────────────────────────────
+// Workbook parser
 
 function parseWorkbook(workbook: XLSX.WorkBook, fileName: string, fleetmap: FleetmapRecord[] = []): DashboardData {
   const sourceSheet = workbook.SheetNames.includes("Raw_Data") ? "Raw_Data" : workbook.SheetNames[0];
@@ -1237,17 +1236,19 @@ function fileSlug(value: string) {
 }
 
 function exportIconSvg(kind: "png" | "xlsx" | "ppt" | "pdf" | "view" | "csv") {
-  const paths = {
-    png: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>',
-    xlsx: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m9 15 4-4"/><path d="m9 11 4 4"/>',
-    ppt: '<path d="M3 4h18"/><path d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4"/><path d="M12 16v4"/><path d="M8 20h8"/><path d="M9 12V8h3a2 2 0 0 1 0 4Z"/>',
-    pdf: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 17v-4h1.5a1.5 1.5 0 0 1 0 3H8"/><path d="M13 13v4"/><path d="M13 13h1.5a2 2 0 0 1 0 4H13"/><path d="M18 13h-2v4"/><path d="M16 15h1.5"/>',
-    view: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
-    csv: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 16h8"/><path d="M8 12h8"/>',
-  };
-  return `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[kind]}</svg>`;
+  if (kind === "view") return `<svg class="file-export-svg file-export-svg-view" viewBox="0 0 64 64" aria-hidden="true"><path d="M6 32s9-16 26-16 26 16 26 16-9 16-26 16S6 32 6 32Z"/><circle cx="32" cy="32" r="8"/></svg>`;
+  if (kind === "png") return `<svg class="file-export-svg file-export-svg-png" viewBox="0 0 64 64" aria-hidden="true"><path class="file-page" d="M14 5h25l11 11v43H14Z"/><path class="file-fold" d="M39 5v12h11"/><circle class="file-mark" cx="25" cy="24" r="5"/><path class="file-mark" d="m18 49 11-13 7 8 5-6 8 11Z"/></svg>`;
+  const meta = {
+    pdf: { label: "PDF", color: "#ef1b2d", grid: false, chart: false },
+    xlsx: { label: "XLSX", color: "#21a366", grid: false, chart: false },
+    csv: { label: "CSV", color: "#45c957", grid: true, chart: false },
+    ppt: { label: "PPTX", color: "#d6421f", grid: false, chart: true },
+  }[kind];
+  const grid = meta.grid ? `<path class="file-grid" d="M22 36h20M22 44h20M22 52h20M29 30v27M37 30v27"/>` : "";
+  const chart = meta.chart ? `<path class="file-chart" d="M28 48a10 10 0 1 0 10-10v10Z"/><path class="file-chart" d="M39 37a10 10 0 0 1 9 9h-9Z"/>` : "";
+  const lines = !meta.grid && !meta.chart ? `<path class="file-lines" d="M21 23h22M21 30h22M21 37h18"/>` : "";
+  return `<svg class="file-export-svg file-export-svg-${kind}" viewBox="0 0 64 64" aria-hidden="true" style="--file-color:${meta.color}"><path class="file-page" d="M14 5h25l11 11v43H14Z"/><path class="file-fold" d="M39 5v12h11"/>${lines}${grid}${chart}<rect class="file-ribbon" x="6" y="34" width="52" height="20" rx="3"/><text class="file-label" x="32" y="49" text-anchor="middle">${meta.label}</text></svg>`;
 }
-
 function escapeXml(value: unknown) {
   return `${value ?? ""}`.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
@@ -1257,9 +1258,67 @@ function htmlEscape(value: unknown) {
 }
 
 const ARABIC_TEXT_RE = /[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]/;
+const PDF_ARABIC_FONT = "TahomaArabic";
+const PDF_ARABIC_FONT_FILE = "tahoma.ttf";
+let pdfArabicFontBase64: string | null = null;
+let pdfArabicFontLoadPromise: Promise<string | null> | null = null;
 
 function hasArabicText(value: unknown) {
   return ARABIC_TEXT_RE.test(`${value ?? ""}`);
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
+
+function loadPdfArabicFontBase64() {
+  if (pdfArabicFontBase64) return Promise.resolve(pdfArabicFontBase64);
+  if (!pdfArabicFontLoadPromise) {
+    pdfArabicFontLoadPromise = fetch(`/assets/${PDF_ARABIC_FONT_FILE}`)
+      .then((response) => response.ok ? response.arrayBuffer() : null)
+      .then((buffer) => {
+        pdfArabicFontBase64 = buffer ? arrayBufferToBase64(buffer) : null;
+        return pdfArabicFontBase64;
+      })
+      .catch(() => null);
+  }
+  return pdfArabicFontLoadPromise;
+}
+
+async function ensurePdfArabicFont(pdf: jsPDF) {
+  const fontBase64 = await loadPdfArabicFontBase64();
+  if (!fontBase64) return;
+  const pdfWithFont = pdf as unknown as {
+    addFileToVFS: (fileName: string, data: string) => void;
+    addFont: (fileName: string, fontName: string, fontStyle: string) => void;
+  };
+  pdfWithFont.addFileToVFS(PDF_ARABIC_FONT_FILE, fontBase64);
+  pdfWithFont.addFont(PDF_ARABIC_FONT_FILE, PDF_ARABIC_FONT, "normal");
+  pdfWithFont.addFont(PDF_ARABIC_FONT_FILE, PDF_ARABIC_FONT, "bold");
+}
+
+function applyWorkbookArabicSupport(workbook: ExcelJS.Workbook) {
+  workbook.eachSheet((worksheet) => {
+    worksheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        const rtl = hasArabicText(cell.value);
+        cell.font = { ...(cell.font ?? {}), name: "Arial" };
+        cell.alignment = {
+          ...(cell.alignment ?? {}),
+          wrapText: true,
+          vertical: cell.alignment?.vertical ?? "middle",
+          readingOrder: rtl ? "rtl" : "ltr",
+        } as Partial<ExcelJS.Alignment>;
+      });
+    });
+  });
 }
 
 function pdfExportText(pdf: jsPDF, value: unknown) {
@@ -1270,7 +1329,19 @@ function pdfExportText(pdf: jsPDF, value: unknown) {
 }
 
 function pdfText(pdf: jsPDF, value: unknown, x: number, y: number, options?: Parameters<jsPDF["text"]>[3]) {
-  pdf.text(pdfExportText(pdf, value), x, y, options);
+  const rtl = hasArabicText(value);
+  const api = pdf as unknown as { setR2L?: (enabled: boolean) => void; getR2L?: () => boolean };
+  const previousR2L = api.getR2L?.() ?? false;
+  const previousFont = pdf.getFont();
+  if (rtl) {
+    api.setR2L?.(true);
+    if (pdfArabicFontBase64) pdf.setFont(PDF_ARABIC_FONT, previousFont.fontStyle === "bold" ? "bold" : "normal");
+  }
+  pdf.text(pdfExportText(pdf, value), x, y, { ...(options ?? {}), ...(rtl ? { isInputRtl: true, isOutputRtl: true } : {}) } as Parameters<jsPDF["text"]>[3]);
+  if (rtl) {
+    api.setR2L?.(previousR2L);
+    pdf.setFont(previousFont.fontName, previousFont.fontStyle);
+  }
 }
 
 function pptTextOptions<T extends Record<string, unknown>>(value: unknown, options: T): T & { fontFace: string; lang: string; rtlMode?: boolean } {
@@ -1424,7 +1495,7 @@ async function loadFleetmapFromBrowser(key: string): Promise<{ records: Fleetmap
   return data;
 }
 
-// ─── Upload view ─────────────────────────────────────────────────────
+// Upload view
 
 function UploadView({
   onUploadCdr, onUploadRawSystem, onUploadMasterFleetmap, onUploadFixedFleetmap,
@@ -1510,10 +1581,10 @@ function UploadView({
           </div>
 
           <div className="followup-upload-visual">
-            <img src={theme === "light" ? "/assets/light.png" : "/assets/dark.png"} alt="" />
+            <img src="/assets/h.png" alt="Saudi Energy theme" />
             <div className="followup-ready-card">
               <span>READY FOR</span>
-              <strong>CDR · Fleetmap · Raw Logs</strong>
+              <strong>CDR - Fleetmap - Raw Logs</strong>
               <p>Traffic, utilization, regions, users, talkgroups, and export reports.</p>
             </div>
           </div>
@@ -1535,7 +1606,7 @@ function UploadView({
 }
 
 
-// ─── Shared sub-components ────────────────────────────────────────────
+// Shared sub-components
 
 function MetricCard({ label, value, detail, icon: Icon, tone = "blue" }: { label: string; value: string; detail: string; icon: typeof Activity; tone?: "blue" | "amber" | "green" | "red" }) {
   return (
@@ -1547,16 +1618,31 @@ function MetricCard({ label, value, detail, icon: Icon, tone = "blue" }: { label
   );
 }
 
-function ExportButton({ kind, label, onClick, title }: { kind: "xlsx" | "ppt" | "pdf" | "view" | "csv" | "png"; label: string; onClick: () => void; title?: string }) {
-  const icons = { xlsx: FileSpreadsheet, ppt: Presentation, pdf: FileText, view: Eye, csv: Download, png: FileImage };
-  const Icon = icons[kind];
+function FileTypeIcon({ kind }: { kind: "xlsx" | "ppt" | "pdf" | "view" | "csv" | "png" }) {
+  if (kind === "view") return <svg className="file-export-svg file-export-svg-view" viewBox="0 0 64 64" aria-hidden="true"><path d="M6 32s9-16 26-16 26 16 26 16-9 16-26 16S6 32 6 32Z" /><circle cx="32" cy="32" r="8" /></svg>;
+  if (kind === "png") return <svg className="file-export-svg file-export-svg-png" viewBox="0 0 64 64" aria-hidden="true"><path className="file-page" d="M14 5h25l11 11v43H14Z" /><path className="file-fold" d="M39 5v12h11" /><circle className="file-mark" cx="25" cy="24" r="5" /><path className="file-mark" d="m18 49 11-13 7 8 5-6 8 11Z" /></svg>;
+  const meta = {
+    pdf: { label: "PDF", color: "#ef1b2d", grid: false, chart: false },
+    xlsx: { label: "XLSX", color: "#21a366", grid: false, chart: false },
+    csv: { label: "CSV", color: "#45c957", grid: true, chart: false },
+    ppt: { label: "PPTX", color: "#d6421f", grid: false, chart: true },
+  }[kind];
   return (
-    <button className={`button small export-button export-button-${kind}`} type="button" onClick={onClick} title={title ?? label}>
-      <Icon size={14} /><span>{label}</span>
-    </button>
+    <svg className={`file-export-svg file-export-svg-${kind}`} viewBox="0 0 64 64" aria-hidden="true" style={{ "--file-color": meta.color } as CSSProperties}>
+      <path className="file-page" d="M14 5h25l11 11v43H14Z" />
+      <path className="file-fold" d="M39 5v12h11" />
+      {!meta.grid && !meta.chart && <path className="file-lines" d="M21 23h22M21 30h22M21 37h18" />}
+      {meta.grid && <path className="file-grid" d="M22 36h20M22 44h20M22 52h20M29 30v27M37 30v27" />}
+      {meta.chart && <><path className="file-chart" d="M28 48a10 10 0 1 0 10-10v10Z" /><path className="file-chart" d="M39 37a10 10 0 0 1 9 9h-9Z" /></>}
+      <rect className="file-ribbon" x="6" y="34" width="52" height="20" rx="3" />
+      <text className="file-label" x="32" y="49" textAnchor="middle">{meta.label}</text>
+    </svg>
   );
 }
 
+function ExportButton({ kind, label, onClick, title }: { kind: "xlsx" | "ppt" | "pdf" | "view" | "csv" | "png"; label: string; onClick: () => void; title?: string }) {
+  return <button className={`button small export-button export-button-${kind}`} type="button" onClick={onClick} title={title ?? label}><FileTypeIcon kind={kind} /><span>{label}</span></button>;
+}
 function SectionTitle({ id, eyebrow, title, text, actions, collapsed = false, onToggle }: { id?: string; eyebrow: string; title: string; text?: string; actions?: ReactNode; collapsed?: boolean; onToggle?: () => void }) {
   return (
     <div id={id} className={`section-title ${collapsed ? "section-title-collapsed" : ""}`}>
@@ -1653,7 +1739,7 @@ function MultiSelectFilter({ label, value, options, optionLabels, onChange, show
   );
 }
 
-// ─── Main App ─────────────────────────────────────────────────────────
+// Main App
 
 export default function App() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -2520,11 +2606,20 @@ export default function App() {
   }, [records]);
   const qualityScore = Math.max(0, 100 - qualityIssues.reduce((s, i) => s + i.pct, 0));
 
-  const exportSummary = useCallback(() => {
-    const rows = [["Metric", "Value"], ["Total calls", metrics.totalCalls], ["Traffic hours", formatDecimal(metrics.trafficHours, 2)], ["Average duration", secondsToClock(metrics.averageDuration)], ["Active radios", metrics.radios], ["Companies", metrics.companies], ["Regions", metrics.regions], ["Period", CompanyPeriodLabel], ["Top company", topCompany?.name ?? ""], ["Peak hour", peakHour?.name ?? ""]];
-    downloadText("premium-cdr-summary.csv", rows.map((r) => r.map(csvEscape).join(",")).join("\n"));
-  }, [CompanyPeriodLabel, metrics, peakHour, topCompany]);
-
+  const cdrSummaryRows = useMemo<(string | number)[][]>(() => [
+    ["Total calls", formatNumber(metrics.totalCalls)],
+    ["Traffic hours", formatDecimal(metrics.trafficHours, 2)],
+    ["Total duration", secondsToClock(metrics.totalDuration)],
+    ["Average duration", secondsToClock(metrics.averageDuration)],
+    ["Active radios", formatNumber(metrics.radios)],
+    ["Companies", formatNumber(metrics.companies)],
+    ["Regions", formatNumber(metrics.regions)],
+    ["Base stations", formatNumber(metrics.stations)],
+    ["Talkgroups", formatNumber(metrics.talkgroups)],
+    ["Period", CompanyPeriodLabel],
+    ["Top company", topCompany?.name ?? ""],
+    ["Peak hour", peakHour?.name ?? ""],
+  ], [CompanyPeriodLabel, metrics, peakHour, topCompany]);
   const recordExportHeaders = ["SN", "Radio ID", "Radio Alias", "Mobile Type", "Employee Name", "Employee ID", "Region", "Company", "Talkgroup Alias", "Start Time", "End Time", "Duration (s)", "Caller Base Station"];
   const buildFilteredRecordRows = useCallback(() => filtered.map((r, i) => [i + 1, r.radioId, r.radioAlias, r.mobileType, r.employeeName, r.employeeId, r.region, r.company, r.talkgroup, r.startTime, r.endTime, r.durationSeconds, r.baseStation]), [filtered]);
 
@@ -2536,19 +2631,24 @@ export default function App() {
   const exportRowsXlsx = useCallback(() => {
     void (async () => {
       const workbook = new ExcelJS.Workbook(); workbook.creator = "CDR Dashboard";
-      const worksheet = workbook.addWorksheet("Filtered Calls Register", { views: [{ showGridLines: false }] });
       const border = { top: { style: "thin" as const }, left: { style: "thin" as const }, bottom: { style: "thin" as const }, right: { style: "thin" as const } };
+      const titleFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FF1F4E79" } };
       const headerFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFFFF00" } };
+      const styleSheet = (sheet: ExcelJS.Worksheet, titleRows = 1) => { sheet.eachRow((row, rn) => { row.height = rn <= titleRows + 1 ? 24 : 18; row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true }; cell.border = border; if (rn <= titleRows) { cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; cell.fill = titleFill; } if (rn === titleRows + 1) { cell.font = { bold: true, color: { argb: "FF000000" } }; cell.fill = headerFill; } }); }); };
+      const summarySheet = workbook.addWorksheet("CDR Summary", { views: [{ showGridLines: false }] });
+      summarySheet.addRow([exportTitle("CDR Summary")]); summarySheet.mergeCells(1, 1, 1, 2);
+      summarySheet.addRow(["Metric", "Value"]); cdrSummaryRows.forEach((row) => summarySheet.addRow(row));
+      summarySheet.columns = [{ width: 24 }, { width: 38 }]; summarySheet.autoFilter = { from: "A2", to: "B2" }; styleSheet(summarySheet);
+      const worksheet = workbook.addWorksheet("Filtered Calls Register", { views: [{ showGridLines: false }] });
       worksheet.addRow([exportTitle("Filtered Calls Register")]); worksheet.mergeCells(1, 1, 1, recordExportHeaders.length);
       worksheet.addRow(recordExportHeaders); buildFilteredRecordRows().forEach((r) => worksheet.addRow(r));
-      worksheet.eachRow((row, rn) => { row.height = rn <= 2 ? 24 : 18; row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true }; cell.border = border; if (rn <= 2) { cell.font = { bold: true, color: { argb: "FF000000" } }; cell.fill = headerFill; } }); });
       worksheet.columns = [{ width: 8 }, { width: 14 }, { width: 18 }, { width: 24 }, { width: 24 }, { width: 14 }, { width: 14 }, { width: 22 }, { width: 24 }, { width: 22 }, { width: 22 }, { width: 14 }, { width: 26 }];
-      worksheet.autoFilter = { from: "A2", to: `${excelColumnName(recordExportHeaders.length)}2` };
+      worksheet.autoFilter = { from: "A2", to: `${excelColumnName(recordExportHeaders.length)}2` }; styleSheet(worksheet);
+      applyWorkbookArabicSupport(workbook);
       const buffer = await workbook.xlsx.writeBuffer();
       downloadBlob("premium-cdr-filtered-records.xlsx", new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
     })();
-  }, [buildFilteredRecordRows, exportTitle]);
-
+  }, [buildFilteredRecordRows, cdrSummaryRows, exportTitle]);
   const exportUnmatchedFleetmapXlsx = useCallback(() => {
     const headers = ["Caller Number", "Caller Alias", "Talkgroup", "Call Count", "Total Duration", "First Seen", "Last Seen", "Base Stations", "Reason"];
     downloadWorkbookData(
@@ -2573,33 +2673,22 @@ export default function App() {
   }, [CompanyPeriodLabel, exportTitle, unmatchedFleetmapReportRows]);
 
   const exportRowsPdfPage = useCallback(() => {
-    const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const margin = 18;
-    const tableWidth = pageWidth - margin * 2;
-    const colWeights = [0.42, 0.78, 0.9, 1.18, 1.18, 0.78, 0.78, 1.05, 1.15, 0.95, 0.95, 0.65, 1.18];
-    const totalWeight = colWeights.reduce((s, w) => s + w, 0);
-    const colWidths = colWeights.map((w) => tableWidth * w / totalWeight);
-    const rows = pagedRecords.map((r, i) => [(page - 1) * 50 + i + 1, r.radioId, r.radioAlias, r.mobileType, r.employeeName, r.employeeId, r.region, r.company, r.talkgroup, r.startTime, r.endTime, r.durationSeconds, r.baseStation]);
-    const allRows = [recordExportHeaders, ...rows];
-    let y = 44; const rowHeight = 10;
-    pdf.setFont("helvetica", "bold"); pdf.setFontSize(14);
-    pdfText(pdf, `${exportTitle("Filtered Calls Register")} - Page ${page}`, pageWidth / 2, 24, { align: "center" });
-    allRows.forEach((row, ri) => {
-      let x = margin;
-      row.forEach((cell, ci) => {
-        const width = colWidths[ci];
-        pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff");
-        pdf.rect(x, y, width, rowHeight, "FD");
-        pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 4.5 : 4.7); pdf.setTextColor(0, 0, 0);
-        pdfText(pdf, cell, x + width / 2, y + 7, { align: "center", maxWidth: width - 2 });
-        x += width;
-      });
-      y += rowHeight;
-    });
-    pdf.save(`premium-cdr-filtered-records-page-${page}.pdf`);
-  }, [exportTitle, page, pagedRecords]);
-
+    void (async () => {
+      const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+      await ensurePdfArabicFont(pdf);
+      const pageWidth = pdf.internal.pageSize.getWidth(); const margin = 18; const tableWidth = pageWidth - margin * 2;
+      const colWeights = [0.42, 0.78, 0.9, 1.18, 1.18, 0.78, 0.78, 1.05, 1.15, 0.95, 0.95, 0.65, 1.18];
+      const totalWeight = colWeights.reduce((s, w) => s + w, 0); const colWidths = colWeights.map((w) => tableWidth * w / totalWeight);
+      const rows = pagedRecords.map((r, i) => [(page - 1) * 50 + i + 1, r.radioId, r.radioAlias, r.mobileType, r.employeeName, r.employeeId, r.region, r.company, r.talkgroup, r.startTime, r.endTime, r.durationSeconds, r.baseStation]);
+      const allRows = [recordExportHeaders, ...rows]; let y = 34;
+      pdf.setFont("helvetica", "bold"); pdf.setFontSize(14); pdfText(pdf, `${exportTitle("Filtered Calls Register")} - Page ${page}`, pageWidth / 2, 22, { align: "center" });
+      const summaryCols = 4; const summaryGap = 4; const summaryCellWidth = (tableWidth - summaryGap * (summaryCols - 1)) / summaryCols; const summaryRowHeight = 18;
+      cdrSummaryRows.forEach((row, index) => { const col = index % summaryCols; const rowIndex = Math.floor(index / summaryCols); const x = margin + col * (summaryCellWidth + summaryGap); const sy = y + rowIndex * summaryRowHeight; pdf.setDrawColor(20, 36, 48); pdf.setFillColor("#ffffff"); pdf.rect(x, sy, summaryCellWidth, summaryRowHeight, "FD"); pdf.setFillColor("#fff200"); pdf.rect(x, sy, summaryCellWidth * 0.45, summaryRowHeight, "FD"); pdf.setFont("helvetica", "bold"); pdf.setFontSize(6.5); pdf.setTextColor(0, 0, 0); pdfText(pdf, row[0], x + 4, sy + 11.5, { maxWidth: summaryCellWidth * 0.45 - 8 }); pdf.setFont("helvetica", "normal"); pdf.setFontSize(6.5); pdfText(pdf, row[1], x + summaryCellWidth * 0.45 + 4, sy + 11.5, { maxWidth: summaryCellWidth * 0.55 - 8 }); });
+      y += Math.ceil(cdrSummaryRows.length / summaryCols) * summaryRowHeight + 10; const rowHeight = 8.5;
+      allRows.forEach((row, ri) => { let x = margin; row.forEach((cell, ci) => { const width = colWidths[ci]; pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff"); pdf.rect(x, y, width, rowHeight, "FD"); pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 4.2 : 4.35); pdf.setTextColor(0, 0, 0); pdfText(pdf, cell, x + width / 2, y + 6, { align: "center", maxWidth: width - 2 }); x += width; }); y += rowHeight; });
+      pdf.save(`premium-cdr-filtered-records-page-${page}.pdf`);
+    })();
+  }, [cdrSummaryRows, exportTitle, page, pagedRecords]);
   const exportUtilizationXlsx = useCallback(() => {
     void (async () => {
       const workbook = new ExcelJS.Workbook(); workbook.creator = "CDR Dashboard";
@@ -2850,32 +2939,23 @@ export default function App() {
     if (!data) return;
     const cards = Array.from(document.querySelectorAll<HTMLElement>(".app-shell .chart-card"));
     const buttons: HTMLButtonElement[] = [];
+    const titleRows: HTMLElement[] = [];
     cards.forEach((card) => {
       if (card.querySelector(".chart-export-actions")) return;
-      const title = card.querySelector("h3")?.textContent?.trim() || "Dashboard Card";
+      const heading = card.querySelector<HTMLElement>("h3");
+      const title = heading?.textContent?.trim() || "Dashboard Card";
+      if (!heading) return;
+      const titleRow = document.createElement("div"); titleRow.className = "chart-card-title-row";
+      const actions = document.createElement("div"); actions.className = "chart-export-actions";
+      card.insertBefore(titleRow, heading); titleRow.appendChild(heading); titleRow.appendChild(actions); titleRows.push(titleRow);
       const dataset = chartExportDatasets[title];
-      if (dataset) {
-        const xlsxButton = document.createElement("button");
-        xlsxButton.type = "button"; xlsxButton.className = "button small quick-card-export quick-card-export-xlsx";
-        xlsxButton.innerHTML = `${exportIconSvg("xlsx")}<span>XLSX</span>`; xlsxButton.title = `Export ${title} data`;
-        xlsxButton.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); downloadWorkbookData(`${fileSlug(exportTitle(title))}.xlsx`, title, exportTitle(title), dataset); });
-        card.appendChild(xlsxButton); buttons.push(xlsxButton);
-      }
-      const button = document.createElement("button");
-      button.type = "button"; button.className = "button small quick-card-export";
-      button.innerHTML = `${exportIconSvg("png")}<span>PNG</span>`; button.title = `Export ${title}`;
-      button.addEventListener("click", async (e) => {
-        e.preventDefault(); e.stopPropagation();
-        const exportButtons = Array.from(card.querySelectorAll<HTMLElement>(".quick-card-export"));
-        exportButtons.forEach((b) => { b.style.visibility = "hidden"; });
-        try { await new Promise((resolve) => requestAnimationFrame(resolve)); const image = await captureElementPng(card, "#0f1b24"); downloadDataUrl(`${fileSlug(exportTitle(title))}.png`, image); }
-        finally { exportButtons.forEach((b) => { b.style.visibility = ""; }); }
-      });
-      card.appendChild(button); buttons.push(button);
+      if (dataset) { const xlsxButton = document.createElement("button"); xlsxButton.type = "button"; xlsxButton.className = "button small quick-card-export quick-card-export-xlsx"; xlsxButton.innerHTML = `${exportIconSvg("xlsx")}<span>XLSX</span>`; xlsxButton.title = `Export ${title} data`; xlsxButton.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); downloadWorkbookData(`${fileSlug(exportTitle(title))}.xlsx`, title, exportTitle(title), dataset); }); actions.appendChild(xlsxButton); buttons.push(xlsxButton); }
+      const button = document.createElement("button"); button.type = "button"; button.className = "button small quick-card-export"; button.innerHTML = `${exportIconSvg("png")}<span>PNG</span>`; button.title = `Export ${title}`;
+      button.addEventListener("click", async (e) => { e.preventDefault(); e.stopPropagation(); const exportButtons = Array.from(card.querySelectorAll<HTMLElement>(".quick-card-export")); exportButtons.forEach((b) => { b.style.visibility = "hidden"; }); try { await new Promise((resolve) => requestAnimationFrame(resolve)); const image = await captureElementPng(card, "#0f1b24"); downloadDataUrl(`${fileSlug(exportTitle(title))}.png`, image); } finally { exportButtons.forEach((b) => { b.style.visibility = ""; }); } });
+      actions.appendChild(button); buttons.push(button);
     });
-    return () => buttons.forEach((b) => b.remove());
+    return () => { buttons.forEach((b) => b.remove()); titleRows.forEach((row) => { const heading = row.querySelector("h3"); if (heading && row.parentElement) row.parentElement.insertBefore(heading, row); row.remove(); }); };
   }, [CompanyPeriodLabel, chartExportDatasets, data, exportTitle, filtered.length, page]);
-
   if (!data) return (
     <UploadView
       onUploadCdr={handleUpload}
@@ -2904,6 +2984,7 @@ export default function App() {
   return (
     <main className={`app-shell ${themeClass(theme)} active-tab-${activeTab}`}>
       <section className="cdr-command-shell">
+        <img className="cdr-command-theme-image" src={theme === "light" ? "/assets/light-bg.png" : "/assets/dark-bg.png"} alt="" aria-hidden="true" />
       <header className="topbar followup-style-topbar">
         <div className="followup-header-badge followup-header-badge-left">
           <img src="/assets/nascologo.png" alt="NASCO" />
@@ -2911,6 +2992,10 @@ export default function App() {
 
         <div className="followup-dashboard-title">
           <h1>CDR TRAFFIC DASHBOARD</h1>
+        </div>
+
+        <div className="followup-header-badge followup-header-badge-right">
+          <img src="/assets/se.png" alt="Saudi Energy" />
         </div>
 
         <div className="followup-header-actions">
@@ -2987,15 +3072,15 @@ export default function App() {
           {data.cdrSources.length > 1 && (
             <ul className="cdr-sources-list">
               {data.cdrSources.map((src, i) => (
-                <li key={`${src.fileName}-${i}`}><strong>{src.fileName}</strong> — {formatNumber(src.recordCount)} rows</li>
+                <li key={`${src.fileName}-${i}`}><strong>{src.fileName}</strong> - {formatNumber(src.recordCount)} rows</li>
               ))}
             </ul>
           )}
           {(masterFleetmap.meta || fixedFleetmap.meta) && (
             <p className="fleetmap-status">
-              Fleetmap: {masterFleetmap.meta ? `Master (${formatNumber(masterFleetmap.records.length)})` : "—"}
+              Fleetmap: {masterFleetmap.meta ? `Master (${formatNumber(masterFleetmap.records.length)})` : "-"}
               {" + "}
-              {fixedFleetmap.meta ? `Fixed (${formatNumber(fixedFleetmap.records.length)})` : "—"}
+              {fixedFleetmap.meta ? `Fixed (${formatNumber(fixedFleetmap.records.length)})` : "-"}
             </p>
           )}
         </div>
@@ -3011,15 +3096,14 @@ export default function App() {
           <h3>Reports & Export Center</h3>
           <p className="table-note">Export the current filtered dashboard view, KPI data, row register, utilization analysis, and unmatched fleetmap report.</p>
           <div className="export-center-actions">
-            <button className="button primary" type="button" onClick={exportSummary}><Download size={16} /> Summary CSV</button>
-            <button className="button" type="button" onClick={exportRows}><Download size={16} /> Filtered Rows CSV</button>
-            <ExportButton kind="xlsx" label="KPI XLSX" onClick={exportKpiXlsx} />
-            <ExportButton kind="pdf" label="KPI PDF" onClick={exportKpiPdf} />
-            <ExportButton kind="xlsx" label="Utilization XLSX" onClick={exportUtilizationXlsx} />
-            <ExportButton kind="pdf" label="Utilization PDF" onClick={exportUtilizationPdf} />
+            <ExportButton kind="xlsx" label="CDR Report" onClick={exportRowsXlsx} />
+            <ExportButton kind="pdf" label="CDR Report" onClick={exportRowsPdfPage} />
+            <ExportButton kind="xlsx" label="KPI Report" onClick={exportKpiXlsx} />
+            <ExportButton kind="pdf" label="KPI Report" onClick={exportKpiPdf} />
+            <ExportButton kind="ppt" label="KPI Report" onClick={exportKpiPpt} />
+            <ExportButton kind="xlsx" label="Utilization Report" onClick={exportUtilizationXlsx} />
+            <ExportButton kind="pdf" label="Utilization Report" onClick={exportUtilizationPdf} />
             <ExportButton kind="xlsx" label="Unmatched Report" onClick={exportUnmatchedFleetmapXlsx} />
-            <ExportButton kind="xlsx" label="Register XLSX" onClick={exportRowsXlsx} />
-            <ExportButton kind="pdf" label="Register PDF" onClick={exportRowsPdfPage} />
           </div>
         </article>
       </section>
@@ -3233,7 +3317,7 @@ export default function App() {
           <div className="summary-card yellow"><span>Traffic / Region</span><strong>{formatDecimal(trafficIntensity.trafficPerRegion, 2)}</strong><small>Erlangs</small></div>
         </div>
         <article className="table-card wide-table-card">
-          <h3>Region × Hour Busy Map</h3>
+          <h3>Region x Hour Busy Map</h3>
           <div className="heatmap-scroll">
             <table className="busy-heatmap-table">
               <thead><tr><th>Region</th>{heatmapHours.map((hour) => <th key={hour}>{hour}</th>)}<th>Total</th></tr></thead>
@@ -3264,7 +3348,7 @@ export default function App() {
 
       {showKpiTab && (
       <>
-      <SectionTitle id="kpi" eyebrow="KPI Metrics" title="KPI Measurements" collapsed={isSectionCollapsed("kpi")} onToggle={() => toggleSection("kpi")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportKpiXlsx} /><ExportButton kind="ppt" label="PPT" onClick={exportKpiPpt} /><ExportButton kind="pdf" label="PDF" onClick={exportKpiPdf} /></>} />
+      <SectionTitle id="kpi" eyebrow="KPI Metrics" title="KPI Measurements" collapsed={isSectionCollapsed("kpi")} onToggle={() => toggleSection("kpi")} />
       <section id="kpi-content" className={`kpi-grid ${isSectionCollapsed("kpi") ? "section-content-collapsed" : ""}`}>
         <article className="table-card kpi-table kpi-measurements-table-card">
           <h3>KPI Measurements</h3>
@@ -3364,7 +3448,7 @@ export default function App() {
       <section id="Company-content" className={`chart-grid dashboard-chart-grid company-chart-grid ${isSectionCollapsed("Company") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card Company-card company-talkgroups" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Talkgroups per Company</h3>
-          <p>Total {formatNumber(sumValues(CompanyChartData.totalTalkgroups))} &nbsp;·&nbsp; Used {formatNumber(sumValues(CompanyChartData.talkgroupsUsed))}</p>
+          <p>Total {formatNumber(sumValues(CompanyChartData.totalTalkgroups))} &nbsp;-&nbsp; Used {formatNumber(sumValues(CompanyChartData.talkgroupsUsed))}</p>
           <ChartLegend items={[{ name: "Total talkgroups", color: CHART_COLORS.total }, { name: "Used talkgroups", color: CHART_COLORS.used }]} />
           <ResponsiveContainer width="100%" height={340}>
             <BarChart data={CompanyChartData.totalTalkgroups.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.talkgroupsUsed.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
@@ -3378,7 +3462,7 @@ export default function App() {
         </article>
         <article className="chart-card Company-card company-radios" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Radios per Company</h3>
-          <p>Total {formatNumber(sumValues(CompanyChartData.totalUsers))} &nbsp;·&nbsp; Made Calls {formatNumber(sumValues(CompanyChartData.callingUsers))}</p>
+          <p>Total {formatNumber(sumValues(CompanyChartData.totalUsers))} &nbsp;-&nbsp; Made Calls {formatNumber(sumValues(CompanyChartData.callingUsers))}</p>
           <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.totalGreen }, { name: "Radios made calls", color: CHART_COLORS.usedGreen }]} />
           <ResponsiveContainer width="100%" height={340}>
             <BarChart data={CompanyChartData.totalUsers.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.callingUsers.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
@@ -3601,3 +3685,12 @@ export default function App() {
     </main>
   );
 }
+
+
+
+
+
+
+
+
+
