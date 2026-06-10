@@ -192,7 +192,7 @@ a { color: inherit; }
 .topbar::-webkit-scrollbar { display: none; }
 
 .brand-block { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: center; white-space: nowrap; flex-shrink: 0; }
-.brand-block img { grid-row: span 2; width: 54px; height: 54px; object-fit: contain; }
+.brand-block img { grid-row: span 2; width: 40px; height: 40px; object-fit: contain; }
 .brand-block p { margin: 0; color: var(--muted); font-weight: 700; }
 .brand-block h1 { margin: 0; font-size: clamp(18px, 2vw, 28px); letter-spacing: -.03em; }
 
@@ -11231,4 +11231,19 @@ html:has(.upload-shell.dark-background-theme),
 
 .app-shell .cdr-command-shell > .cdr-banner-control-bar .cdr-control-actions {
   transform: translateY(4px) !important;
+}
+
+/* FINAL CDR HEADER HEIGHT INCREASE */
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  grid-template-rows: 172px !important;
+  min-height: 172px !important;
+  height: 172px !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art .cdr-banner-svg {
+  min-height: 172px !important;
 }

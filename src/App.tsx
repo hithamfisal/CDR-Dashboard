@@ -3062,7 +3062,7 @@ export default function App() {
                 <path d="M1352 66 C1256 46 1176 44 1092 63 S990 78 904 61" stroke="#ef4444" strokeWidth="2.2" opacity="0.68" />
               </g>
 
-              <g className="cdr-risk-shield" transform="translate(710 -8)" filter="url(#cdr-risk-soft-glow)">
+              <g className="cdr-risk-shield" transform="translate(780 8) scale(0.5)" filter="url(#cdr-risk-soft-glow)">
                 <path d="M10 0 L30 8 V22 C30 38 21 48 10 55 C-1 48 -10 38 -10 22 V8 Z" fill="rgba(5,22,55,0.80)" stroke="rgba(0,206,209,0.66)" strokeWidth="1.5" />
                 <path d="M3 24 l5 5 10 -14" fill="none" stroke="rgba(0,206,209,0.92)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </g>
