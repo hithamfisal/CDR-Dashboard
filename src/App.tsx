@@ -1430,6 +1430,14 @@ type ThemeName = "dark" | "light";
 
 function themeClass(theme: ThemeName) { return theme === "light" ? "light-background-theme" : "dark-background-theme"; }
 
+function useTheme() {
+  const [theme, setTheme] = useState<ThemeName>("light");
+  const isDark = theme === "dark";
+  const toggleTheme = useCallback(() => setTheme((current) => (current === "light" ? "dark" : "light")), []);
+
+  return { theme, isDark, toggleTheme };
+}
+
 function workbookMeta(data: DashboardData): SavedWorkbookMeta {
   return { fileName: data.fileName, sourceSheet: data.sourceSheet, loadedAt: data.loadedAt, rawRows: data.rawRows };
 }
@@ -1752,14 +1760,13 @@ export default function App() {
   const [masterFleetmap, setMasterFleetmap] = useState<FleetmapState>({ records: [], meta: null, isParsing: false });
   const [fixedFleetmap, setFixedFleetmap]   = useState<FleetmapState>({ records: [], meta: null, isParsing: false });
   const [page, setPage] = useState(1);
-  const [theme, setTheme] = useState<ThemeName>("light");
+  const { theme, isDark, toggleTheme } = useTheme();
   const [activeSection, setActiveSection] = useState(SECTION_NAV_ITEMS[0]?.id ?? "kpi");
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
     () => new Set()
   );
 
-  const toggleTheme = useCallback(() => setTheme((c) => (c === "light" ? "dark" : "light")), []);
   const scrollToSection = useCallback((id: string) => {
     setActiveSection(id);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2984,45 +2991,138 @@ export default function App() {
   return (
     <main className={`app-shell ${themeClass(theme)} active-tab-${activeTab}`}>
       <section className="cdr-command-shell">
-        <img className="cdr-command-theme-image" src={theme === "light" ? "/assets/light-bg.png" : "/assets/dark-bg.png"} alt="" aria-hidden="true" />
-      <header className="topbar followup-style-topbar">
-        <div className="followup-header-badge followup-header-badge-left">
-          <img src="/assets/nascologo.png" alt="NASCO" />
+        <header className="topbar followup-style-topbar cdr-navy-banner">
+          <div className="cdr-banner-art" aria-hidden="true">
+            <svg className="cdr-banner-svg" viewBox="0 0 1440 132" preserveAspectRatio="none">
+              <defs>
+                <pattern id="cdr-risk-dot-grid" width="34" height="24" patternUnits="userSpaceOnUse">
+                  <circle cx="3" cy="3" r="1.15" fill="rgba(118,178,255,0.38)" />
+                </pattern>
+                <filter id="cdr-risk-soft-glow" x="-80%" y="-80%" width="260%" height="260%">
+                  <feGaussianBlur stdDeviation="5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <radialGradient id="cdr-risk-left-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#7dd3fc" stopOpacity="0.54" />
+                  <stop offset="42%" stopColor="#0ea5e9" stopOpacity="0.28" />
+                  <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
+                </radialGradient>
+                <radialGradient id="cdr-risk-right-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#fb7185" stopOpacity="0.60" />
+                  <stop offset="44%" stopColor="#ef4444" stopOpacity="0.34" />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="cdr-risk-blue-wave" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.82" />
+                  <stop offset="48%" stopColor="#0284c7" stopOpacity="0.58" />
+                  <stop offset="100%" stopColor="#00ced1" stopOpacity="0.18" />
+                </linearGradient>
+                <linearGradient id="cdr-risk-teal-wave" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#00ced1" stopOpacity="0.45" />
+                  <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.12" />
+                </linearGradient>
+                <linearGradient id="cdr-risk-red-wave" x1="1" y1="0" x2="0" y2="0">
+                  <stop offset="0%" stopColor="#f87171" stopOpacity="0.78" />
+                  <stop offset="48%" stopColor="#b91c1c" stopOpacity="0.54" />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity="0.16" />
+                </linearGradient>
+                <linearGradient id="cdr-risk-frame" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#00ced1" stopOpacity="0" />
+                  <stop offset="14%" stopColor="#00ced1" stopOpacity="0.72" />
+                  <stop offset="44%" stopColor="#38bdf8" stopOpacity="0.18" />
+                  <stop offset="58%" stopColor="#38bdf8" stopOpacity="0.18" />
+                  <stop offset="86%" stopColor="#ef4444" stopOpacity="0.64" />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+
+              <rect x="0" y="0" width="1440" height="132" fill="url(#cdr-risk-dot-grid)" opacity="0.42" />
+              <ellipse cx="74" cy="66" rx="170" ry="92" fill="url(#cdr-risk-left-glow)" opacity="0.92" />
+              <ellipse cx="1366" cy="66" rx="170" ry="92" fill="url(#cdr-risk-right-glow)" opacity="0.96" />
+
+              <g className="cdr-risk-frame-lines" filter="url(#cdr-risk-soft-glow)">
+                <line x1="0" y1="25" x2="408" y2="25" stroke="url(#cdr-risk-frame)" strokeWidth="1.7" opacity="0.88" />
+                <line x1="1032" y1="25" x2="1440" y2="25" stroke="url(#cdr-risk-frame)" strokeWidth="1.7" opacity="0.76" />
+                <line x1="0" y1="118" x2="408" y2="118" stroke="rgba(0,206,209,0.24)" strokeWidth="1.3" opacity="0.80" />
+                <line x1="1032" y1="118" x2="1440" y2="118" stroke="rgba(239,68,68,0.24)" strokeWidth="1.3" opacity="0.80" />
+              </g>
+
+              <g className="cdr-risk-blue-waves" fill="none" strokeLinecap="round" filter="url(#cdr-risk-soft-glow)">
+                <path d="M-24 87 C94 54 144 101 246 70 S390 60 548 88" stroke="url(#cdr-risk-blue-wave)" strokeWidth="3" opacity="0.92" />
+                <path d="M-34 105 C88 84 144 123 248 92 S414 84 548 106" stroke="url(#cdr-risk-teal-wave)" strokeWidth="2" opacity="0.82" />
+                <path d="M88 66 C184 46 264 44 348 63 S450 78 536 61" stroke="#0ea5e9" strokeWidth="2.2" opacity="0.72" />
+              </g>
+
+              <g className="cdr-risk-red-waves" fill="none" strokeLinecap="round" filter="url(#cdr-risk-soft-glow)">
+                <path d="M1464 87 C1346 54 1296 101 1194 70 S1050 60 892 88" stroke="url(#cdr-risk-red-wave)" strokeWidth="3" opacity="0.88" />
+                <path d="M1474 105 C1352 84 1296 123 1192 92 S1026 84 892 106" stroke="#7f1d1d" strokeWidth="2" opacity="0.56" />
+                <path d="M1352 66 C1256 46 1176 44 1092 63 S990 78 904 61" stroke="#ef4444" strokeWidth="2.2" opacity="0.68" />
+              </g>
+
+              <g className="cdr-risk-shield" transform="translate(710 -8)" filter="url(#cdr-risk-soft-glow)">
+                <path d="M10 0 L30 8 V22 C30 38 21 48 10 55 C-1 48 -10 38 -10 22 V8 Z" fill="rgba(5,22,55,0.80)" stroke="rgba(0,206,209,0.66)" strokeWidth="1.5" />
+                <path d="M3 24 l5 5 10 -14" fill="none" stroke="rgba(0,206,209,0.92)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </g>
+
+              <g className="cdr-risk-bar-chart" transform="translate(585 104)" opacity="0.60">
+                <rect x="0" y="-28" width="7" height="28" rx="2" fill="#0ea5e9" />
+                <rect x="13" y="-40" width="7" height="40" rx="2" fill="#0284c7" />
+                <rect x="26" y="-54" width="7" height="54" rx="2" fill="#075985" />
+              </g>
+
+              <g className="cdr-risk-donut" transform="translate(820 111)" opacity="0.48">
+                <circle cx="0" cy="0" r="21" fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="11" />
+                <path d="M0 -21 A21 21 0 0 1 20 7" fill="none" stroke="#ef4444" strokeWidth="11" strokeLinecap="round" />
+                <path d="M20 7 A21 21 0 0 1 -11 18" fill="none" stroke="#0ea5e9" strokeWidth="11" strokeLinecap="round" />
+              </g>
+
+              <g className="cdr-risk-circuit" fill="none" strokeWidth="1.4" opacity="0.70">
+                <path d="M70 25 h330" stroke="rgba(0,206,209,0.42)" />
+                <path d="M1040 25 h330" stroke="rgba(239,68,68,0.34)" />
+                <circle cx="68" cy="25" r="5" fill="none" stroke="#00ced1" />
+                <circle cx="68" cy="25" r="2" fill="#00ced1" />
+                <circle cx="1372" cy="25" r="5" fill="none" stroke="#ef4444" />
+                <circle cx="1372" cy="25" r="2" fill="#ef4444" />
+              </g>
+            </svg>
+          </div>
+          <div className="followup-header-badge followup-header-badge-left">
+            <img src="/assets/se-logo.png" alt="Saudi Energy" />
+          </div>
+
+          <div className="followup-dashboard-title">
+            <h1>CDR Traffic Dashboard</h1>
+            <p>CALL DETAIL RECORD ANALYTICS</p>
+          </div>
+
+          <div className="followup-header-badge followup-header-badge-right">
+            <img src="/assets/nasco-logo.png" alt="NASCO" />
+          </div>
+        </header>
+
+        <div className="cdr-banner-control-bar">
+          <div className="cdr-control-actions" aria-label="Dashboard quick actions">
+            <button className="button small theme-toggle cdr-action-pill cdr-action-primary" type="button" onClick={toggleTheme}>
+              <Palette size={18} /> {isDark ? "Light Theme" : "Dark Theme"}
+            </button>
+            <button className="button small cdr-action-pill" type="button" onClick={() => { setData(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+              <Home size={18} /> Home
+            </button>
+            <button className="button small cdr-action-pill" type="button" onClick={() => { setActiveTab("region"); window.setTimeout(() => document.getElementById("regionPerformance")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }}>
+              <UploadCloud size={18} /> Add Region ({formatNumber(metrics.regions)})
+            </button>
+            <label className="button small cdr-action-pill cdr-action-file" title="Add new workbook files to the current dashboard">
+              <RefreshCw size={18} /> New workbook(s)
+              <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={handleAddMoreCdr} />
+            </label>
+            <button className="button small cdr-action-pill cdr-action-primary" type="button" onClick={exportKpiPdf}>
+              <FileText size={18} /> Dashboard PDF
+            </button>
+          </div>
         </div>
-
-        <div className="followup-dashboard-title">
-          <h1>CDR TRAFFIC DASHBOARD</h1>
-        </div>
-
-        <div className="followup-header-badge followup-header-badge-right">
-          <img src="/assets/se.png" alt="Saudi Energy" />
-        </div>
-
-        <div className="followup-header-actions">
-          <button className="button small theme-toggle" type="button" onClick={toggleTheme}>
-            <Palette size={18} /> {theme === "light" ? "Dark Theme" : "Light Theme"}
-          </button>
-
-          <button className="button small" type="button" onClick={() => { setData(null); setError(""); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-            <Home size={19} /> Home
-          </button>
-
-          <label className="button small add-region-button" title="Upload another region's CDR and merge into current view">
-            <UploadCloud size={19} />
-            {isAddingMoreCdr ? "Merging..." : `Add Region${data.cdrSources.length > 1 ? ` (${data.cdrSources.length})` : ""}`}
-            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={handleAddMoreCdr} />
-          </label>
-
-          <label className="button small">
-            <RefreshCw size={19} /> New workbook(s)
-            <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={handleUpload} />
-          </label>
-
-          <button className="button small followup-pdf-button" onClick={exportRowsPdfPage}>
-            <FileText size={19} /> Dashboard PDF
-          </button>
-        </div>
-      </header>
 
       <nav className="dashboard-tabs" aria-label="Dashboard tabs">
         {DASHBOARD_TABS.map((tab) => (
