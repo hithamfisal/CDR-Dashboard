@@ -192,7 +192,7 @@ a { color: inherit; }
 .topbar::-webkit-scrollbar { display: none; }
 
 .brand-block { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: center; white-space: nowrap; flex-shrink: 0; }
-.brand-block img { grid-row: span 2; width: 40px; height: 40px; object-fit: contain; }
+.brand-block img { grid-row: span 2; width: 54px; height: 54px; object-fit: contain; }
 .brand-block p { margin: 0; color: var(--muted); font-weight: 700; }
 .brand-block h1 { margin: 0; font-size: clamp(18px, 2vw, 28px); letter-spacing: -.03em; }
 
@@ -11246,4 +11246,559 @@ html:has(.upload-shell.dark-background-theme),
 
 .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art .cdr-banner-svg {
   min-height: 172px !important;
+}
+
+/* FINAL GLOSSY DASHBOARD KPI CARD VISUALIZATION STYLE */
+.app-shell .visual-kpi-cards.summary-cards-10-layout {
+  gap: 8px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-row {
+  gap: 8px !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card,
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 58px !important;
+  height: 58px !important;
+  padding: 7px 10px 6px 10px !important;
+  border-radius: 9px !important;
+  overflow: hidden !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.36) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.42), inset 0 -16px 26px rgba(0,0,0,0.18), 0 8px 18px rgba(2, 8, 23, 0.22) !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 48%, #164e63 100%) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card::before,
+.app-shell .visual-quality-panel .visual-quality-card::before,
+.app-shell .visual-quality-panel .visual-quality-issue::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.06) 42%, rgba(0,0,0,0.12) 100%) !important;
+  pointer-events: none !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head,
+.app-shell .visual-quality-panel .summary-card-head {
+  display: grid !important;
+  grid-template-columns: 20px minmax(0, 1fr) 20px !important;
+  align-items: center !important;
+  gap: 3px !important;
+  min-width: 0 !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head span,
+.app-shell .visual-quality-panel .summary-card-head span {
+  grid-column: 2 !important;
+  font-size: clamp(7px, 0.58vw, 10px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.035em !important;
+  text-transform: uppercase !important;
+  font-weight: 900 !important;
+  color: rgba(255,255,255,0.95) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.34) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-icon,
+.app-shell .visual-quality-panel .summary-card-icon {
+  grid-column: 1 !important;
+  justify-self: start !important;
+  width: 17px !important;
+  height: 17px !important;
+  color: rgba(255,255,255,0.94) !important;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35)) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card strong,
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-issue strong {
+  display: block !important;
+  margin: 2px 0 0 !important;
+  font-size: clamp(14px, 1.08vw, 21px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.035em !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.38) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card small,
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-issue small {
+  display: block !important;
+  margin-top: 1px !important;
+  font-size: clamp(6.5px, 0.5vw, 8.5px) !important;
+  line-height: 1.05 !important;
+  font-weight: 800 !important;
+  color: rgba(255,255,255,0.86) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .visual-kpi-cards .visual-tone-cyan { background: linear-gradient(135deg, #0891b2 0%, #0e7490 48%, #164e63 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-green { background: linear-gradient(135deg, #16a34a 0%, #15803d 48%, #14532d 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-purple { background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 50%, #312e81 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-amber { background: linear-gradient(135deg, #d97706 0%, #b45309 48%, #78350f 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-red { background: linear-gradient(135deg, #b91c1c 0%, #991b1b 48%, #450a0a 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-blue { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 48%, #1e3a8a 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-slate { background: linear-gradient(135deg, #64748b 0%, #475569 48%, #1e293b 100%) !important; }
+
+.app-shell .visual-quality-panel {
+  display: grid !important;
+  grid-template-columns: minmax(170px, 1.05fr) minmax(0, 4fr) !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card {
+  min-height: 68px !important;
+  height: 68px !important;
+  background: linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(226,232,240,0.92) 50%, rgba(148,163,184,0.86) 100%) !important;
+  color: #0f172a !important;
+  border-color: rgba(148,163,184,0.55) !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card .summary-card-head span,
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-card .summary-card-icon {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+.app-shell .visual-quality-panel .quality-issue-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(120px, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-issue {
+  min-height: 68px !important;
+  height: 68px !important;
+  background: linear-gradient(135deg, rgba(248,250,252,0.92) 0%, rgba(226,232,240,0.88) 50%, rgba(148,163,184,0.82) 100%) !important;
+  color: #0f172a !important;
+  border-color: rgba(148,163,184,0.5) !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-issue .summary-card-head span,
+.app-shell .visual-quality-panel .visual-quality-issue strong,
+.app-shell .visual-quality-panel .visual-quality-issue small,
+.app-shell .visual-quality-panel .visual-quality-issue .summary-card-icon {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell .visual-quality-panel {
+    grid-template-columns: 1fr !important;
+  }
+  .app-shell .visual-quality-panel .quality-issue-grid {
+    grid-template-columns: repeat(2, minmax(150px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell .visual-quality-panel .quality-issue-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   IMPROVED KPI CARD DESIGN
+   — Only CSS changes. App.tsx and structure untouched.
+   — Each tone gets a vivid color-coded gradient (matching original
+     color intent) with a glowing left-edge accent bar.
+   — Cards are taller, more breathable, values are larger.
+   — Data quality row stays light/white for visual contrast.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Layout: grid container ── */
+.app-shell .visual-kpi-cards.summary-cards-10-layout {
+  --cdr-kpi-gap: 10px;
+  --cdr-kpi-card-height: 92px;
+  --cdr-kpi-radius: 14px;
+  display: grid !important;
+  gap: var(--cdr-kpi-gap) !important;
+  margin: 18px 0 20px !important;
+  padding: 0 !important;
+}
+
+/* ── Row grids: 10 / 8 / 7 all use 10 columns on large screens ── */
+.app-shell .visual-kpi-cards .summary-card-row,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+  display: grid !important;
+  gap: var(--cdr-kpi-gap) !important;
+  align-items: stretch !important;
+  width: 100% !important;
+}
+
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10 {
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+}
+
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8 {
+  grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+}
+
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+/* ── Card base: height grows with content, text wraps inside box ── */
+.app-shell .visual-kpi-cards .visual-summary-card {
+  position: relative !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: var(--cdr-kpi-card-height) !important;
+  height: auto !important;
+  padding: 11px 13px 10px 17px !important;
+  border-radius: var(--cdr-kpi-radius) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: stretch !important;
+  text-align: center !important;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  background: linear-gradient(145deg, #0e2236 0%, #102a40 50%, #071522 100%) !important;
+  box-shadow:
+    0 6px 18px rgba(2, 6, 23, 0.32),
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -14px 28px rgba(0,0,0,0.16) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+/* Subtle glass sheen on top */
+.app-shell .visual-kpi-cards .visual-summary-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 52%) !important;
+  pointer-events: none !important;
+}
+
+/* Glowing left-edge accent bar — THE signature element */
+.app-shell .visual-kpi-cards .visual-summary-card::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 10px !important;
+  bottom: 10px !important;
+  width: 4px !important;
+  border-radius: 0 4px 4px 0 !important;
+  background: var(--cdr-kpi-accent, #38bdf8) !important;
+  box-shadow: 0 0 16px var(--cdr-kpi-accent-glow, rgba(56,189,248,0.55)) !important;
+}
+
+/* ── z-index for content above pseudo-elements ── */
+.app-shell .visual-kpi-cards .summary-card-head,
+.app-shell .visual-kpi-cards .visual-summary-card > strong,
+.app-shell .visual-kpi-cards .visual-summary-card > small {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* ── Header row: icon + label centered ── */
+.app-shell .visual-kpi-cards .summary-card-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  min-width: 0 !important;
+}
+
+/* Icon badge — LEFT side (order:1) */
+.app-shell .visual-kpi-cards .summary-card-icon {
+  order: 1 !important;
+  flex: 0 0 auto !important;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 5px !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.28) !important;
+  filter: none !important;
+}
+
+/* Label text — centered, wraps inside the card ── */
+.app-shell .visual-kpi-cards .summary-card-head span {
+  order: 2 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-size: clamp(8px, 0.65vw, 11px) !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* ── Main value — centered, wraps inside card ── */
+.app-shell .visual-kpi-cards .visual-summary-card strong {
+  margin: 6px 0 0 !important;
+  display: block !important;
+  color: #ffffff !important;
+  font-size: clamp(14px, 1.2vw, 22px) !important;
+  line-height: 1.1 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.03em !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.32) !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* ── Subtitle / detail — centered, wraps inside card ── */
+.app-shell .visual-kpi-cards .visual-summary-card small {
+  display: block !important;
+  margin-top: 4px !important;
+  color: rgba(203, 213, 225, 0.68) !important;
+  font-size: clamp(7.5px, 0.56vw, 10px) !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  text-shadow: none !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* ── Tone-specific gradient backgrounds + accent colors ──
+   Matching your original image's color intent per tile category:
+   cyan  → teal-blue  (total calls, traffic)
+   green → rich green (regions, talkgroups)
+   purple→ deep purple(companies, avg duration)
+   amber → warm orange(radios, max duration, peak entries)
+   red   → deep red   (base stations, all peaks)
+   blue  → royal blue (total/min duration)
+   slate → cool gray  (fallback)
+*/
+.app-shell .visual-kpi-cards .visual-tone-cyan {
+  --cdr-kpi-accent: #22d3ee;
+  --cdr-kpi-accent-glow: rgba(34,211,238,0.52);
+  background: linear-gradient(145deg, #0a3040 0%, #0d3d52 52%, #071e2e 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-green {
+  --cdr-kpi-accent: #4ade80;
+  --cdr-kpi-accent-glow: rgba(74,222,128,0.48);
+  background: linear-gradient(145deg, #0b2e1c 0%, #103d26 52%, #071a10 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-purple {
+  --cdr-kpi-accent: #a78bfa;
+  --cdr-kpi-accent-glow: rgba(167,139,250,0.5);
+  background: linear-gradient(145deg, #1e1245 0%, #261558 52%, #110c2c 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-amber {
+  --cdr-kpi-accent: #fbbf24;
+  --cdr-kpi-accent-glow: rgba(251,191,36,0.48);
+  background: linear-gradient(145deg, #3a2208 0%, #4d2c0a 52%, #221408 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-red {
+  --cdr-kpi-accent: #fb7185;
+  --cdr-kpi-accent-glow: rgba(251,113,133,0.48);
+  background: linear-gradient(145deg, #3d1018 0%, #521420 52%, #230a0d 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-blue {
+  --cdr-kpi-accent: #60a5fa;
+  --cdr-kpi-accent-glow: rgba(96,165,250,0.5);
+  background: linear-gradient(145deg, #0b1f45 0%, #0e2b60 52%, #07132e 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-slate {
+  --cdr-kpi-accent: #94a3b8;
+  --cdr-kpi-accent-glow: rgba(148,163,184,0.36);
+  background: linear-gradient(145deg, #162033 0%, #1e2d43 52%, #0f172a 100%) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DATA QUALITY PANEL
+   — Kept light/white as in the original for visual contrast
+   — Larger numbers, cleaner spacing
+   ═══════════════════════════════════════════════════════════════ */
+
+.app-shell .visual-quality-panel {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+  margin: 18px 0 24px !important;
+}
+
+.app-shell .visual-quality-panel .quality-issue-grid {
+  display: contents !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue {
+  min-height: 100px !important;
+  height: auto !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  padding: 14px 16px 12px !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: stretch !important;
+  text-align: center !important;
+  background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 55%, #e2e8f0 100%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  color: #0f172a !important;
+  box-shadow: 0 6px 18px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+  overflow: hidden !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head span {
+  order: 2 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  color: #334155 !important;
+  font-size: clamp(8px, 0.65vw, 10.5px) !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  text-shadow: none !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-icon {
+  order: 1 !important;
+  flex: 0 0 auto !important;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 5px !important;
+  border-radius: 8px !important;
+  color: #334155 !important;
+  background: rgba(15,23,42,0.09) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5) !important;
+  filter: none !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-issue strong {
+  color: #0f172a !important;
+  font-size: clamp(22px, 1.8vw, 32px) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.045em !important;
+  text-shadow: none !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-issue small {
+  color: #64748b !important;
+  font-size: clamp(8px, 0.6vw, 10px) !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+  text-align: center !important;
+}
+
+/* ── Responsive breakpoints ── */
+@media (max-width: 1450px) {
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10 {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+  .app-shell .visual-quality-panel {
+    grid-template-columns: repeat(3, minmax(160px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7,
+  .app-shell .visual-quality-panel {
+    grid-template-columns: repeat(2, minmax(150px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7,
+  .app-shell .visual-quality-panel {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Light theme override: preserve readability ── */
+.app-shell.light-background-theme .visual-kpi-cards .visual-summary-card,
+.app-shell.se-theme .visual-kpi-cards .visual-summary-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.97) 0%, rgba(241,245,249,0.96) 55%, rgba(226,232,240,0.93) 100%) !important;
+  border-color: rgba(15,23,42,0.10) !important;
+  box-shadow: 0 6px 18px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-head span,
+.app-shell.se-theme .visual-kpi-cards .summary-card-head span {
+  color: #334155 !important;
+}
+.app-shell.light-background-theme .visual-kpi-cards .visual-summary-card strong,
+.app-shell.se-theme .visual-kpi-cards .visual-summary-card strong {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+.app-shell.light-background-theme .visual-kpi-cards .visual-summary-card small,
+.app-shell.se-theme .visual-kpi-cards .visual-summary-card small {
+  color: #64748b !important;
+}
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon {
+  color: #0f172a !important;
+  background: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 18%, #e2e8f0) !important;
 }

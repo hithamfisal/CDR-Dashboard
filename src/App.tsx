@@ -6,6 +6,7 @@ import JSZip from "jszip";
 import { jsPDF } from "jspdf";
 import pptxgen from "pptxgenjs";
 import {
+  // ── UI / navigation (keep all originals) ─────────────────────
   Activity,
   AlertTriangle,
   ArrowUp,
@@ -32,6 +33,22 @@ import {
   Users,
   Waves,
   X,
+
+  // ── NEW: KPI card icons ───────────────────────────────────────
+  // Change any value in DASHBOARD_CARD_ICONS below to swap icons.
+  // Browse all icons at: https://lucide.dev/icons/
+  // Add the import name here first, then update DASHBOARD_CARD_ICONS.
+  PhoneCall,          // totalCalls
+  Globe,              // regions
+  MessageSquare,      // talkgroups, peakTalkgroup
+  Antenna,            // baseStations, peakBaseStation, missingStation
+  Timer,              // totalDuration, maxDuration, minDuration, busyHour, missingDuration
+  User,               // peakUserName
+  BadgeCheck,         // peakUserId
+  CalendarDays,       // peakMonth
+  CalendarRange,      // peakWeek
+  CalendarClock,      // peakDay
+  PhoneIncoming,      // peakHourCalls
 } from "lucide-react";
 import {
   Area,
@@ -1626,6 +1643,91 @@ function MetricCard({ label, value, detail, icon: Icon, tone = "blue" }: { label
   );
 }
 
+/*
+  DASHBOARD CARD ICON CONFIGURATION
+  Change icons here in the future instead of editing every card.
+  Example: to change Peak Radio, update peakRadio: Radio to another imported icon.
+  Peak Radio and Missing Radio intentionally use the same Radio icon as Total Radios.
+*/
+/*
+ * ─────────────────────────────────────────────────────────────
+ *  DASHBOARD CARD ICON LIBRARY
+ *  To change any icon, replace the value with any lucide-react
+ *  icon name. Browse all icons at: https://lucide.dev/icons/
+ *  Then add the import at the top of this file.
+ *
+ *  Example: change totalCalls from PhoneCall to PhoneMissed:
+ *    1. Add  PhoneMissed  to the lucide-react import block above
+ *    2. Change  totalCalls: PhoneCall  →  totalCalls: PhoneMissed
+ * ─────────────────────────────────────────────────────────────
+ */
+const DASHBOARD_CARD_ICONS = {
+  // ── Row 1: Network Overview ────────────────────────────────
+  totalCalls:       PhoneCall,      // 📞 Total calls made
+  regions:          Globe,          // 🌍 Geographic regions
+  companies:        Building2,      // 🏢 Companies covered
+  radios:           Radio,          // 📻 Active radio devices
+  talkgroups:       MessageSquare,  // 💬 Used talkgroups
+  baseStations:     Antenna,        // 📡 Network base stations
+  totalDuration:    Timer,          // ⏱  Total call duration
+  averageDuration:  Gauge,          // ⌛ Average call duration
+  maxDuration:      Timer,          // ⬆  Longest call duration
+  minDuration:      Timer,          // ⬇  Shortest call duration
+
+  // ── Row 2: Peak Identifiers ────────────────────────────────
+  peakRadio:        Radio,          // 📻 Most active radio
+  peakUserName:     User,           // 👤 Most active user name
+  peakUserId:       BadgeCheck,     // 🪪 Most active user ID
+  peakUserCompany:  Building2,      // 🏭 User's company
+  peakCompany:      Building2,      // 🏦 Company with most calls
+  peakTalkgroup:    MessageSquare,  // 📢 Talkgroup with most calls
+  peakBaseStation:  Antenna,        // 🗼 Base station with most calls
+  peakMonth:        CalendarDays,   // 📅 Month with most calls
+
+  // ── Row 3: Traffic & Timing ────────────────────────────────
+  peakWeek:             CalendarRange,   // 🗓  Week with most calls
+  peakDay:              CalendarClock,   // 📅 Day with most calls
+  busyHour:             Timer,           // 🕛 Busiest hour of day
+  peakHourCalls:        PhoneIncoming,   // 📞 Calls in peak hour
+  trafficErlangs:       Waves,           // 📶 Total traffic (Erlangs)
+  peakTrafficErlangs:   Waves,           // 📈 Peak traffic (Erlangs)
+  peakHourAvgDuration:  Gauge,           // ⏱  Avg duration in peak hour
+
+  // ── Row 4: Data Quality ────────────────────────────────────
+  dataQuality:      ShieldCheck,    // ✓  Overall quality score
+  missingCompany:   Building2,      // 🏢 Records missing company
+  missingStation:   Antenna,        // 📡 Records missing station
+  missingDuration:  Timer,          // ⏱  Records missing duration
+  missingRadio:     Radio,          // 📻 Records missing radio ID
+} as const;
+
+type DashboardCardIconKey = keyof typeof DASHBOARD_CARD_ICONS;
+type SummaryCardTone = "cyan" | "green" | "purple" | "amber" | "red" | "blue" | "slate";
+
+function VisualSummaryCard({ label, value, detail, iconKey, tone = "cyan", primary = false }: { label: string; value: string; detail: string; iconKey: DashboardCardIconKey; tone?: SummaryCardTone; primary?: boolean }) {
+  const Icon = DASHBOARD_CARD_ICONS[iconKey];
+  return (
+    <div className={`summary-card visual-summary-card visual-tone-${tone} ${primary ? "summary-card-primary" : ""}`}>
+      <div className="summary-card-head">
+        {/* Icon is first (left), label is second (right) — matches dashboard image */}
+        <Icon className="summary-card-icon" size={18} strokeWidth={2.4} />
+        <span>{label}</span>
+      </div>
+      <strong>{value}</strong>
+      <small>{detail}</small>
+    </div>
+  );
+}
+
+function qualityIssueIconKey(name: string): DashboardCardIconKey {
+  const normalized = name.toLowerCase();
+  if (normalized.includes("company")) return "missingCompany";
+  if (normalized.includes("station")) return "missingStation";
+  if (normalized.includes("duration")) return "missingDuration";
+  if (normalized.includes("radio")) return "missingRadio";
+  return "dataQuality";
+}
+
 function FileTypeIcon({ kind }: { kind: "xlsx" | "ppt" | "pdf" | "view" | "csv" | "png" }) {
   if (kind === "view") return <svg className="file-export-svg file-export-svg-view" viewBox="0 0 64 64" aria-hidden="true"><path d="M6 32s9-16 26-16 26 16 26 16-9 16-26 16S6 32 6 32Z" /><circle cx="32" cy="32" r="8" /></svg>;
   if (kind === "png") return <svg className="file-export-svg file-export-svg-png" viewBox="0 0 64 64" aria-hidden="true"><path className="file-page" d="M14 5h25l11 11v43H14Z" /><path className="file-fold" d="M39 5v12h11" /><circle className="file-mark" cx="25" cy="24" r="5" /><path className="file-mark" d="m18 49 11-13 7 8 5-6 8 11Z" /></svg>;
@@ -3062,7 +3164,7 @@ export default function App() {
                 <path d="M1352 66 C1256 46 1176 44 1092 63 S990 78 904 61" stroke="#ef4444" strokeWidth="2.2" opacity="0.68" />
               </g>
 
-              <g className="cdr-risk-shield" transform="translate(780 8) scale(0.5)" filter="url(#cdr-risk-soft-glow)">
+              <g className="cdr-risk-shield" transform="translate(710 -8)" filter="url(#cdr-risk-soft-glow)">
                 <path d="M10 0 L30 8 V22 C30 38 21 48 10 55 C-1 48 -10 38 -10 22 V8 Z" fill="rgba(5,22,55,0.80)" stroke="rgba(0,206,209,0.66)" strokeWidth="1.5" />
                 <path d="M3 24 l5 5 10 -14" fill="none" stroke="rgba(0,206,209,0.92)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </g>
@@ -3211,59 +3313,68 @@ export default function App() {
 
       {showOverviewTab && (
       <>
-      <section className="summary-cards summary-cards-arranged summary-cards-manual-rows summary-cards-10-layout">
+      <section className="summary-cards summary-cards-arranged summary-cards-manual-rows summary-cards-10-layout visual-kpi-cards">
         {/* Row 1: first 10 cards */}
         <div className="summary-card-row summary-card-row-10">
-          <div className="summary-card yellow summary-card-primary"><span>Total Calls</span><strong>{formatNumber(metrics.totalCalls)}</strong><small>Filtered result</small></div>
-          <div className="summary-card green"><span>Regions</span><strong>{formatNumber(metrics.regions)}</strong><small>Geographic coverage</small></div>
-          <div className="summary-card yellow"><span>Companies</span><strong>{formatNumber(metrics.companies)}</strong><small>Business coverage</small></div>
-          <div className="summary-card green"><span>Radios</span><strong>{formatNumber(metrics.radios)}</strong><small>Active radio users</small></div>
-          <div className="summary-card green"><span>Talkgroups</span><strong>{formatNumber(metrics.talkgroups)}</strong><small>Used groups</small></div>
-          <div className="summary-card yellow"><span>Base Stations</span><strong>{formatNumber(metrics.stations)}</strong><small>Network sites</small></div>
-          <div className="summary-card green"><span>Total Duration</span><strong>{secondsToClock(metrics.totalDuration)}</strong><small>Filtered result</small></div>
-          <div className="summary-card yellow"><span>Average Duration</span><strong>{secondsToClock(metrics.averageDuration)}</strong><small>Per call</small></div>
-          <div className="summary-card yellow"><span>Max Duration</span><strong>{secondsToClock(maxDuration)}</strong><small>Longest call</small></div>
-          <div className="summary-card green"><span>Min Duration</span><strong>{secondsToClock(minDuration)}</strong><small>Shortest call</small></div>
+          <VisualSummaryCard label="Total Calls" value={formatNumber(metrics.totalCalls)} detail="Filtered result" iconKey="totalCalls" tone="cyan" primary />
+          <VisualSummaryCard label="Regions" value={formatNumber(metrics.regions)} detail="Geographic coverage" iconKey="regions" tone="green" />
+          <VisualSummaryCard label="Companies" value={formatNumber(metrics.companies)} detail="Business coverage" iconKey="companies" tone="purple" />
+          <VisualSummaryCard label="Radios" value={formatNumber(metrics.radios)} detail="Active radio users" iconKey="radios" tone="amber" />
+          <VisualSummaryCard label="Talkgroups" value={formatNumber(metrics.talkgroups)} detail="Used groups" iconKey="talkgroups" tone="green" />
+          <VisualSummaryCard label="Base Stations" value={formatNumber(metrics.stations)} detail="Network sites" iconKey="baseStations" tone="red" />
+          <VisualSummaryCard label="Total Duration" value={secondsToClock(metrics.totalDuration)} detail="Filtered result" iconKey="totalDuration" tone="blue" />
+          <VisualSummaryCard label="Average Duration" value={secondsToClock(metrics.averageDuration)} detail="Per call" iconKey="averageDuration" tone="purple" />
+          <VisualSummaryCard label="Max Duration" value={secondsToClock(maxDuration)} detail="Longest call" iconKey="maxDuration" tone="amber" />
+          <VisualSummaryCard label="Min Duration" value={secondsToClock(minDuration)} detail="Shortest call" iconKey="minDuration" tone="blue" />
         </div>
 
         {/* Row 2: next 8 cards */}
         <div className="summary-card-row summary-card-row-8">
-          <div className="summary-card yellow"><span>Peak Radio</span><strong>{peakRadioEntry?.[0] ?? "--"}</strong><small>Most active radio</small></div>
-          <div className="summary-card green"><span>Peak User Name</span><strong>{peakUserParts[0] ?? "--"}</strong><small>Most active user</small></div>
-          <div className="summary-card yellow"><span>Peak User ID</span><strong>{peakUserParts[1] ?? "--"}</strong><small>User identifier</small></div>
-          <div className="summary-card yellow"><span>Peak User Company</span><strong>{peakUserParts[2] ?? "--"}</strong><small>User company</small></div>
-          <div className="summary-card green"><span>Peak Company</span><strong>{topCompany?.name ?? "--"}</strong><small>Most calls</small></div>
-          <div className="summary-card yellow"><span>Peak Talkgroup</span><strong>{topTalkgroup?.name ?? "--"}</strong><small>Most calls</small></div>
-          <div className="summary-card green"><span>Peak Base Station</span><strong>{topStation?.name ?? "--"}</strong><small>Most calls</small></div>
-          <div className="summary-card yellow"><span>Peak Month</span><strong>{peakMonthEntry?.[0] ?? "--"}</strong><small>Highest calls</small></div>
+          <VisualSummaryCard label="Peak Radio" value={peakRadioEntry?.[0] ?? "--"} detail="Most active radio" iconKey="peakRadio" tone="amber" />
+          <VisualSummaryCard label="Peak User Name" value={peakUserParts[0] ?? "--"} detail="Most active user" iconKey="peakUserName" tone="red" />
+          <VisualSummaryCard label="Peak User ID" value={peakUserParts[1] ?? "--"} detail="User identifier" iconKey="peakUserId" tone="amber" />
+          <VisualSummaryCard label="Peak User Company" value={peakUserParts[2] ?? "--"} detail="User company" iconKey="peakUserCompany" tone="red" />
+          <VisualSummaryCard label="Peak Company" value={topCompany?.name ?? "--"} detail="Most calls" iconKey="peakCompany" tone="red" />
+          <VisualSummaryCard label="Peak Talkgroup" value={topTalkgroup?.name ?? "--"} detail="Most calls" iconKey="peakTalkgroup" tone="red" />
+          <VisualSummaryCard label="Peak Base Station" value={topStation?.name ?? "--"} detail="Most calls" iconKey="peakBaseStation" tone="red" />
+          <VisualSummaryCard label="Peak Month" value={peakMonthEntry?.[0] ?? "--"} detail="Highest calls" iconKey="peakMonth" tone="red" />
         </div>
 
         {/* Row 3: remaining 7 cards */}
         <div className="summary-card-row summary-card-row-7">
-          <div className="summary-card green"><span>Peak Week</span><strong>{peakWeekEntry?.[0] ?? "--"}</strong><small>Highest calls</small></div>
-          <div className="summary-card yellow"><span>Peak Day</span><strong>{peakDayEntry?.[0] ?? "--"}</strong><small>Highest calls</small></div>
-          <div className="summary-card yellow"><span>Busy Hour</span><strong>{peakHour?.name ?? "--"}</strong><small>Highest calls</small></div>
-          <div className="summary-card yellow"><span>Peak Hour Calls</span><strong>{formatNumber(peakHour?.calls ?? 0)}</strong><small>Busy hour volume</small></div>
-          <div className="summary-card green"><span>Traffic (Erlangs)</span><strong>{formatDecimal(metrics.trafficHours, 1)}</strong><small>Total traffic</small></div>
-          <div className="summary-card green"><span>Peak Traffic (Erlangs)</span><strong>{formatDecimal(peakTrafficHour?.trafficHours ?? 0, 1)}</strong><small>Highest traffic hour</small></div>
-          <div className="summary-card green"><span>Peak Hour Avg Duration</span><strong>{formatDecimal(peakHourAvgDuration, 1)}</strong><small>Seconds per call</small></div>
+          <VisualSummaryCard label="Peak Week" value={peakWeekEntry?.[0] ?? "--"} detail="Highest calls" iconKey="peakWeek" tone="red" />
+          <VisualSummaryCard label="Peak Day" value={peakDayEntry?.[0] ?? "--"} detail="Highest calls" iconKey="peakDay" tone="red" />
+          <VisualSummaryCard label="Busy Hour" value={peakHour?.name ?? "--"} detail="Highest calls" iconKey="busyHour" tone="amber" />
+          <VisualSummaryCard label="Peak Hour Calls" value={formatNumber(peakHour?.calls ?? 0)} detail="Busy hour volume" iconKey="peakHourCalls" tone="amber" />
+          <VisualSummaryCard label="Traffic (Erlangs)" value={formatDecimal(metrics.trafficHours, 1)} detail="Total traffic" iconKey="trafficErlangs" tone="cyan" />
+          <VisualSummaryCard label="Peak Traffic (Erlangs)" value={formatDecimal(peakTrafficHour?.trafficHours ?? 0, 1)} detail="Highest traffic hour" iconKey="peakTrafficErlangs" tone="red" />
+          <VisualSummaryCard label="Peak Hour Avg Duration" value={formatDecimal(peakHourAvgDuration, 1)} detail="Seconds per call" iconKey="peakHourAvgDuration" tone="purple" />
         </div>
       </section>
 
-      <section className="data-quality-panel" aria-label="Data quality and filter health">
-        <div className="quality-score-card">
-          <span>Data Quality Score</span>
+      <section className="data-quality-panel visual-quality-panel" aria-label="Data quality and filter health">
+        <div className="quality-score-card visual-quality-card">
+          <div className="summary-card-head">
+            <span>Data Quality Score</span>
+            <CheckCircle2 className="summary-card-icon" size={18} strokeWidth={2.4} />
+          </div>
           <strong>{formatDecimal(qualityScore, 1)}%</strong>
           <small>{formatNumber(records.length)} source rows checked</small>
         </div>
         <div className="quality-issue-grid">
-          {qualityIssues.map((issue) => (
-            <div className="quality-issue" key={issue.name}>
-              <span>{issue.name}</span>
-              <strong>{formatNumber(issue.count)}</strong>
-              <small>{formatDecimal(issue.pct, 1)}%</small>
-            </div>
-          ))}
+          {qualityIssues.map((issue) => {
+            const IssueIcon = DASHBOARD_CARD_ICONS[qualityIssueIconKey(issue.name)];
+            return (
+              <div className="quality-issue visual-quality-issue" key={issue.name}>
+                <div className="summary-card-head">
+                  <span>{issue.name}</span>
+                  <IssueIcon className="summary-card-icon" size={18} strokeWidth={2.4} />
+                </div>
+                <strong>{formatNumber(issue.count)}</strong>
+                <small>{formatDecimal(issue.pct, 1)}%</small>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -3785,12 +3896,3 @@ export default function App() {
     </main>
   );
 }
-
-
-
-
-
-
-
-
-

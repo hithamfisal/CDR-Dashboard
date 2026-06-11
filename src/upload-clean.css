@@ -1,0 +1,424 @@
+﻿/*
+  CDR upload clean layer.
+  This file is imported after the legacy dashboard styles and owns only the startup page.
+*/
+
+html:has(.upload-shell),
+body:has(.upload-shell),
+body:has(.upload-shell.light-background-theme),
+body:has(.upload-shell.dark-background-theme) {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+  overflow-x: hidden !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: cover !important;
+}
+
+body:has(.upload-shell.light-background-theme) {
+  background-color: #eef6fb !important;
+}
+
+body:has(.upload-shell.dark-background-theme) {
+  background-color: #020914 !important;
+}
+
+.upload-shell,
+.upload-shell.light-background-theme,
+.upload-shell.dark-background-theme {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-color: #eef6fb !important;
+  color: #0b2435 !important;
+}
+
+.upload-shell.dark-background-theme {
+  background-color: #020914 !important;
+  color: #f4fbff !important;
+}
+
+.upload-shell::before,
+.upload-shell::after,
+.upload-shell.light-background-theme::before,
+.upload-shell.light-background-theme::after,
+.upload-shell.dark-background-theme::before,
+.upload-shell.dark-background-theme::after,
+.upload-shell .followup-upload-shell::before,
+.upload-shell .followup-upload-shell::after,
+.upload-shell .followup-upload-card::before,
+.upload-shell .followup-upload-card::after,
+.upload-shell .followup-upload-visual::before,
+.upload-shell .followup-upload-visual::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  opacity: 0 !important;
+}
+
+.upload-shell .followup-upload-shell {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  background: transparent !important;
+}
+
+.upload-shell .followup-upload-card,
+.upload-shell.light-background-theme .followup-upload-card,
+.upload-shell.dark-background-theme .followup-upload-card {
+  position: relative !important;
+  width: min(100%, 1680px) !important;
+  min-height: min(820px, calc(100vh - 48px)) !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr) !important;
+  gap: clamp(24px, 3vw, 48px) !important;
+  align-items: stretch !important;
+  padding: clamp(28px, 3.3vw, 54px) !important;
+  border: 1px solid rgba(60, 137, 175, 0.2) !important;
+  border-radius: 28px !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  box-shadow: 0 28px 80px rgba(17, 47, 70, 0.18) !important;
+  color: #0c2638 !important;
+  overflow: hidden !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-card {
+  border-color: rgba(57, 193, 241, 0.24) !important;
+  background: #061321 !important;
+  color: #f4fbff !important;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42) !important;
+}
+
+.upload-shell .followup-upload-left {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  min-width: 0 !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  padding: clamp(8px, 1.2vw, 20px) !important;
+}
+
+.upload-shell .followup-eyebrow,
+.upload-shell .followup-drop-note {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 0 18px !important;
+  color: #1d607d !important;
+  font-size: 0.85rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+.upload-shell.dark-background-theme .followup-eyebrow,
+.upload-shell.dark-background-theme .followup-drop-note {
+  color: #8bd7ff !important;
+}
+
+.upload-shell .followup-upload-left h1 {
+  margin: 0 !important;
+  max-width: 760px !important;
+  color: #14384a !important;
+  font-size: clamp(3rem, 5.8vw, 6.8rem) !important;
+  line-height: 0.95 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-left h1 {
+  color: #f5fbff !important;
+}
+
+.upload-shell .followup-upload-left h1 span {
+  display: block !important;
+}
+
+.upload-shell .followup-lead {
+  max-width: 720px !important;
+  margin: 26px 0 28px !important;
+  color: #33596b !important;
+  font-size: clamp(1rem, 1.15vw, 1.24rem) !important;
+  line-height: 1.55 !important;
+  font-weight: 650 !important;
+}
+
+.upload-shell.dark-background-theme .followup-lead {
+  color: #bdd7e6 !important;
+}
+
+.upload-shell .followup-primary-actions,
+.upload-shell .followup-mini-grid {
+  width: 100% !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+.upload-shell .followup-mini-grid {
+  margin-top: 8px !important;
+}
+
+.upload-shell .followup-action-button,
+.upload-shell .followup-mini-card,
+.upload-shell.light-background-theme .followup-action-button,
+.upload-shell.light-background-theme .followup-mini-card,
+.upload-shell.dark-background-theme .followup-action-button,
+.upload-shell.dark-background-theme .followup-mini-card {
+  min-height: 52px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  border: 1px solid rgba(40, 120, 160, 0.22) !important;
+  border-radius: 14px !important;
+  background: #f8fcff !important;
+  color: #153a4d !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+.upload-shell .followup-action-button {
+  padding: 0 18px !important;
+}
+
+.upload-shell .followup-mini-card {
+  justify-content: flex-start !important;
+  min-width: 260px !important;
+  padding: 14px 18px !important;
+  text-transform: none !important;
+}
+
+.upload-shell.dark-background-theme .followup-action-button,
+.upload-shell.dark-background-theme .followup-mini-card {
+  border-color: rgba(91, 204, 247, 0.3) !important;
+  background: rgba(8, 31, 48, 0.92) !important;
+  color: #effaff !important;
+}
+
+.upload-shell .followup-action-button:hover,
+.upload-shell .followup-mini-card:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(0, 152, 216, 0.58) !important;
+}
+
+.upload-shell .followup-action-button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.58 !important;
+}
+
+.upload-shell .followup-action-button input,
+.upload-shell .followup-mini-card input {
+  display: none !important;
+}
+
+.upload-shell .followup-mini-card strong,
+.upload-shell .followup-mini-card span {
+  display: block !important;
+  color: inherit !important;
+}
+
+.upload-shell .followup-mini-card span {
+  margin-top: 3px !important;
+  color: #4d6f81 !important;
+  font-size: 0.83rem !important;
+  font-weight: 700 !important;
+}
+
+.upload-shell.dark-background-theme .followup-mini-card span {
+  color: #b4d1df !important;
+}
+
+.upload-shell .followup-upload-visual,
+.upload-shell.light-background-theme .followup-upload-visual,
+.upload-shell.dark-background-theme .followup-upload-visual {
+  position: relative !important;
+  z-index: 1 !important;
+  min-height: 520px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: clamp(18px, 2.4vw, 34px) !important;
+  border: 1px solid rgba(74, 144, 180, 0.22) !important;
+  border-radius: 24px !important;
+  background: #dcecf7 !important;
+  background-image: none !important;
+  overflow: hidden !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual {
+  border-color: rgba(65, 195, 241, 0.26) !important;
+  background: #0b2234 !important;
+}
+
+.upload-shell .followup-upload-visual img,
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  position: static !important;
+  z-index: 1 !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.upload-shell .followup-ready-card,
+.upload-shell.light-background-theme .followup-ready-card,
+.upload-shell.dark-background-theme .followup-ready-card {
+  position: absolute !important;
+  left: 32px !important;
+  right: 32px !important;
+  bottom: 28px !important;
+  z-index: 3 !important;
+  padding: 18px 22px !important;
+  border: 1px solid rgba(99, 203, 246, 0.28) !important;
+  border-radius: 16px !important;
+  background: rgba(4, 19, 32, 0.92) !important;
+  color: #eefaff !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.upload-shell .followup-ready-card span,
+.upload-shell .followup-ready-card strong,
+.upload-shell .followup-ready-card p {
+  color: inherit !important;
+}
+
+.upload-shell .followup-ready-card span {
+  display: block !important;
+  margin-bottom: 5px !important;
+  color: #6bcdf5 !important;
+  font-size: 0.78rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.14em !important;
+}
+
+.upload-shell .followup-ready-card strong {
+  display: block !important;
+  font-size: clamp(1.3rem, 2vw, 2.3rem) !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+}
+
+.upload-shell .followup-ready-card p {
+  margin: 8px 0 0 !important;
+  color: #b9d4e1 !important;
+  font-weight: 700 !important;
+}
+
+.upload-shell .followup-theme-button,
+.upload-shell.light-background-theme .followup-theme-button,
+.upload-shell.dark-background-theme .followup-theme-button {
+  position: absolute !important;
+  top: 22px !important;
+  right: 22px !important;
+  z-index: 8 !important;
+  min-height: 42px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 16px !important;
+  border: 1px solid rgba(39, 126, 169, 0.28) !important;
+  border-radius: 999px !important;
+  background: #f7fcff !important;
+  color: #102f42 !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+  box-shadow: 0 10px 30px rgba(11, 35, 52, 0.12) !important;
+}
+
+.upload-shell.dark-background-theme .followup-theme-button {
+  border-color: rgba(86, 210, 255, 0.3) !important;
+  background: rgba(8, 28, 43, 0.94) !important;
+  color: #f4fbff !important;
+}
+
+.upload-shell .loading-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 50 !important;
+  display: grid !important;
+  place-items: center !important;
+  background: rgba(2, 10, 18, 0.58) !important;
+}
+
+@media (max-width: 1180px) {
+  .upload-shell .followup-upload-card,
+  .upload-shell.light-background-theme .followup-upload-card,
+  .upload-shell.dark-background-theme .followup-upload-card {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+
+  .upload-shell .followup-upload-visual,
+  .upload-shell.light-background-theme .followup-upload-visual,
+  .upload-shell.dark-background-theme .followup-upload-visual {
+    min-height: 440px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .upload-shell .followup-upload-shell {
+    padding: 12px !important;
+  }
+
+  .upload-shell .followup-upload-card,
+  .upload-shell.light-background-theme .followup-upload-card,
+  .upload-shell.dark-background-theme .followup-upload-card {
+    padding: 24px 18px !important;
+    border-radius: 20px !important;
+  }
+
+  .upload-shell .followup-theme-button {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    justify-self: flex-end !important;
+    margin-left: auto !important;
+  }
+
+  .upload-shell .followup-upload-left h1 {
+    font-size: clamp(2.7rem, 13vw, 4.2rem) !important;
+  }
+
+  .upload-shell .followup-action-button,
+  .upload-shell .followup-mini-card {
+    width: 100% !important;
+  }
+
+  .upload-shell .followup-upload-visual {
+    min-height: 360px !important;
+    padding: 14px !important;
+  }
+
+  .upload-shell .followup-ready-card {
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 16px !important;
+  }
+}

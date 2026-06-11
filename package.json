@@ -8,7 +8,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "desktop:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && electron .\"",
+    "desktop:dev": "concurrently -k \"vite --host 127.0.0.1 --port 5178 --strictPort\" \"wait-on http://127.0.0.1:5178 && electron .\"",
     "desktop:pack": "yarn build && electron-builder --dir",
     "desktop:dist": "yarn build && electron-builder"
   },
