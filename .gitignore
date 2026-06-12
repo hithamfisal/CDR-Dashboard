@@ -9,3 +9,9 @@ Thumbs.db
 Backup/
 electron/
 release/
+node_modules/
+dist/
+release/
+Backup/
+electron/
+*.log
