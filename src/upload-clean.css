@@ -422,3 +422,252 @@ body:has(.upload-shell.dark-background-theme) {
     bottom: 16px !important;
   }
 }
+
+/* Upload layout refinement: one-line title and grouped buttons */
+.upload-shell .followup-theme-button,
+.upload-shell.light-background-theme .followup-theme-button,
+.upload-shell.dark-background-theme .followup-theme-button {
+  left: 22px !important;
+  right: auto !important;
+}
+
+.upload-shell .followup-upload-left h1 {
+  max-width: none !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  font-size: clamp(3.1rem, 4.9vw, 5.7rem) !important;
+  line-height: 1 !important;
+}
+
+.upload-shell .followup-upload-left h1 span {
+  display: inline !important;
+}
+
+.upload-shell .followup-upload-left h1 span + span::before {
+  content: " " !important;
+}
+
+.upload-shell .followup-primary-actions {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+}
+
+.upload-shell .followup-primary-actions .followup-action-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 14px !important;
+  white-space: nowrap !important;
+}
+
+.upload-shell .followup-mini-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+}
+
+.upload-shell .followup-mini-card {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+@media (max-width: 1180px) {
+  .upload-shell .followup-upload-left h1 {
+    white-space: normal !important;
+    font-size: clamp(2.8rem, 8vw, 5rem) !important;
+  }
+
+  .upload-shell .followup-primary-actions,
+  .upload-shell .followup-mini-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .upload-shell .followup-theme-button,
+  .upload-shell.light-background-theme .followup-theme-button,
+  .upload-shell.dark-background-theme .followup-theme-button {
+    left: auto !important;
+  }
+}
+
+/* Upload card image moved from boxed panel into the main card */
+.upload-shell .followup-upload-card,
+.upload-shell.light-background-theme .followup-upload-card,
+.upload-shell.dark-background-theme .followup-upload-card {
+  grid-template-columns: 1fr !important;
+  align-items: start !important;
+  min-height: min(760px, calc(100vh - 48px)) !important;
+  padding-top: clamp(74px, 7vw, 104px) !important;
+  padding-right: clamp(360px, 43vw, 680px) !important;
+}
+
+.upload-shell .followup-upload-card::after,
+.upload-shell.light-background-theme .followup-upload-card::after,
+.upload-shell.dark-background-theme .followup-upload-card::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  right: clamp(24px, 4vw, 58px) !important;
+  top: clamp(86px, 9vw, 130px) !important;
+  bottom: clamp(28px, 4vw, 56px) !important;
+  width: min(40vw, 620px) !important;
+  min-width: 330px !important;
+  border-radius: 24px !important;
+  background-image: url("/assets/h.png") !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  background-position: center !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+  filter: none !important;
+}
+
+.upload-shell .followup-upload-left {
+  justify-content: flex-start !important;
+  align-self: start !important;
+  max-width: 880px !important;
+  padding-top: 0 !important;
+}
+
+.upload-shell .followup-lead {
+  margin: 18px 0 22px !important;
+}
+
+.upload-shell .followup-drop-note {
+  margin-top: 24px !important;
+}
+
+.upload-shell .followup-upload-visual,
+.upload-shell .followup-ready-card {
+  display: none !important;
+}
+
+@media (max-width: 1180px) {
+  .upload-shell .followup-upload-card,
+  .upload-shell.light-background-theme .followup-upload-card,
+  .upload-shell.dark-background-theme .followup-upload-card {
+    padding-right: clamp(28px, 3.3vw, 54px) !important;
+    padding-bottom: 360px !important;
+  }
+
+  .upload-shell .followup-upload-card::after,
+  .upload-shell.light-background-theme .followup-upload-card::after,
+  .upload-shell.dark-background-theme .followup-upload-card::after {
+    top: auto !important;
+    left: 24px !important;
+    right: 24px !important;
+    bottom: 24px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 310px !important;
+    background-position: center !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .upload-shell .followup-upload-card,
+  .upload-shell.light-background-theme .followup-upload-card,
+  .upload-shell.dark-background-theme .followup-upload-card {
+    padding-top: 24px !important;
+    padding-bottom: 260px !important;
+  }
+
+  .upload-shell .followup-upload-card::after,
+  .upload-shell.light-background-theme .followup-upload-card::after,
+  .upload-shell.dark-background-theme .followup-upload-card::after {
+    height: 220px !important;
+    left: 14px !important;
+    right: 14px !important;
+    bottom: 14px !important;
+  }
+}
+
+/* Staged upload review before opening dashboard */
+.upload-shell .followup-staged-upload,
+.upload-shell.light-background-theme .followup-staged-upload,
+.upload-shell.dark-background-theme .followup-staged-upload {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 14px !important;
+  align-items: center !important;
+  margin-top: 14px !important;
+  padding: 14px !important;
+  border: 1px solid rgba(40, 120, 160, 0.22) !important;
+  border-radius: 16px !important;
+  background: rgba(248, 252, 255, 0.88) !important;
+  color: #123548 !important;
+}
+
+.upload-shell.dark-background-theme .followup-staged-upload {
+  border-color: rgba(91, 204, 247, 0.3) !important;
+  background: rgba(7, 25, 40, 0.9) !important;
+  color: #f4fbff !important;
+}
+
+.upload-shell .followup-staged-upload strong,
+.upload-shell .followup-staged-upload span {
+  display: block !important;
+  color: inherit !important;
+}
+
+.upload-shell .followup-staged-upload strong {
+  font-size: 0.95rem !important;
+  font-weight: 900 !important;
+}
+
+.upload-shell .followup-staged-upload span {
+  margin-top: 4px !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: #4d6f81 !important;
+  font-size: 0.86rem !important;
+  font-weight: 750 !important;
+}
+
+.upload-shell.dark-background-theme .followup-staged-upload span {
+  color: #b8d6e5 !important;
+}
+
+.upload-shell .followup-staged-upload.has-files {
+  border-color: rgba(0, 166, 166, 0.52) !important;
+  box-shadow: 0 0 0 1px rgba(0, 166, 166, 0.08) inset !important;
+}
+
+.upload-shell .followup-staged-actions {
+  display: flex !important;
+  gap: 10px !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+.upload-shell .followup-staged-actions .followup-action-button {
+  min-height: 44px !important;
+  width: auto !important;
+  white-space: nowrap !important;
+}
+
+.upload-shell .followup-confirm-upload:not(:disabled),
+.upload-shell.light-background-theme .followup-confirm-upload:not(:disabled),
+.upload-shell.dark-background-theme .followup-confirm-upload:not(:disabled) {
+  border-color: rgba(0, 166, 166, 0.75) !important;
+  background: linear-gradient(135deg, #1fd4e8, #59a8ff) !important;
+  color: #041522 !important;
+}
+
+@media (max-width: 900px) {
+  .upload-shell .followup-staged-upload {
+    grid-template-columns: 1fr !important;
+  }
+
+  .upload-shell .followup-staged-actions {
+    justify-content: stretch !important;
+  }
+
+  .upload-shell .followup-staged-actions .followup-action-button {
+    flex: 1 1 0 !important;
+  }
+}

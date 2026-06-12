@@ -1,54 +1,35 @@
 ﻿import { CSSProperties, ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { ChartLegend, ExportButton, SectionTitle } from "./components/DashboardUi";
+import { MultiSelectFilter } from "./components/MultiSelectFilter";
+import { chartLabel, formatDecimal, formatNumber, formatPercent, secondsToClock, sumValues } from "./lib/formatters";
+import { captureElementPng } from "./lib/capture";
+import { getSavedWorkbookMeta, loadFleetmapFromBrowser, loadWorkbookFromBrowser, saveFleetmapToBrowser, saveWorkbookToBrowser, setSavedWorkbookMeta, themeClass, useTheme, workbookMeta } from "./lib/browserCache";
+import { CHART_COLORS, COLORS, COMPANY_COLORS, DASHBOARD_TABS, EMPTY_FILTERS, FLEETMAP_HEADER_ALIASES, HEADER_ALIASES, MOBILE_TYPE_COLORS, MOBILE_TYPE_LABELS, NUMERIC_TALKGROUP_FILTER, RAW_SYSTEM_HEADER_ALIASES, SAVED_FIXED_FLEETMAP_KEY, SAVED_MASTER_FLEETMAP_KEY, SAVED_WORKBOOK_DB, SAVED_WORKBOOK_KEY, SAVED_WORKBOOK_META_KEY, SAVED_WORKBOOK_STORE, SECTION_NAV_ITEMS, TOOLTIP_STYLE } from "./lib/dashboardConstants";
+import type { CallRecord, ChartExportDataset, DashboardData, DashboardTab, Filters, FleetmapMeta, FleetmapRecord, FleetmapState, LookupRecord, NativeChartConfig, NativeChartSeries, Ranking, RawRow, SavedWorkbookMeta, StagedTrafficUpload, ThemeName } from "./types/dashboard";
+import { OverviewSummaryCards } from "./components/OverviewSummaryCards";
+import { UploadView } from "./components/UploadView";
 import ExcelJS from "exceljs";
-import html2canvas from "html2canvas";
 import JSZip from "jszip";
 import { jsPDF } from "jspdf";
 import pptxgen from "pptxgenjs";
 import {
-  // ── UI / navigation (keep all originals) ─────────────────────
   Activity,
   AlertTriangle,
-  ArrowUp,
   BarChart3,
   Building2,
-  ChevronDown,
-  CheckCircle2,
   Clock3,
   Eye,
   FileImage,
-  FileSpreadsheet,
   FileText,
   Filter,
-  Gauge,
-  HardDrive,
   Home,
   Palette,
   Presentation,
-  Radio,
   RefreshCw,
   Search,
   ShieldCheck,
   UploadCloud,
-  Users,
-  Waves,
   X,
-
-  // ── NEW: KPI card icons ───────────────────────────────────────
-  // Change any value in DASHBOARD_CARD_ICONS below to swap icons.
-  // Browse all icons at: https://lucide.dev/icons/
-  // Add the import name here first, then update DASHBOARD_CARD_ICONS.
-  PhoneCall,          // totalCalls
-  Globe,              // regions
-  MessageSquare,      // talkgroups, peakTalkgroup
-  Antenna,            // baseStations, peakBaseStation, missingStation
-  Timer,              // totalDuration, maxDuration, minDuration, busyHour, missingDuration
-  User,               // peakUserName
-  BadgeCheck,         // peakUserId
-  CalendarDays,       // peakMonth
-  CalendarRange,      // peakWeek
-  CalendarClock,      // peakDay
-  PhoneIncoming,      // peakHourCalls
 } from "lucide-react";
 import {
   Area,
@@ -70,223 +51,6 @@ import {
 } from "recharts";
 import * as XLSX from "xlsx";
 
-type RawRow = Record<string, unknown>;
-
-type CallRecord = {
-  radioId: string;
-  radioAlias: string;
-  mobileType: string;
-  employeeName: string;
-  employeeId: string;
-  region: string;
-  company: string;
-  talkgroup: string;
-  callDate: string;
-  startTime: string;
-  endTime: string;
-  year: string;
-  month: string;
-  week: string;
-  hour: string;
-  durationSeconds: number;
-  trafficHours: number;
-  baseStation: string;
-};
-
-type LookupRecord = {
-  radioId: string;
-  company: string;
-  region: string;
-  talkgroup: string;
-};
-
-type FleetmapRecord = {
-  radioId: string;
-  radioAlias: string;
-  employeeName: string;
-  employeeId: string;
-  company: string;
-  region: string;
-  talkgroup: string;
-  mobileType: string;
-  source: "master" | "fixed";
-};
-
-type FleetmapMeta = { fileName: string; loadedAt: string };
-
-type FleetmapState = {
-  records: FleetmapRecord[];
-  meta: FleetmapMeta | null;
-  isParsing: boolean;
-};
-
-type CdrSource = {
-  fileName: string;
-  rawRows: number;
-  loadedAt: string;
-  recordCount: number;
-};
-
-type DashboardData = {
-  fileName: string;
-  sourceSheet: string;
-  loadedAt: string;
-  rawRows: number;
-  records: CallRecord[];
-  lookupRecords: LookupRecord[];
-  fleetmapRecords: FleetmapRecord[];
-  cdrSources: CdrSource[];
-  warnings: string[];
-};
-
-type SavedWorkbookMeta = {
-  fileName: string;
-  sourceSheet: string;
-  loadedAt: string;
-  rawRows: number;
-};
-
-type Filters = {
-  region: string[];
-  year: string[];
-  company: string[];
-  month: string[];
-  baseStation: string[];
-  talkgroup: string[];
-  search: string;
-};
-
-type Ranking = {
-  name: string;
-  calls: number;
-  durationSeconds: number;
-  trafficHours: number;
-  radios: number;
-};
-
-type ExportCell = string | number | boolean | null;
-type ChartExportDataset = {
-  headers: string[];
-  rows: ExportCell[][];
-};
-
-const SECTION_NAV_ITEMS = [
-  { id: "networkUtilization", label: "Network Utilization" },
-  { id: "unmatchedFleetmap", label: "Unmatched Fleetmap" },
-  { id: "regionPerformance", label: "Region Performance" },
-  { id: "trafficIntensity", label: "Traffic Intensity" },
-  { id: "talkgroupEfficiency", label: "Talkgroup Efficiency" },
-  { id: "kpi", label: "KPI Table" },
-  { id: "Company", label: "Company Contribution" },
-  { id: "Performance", label: "Performance Charts" },
-  { id: "General", label: "General Charts" },
-  { id: "Charts", label: "Top 10 Charts" },
-  { id: "users", label: "Radio & User Behavior" },
-  { id: "records", label: "Filtered Calls Register" },
-];
-
-const DASHBOARD_TABS = [
-  { id: "overview", label: "Overview & Records" },
-  { id: "fleet", label: "Fleet Activation" },
-  { id: "region", label: "Region & Traffic" },
-  { id: "company", label: "Company, Talkgroup & Users" },
-  { id: "kpi", label: "Performance KPI" },
-  { id: "reports", label: "Reports" },
-] as const;
-
-type DashboardTab = typeof DASHBOARD_TABS[number]["id"];
-
-const SAVED_WORKBOOK_DB = "cdr-dashboard-cache";
-const SAVED_WORKBOOK_STORE = "workbooks";
-const SAVED_WORKBOOK_KEY = "last-workbook";
-const SAVED_WORKBOOK_META_KEY = "cdr-dashboard-last-workbook-meta";
-const SAVED_MASTER_FLEETMAP_KEY = "master-fleetmap";
-const SAVED_FIXED_FLEETMAP_KEY = "fixed-fleetmap";
-
-const EMPTY_FILTERS: Filters = {
-  region: [],
-  year: [],
-  company: [],
-  month: [],
-  baseStation: [],
-  talkgroup: [],
-  search: "",
-};
-
-const COLORS = ["#0078D4", "#00A6A6", "#FFB000", "#6F5BD5", "#D95F5F", "#009E73", "#9A6B00", "#C64E9C"];
-const COMPANY_COLORS = ["#0078D4", "#00A6A6", "#FFB000", "#6F5BD5", "#D95F5F", "#009E73", "#9A6B00", "#C64E9C", "#006D77", "#7A4CC2"];
-const CHART_COLORS = {
-  calls: "#0078D4",
-  callsLight: "#6EC9FF",
-  callsDeep: "#004E91",
-  duration: "#FFB000",
-  durationLight: "#FFE08A",
-  durationDeep: "#B87500",
-  total: "#005B99",
-  used: "#64B5F6",
-  totalGreen: "#007A5A",
-  usedGreen: "#7ADFA5",
-  grid: "#6E8394",
-  axis: "#617789",
-  label: "#FFFFFF",
-  labelStroke: "#08202E",
-  tooltipBg: "#102331",
-  tooltipBorder: "#2F5D73",
-  tooltipText: "#F8FCFF",
-};
-const TOOLTIP_STYLE = { background: CHART_COLORS.tooltipBg, border: `1px solid ${CHART_COLORS.tooltipBorder}`, color: CHART_COLORS.tooltipText };
-const MOBILE_TYPE_LABELS = [
-  "PORTABLE - \u062c\u0647\u0627\u0632 \u0645\u062d\u0645\u0648\u0644",
-  "ATEX - \u0645\u062d\u0645\u0648\u0644 \u062e\u0627\u0635",
-  "MOBILE - \u0633\u064a\u0627\u0631",
-  "FIXED - \u0645\u0643\u062a\u0628\u064a",
-  "Dispatcher",
-];
-const MOBILE_TYPE_COLORS = ["#0078D4", "#FFB000", "#00A6A6", "#6F5BD5", "#D95F5F"];
-const NUMERIC_TALKGROUP_FILTER = "__NUMERIC_TALKGROUPS__";
-
-const HEADER_ALIASES = {
-  radioId: ["radioid", "radio id", "radio"],
-  radioAlias: ["radioalias", "radio alias", "alias"],
-  mobileType: ["mobiletype", "mobile type", "radio type", "radiotype", "terminal type", "terminaltype", "device type"],
-  employeeName: ["employeename", "employee name", "employee", "user name", "username"],
-  employeeId: ["employeeid", "employee id", "user id", "userid"],
-  region: ["region", "area"],
-  company: ["company", "company / bl", "call source"],
-  talkgroup: ["talkgroupalias", "talkgroup alias", "talkgroup", "talkgroup name"],
-  callDate: ["calldate", "call date", "date"],
-  startTime: ["starttime", "start time"],
-  endTime: ["endtime", "end time", "call end", "call end time", "stop time", "stoptime"],
-  year: ["year"],
-  month: ["month"],
-  week: ["week"],
-  hour: ["hour", "hour label", "hourlabel", "hournumber", "hour number"],
-  durationSeconds: ["durationseconds", "duration seconds", "duration sec", "duration (sec)", "seconds"],
-  trafficHours: ["traffichours", "traffic hours", "traffic", "erlangs"],
-  baseStation: ["callerbasestation", "caller base station", "base station", "station"],
-};
-
-const FLEETMAP_HEADER_ALIASES = {
-  radioId:      ["radioid", "radio id", "radio", "id", "subscriberid", "subscriber id"],
-  radioAlias:   ["radioalias", "radio alias", "alias", "name"],
-  employeeName: ["employeename", "employee name", "user name", "username", "user", "employee"],
-  employeeId:   ["employeeid", "employee id", "user id", "userid"],
-  company:      ["company", "company / bl", "department", "bl", "business line"],
-  region:       ["region", "area", "site", "location"],
-  talkgroup:    ["talkgroupalias", "talkgroup alias", "talkgroup", "talk group", "group"],
-  mobileType:   ["mobiletype", "mobile type", "radio type", "radiotype", "terminal type", "device type", "type"],
-};
-
-const RAW_SYSTEM_HEADER_ALIASES = {
-  callerNumber: ["caller number", "callernumber", "caller radio", "caller radio id", "radio id", "radioid"],
-  callerAlias: ["caller alias", "calleralias", "radio alias", "alias"],
-  calleeNumber: ["callee number", "calleenumber", "called number", "callednumber", "talkgroup id", "talkgroup number"],
-  calleeAlias: ["callee alias", "calleealias", "called alias", "calledalias", "talkgroup alias", "talkgroup"],
-  startTime: ["start time", "starttime", "call start", "callstart"],
-  endTime: ["end time", "endtime", "call end", "callend", "stop time", "stoptime"],
-  durationSeconds: ["duration (s)", "duration s", "duration seconds", "durationseconds", "duration sec", "seconds"],
-  baseStation: ["caller base station", "callerbasestation", "base station", "station"],
-};
 
 function normalizeHeader(value: unknown) {
   return `${value ?? ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -626,6 +390,10 @@ function parseWorkbook(workbook: XLSX.WorkBook, fileName: string, fleetmap: Flee
       const rawEmpId      = cleanText(findValue(row, HEADER_ALIASES.employeeId),  "Unknown");
       const rawRegion     = cleanText(findValue(row, HEADER_ALIASES.region),      "Unknown");
       const rawTalkgroup  = cleanText(findValue(row, HEADER_ALIASES.talkgroup),   "Unknown");
+      const rawCallType = cleanText(findValue(row, HEADER_ALIASES.callType), "Unknown");
+      const rawDuplexType = cleanText(findValue(row, HEADER_ALIASES.duplexType), "Unknown");
+      const rawCallPriority = cleanText(findValue(row, HEADER_ALIASES.callPriority), "Unknown");
+      const rawEncrypted = cleanText(findValue(row, HEADER_ALIASES.encrypted), "Unknown");
       const mappedMobileType = mobileTypeFromRadioId(radioId, pickFleet(rawMobileType, fleet?.mobileType, "Unknown"));
       const mappedBaseStation = baseStationOrRadioType(cleanText(findValue(row, HEADER_ALIASES.baseStation), "Unknown"), mappedMobileType);
 
@@ -648,6 +416,10 @@ function parseWorkbook(workbook: XLSX.WorkBook, fileName: string, fleetmap: Flee
         durationSeconds,
         trafficHours: parseNumber(findValue(row, HEADER_ALIASES.trafficHours), durationSeconds / 3600),
         baseStation:  mappedBaseStation,
+        callType: rawCallType,
+        duplexType: rawDuplexType,
+        callPriority: rawCallPriority,
+        encrypted: rawEncrypted,
       };
     })
     .filter((record) => record.radioId !== "Unknown" || record.company !== "Unknown" || record.durationSeconds > 0);
@@ -736,6 +508,10 @@ function parseRawSystemWorkbook(workbook: XLSX.WorkBook, fileName: string, fleet
         findValue(row, RAW_SYSTEM_HEADER_ALIASES.calleeAlias),
         cleanRawSystemValue(findValue(row, RAW_SYSTEM_HEADER_ALIASES.calleeNumber), "Unknown")
       );
+      const rawCallType = cleanText(findValue(row, RAW_SYSTEM_HEADER_ALIASES.callType), "Unknown");
+      const rawDuplexType = cleanText(findValue(row, RAW_SYSTEM_HEADER_ALIASES.duplexType), "Unknown");
+      const rawCallPriority = cleanText(findValue(row, RAW_SYSTEM_HEADER_ALIASES.callPriority), "Unknown");
+      const rawEncrypted = cleanText(findValue(row, RAW_SYSTEM_HEADER_ALIASES.encrypted), "Unknown");
       const parsedStart = parseDate(startRaw);
 
       const preferKnown = (primary: string, fallbackValue: string | undefined, fallback = "Unknown") =>
@@ -762,6 +538,10 @@ function parseRawSystemWorkbook(workbook: XLSX.WorkBook, fileName: string, fleet
         durationSeconds,
         trafficHours: durationSeconds / 3600,
         baseStation: mappedBaseStation,
+        callType: rawCallType,
+        duplexType: rawDuplexType,
+        callPriority: rawCallPriority,
+        encrypted: rawEncrypted,
       };
     })
     .filter((record) => record.radioId !== "Unknown" || record.durationSeconds > 0);
@@ -822,30 +602,6 @@ function mergeCdrIntoData(base: DashboardData, addition: DashboardData): Dashboa
   };
 }
 
-function formatNumber(value: number) {
-  return new Intl.NumberFormat("en-US").format(Math.round(value || 0));
-}
-
-function formatDecimal(value: number, digits = 2) {
-  return new Intl.NumberFormat("en-US", { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(value || 0);
-}
-
-function formatPercent(value: number, digits = 1) {
-  return `${formatDecimal(value, digits)}%`;
-}
-
-function secondsToClock(totalSeconds: number) {
-  const safe = Math.max(0, Math.round(totalSeconds || 0));
-  const h = Math.floor(safe / 3600);
-  const m = Math.floor((safe % 3600) / 60);
-  const s = safe % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
-function sumValues(data: { value: number }[]) {
-  return data.reduce((sum, item) => sum + item.value, 0);
-}
-
 function modeBy<T extends string>(records: CallRecord[], getValue: (record: CallRecord) => T) {
   const counts = new Map<T, { count: number; durationSeconds: number }>();
   records.forEach((record) => {
@@ -858,13 +614,6 @@ function modeBy<T extends string>(records: CallRecord[], getValue: (record: Call
   return [...counts.entries()].sort((a, b) => b[1].count - a[1].count || b[1].durationSeconds - a[1].durationSeconds)[0];
 }
 
-function chartLabel(value: unknown) {
-  const numeric = Number(value ?? 0);
-  if (!Number.isFinite(numeric) || numeric <= 0) return "";
-  if (numeric >= 1_000_000) return `${formatDecimal(numeric / 1_000_000, 1)}M`;
-  if (numeric >= 1_000) return `${formatDecimal(numeric / 1_000, 1)}K`;
-  return formatNumber(numeric);
-}
 
 function KpiBarLabel(props: any) {
   const value = Number(props.value ?? 0);
@@ -924,15 +673,14 @@ function PieDecimalLabel(props: any) {
   return <text x={props.x} y={props.y} textAnchor="middle" dominantBaseline="central" fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={10} fontWeight={900}>{formatDecimal(value, 2)}</text>;
 }
 
-function ChartLegend({ items, className = "" }: { items: { name: string; color: string }[]; className?: string }) {
+function CompanyPerformanceTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  const row = payload[0]?.payload ?? {};
   return (
-    <div className={`chart-legend ${className}`.trim()}>
-      {items.map((item) => (
-        <span key={`${item.name}-${item.color}`}>
-          <i style={{ background: item.color }} />
-          {item.name}
-        </span>
-      ))}
+    <div className="custom-tooltip">
+      <strong>{row.name ?? label}</strong>
+      <span>Calls: {formatNumber(row.calls ?? 0)}</span>
+      <span>Duration: {secondsToClock(row.durationSeconds ?? 0)}</span>
     </div>
   );
 }
@@ -965,38 +713,17 @@ function RadioTooltip({ active, payload }: any) {
 
 function MobileTypeTooltip({ active, payload, label, mobileTypes = [] }: any) {
   if (!active || !payload?.length) return null;
-  const row = payload[0]?.payload;
-  if (!row) return null;
-  const items = mobileTypes
-    .map((type: string) => ({ name: type, value: Number(row[mobileTypeKey(type)] ?? 0), color: mobileTypeColor(type) }))
-    .filter((item: any) => item.value > 0);
+  const row = payload[0]?.payload ?? {};
   return (
     <div className="custom-tooltip">
       <strong>{row.name ?? label}</strong>
       <span>Total radios: {formatNumber(row.total ?? 0)}</span>
-      {items.map((item: any) => (
-        <span key={item.name} style={{ color: item.color }}>{item.name}: {formatNumber(item.value)}</span>
+      {mobileTypes.map((type: string) => (
+        <span key={type}>{type}: {formatNumber(row[mobileTypeKey(type)] ?? 0)}</span>
       ))}
     </div>
   );
 }
-
-function CompanyPerformanceTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
-  const row = payload[0]?.payload;
-  if (!row) return null;
-  const calls = Number(row.calls ?? 0);
-  const durationSeconds = Number(row.durationSeconds ?? 0);
-  return (
-    <div className="custom-tooltip">
-      <strong>{row.name ?? label}</strong>
-      <span>Total calls: {formatNumber(calls)}</span>
-      <span>Total duration: {secondsToClock(durationSeconds)}</span>
-      <span>Avg duration/call: {secondsToClock(calls ? durationSeconds / calls : 0)}</span>
-    </div>
-  );
-}
-
 function CallsDurationPerformanceChart({ title, data, height = 360, xTickFormatter = (value: unknown) => truncateLabel(value, 18), gradientId }: { title: string; data: Ranking[]; height?: number; xTickFormatter?: (value: unknown) => string; gradientId: string }) {
   return (
     <>
@@ -1361,7 +1088,7 @@ function pdfText(pdf: jsPDF, value: unknown, x: number, y: number, options?: Par
   }
 }
 
-function pptTextOptions<T extends Record<string, unknown>>(value: unknown, options: T): T & { fontFace: string; lang: string; rtlMode?: boolean } {
+function pptTextOptions(value: unknown, options: Record<string, unknown>): any {
   return {
     ...options,
     fontFace: "Arial",
@@ -1381,8 +1108,6 @@ function excelRange(sheetName: string, col: number, startRow: number, endRow: nu
   return `'${safeName}'!$${excelColumnName(col)}$${startRow}:$${excelColumnName(col)}$${endRow}`;
 }
 
-type NativeChartSeries = { name: string; valuesRef: string; color: string };
-type NativeChartConfig = { sheetIndex: number; chartIndex: number; title: string; type: "bar" | "line" | "doughnut"; categoriesRef: string; series: NativeChartSeries[]; from?: { col: number; row: number }; to?: { col: number; row: number } };
 
 function nativeSeriesXml(series: NativeChartSeries, index: number, categoriesRef: string, chartType: "bar" | "line" | "doughnut") {
   const shape = `<c:spPr><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill><a:ln><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill></a:ln></c:spPr>`;
@@ -1438,416 +1163,8 @@ async function patchWorkbookWithNativeCharts(buffer: ExcelJS.Buffer, configs: Na
   return zip.generateAsync({ type: "blob" });
 }
 
-async function captureElementPng(element: HTMLElement, backgroundColor = "#ffffff") {
-  const canvas = await html2canvas(element, { backgroundColor, scale: 2, useCORS: true });
-  return canvas.toDataURL("image/png");
-}
-
-type ThemeName = "dark" | "light";
-
-function themeClass(theme: ThemeName) { return theme === "light" ? "light-background-theme" : "dark-background-theme"; }
-
-function useTheme() {
-  const [theme, setTheme] = useState<ThemeName>("light");
-  const isDark = theme === "dark";
-  const toggleTheme = useCallback(() => setTheme((current) => (current === "light" ? "dark" : "light")), []);
-
-  return { theme, isDark, toggleTheme };
-}
-
-function workbookMeta(data: DashboardData): SavedWorkbookMeta {
-  return { fileName: data.fileName, sourceSheet: data.sourceSheet, loadedAt: data.loadedAt, rawRows: data.rawRows };
-}
-
-function getSavedWorkbookMeta(): SavedWorkbookMeta | null {
-  try { const raw = window.localStorage.getItem(SAVED_WORKBOOK_META_KEY); return raw ? JSON.parse(raw) as SavedWorkbookMeta : null; } catch { return null; }
-}
-
-function setSavedWorkbookMeta(meta: SavedWorkbookMeta | null) {
-  try { if (meta) window.localStorage.setItem(SAVED_WORKBOOK_META_KEY, JSON.stringify(meta)); else window.localStorage.removeItem(SAVED_WORKBOOK_META_KEY); } catch { /* ignore */ }
-}
-
-function openSavedWorkbookDb(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = window.indexedDB.open(SAVED_WORKBOOK_DB, 1);
-    request.onupgradeneeded = () => { request.result.createObjectStore(SAVED_WORKBOOK_STORE); };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function saveWorkbookToBrowser(data: DashboardData) {
-  const db = await openSavedWorkbookDb();
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(SAVED_WORKBOOK_STORE, "readwrite");
-    tx.objectStore(SAVED_WORKBOOK_STORE).put(data, SAVED_WORKBOOK_KEY);
-    tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error);
-  });
-  db.close();
-  setSavedWorkbookMeta(workbookMeta(data));
-}
-
-async function loadWorkbookFromBrowser(): Promise<DashboardData | null> {
-  const db = await openSavedWorkbookDb();
-  const data = await new Promise<DashboardData | null>((resolve, reject) => {
-    const tx = db.transaction(SAVED_WORKBOOK_STORE, "readonly");
-    const req = tx.objectStore(SAVED_WORKBOOK_STORE).get(SAVED_WORKBOOK_KEY);
-    req.onsuccess = () => resolve((req.result as DashboardData | undefined) ?? null);
-    req.onerror = () => reject(req.error);
-  });
-  db.close();
-  return data;
-}
-
-async function saveFleetmapToBrowser(key: string, records: FleetmapRecord[], meta: FleetmapMeta) {
-  const db = await openSavedWorkbookDb();
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(SAVED_WORKBOOK_STORE, "readwrite");
-    tx.objectStore(SAVED_WORKBOOK_STORE).put({ records, meta }, key);
-    tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error);
-  });
-  db.close();
-}
-
-async function loadFleetmapFromBrowser(key: string): Promise<{ records: FleetmapRecord[]; meta: FleetmapMeta } | null> {
-  const db = await openSavedWorkbookDb();
-  const data = await new Promise<any>((resolve, reject) => {
-    const tx = db.transaction(SAVED_WORKBOOK_STORE, "readonly");
-    const req = tx.objectStore(SAVED_WORKBOOK_STORE).get(key);
-    req.onsuccess = () => resolve(req.result ?? null); req.onerror = () => reject(req.error);
-  });
-  db.close();
-  return data;
-}
-
-// Upload view
-
-function UploadView({
-  onUploadCdr, onUploadRawSystem, onUploadMasterFleetmap, onUploadFixedFleetmap,
-  onLoadSaved, savedWorkbook, masterFleetmap, fixedFleetmap,
-  isParsing, isLoadingSaved, error, theme, onToggleTheme,
-}: {
-  onUploadCdr: (event: ChangeEvent<HTMLInputElement>) => void;
-  onUploadRawSystem: (event: ChangeEvent<HTMLInputElement>) => void;
-  onUploadMasterFleetmap: (event: ChangeEvent<HTMLInputElement>) => void;
-  onUploadFixedFleetmap: (event: ChangeEvent<HTMLInputElement>) => void;
-  onLoadSaved: () => void;
-  savedWorkbook: SavedWorkbookMeta | null;
-  masterFleetmap: FleetmapState;
-  fixedFleetmap: FleetmapState;
-  isParsing: boolean;
-  isLoadingSaved: boolean;
-  error: string;
-  theme: ThemeName;
-  onToggleTheme: () => void;
-}) {
-  return (
-    <main className={`upload-shell ${themeClass(theme)}`}>
-      <section className="followup-upload-shell">
-        <div className="followup-upload-card">
-          <button className="followup-theme-button" type="button" onClick={onToggleTheme}>
-            <Palette size={16} />
-            {theme === "light" ? "Dark Theme" : "Light Theme"}
-          </button>
-
-          <div className="followup-upload-left">
-            <p className="followup-eyebrow"><UploadCloud size={14} /> CDR WORKBOOKS UPLOAD</p>
-            <h1><span>Load the CDR traffic</span><span>workbook</span></h1>
-            <p className="followup-lead">
-              Start with Master and Fixed Fleetmap, then upload processed CDR files or raw system call logs.
-            </p>
-
-            <div className="followup-primary-actions">
-              <label className="followup-action-button followup-primary-upload">
-                <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={onUploadCdr} />
-                <FileSpreadsheet size={18} />
-                <span>{isParsing ? "Reading CDR..." : "Select CDR workbook"}</span>
-              </label>
-
-              <label className="followup-action-button">
-                <input type="file" accept=".csv,.xlsx,.xls,.xlsm,.xlsb" multiple onChange={onUploadRawSystem} />
-                <FileText size={18} />
-                <span>{isParsing ? "Reading raw..." : "Select raw call log"}</span>
-              </label>
-
-              <button
-                className="followup-action-button"
-                type="button"
-                onClick={onLoadSaved}
-                disabled={!savedWorkbook || isLoadingSaved || isParsing}
-              >
-                <HardDrive size={18} />
-                <span>{isLoadingSaved ? "Opening..." : "Continue previous workbook"}</span>
-              </button>
-            </div>
-
-            <p className="followup-drop-note">REFERENCE FILES & DATA SOURCES</p>
-
-            <div className="followup-mini-grid">
-              <label className={`followup-mini-card ${masterFleetmap.meta ? "loaded" : ""}`}>
-                <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadMasterFleetmap} />
-                <Users size={18} />
-                <div>
-                  <strong>{masterFleetmap.isParsing ? "Reading..." : masterFleetmap.meta?.fileName ?? "Master Fleetmap"}</strong>
-                  <span>{masterFleetmap.meta ? `${formatNumber(masterFleetmap.records.length)} radios saved` : "Company, region and users"}</span>
-                </div>
-              </label>
-
-              <label className={`followup-mini-card ${fixedFleetmap.meta ? "loaded" : ""}`}>
-                <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadFixedFleetmap} />
-                <Radio size={18} />
-                <div>
-                  <strong>{fixedFleetmap.isParsing ? "Reading..." : fixedFleetmap.meta?.fileName ?? "Fixed Fleetmap"}</strong>
-                  <span>{fixedFleetmap.meta ? `${formatNumber(fixedFleetmap.records.length)} radios saved` : "Fixed radio reference"}</span>
-                </div>
-              </label>
-
-            </div>
-          </div>
-
-          <div className="followup-upload-visual">
-            <img src="/assets/h.png" alt="Saudi Energy theme" />
-            <div className="followup-ready-card">
-              <span>READY FOR</span>
-              <strong>CDR - Fleetmap - Raw Logs</strong>
-              <p>Traffic, utilization, regions, users, talkgroups, and export reports.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {(isParsing || isLoadingSaved || masterFleetmap.isParsing || fixedFleetmap.isParsing) && (
-        <div className="loading-overlay" role="status" aria-live="polite">
-          <div className="loading-card">
-            <Activity size={28} />
-            <strong>{isLoadingSaved ? "Opening previous workbook..." : "Processing workbook..."}</strong>
-            <span>Preparing the dashboard data and saved references.</span>
-          </div>
-        </div>
-      )}
-      {error && <div className="toast error">{error}</div>}
-    </main>
-  );
-}
-
 
 // Shared sub-components
-
-function MetricCard({ label, value, detail, icon: Icon, tone = "blue" }: { label: string; value: string; detail: string; icon: typeof Activity; tone?: "blue" | "amber" | "green" | "red" }) {
-  return (
-    <article className={`metric-card ${tone}`}>
-      <div><span>{label}</span><strong>{value}</strong></div>
-      <Icon size={22} />
-      <p>{detail}</p>
-    </article>
-  );
-}
-
-/*
-  DASHBOARD CARD ICON CONFIGURATION
-  Change icons here in the future instead of editing every card.
-  Example: to change Peak Radio, update peakRadio: Radio to another imported icon.
-  Peak Radio and Missing Radio intentionally use the same Radio icon as Total Radios.
-*/
-/*
- * ─────────────────────────────────────────────────────────────
- *  DASHBOARD CARD ICON LIBRARY
- *  To change any icon, replace the value with any lucide-react
- *  icon name. Browse all icons at: https://lucide.dev/icons/
- *  Then add the import at the top of this file.
- *
- *  Example: change totalCalls from PhoneCall to PhoneMissed:
- *    1. Add  PhoneMissed  to the lucide-react import block above
- *    2. Change  totalCalls: PhoneCall  →  totalCalls: PhoneMissed
- * ─────────────────────────────────────────────────────────────
- */
-const DASHBOARD_CARD_ICONS = {
-  // ── Row 1: Network Overview ────────────────────────────────
-  totalCalls:       PhoneCall,      // 📞 Total calls made
-  regions:          Globe,          // 🌍 Geographic regions
-  companies:        Building2,      // 🏢 Companies covered
-  radios:           Radio,          // 📻 Active radio devices
-  talkgroups:       MessageSquare,  // 💬 Used talkgroups
-  baseStations:     Antenna,        // 📡 Network base stations
-  totalDuration:    Timer,          // ⏱  Total call duration
-  averageDuration:  Gauge,          // ⌛ Average call duration
-  maxDuration:      Timer,          // ⬆  Longest call duration
-  minDuration:      Timer,          // ⬇  Shortest call duration
-
-  // ── Row 2: Peak Identifiers ────────────────────────────────
-  peakRadio:        Radio,          // 📻 Most active radio
-  peakUserName:     User,           // 👤 Most active user name
-  peakUserId:       BadgeCheck,     // 🪪 Most active user ID
-  peakUserCompany:  Building2,      // 🏭 User's company
-  peakCompany:      Building2,      // 🏦 Company with most calls
-  peakTalkgroup:    MessageSquare,  // 📢 Talkgroup with most calls
-  peakBaseStation:  Antenna,        // 🗼 Base station with most calls
-  peakMonth:        CalendarDays,   // 📅 Month with most calls
-
-  // ── Row 3: Traffic & Timing ────────────────────────────────
-  peakWeek:             CalendarRange,   // 🗓  Week with most calls
-  peakDay:              CalendarClock,   // 📅 Day with most calls
-  busyHour:             Timer,           // 🕛 Busiest hour of day
-  peakHourCalls:        PhoneIncoming,   // 📞 Calls in peak hour
-  trafficErlangs:       Waves,           // 📶 Total traffic (Erlangs)
-  peakTrafficErlangs:   Waves,           // 📈 Peak traffic (Erlangs)
-  peakHourAvgDuration:  Gauge,           // ⏱  Avg duration in peak hour
-
-  // ── Row 4: Data Quality ────────────────────────────────────
-  dataQuality:      ShieldCheck,    // ✓  Overall quality score
-  missingCompany:   Building2,      // 🏢 Records missing company
-  missingStation:   Antenna,        // 📡 Records missing station
-  missingDuration:  Timer,          // ⏱  Records missing duration
-  missingRadio:     Radio,          // 📻 Records missing radio ID
-} as const;
-
-type DashboardCardIconKey = keyof typeof DASHBOARD_CARD_ICONS;
-type SummaryCardTone = "cyan" | "green" | "purple" | "amber" | "red" | "blue" | "slate";
-
-function VisualSummaryCard({ label, value, detail, iconKey, tone = "cyan", primary = false }: { label: string; value: string; detail: string; iconKey: DashboardCardIconKey; tone?: SummaryCardTone; primary?: boolean }) {
-  const Icon = DASHBOARD_CARD_ICONS[iconKey];
-  return (
-    <div className={`summary-card visual-summary-card visual-tone-${tone} ${primary ? "summary-card-primary" : ""}`}>
-      <div className="summary-card-head">
-        {/* Icon is first (left), label is second (right) — matches dashboard image */}
-        <Icon className="summary-card-icon" size={18} strokeWidth={2.4} />
-        <span>{label}</span>
-      </div>
-      <strong>{value}</strong>
-      <small>{detail}</small>
-    </div>
-  );
-}
-
-function qualityIssueIconKey(name: string): DashboardCardIconKey {
-  const normalized = name.toLowerCase();
-  if (normalized.includes("company")) return "missingCompany";
-  if (normalized.includes("station")) return "missingStation";
-  if (normalized.includes("duration")) return "missingDuration";
-  if (normalized.includes("radio")) return "missingRadio";
-  return "dataQuality";
-}
-
-function FileTypeIcon({ kind }: { kind: "xlsx" | "ppt" | "pdf" | "view" | "csv" | "png" }) {
-  if (kind === "view") return <svg className="file-export-svg file-export-svg-view" viewBox="0 0 64 64" aria-hidden="true"><path d="M6 32s9-16 26-16 26 16 26 16-9 16-26 16S6 32 6 32Z" /><circle cx="32" cy="32" r="8" /></svg>;
-  if (kind === "png") return <svg className="file-export-svg file-export-svg-png" viewBox="0 0 64 64" aria-hidden="true"><path className="file-page" d="M14 5h25l11 11v43H14Z" /><path className="file-fold" d="M39 5v12h11" /><circle className="file-mark" cx="25" cy="24" r="5" /><path className="file-mark" d="m18 49 11-13 7 8 5-6 8 11Z" /></svg>;
-  const meta = {
-    pdf: { label: "PDF", color: "#ef1b2d", grid: false, chart: false },
-    xlsx: { label: "XLSX", color: "#21a366", grid: false, chart: false },
-    csv: { label: "CSV", color: "#45c957", grid: true, chart: false },
-    ppt: { label: "PPTX", color: "#d6421f", grid: false, chart: true },
-  }[kind];
-  return (
-    <svg className={`file-export-svg file-export-svg-${kind}`} viewBox="0 0 64 64" aria-hidden="true" style={{ "--file-color": meta.color } as CSSProperties}>
-      <path className="file-page" d="M14 5h25l11 11v43H14Z" />
-      <path className="file-fold" d="M39 5v12h11" />
-      {!meta.grid && !meta.chart && <path className="file-lines" d="M21 23h22M21 30h22M21 37h18" />}
-      {meta.grid && <path className="file-grid" d="M22 36h20M22 44h20M22 52h20M29 30v27M37 30v27" />}
-      {meta.chart && <><path className="file-chart" d="M28 48a10 10 0 1 0 10-10v10Z" /><path className="file-chart" d="M39 37a10 10 0 0 1 9 9h-9Z" /></>}
-      <rect className="file-ribbon" x="6" y="34" width="52" height="20" rx="3" />
-      <text className="file-label" x="32" y="49" textAnchor="middle">{meta.label}</text>
-    </svg>
-  );
-}
-
-function ExportButton({ kind, label, onClick, title }: { kind: "xlsx" | "ppt" | "pdf" | "view" | "csv" | "png"; label: string; onClick: () => void; title?: string }) {
-  return <button className={`button small export-button export-button-${kind}`} type="button" onClick={onClick} title={title ?? label}><FileTypeIcon kind={kind} /><span>{label}</span></button>;
-}
-function SectionTitle({ id, eyebrow, title, text, actions, collapsed = false, onToggle }: { id?: string; eyebrow: string; title: string; text?: string; actions?: ReactNode; collapsed?: boolean; onToggle?: () => void }) {
-  return (
-    <div id={id} className={`section-title ${collapsed ? "section-title-collapsed" : ""}`}>
-      <div className="section-title-heading">
-        {onToggle && (
-          <button className="section-title-arrow" type="button" onClick={onToggle} aria-expanded={!collapsed} aria-label={collapsed ? "Expand section" : "Collapse section"}>
-            <ChevronDown size={16} />
-          </button>
-        )}
-        <div className="section-title-copy">
-          <p>{eyebrow}</p><h2>{title}</h2>
-          {text && <span>{text}</span>}
-        </div>
-      </div>
-      <div className="section-title-actions">
-        {actions}
-        {id && <button className="button small section-top-button" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}><ArrowUp size={15} /><span>Top</span></button>}
-      </div>
-    </div>
-  );
-}
-
-function MultiSelectFilter({ label, value, options, optionLabels, onChange, showAllOption = true, className = "" }: { label: string; value: string[]; options: string[]; optionLabels?: Record<string, string>; onChange: (value: string[]) => void; showAllOption?: boolean; className?: string }) {
-  const active = value.length > 0;
-  const [open, setOpen] = useState(false);
-  const [dropdownStyle, setDropdownStyle] = useState<CSSProperties>({});
-  const wrapRef = useRef<HTMLDivElement | null>(null);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node;
-      if (!wrapRef.current?.contains(target) && !dropdownRef.current?.contains(target)) setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  function computePosition() {
-    if (!triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    const longest = Math.max(...options.map((o) => (optionLabels?.[o] ?? o).length), label.length, 10);
-    const dropWidth = Math.min(Math.max(rect.width, longest * 8 + 58, 220), 520);
-    const dropHeight = Math.min(280, options.length * 36 + 48);
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const left = Math.min(rect.left, window.innerWidth - dropWidth - 8);
-    if (spaceBelow >= dropHeight || spaceBelow >= 160) setDropdownStyle({ position: "fixed", top: rect.bottom + 4, left, width: dropWidth, zIndex: 99999 });
-    else setDropdownStyle({ position: "fixed", bottom: window.innerHeight - rect.top + 4, left, width: dropWidth, zIndex: 99999 });
-  }
-
-  function handleOpen() { if (!open) computePosition(); setOpen((c) => !c); }
-
-  useEffect(() => {
-    if (!open) return;
-    const update = () => computePosition();
-    window.addEventListener("scroll", update, true); window.addEventListener("resize", update);
-    return () => { window.removeEventListener("scroll", update, true); window.removeEventListener("resize", update); };
-  }, [open, options.length]);
-
-  const toggleOption = (option: string) => {
-    if (!active) { onChange([option]); return; }
-    onChange(value.includes(option) ? value.filter((i) => i !== option) : [...value, option]);
-  };
-  const displayValue = active ? value.length === 1 ? (optionLabels?.[value[0]] ?? value[0]) : `${value.length} selected` : "All";
-  const dropdown = open ? createPortal(
-    <div className="multi-select-dropdown" style={dropdownStyle} ref={dropdownRef}>
-      {showAllOption && (
-        <label className="multi-select-option multi-select-option-all" onClick={() => onChange([])}>
-          <input type="checkbox" readOnly checked={!active} />
-          <span style={{ fontWeight: !active ? 700 : undefined, color: !active ? "#22d3ee" : undefined }}>All</span>
-        </label>
-      )}
-      {!showAllOption && active && <button type="button" className="multi-select-clear" onClick={() => onChange([])}>Clear</button>}
-      {options.map((option) => (
-        <label key={option} className="multi-select-option">
-          <input type="checkbox" checked={value.includes(option)} onChange={() => toggleOption(option)} />
-          <span>{optionLabels?.[option] ?? option}</span>
-        </label>
-      ))}
-    </div>,
-    document.body
-  ) : null;
-
-  return (
-    <div className={`filter-field multi-select-filter ${className}`} ref={wrapRef}>
-      <span>{label}</span>
-      <button type="button" className="multi-select-trigger" ref={triggerRef} onClick={handleOpen}>
-        <span className="multi-select-value">{displayValue}</span>
-        <ChevronDown size={14} style={{ transform: open ? "rotate(180deg)" : undefined, transition: "transform .15s" }} />
-      </button>
-      {dropdown}
-    </div>
-  );
-}
 
 // Main App
 
@@ -1856,6 +1173,7 @@ export default function App() {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [error, setError] = useState("");
   const [isParsing, setIsParsing] = useState(false);
+  const [stagedTrafficUpload, setStagedTrafficUpload] = useState<StagedTrafficUpload>(null);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
   const [isAddingMoreCdr, setIsAddingMoreCdr] = useState(false);
   const [savedWorkbook, setSavedWorkbook] = useState<SavedWorkbookMeta | null>(() => getSavedWorkbookMeta());
@@ -1865,6 +1183,7 @@ export default function App() {
   const { theme, isDark, toggleTheme } = useTheme();
   const [activeSection, setActiveSection] = useState(SECTION_NAV_ITEMS[0]?.id ?? "kpi");
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
+  const [showReportsCdrRegister, setShowReportsCdrRegister] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
     () => new Set()
   );
@@ -1951,33 +1270,30 @@ export default function App() {
     } finally { event.target.value = ""; }
   }, []);
 
-  const handleUpload = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
     if (files.length === 0) return;
-    setError(""); setIsParsing(true);
-    try {
-      const combinedFleetmap = unionFleetmaps(masterFleetmap.records, fixedFleetmap.records);
-      let merged: DashboardData | null = null;
-      for (const file of files) {
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-        const workbook = await readWorkbookFromUploadedFile(file);
-        const parsed = parseUploadedTrafficWorkbook(workbook, file.name, combinedFleetmap);
-        merged = merged ? mergeCdrIntoData(merged, parsed) : parsed;
-      }
-      if (!merged) return;
-      if (files.length > 1) merged.fileName = `${files.length} CDR files merged`;
-      setData(merged);
-      try { await saveWorkbookToBrowser(merged); setSavedWorkbook(workbookMeta(merged)); }
-      catch { setSavedWorkbookMeta(null); setSavedWorkbook(null); }
-      setFilters(EMPTY_FILTERS); setPage(1);
-    } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : "Workbook could not be parsed.");
-    } finally { setIsParsing(false); event.target.value = ""; }
-  }, [masterFleetmap.records, fixedFleetmap.records]);
+    setError("");
+    setStagedTrafficUpload({ mode: "cdr", files });
+    event.target.value = "";
+  }, []);
 
-  const handleRawSystemUpload = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleRawSystemUpload = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
     if (files.length === 0) return;
+    setError("");
+    setStagedTrafficUpload({ mode: "raw", files });
+    event.target.value = "";
+  }, []);
+
+  const handleClearStagedUpload = useCallback(() => {
+    setStagedTrafficUpload(null);
+    setError("");
+  }, []);
+
+  const handleConfirmStagedUpload = useCallback(async () => {
+    if (!stagedTrafficUpload || stagedTrafficUpload.files.length === 0) return;
+    const files = stagedTrafficUpload.files;
     setError(""); setIsParsing(true);
     try {
       const combinedFleetmap = unionFleetmaps(masterFleetmap.records, fixedFleetmap.records);
@@ -1985,19 +1301,26 @@ export default function App() {
       for (const file of files) {
         await new Promise((resolve) => requestAnimationFrame(resolve));
         const workbook = await readWorkbookFromUploadedFile(file);
-        const parsed = parseRawSystemWorkbook(workbook, file.name, combinedFleetmap);
+        const parsed = stagedTrafficUpload.mode === "raw"
+          ? parseRawSystemWorkbook(workbook, file.name, combinedFleetmap)
+          : parseUploadedTrafficWorkbook(workbook, file.name, combinedFleetmap);
         merged = merged ? mergeCdrIntoData(merged, parsed) : parsed;
       }
       if (!merged) return;
-      merged.fileName = files.length > 1 ? `${files.length} raw system call logs merged` : `Raw system call log: ${files[0].name}`;
+      if (stagedTrafficUpload.mode === "raw") {
+        merged.fileName = files.length > 1 ? `${files.length} raw system call logs merged` : `Raw system call log: ${files[0].name}`;
+      } else if (files.length > 1) {
+        merged.fileName = `${files.length} CDR files merged`;
+      }
       setData(merged);
+      setStagedTrafficUpload(null);
       try { await saveWorkbookToBrowser(merged); setSavedWorkbook(workbookMeta(merged)); }
       catch { setSavedWorkbookMeta(null); setSavedWorkbook(null); }
       setFilters(EMPTY_FILTERS); setPage(1);
     } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : "Raw system call log could not be parsed.");
-    } finally { setIsParsing(false); event.target.value = ""; }
-  }, [masterFleetmap.records, fixedFleetmap.records]);
+      setError(uploadError instanceof Error ? uploadError.message : "Selected file could not be parsed.");
+    } finally { setIsParsing(false); }
+  }, [fixedFleetmap.records, masterFleetmap.records, stagedTrafficUpload]);
 
   const handleAddMoreCdr = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
@@ -2089,6 +1412,10 @@ export default function App() {
     user:       groupBy(filtered, (r) => `${r.employeeName} - ${r.employeeId}`),
     hour:       groupBy(filtered, (r) => r.hour).sort((a, b) => a.name.localeCompare(b.name)),
     month:      groupBy(filtered, (r) => r.month).sort((a, b) => monthSortValue(a.name) - monthSortValue(b.name) || a.name.localeCompare(b.name)),
+    callType:   groupBy(filtered, (r) => r.callType || "Unknown"),
+    duplexType: groupBy(filtered, (r) => r.duplexType || "Unknown"),
+    callPriority: groupBy(filtered, (r) => r.callPriority || "Unknown"),
+    encrypted: groupBy(filtered, (r) => r.encrypted || "Unknown"),
   }), [filtered]);
 
   const regionPerformanceRows = useMemo(() => {
@@ -2123,17 +1450,6 @@ export default function App() {
   }, [filtered]);
 
   const fleetActivation = useMemo(() => {
-    /*
-      Build registered fleet from every possible source, in this priority:
-      1) live Master + Fixed Fleetmap states,
-      2) DashboardData.fleetmapRecords saved with the parsed workbook,
-      3) DashboardData.lookupRecords fallback,
-      4) filtered CDR company/region values only for non-empty display rows.
-
-      This prevents Inactive Radios by Company/Region from rendering empty when
-      raw-system data is uploaded or restored and the fleetmap is not attached
-      to the current DashboardData object.
-    */
     const liveFleetmap = unionFleetmaps(masterFleetmap.records, fixedFleetmap.records);
     const savedFleetmap = data?.fleetmapRecords ?? [];
     const lookupFleetmapFallback: FleetmapRecord[] = (data?.lookupRecords ?? []).map((record) => ({
@@ -2527,10 +1843,14 @@ export default function App() {
   const captureKpiChartImages = useCallback(async () => {
     const charts = await Promise.all(kpiExportItems.map(async (item) => {
       const element = item.ref.current;
-      if (!element) throw new Error(`${item.title} is not ready yet.`);
-      return { title: exportTitle(item.title), image: await captureElementPng(element, "#0f1b24") };
+      if (!element) return null;
+      try {
+        return { title: exportTitle(item.title), image: await captureElementPng(element, "#0f1b24") };
+      } catch {
+        return null;
+      }
     }));
-    return charts;
+    return charts.filter((chart): chart is { title: string; image: string } => Boolean(chart));
   }, [exportTitle, kpiExportItems]);
 
   const exportKpiXlsx = useCallback(() => {
@@ -2620,7 +1940,7 @@ export default function App() {
       tableSlide.background = { color: "FFFFFF" };
       tableSlide.addText(exportTitle("KPI Measurements"), pptTextOptions(exportTitle("KPI Measurements"), { x: 0.3, y: 0.18, w: 12.7, h: 0.36, fontSize: 18, bold: true, align: "center", color: "111111" }));
       const pptTableRows = kpiExportTableRows.map((row, ri) => row.map((cell) => ({ text: String(cell), options: pptTextOptions(cell, { bold: ri === 0, fill: { color: ri === 0 ? "FFF200" : "FFFFFF" }, color: "111111" }) })));
-      tableSlide.addTable(pptTableRows, { x: 0.18, y: 0.7, w: 12.98, h: 6.25, fontFace: "Arial", fontSize: 5.7, color: "111111", margin: 0.02, align: "center", valign: "mid", border: { type: "solid", color: "111111", pt: 0.5 }, fill: { color: "FFFFFF" }, autoFit: false, colW: [1.45, 0.86, 0.75, 0.86, 1.02, 1.08, 1.08, 1.45, 0.55], rowH: kpiExportTableRows.map((_, i) => i === 0 ? 0.58 : 0.38), bold: false, fit: "shrink" });
+      tableSlide.addTable(pptTableRows, { x: 0.18, y: 0.7, w: 12.98, h: 6.25, fontFace: "Arial", fontSize: 5.7, color: "111111", margin: 0.02, align: "center", valign: "mid", border: { type: "solid", color: "111111", pt: 0.5 }, fill: { color: "FFFFFF" }, autoFit: false, colW: [1.45, 0.86, 0.75, 0.86, 1.02, 1.08, 1.08, 1.45, 0.55], rowH: kpiExportTableRows.map((_, i) => i === 0 ? 0.58 : 0.38), bold: false, fit: "shrink" } as any);
       const addImageSlide = (title: string, image: string) => {
         const slide = pptx.addSlide();
         slide.background = { color: "0F1B24" };
@@ -2781,6 +2101,48 @@ export default function App() {
     );
   }, [CompanyPeriodLabel, exportTitle, unmatchedFleetmapReportRows]);
 
+  const exportTablePdf = useCallback((fileName: string, title: string, headers: string[], rows: (string | number)[][]) => {
+    void (async () => {
+      const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+      await ensurePdfArabicFont(pdf);
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 24;
+      const tableWidth = pageWidth - margin * 2;
+      const colWidth = tableWidth / Math.max(1, headers.length);
+      const rowHeight = 20;
+      let y = 54;
+      pdf.setFont("helvetica", "bold"); pdf.setFontSize(15); pdf.setTextColor(0, 0, 0);
+      pdfText(pdf, exportTitle(title), pageWidth / 2, 28, { align: "center" });
+      const drawRow = (row: (string | number)[], isHeader = false) => {
+        if (y + rowHeight > pageHeight - margin) { pdf.addPage("a4", "landscape"); y = margin; }
+        let x = margin;
+        row.forEach((cell) => {
+          pdf.setDrawColor(20, 36, 48);
+          pdf.setFillColor(isHeader ? "#fff200" : "#ffffff");
+          pdf.rect(x, y, colWidth, rowHeight, "FD");
+          pdf.setFont("helvetica", isHeader ? "bold" : "normal"); pdf.setFontSize(isHeader ? 7 : 7.2); pdf.setTextColor(0, 0, 0);
+          pdfText(pdf, cell, x + colWidth / 2, y + 13, { align: "center", maxWidth: colWidth - 4 });
+          x += colWidth;
+        });
+        y += rowHeight;
+      };
+      drawRow(headers, true);
+      rows.forEach((row) => drawRow(row));
+      pdf.save(fileName);
+    })();
+  }, [exportTitle]);
+
+  const regionPerformanceHeaders = ["Region", "Calls", "Duration", "Traffic Hours", "Active Radios", "Talkgroups", "Companies", "Base Stations", "Average Duration", "Peak Hour", "Top Company"];
+  const regionPerformanceExportRows = useMemo(() => regionPerformanceRows.map((row) => [row.name, formatNumber(row.calls), secondsToClock(row.durationSeconds), formatDecimal(row.trafficHours, 2), formatNumber(row.radios), formatNumber(row.talkgroups), formatNumber(row.companies), formatNumber(row.stations), secondsToClock(row.averageDuration), row.peakHour, row.topCompany]), [regionPerformanceRows]);
+  const exportRegionPerformanceXlsx = useCallback(() => downloadWorkbookData(`region-performance-${fileSlug(CompanyPeriodLabel)}.xlsx`, "Region Performance", exportTitle("Region Performance Matrix"), { headers: regionPerformanceHeaders, rows: regionPerformanceExportRows }), [CompanyPeriodLabel, exportTitle, regionPerformanceExportRows]);
+  const exportRegionPerformancePdf = useCallback(() => exportTablePdf(`region-performance-${fileSlug(CompanyPeriodLabel)}.pdf`, "Region Performance Matrix", regionPerformanceHeaders, regionPerformanceExportRows), [CompanyPeriodLabel, exportTablePdf, regionPerformanceExportRows]);
+
+  const talkgroupEfficiencyHeaders = ["Talkgroup", "Calls", "Duration", "Traffic Hours", "Radios", "Users", "Average Duration", "Peak Hour", "Peak Region", "Peak Company"];
+  const talkgroupEfficiencyExportRows = useMemo(() => talkgroupEfficiencyRows.map((row) => [row.name, formatNumber(row.calls), secondsToClock(row.durationSeconds), formatDecimal(row.trafficHours, 2), formatNumber(row.radios), formatNumber(row.users), secondsToClock(row.averageDuration), row.peakHour, row.peakRegion, row.peakCompany]), [talkgroupEfficiencyRows]);
+  const exportTalkgroupEfficiencyXlsx = useCallback(() => downloadWorkbookData(`talkgroup-efficiency-${fileSlug(CompanyPeriodLabel)}.xlsx`, "Talkgroup Efficiency", exportTitle("Talkgroup Efficiency"), { headers: talkgroupEfficiencyHeaders, rows: talkgroupEfficiencyExportRows }), [CompanyPeriodLabel, exportTitle, talkgroupEfficiencyExportRows]);
+  const exportTalkgroupEfficiencyPdf = useCallback(() => exportTablePdf(`talkgroup-efficiency-${fileSlug(CompanyPeriodLabel)}.pdf`, "Talkgroup Efficiency", talkgroupEfficiencyHeaders, talkgroupEfficiencyExportRows), [CompanyPeriodLabel, exportTablePdf, talkgroupEfficiencyExportRows]);
+
   const exportRowsPdfPage = useCallback(() => {
     void (async () => {
       const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
@@ -2936,7 +2298,7 @@ export default function App() {
     companies.forEach((_, i) => worksheet.mergeCells(2, 2 + i * 2, 2, 3 + i * 2));
     rows.forEach((row) => worksheet.addRow([row.label, ...row.values.flatMap((v) => [v.calls, v.durationSeconds])]));
     worksheet.addRow(["Total", ...companies.flatMap((c) => { const t = totals.get(c) ?? { calls: 0, durationSeconds: 0 }; return [t.calls, t.durationSeconds]; })]);
-    worksheet.eachRow((row, rn) => { row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle" }; cell.border = border; if (rn <= 3 || rn === rows.length + 4) { cell.font = { bold: true }; cell.fill = rn === rows.length + 4 || rn === 1 ? headerFill : undefined; } }); });
+    worksheet.eachRow((row, rn) => { row.eachCell((cell) => { cell.alignment = { horizontal: "center", vertical: "middle" }; cell.border = border; if (rn <= 3 || rn === rows.length + 4) { cell.font = { bold: true }; if (rn === rows.length + 4 || rn === 1) cell.fill = headerFill; } }); });
     worksheet.columns = [{ width: 16 }, ...companies.flatMap((c) => [{ width: Math.max(12, c.length + 3) }, { width: 14 }])];
     chartData.addRow(["Category", "Calls", "Duration Seconds"]);
     monthlyCompanyChartData.forEach((r) => chartData.addRow([r.category, r.calls, r.durationSeconds]));
@@ -3037,12 +2399,16 @@ export default function App() {
       "Talkgroup Performance": rankingDataset(rankings.talkgroup.slice(0, 12)),
       "Radio Type Performance": rankingDataset(rankings.mobileType),
       "Hour Performance": rankingDataset(rankings.hour),
+      "Call Type": rankingDataset(rankings.callType),
+      "Duplex Type": { headers: ["Duplex Type", "Duration Seconds", "Duration", "Calls"], rows: rankings.duplexType.map((r) => [r.name, r.durationSeconds, secondsToClock(r.durationSeconds), r.calls]) },
+      "Call Priority": rankingDataset(rankings.callPriority),
+      "Encrypted": rankingDataset(rankings.encrypted),
       "Busy-hour profile": rankingDataset(rankings.hour),
       "Top Companies by Calls": rankingDataset(rankings.company.slice(0, 10)),
       "Top Base Stations by Calls": rankingDataset(rankings.station.slice(0, 10)),
       "Top Talkgroups by Calls": rankingDataset(rankings.talkgroup.slice(0, 10)),
     };
-  }, [CompanyChartData.calls, CompanyChartData.duration, CompanyRows, kpiRows, mobileTypeByCompany, mobileTypeByMonth, mobileTypes, monthlyCompanyRows, monthlyKpi.months, monthlyKpi.rows, monthlyKpiPieData, rankings.company, rankings.hour, rankings.mobileType, rankings.month, rankings.region, rankings.station, rankings.talkgroup, radioMonths]);
+  }, [CompanyChartData.calls, CompanyChartData.duration, CompanyRows, kpiRows, mobileTypeByCompany, mobileTypeByMonth, mobileTypes, monthlyCompanyRows, monthlyKpi.months, monthlyKpi.rows, monthlyKpiPieData, rankings.callPriority, rankings.callType, rankings.company, rankings.duplexType, rankings.encrypted, rankings.hour, rankings.mobileType, rankings.month, rankings.region, rankings.station, rankings.talkgroup, radioMonths]);
 
   useEffect(() => {
     if (!data) return;
@@ -3072,7 +2438,10 @@ export default function App() {
       onUploadMasterFleetmap={handleUploadMasterFleetmap}
       onUploadFixedFleetmap={handleUploadFixedFleetmap}
       onLoadSaved={handleLoadSavedWorkbook}
+      onConfirmUpload={handleConfirmStagedUpload}
+      onClearStagedUpload={handleClearStagedUpload}
       savedWorkbook={savedWorkbook}
+      stagedTrafficUpload={stagedTrafficUpload}
       masterFleetmap={masterFleetmap}
       fixedFleetmap={fixedFleetmap}
       isParsing={isParsing}
@@ -3080,12 +2449,13 @@ export default function App() {
       error={error}
       theme={theme}
       onToggleTheme={toggleTheme}
+      formatNumber={formatNumber}
     />
   );
 
   const showOverviewTab = activeTab === "overview";
+  const showChartsTab = activeTab === "charts";
   const showFleetTab = activeTab === "fleet";
-  const showRegionTab = activeTab === "region";
   const showCompanyTab = activeTab === "company";
   const showKpiTab = activeTab === "kpi";
   const showReportsTab = activeTab === "reports";
@@ -3192,16 +2562,16 @@ export default function App() {
             </svg>
           </div>
           <div className="followup-header-badge followup-header-badge-left">
-            <img src="/assets/se-logo.png" alt="Saudi Energy" />
+            {/* <img src="/assets/se-logo.png" alt="Saudi Energy" /> */}
           </div>
 
           <div className="followup-dashboard-title">
-            <h1>CDR Traffic Dashboard</h1>
-            <p>CALL DETAIL RECORD ANALYTICS</p>
+            <h1 style={{ fontSize: "clamp(1.3rem, 2.5vw, 2rem)", fontWeight: 900, color: "#ffffff", letterSpacing: "0.02em" }}>CDR Traffic Dashboard</h1>
+            <p style={{ fontSize: "0.72rem", fontWeight: 700, color: "#7ecef4", letterSpacing: "0.14em", textTransform: "uppercase" }}>CALL DETAIL RECORD ANALYTICS</p>
           </div>
 
           <div className="followup-header-badge followup-header-badge-right">
-            <img src="/assets/nasco-logo.png" alt="NASCO" />
+            {/* <img src="/assets/nasco-logo.png" alt="NASCO" /> */}
           </div>
         </header>
 
@@ -3213,7 +2583,7 @@ export default function App() {
             <button className="button small cdr-action-pill" type="button" onClick={() => { setData(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
               <Home size={18} /> Home
             </button>
-            <button className="button small cdr-action-pill" type="button" onClick={() => { setActiveTab("region"); window.setTimeout(() => document.getElementById("regionPerformance")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }}>
+            <button className="button small cdr-action-pill" type="button" onClick={() => { setActiveTab("company"); window.setTimeout(() => document.getElementById("regionPerformance")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }}>
               <UploadCloud size={18} /> Add Region ({formatNumber(metrics.regions)})
             </button>
             <label className="button small cdr-action-pill cdr-action-file" title="Add new workbook files to the current dashboard">
@@ -3252,7 +2622,7 @@ export default function App() {
         <MultiSelectFilter className="filter-xwide" label="Base Station" value={filters.baseStation} options={options.baseStation} onChange={(baseStation) => { setFilters((c) => ({ ...c, baseStation })); setPage(1); }} />
         <MultiSelectFilter className="filter-wide" label="Talkgroup" value={filters.talkgroup} options={options.talkgroup} optionLabels={talkgroupLabels} onChange={(talkgroup) => { setFilters((c) => ({ ...c, talkgroup })); setPage(1); }} />
         <button className="button reset-filter-button" onClick={() => { setFilters(EMPTY_FILTERS); setPage(1); }}><X size={16} /> Reset Filters</button>
-        <span className="filter-count">{formatNumber(filtered.length)} from {formatNumber(records.length)} - {formatPercent(filteredShare)}</span>
+        <span className="filter-count" style={{ fontSize: "0.8rem", fontWeight: 600, color: "#7ecef4" }}>{formatNumber(filtered.length)} from {formatNumber(records.length)} - {formatPercent(filteredShare)}</span>
       </section>
 
       </section>
@@ -3261,25 +2631,25 @@ export default function App() {
         <div className="hero-main hero-main-with-icon">
           <img className="hero-call-icon" src="/assets/call.png" alt="Calls under analysis" />
           <div className="hero-profile-copy">
-            <p className="eyebrow">Live workbook profile</p>
-            <h2>{formatNumber(metrics.totalCalls)}</h2>
-            <p className="hero-subtitle">calls under analysis</p>
+            <p className="eyebrow" style={{ fontSize: "18px", fontWeight: 900, letterSpacing: "0.08em", color: "#7ecef4", textTransform: "uppercase" }}>Uploaded workbook profile</p>
+            <h2 style={{ fontSize: "18px", fontWeight: 900, color: "#ffffff", lineHeight: 1.0 }}>{formatNumber(metrics.totalCalls)}</h2>
+            <p className="hero-subtitle" style={{ fontSize: "14px", fontWeight: 500, color: "#a8c8e8" }}>Calls under Analysis</p>
           </div>
         </div>
         <div className="workbook-card">
           <ShieldCheck size={28} />
-          <span>Workbook</span>
-          <strong>{data.fileName}</strong>
-          <p>{formatNumber(data.rawRows)} records - loaded {data.loadedAt}</p>
+          <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", color: "#7ecef4", textTransform: "uppercase" }}>Workbook</span>
+          <strong style={{ fontSize: "0.95rem", fontWeight: 700, color: "#e8f4ff" }}>{data.fileName}</strong>
+          <p style={{ fontSize: "0.82rem", color: "#8aafc8" }}>{formatNumber(data.rawRows)} records - loaded {data.loadedAt}</p>
           {data.cdrSources.length > 1 && (
             <ul className="cdr-sources-list">
               {data.cdrSources.map((src, i) => (
-                <li key={`${src.fileName}-${i}`}><strong>{src.fileName}</strong> - {formatNumber(src.recordCount)} rows</li>
+                <li key={`${src.fileName}-${i}`} style={{ fontSize: "0.8rem", color: "#8aafc8" }}><strong style={{ color: "#c8e0f4" }}>{src.fileName}</strong> - {formatNumber(src.recordCount)} rows</li>
               ))}
             </ul>
           )}
           {(masterFleetmap.meta || fixedFleetmap.meta) && (
-            <p className="fleetmap-status">
+            <p className="fleetmap-status" style={{ fontSize: "0.8rem", color: "#7ecef4" }}>
               Fleetmap: {masterFleetmap.meta ? `Master (${formatNumber(masterFleetmap.records.length)})` : "-"}
               {" + "}
               {fixedFleetmap.meta ? `Fixed (${formatNumber(fixedFleetmap.records.length)})` : "-"}
@@ -3289,17 +2659,18 @@ export default function App() {
       </section>
 
       {data.warnings.length > 0 && (
-        <div className="warning-strip"><AlertTriangle size={18} /> {data.warnings.join(" ")}</div>
+        <div className="warning-strip" style={{ fontSize: "0.85rem", fontWeight: 600, color: "#ffe082" }}><AlertTriangle size={18} /> {data.warnings.join(" ")}</div>
       )}
 
       {showReportsTab && (
       <section id="reportsTabPanel" className="reports-tab-panel">
         <article className="table-card export-center-card">
-          <h3>Reports & Export Center</h3>
-          <p className="table-note">Export the current filtered dashboard view, KPI data, row register, utilization analysis, and unmatched fleetmap report.</p>
+          <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#e8f4ff" }}>Reports & Export Center</h3>
+          <p className="table-note" style={{ fontSize: "0.85rem", color: "#8aafc8" }}>Export the current filtered dashboard view, KPI data, row register, utilization analysis, and unmatched fleetmap report.</p>
           <div className="export-center-actions">
             <ExportButton kind="xlsx" label="CDR Report" onClick={exportRowsXlsx} />
             <ExportButton kind="pdf" label="CDR Report" onClick={exportRowsPdfPage} />
+            <ExportButton kind="view" label="CDR View" onClick={() => { setShowReportsCdrRegister((current) => !current); window.setTimeout(() => document.getElementById("reports-cdr-register")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
             <ExportButton kind="xlsx" label="KPI Report" onClick={exportKpiXlsx} />
             <ExportButton kind="pdf" label="KPI Report" onClick={exportKpiPdf} />
             <ExportButton kind="ppt" label="KPI Report" onClick={exportKpiPpt} />
@@ -3308,81 +2679,86 @@ export default function App() {
             <ExportButton kind="xlsx" label="Unmatched Report" onClick={exportUnmatchedFleetmapXlsx} />
           </div>
         </article>
-      </section>
+              {showReportsCdrRegister && (
+          <article id="reports-cdr-register" className="records-card reports-cdr-register">
+            <div className="section-title reports-register-title">
+              <div className="section-title-heading">
+                <div className="section-title-copy">
+                  <p>CDR View</p>
+                  <h2>Filtered Calls Register</h2>
+                  <span>{formatNumber(filtered.length)} filtered rows from {formatNumber(records.length)} source rows.</span>
+                </div>
+              </div>
+            </div>
+            <div className="records-scroll records-scroll-fixed-register fixed-row-table">
+              <table className="filtered-register-table">
+                <colgroup>
+                  <col className="col-sn" />
+                  <col className="col-radio-id" />
+                  <col className="col-radio-alias" />
+                  <col className="col-radio-type" />
+                  <col className="col-employee-name" />
+                  <col className="col-employee-id" />
+                  <col className="col-region" />
+                  <col className="col-company" />
+                  <col className="col-talkgroup" />
+                  <col className="col-start" />
+                  <col className="col-end" />
+                  <col className="col-duration" />
+                  <col className="col-base-station" />
+                </colgroup>
+                <thead><tr><th>SN</th><th>Radio ID</th><th>Radio Alias</th><th>Radio Type</th><th>Employee Name</th><th>Employee ID</th><th>Region</th><th>Company</th><th>Talkgroup Alias</th><th>Start Time</th><th>End Time</th><th>Duration (s)</th><th>Base Station</th></tr></thead>
+                <tbody>
+                  {pagedRecords.map((record, index) => (
+                    <tr key={`reports-${record.radioId}-${index}`}>
+                      <td>{(page - 1) * 50 + index + 1}</td><td>{record.radioId}</td><td>{record.radioAlias}</td><td>{record.mobileType}</td>
+                      <td>{record.employeeName}</td><td>{record.employeeId}</td><td>{record.region}</td><td>{record.company}</td>
+                      <td>{record.talkgroup}</td><td>{record.startTime}</td><td>{record.endTime}</td>
+                      <td>{formatNumber(record.durationSeconds)}</td><td>{record.baseStation}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="pager">
+              <button className="button" disabled={page <= 1} onClick={() => setPage((c) => Math.max(1, c - 1))}>Previous</button>
+              <span>Page {formatNumber(page)} of {formatNumber(pageCount)} - showing {formatNumber(pagedRecords.length)} rows</span>
+              <button className="button" disabled={page >= pageCount} onClick={() => setPage((c) => Math.min(pageCount, c + 1))}>Next</button>
+            </div>
+          </article>
+        )}      </section>
       )}
 
       {showOverviewTab && (
-      <>
-      <section className="summary-cards summary-cards-arranged summary-cards-manual-rows summary-cards-10-layout visual-kpi-cards">
-        {/* Row 1: first 10 cards */}
-        <div className="summary-card-row summary-card-row-10">
-          <VisualSummaryCard label="Total Calls" value={formatNumber(metrics.totalCalls)} detail="Filtered result" iconKey="totalCalls" tone="cyan" primary />
-          <VisualSummaryCard label="Regions" value={formatNumber(metrics.regions)} detail="Geographic coverage" iconKey="regions" tone="green" />
-          <VisualSummaryCard label="Companies" value={formatNumber(metrics.companies)} detail="Business coverage" iconKey="companies" tone="purple" />
-          <VisualSummaryCard label="Radios" value={formatNumber(metrics.radios)} detail="Active radio users" iconKey="radios" tone="amber" />
-          <VisualSummaryCard label="Talkgroups" value={formatNumber(metrics.talkgroups)} detail="Used groups" iconKey="talkgroups" tone="green" />
-          <VisualSummaryCard label="Base Stations" value={formatNumber(metrics.stations)} detail="Network sites" iconKey="baseStations" tone="red" />
-          <VisualSummaryCard label="Total Duration" value={secondsToClock(metrics.totalDuration)} detail="Filtered result" iconKey="totalDuration" tone="blue" />
-          <VisualSummaryCard label="Average Duration" value={secondsToClock(metrics.averageDuration)} detail="Per call" iconKey="averageDuration" tone="purple" />
-          <VisualSummaryCard label="Max Duration" value={secondsToClock(maxDuration)} detail="Longest call" iconKey="maxDuration" tone="amber" />
-          <VisualSummaryCard label="Min Duration" value={secondsToClock(minDuration)} detail="Shortest call" iconKey="minDuration" tone="blue" />
-        </div>
-
-        {/* Row 2: next 8 cards */}
-        <div className="summary-card-row summary-card-row-8">
-          <VisualSummaryCard label="Peak Radio" value={peakRadioEntry?.[0] ?? "--"} detail="Most active radio" iconKey="peakRadio" tone="amber" />
-          <VisualSummaryCard label="Peak User Name" value={peakUserParts[0] ?? "--"} detail="Most active user" iconKey="peakUserName" tone="red" />
-          <VisualSummaryCard label="Peak User ID" value={peakUserParts[1] ?? "--"} detail="User identifier" iconKey="peakUserId" tone="amber" />
-          <VisualSummaryCard label="Peak User Company" value={peakUserParts[2] ?? "--"} detail="User company" iconKey="peakUserCompany" tone="red" />
-          <VisualSummaryCard label="Peak Company" value={topCompany?.name ?? "--"} detail="Most calls" iconKey="peakCompany" tone="red" />
-          <VisualSummaryCard label="Peak Talkgroup" value={topTalkgroup?.name ?? "--"} detail="Most calls" iconKey="peakTalkgroup" tone="red" />
-          <VisualSummaryCard label="Peak Base Station" value={topStation?.name ?? "--"} detail="Most calls" iconKey="peakBaseStation" tone="red" />
-          <VisualSummaryCard label="Peak Month" value={peakMonthEntry?.[0] ?? "--"} detail="Highest calls" iconKey="peakMonth" tone="red" />
-        </div>
-
-        {/* Row 3: remaining 7 cards */}
-        <div className="summary-card-row summary-card-row-7">
-          <VisualSummaryCard label="Peak Week" value={peakWeekEntry?.[0] ?? "--"} detail="Highest calls" iconKey="peakWeek" tone="red" />
-          <VisualSummaryCard label="Peak Day" value={peakDayEntry?.[0] ?? "--"} detail="Highest calls" iconKey="peakDay" tone="red" />
-          <VisualSummaryCard label="Busy Hour" value={peakHour?.name ?? "--"} detail="Highest calls" iconKey="busyHour" tone="amber" />
-          <VisualSummaryCard label="Peak Hour Calls" value={formatNumber(peakHour?.calls ?? 0)} detail="Busy hour volume" iconKey="peakHourCalls" tone="amber" />
-          <VisualSummaryCard label="Traffic (Erlangs)" value={formatDecimal(metrics.trafficHours, 1)} detail="Total traffic" iconKey="trafficErlangs" tone="cyan" />
-          <VisualSummaryCard label="Peak Traffic (Erlangs)" value={formatDecimal(peakTrafficHour?.trafficHours ?? 0, 1)} detail="Highest traffic hour" iconKey="peakTrafficErlangs" tone="red" />
-          <VisualSummaryCard label="Peak Hour Avg Duration" value={formatDecimal(peakHourAvgDuration, 1)} detail="Seconds per call" iconKey="peakHourAvgDuration" tone="purple" />
-        </div>
-      </section>
-
-      <section className="data-quality-panel visual-quality-panel" aria-label="Data quality and filter health">
-        <div className="quality-score-card visual-quality-card">
-          <div className="summary-card-head">
-            <span>Data Quality Score</span>
-            <CheckCircle2 className="summary-card-icon" size={18} strokeWidth={2.4} />
-          </div>
-          <strong>{formatDecimal(qualityScore, 1)}%</strong>
-          <small>{formatNumber(records.length)} source rows checked</small>
-        </div>
-        <div className="quality-issue-grid">
-          {qualityIssues.map((issue) => {
-            const IssueIcon = DASHBOARD_CARD_ICONS[qualityIssueIconKey(issue.name)];
-            return (
-              <div className="quality-issue visual-quality-issue" key={issue.name}>
-                <div className="summary-card-head">
-                  <span>{issue.name}</span>
-                  <IssueIcon className="summary-card-icon" size={18} strokeWidth={2.4} />
-                </div>
-                <strong>{formatNumber(issue.count)}</strong>
-                <small>{formatDecimal(issue.pct, 1)}%</small>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      <>      <OverviewSummaryCards
+        metrics={metrics}
+        maxDuration={maxDuration}
+        minDuration={minDuration}
+        peakRadioName={peakRadioEntry?.[0] ?? "--"}
+        peakUserParts={peakUserParts}
+        topCompany={topCompany}
+        topTalkgroup={topTalkgroup}
+        topStation={topStation}
+        peakMonthName={peakMonthEntry?.[0] ?? "--"}
+        peakWeekName={peakWeekEntry?.[0] ?? "--"}
+        peakDayName={peakDayEntry?.[0] ?? "--"}
+        peakHour={peakHour}
+        peakTrafficHour={peakTrafficHour}
+        peakHourAvgDuration={peakHourAvgDuration}
+        trafficIntensity={trafficIntensity}
+        qualityScore={qualityScore}
+        qualityIssues={qualityIssues}
+        recordsCount={records.length}
+        formatNumber={formatNumber}
+        formatDecimal={formatDecimal}
+        secondsToClock={secondsToClock}
+      />
 
       {filtered.length === 0 && (
         <div className="empty-state" role="status">
           <Search size={34} />
-          <strong>No records found</strong>
-          <span>Try changing or resetting your filters.</span>
+          <strong style={{ fontSize: "1.1rem", fontWeight: 700, color: "#e8f4ff" }}>No records found</strong>
+          <span style={{ fontSize: "0.9rem", color: "#8aafc8" }}>Try changing or resetting your filters.</span>
         </div>
       )}
       </>
@@ -3393,11 +2769,11 @@ export default function App() {
       <SectionTitle id="networkUtilization" eyebrow="Fleet activation" title={`Network Utilization & Fleet Activation in ${CompanyPeriodLabel}`} text="Compare registered fleetmap radios against radios that made calls in the filtered period." collapsed={isSectionCollapsed("networkUtilization")} onToggle={() => toggleSection("networkUtilization")} />
       <section id="networkUtilization-content" className={`network-utilization-section ${isSectionCollapsed("networkUtilization") ? "section-content-collapsed" : ""}`}>
         <div className="summary-cards network-utilization-cards">
-          <div className="summary-card yellow"><span>Registered Radios</span><strong>{formatNumber(fleetActivation.registeredCount)}</strong><small>From fleetmap</small></div>
-          <div className="summary-card green"><span>Active Registered</span><strong>{formatNumber(fleetActivation.activeRegisteredCount)}</strong><small>Made calls</small></div>
-          <div className="summary-card yellow"><span>Inactive Radios</span><strong>{formatNumber(fleetActivation.inactiveCount)}</strong><small>No calls found</small></div>
-          <div className="summary-card green"><span>Activation %</span><strong>{formatDecimal(fleetActivation.activationRate, 1)}%</strong><small>Active / registered</small></div>
-          <div className="summary-card yellow"><span>Traffic / Active Radio</span><strong>{formatDecimal(trafficIntensity.trafficPerRadio, 2)}</strong><small>Erlangs per radio</small></div>
+          <div className="summary-card yellow"><span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#b0b8c8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Registered Radios</span><strong style={{ fontSize: "1.6rem", fontWeight: 900, color: "#ffe082" }}>{formatNumber(fleetActivation.registeredCount)}</strong><small style={{ fontSize: "0.75rem", color: "#8aafc8" }}>From fleetmap</small></div>
+          <div className="summary-card green"><span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#b0b8c8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Active Registered</span><strong style={{ fontSize: "1.6rem", fontWeight: 900, color: "#69f0ae" }}>{formatNumber(fleetActivation.activeRegisteredCount)}</strong><small style={{ fontSize: "0.75rem", color: "#8aafc8" }}>Made calls</small></div>
+          <div className="summary-card yellow"><span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#b0b8c8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Inactive Radios</span><strong style={{ fontSize: "1.6rem", fontWeight: 900, color: "#ffe082" }}>{formatNumber(fleetActivation.inactiveCount)}</strong><small style={{ fontSize: "0.75rem", color: "#8aafc8" }}>No calls found</small></div>
+          <div className="summary-card green"><span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#b0b8c8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Activation %</span><strong style={{ fontSize: "1.6rem", fontWeight: 900, color: "#69f0ae" }}>{formatDecimal(fleetActivation.activationRate, 1)}%</strong><small style={{ fontSize: "0.75rem", color: "#8aafc8" }}>Active / registered</small></div>
+          <div className="summary-card yellow"><span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#b0b8c8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Traffic / Active Radio</span><strong style={{ fontSize: "1.6rem", fontWeight: 900, color: "#ffe082" }}>{formatDecimal(trafficIntensity.trafficPerRadio, 2)}</strong><small style={{ fontSize: "0.75rem", color: "#8aafc8" }}>Erlangs per radio</small></div>
         </div>
         <div className="quality-grid">
           <article className="table-card inactive-radio-table-card">
@@ -3503,9 +2879,8 @@ export default function App() {
       </>
       )}
 
-      {showRegionTab && (
-      <>
-      <SectionTitle id="regionPerformance" eyebrow="Regional deck" title={`Region Performance in ${CompanyPeriodLabel}`} text="Compare regional calls, duration, traffic, active radios, talkgroups, companies, and peak operating periods." collapsed={isSectionCollapsed("regionPerformance")} onToggle={() => toggleSection("regionPerformance")} />
+      {showCompanyTab && (
+      <><SectionTitle id="regionPerformance" eyebrow="Regional deck" title={`Region Performance in ${CompanyPeriodLabel}`} text="Compare regional calls, duration, traffic, active radios, talkgroups, companies, and peak operating periods." collapsed={isSectionCollapsed("regionPerformance")} onToggle={() => toggleSection("regionPerformance")} actions={<><ExportButton kind="xlsx" label="Region XLSX" onClick={exportRegionPerformanceXlsx} /><ExportButton kind="pdf" label="Region PDF" onClick={exportRegionPerformancePdf} /></>} />
       <section id="regionPerformance-content" className={`region-performance-section ${isSectionCollapsed("regionPerformance") ? "section-content-collapsed" : ""}`}>
         <article className="table-card wide-table-card">
           <h3>Region Performance Matrix</h3>
@@ -3516,33 +2891,13 @@ export default function App() {
             </table>
           </div>
         </article>
-      </section>
-
-      <SectionTitle id="trafficIntensity" eyebrow="Traffic deck" title={`Busy Hour & Traffic Intensity in ${CompanyPeriodLabel}`} text="Show when the network is busiest and how much traffic each operational dimension carries." collapsed={isSectionCollapsed("trafficIntensity")} onToggle={() => toggleSection("trafficIntensity")} />
-      <section id="trafficIntensity-content" className={`traffic-intensity-section ${isSectionCollapsed("trafficIntensity") ? "section-content-collapsed" : ""}`}>
-        <div className="summary-cards traffic-intensity-cards">
-          <div className="summary-card yellow"><span>Busy Traffic Hour</span><strong>{trafficIntensity.busyTrafficHour?.name ?? "--"}</strong><small>Highest Erlangs</small></div>
-          <div className="summary-card green"><span>Busy Hour Traffic</span><strong>{formatDecimal(trafficIntensity.busyTrafficHour?.trafficHours ?? 0, 2)}</strong><small>Erlangs</small></div>
-          <div className="summary-card yellow"><span>Traffic / Talkgroup</span><strong>{formatDecimal(trafficIntensity.trafficPerTalkgroup, 2)}</strong><small>Erlangs</small></div>
-          <div className="summary-card green"><span>Traffic / Company</span><strong>{formatDecimal(trafficIntensity.trafficPerCompany, 2)}</strong><small>Erlangs</small></div>
-          <div className="summary-card yellow"><span>Traffic / Region</span><strong>{formatDecimal(trafficIntensity.trafficPerRegion, 2)}</strong><small>Erlangs</small></div>
-        </div>
-        <article className="table-card wide-table-card">
-          <h3>Region x Hour Busy Map</h3>
-          <div className="heatmap-scroll">
-            <table className="busy-heatmap-table">
-              <thead><tr><th>Region</th>{heatmapHours.map((hour) => <th key={hour}>{hour}</th>)}<th>Total</th></tr></thead>
-              <tbody>{regionHourHeatmap.map((row) => <tr key={row.region}><td>{row.region}</td>{row.cells.map((value, index) => <td key={`${row.region}-${heatmapHours[index]}`}><span className="busy-heat-cell" style={{ opacity: Math.max(0.18, value / heatmapMax) }}>{formatNumber(value)}</span></td>)}<td>{formatNumber(row.total)}</td></tr>)}</tbody>
-            </table>
-          </div>
-        </article>
-      </section>
+      </section>      
       </>
       )}
 
       {showCompanyTab && (
       <>
-      <SectionTitle id="talkgroupEfficiency" eyebrow="Talkgroup deck" title={`Talkgroup Efficiency in ${CompanyPeriodLabel}`} text="Rank talkgroups by traffic, active radios, active users, average duration, and peak operating context." collapsed={isSectionCollapsed("talkgroupEfficiency")} onToggle={() => toggleSection("talkgroupEfficiency")} />
+      <SectionTitle id="talkgroupEfficiency" eyebrow="Talkgroup deck" title={`Talkgroup Efficiency in ${CompanyPeriodLabel}`} text="Rank talkgroups by traffic, active radios, active users, average duration, and peak operating context." collapsed={isSectionCollapsed("talkgroupEfficiency")} onToggle={() => toggleSection("talkgroupEfficiency")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportTalkgroupEfficiencyXlsx} /><ExportButton kind="pdf" label="PDF" onClick={exportTalkgroupEfficiencyPdf} /></>} />
       <section id="talkgroupEfficiency-content" className={`talkgroup-efficiency-section ${isSectionCollapsed("talkgroupEfficiency") ? "section-content-collapsed" : ""}`}>
         <article className="table-card wide-table-card">
           <h3>Talkgroup Efficiency Matrix</h3>
@@ -3653,9 +3008,8 @@ export default function App() {
       </>
       )}
 
-      {showCompanyTab && (
-      <>
-      <SectionTitle id="Company" eyebrow="Company deck" title={`Company contribution in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Company")} onToggle={() => toggleSection("Company")} actions={<><ExportButton kind="view" label="View" onClick={openMonthlyCompanyTable} /><ExportButton kind="xlsx" label="XLSX" onClick={exportMonthlyCompanyXlsx} /><ExportButton kind="ppt" label="PPT" onClick={exportMonthlyCompanyPpt} /><ExportButton kind="pdf" label="PDF" onClick={exportMonthlyCompanyPdf} /></>} />
+      {showChartsTab && (
+      <><SectionTitle id="Company" eyebrow="Company deck" title={`Company contribution in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Company")} onToggle={() => toggleSection("Company")} actions={<><ExportButton kind="view" label="View" onClick={openMonthlyCompanyTable} /><ExportButton kind="xlsx" label="XLSX" onClick={exportMonthlyCompanyXlsx} /><ExportButton kind="ppt" label="PPT" onClick={exportMonthlyCompanyPpt} /><ExportButton kind="pdf" label="PDF" onClick={exportMonthlyCompanyPdf} /></>} />
       <section id="Company-content" className={`chart-grid dashboard-chart-grid company-chart-grid ${isSectionCollapsed("Company") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card Company-card company-talkgroups" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Talkgroups per Company</h3>
@@ -3741,7 +3095,11 @@ export default function App() {
         <article className="chart-card performance-basestation"><CallsDurationPerformanceChart title="Base Stations Performance" data={rankings.station.slice(0, 12)} gradientId="performanceStation" /></article>
         <article className="chart-card performance-hour"><CallsDurationPerformanceChart title="Hours Performance" data={rankings.hour} gradientId="performanceHour" xTickFormatter={(v) => `${v ?? ""}`} /></article>
       </section>
+      </>
+      )}
 
+      {showChartsTab && (
+      <>
       <SectionTitle id="General" eyebrow="General" title={`General Charts in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("General")} onToggle={() => toggleSection("General")} />
       <section id="General-content" className={`chart-grid dashboard-chart-grid general-chart-grid ${isSectionCollapsed("General") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card general-mobile-type wide">
@@ -3758,13 +3116,37 @@ export default function App() {
             </BarChart>
           </ResponsiveContainer>
         </article>
+        <article className="chart-card">
+          <CallsDurationPerformanceChart title="Call Type" data={rankings.callType} gradientId="callTypePerformance" />
+        </article>
+        <article className="chart-card">
+          <h3>Duplex Type</h3>
+          <ResponsiveContainer width="100%" height={340}>
+            <BarChart data={rankings.duplexType} margin={{ left: 0, right: 8, top: 18, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
+              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={62} tickFormatter={(v) => truncateLabel(v, 18)} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={chartLabel} />
+              <Tooltip content={<CompanyPerformanceTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="durationSeconds" name="Duration seconds" fill={CHART_COLORS.duration} radius={[8, 8, 0, 0]} maxBarSize={58}>
+                <LabelList dataKey="durationSeconds" content={TopValueLabel} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Duration seconds", color: CHART_COLORS.duration }]} />
+        </article>
+
+        <article className="chart-card">
+          <CallsDurationPerformanceChart title="Call Priority" data={rankings.callPriority} gradientId="callPriorityPerformance" />
+        </article>
+        <article className="chart-card">
+          <CallsDurationPerformanceChart title="Encrypted" data={rankings.encrypted} gradientId="encryptedPerformance" />
+        </article>
       </section>
       </>
       )}
 
-      {showCompanyTab && (
-      <>
-      <SectionTitle id="Charts" eyebrow="Top 10" title={`Top 10 per Calls in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Charts")} onToggle={() => toggleSection("Charts")} />
+      {showChartsTab && (
+      <><SectionTitle id="Charts" eyebrow="Top 10" title={`Top 10 per Calls in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Charts")} onToggle={() => toggleSection("Charts")} />
       <section id="Charts-content" className={`chart-grid top-10-row ${isSectionCollapsed("Charts") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card">
           <h3>Top Companies by Calls</h3>
@@ -3806,7 +3188,11 @@ export default function App() {
           <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.calls }]} />
         </article>
       </section>
+      </>
+      )}
 
+      {showCompanyTab && (
+      <>
       <SectionTitle id="users" eyebrow="Behavior deck" title={`Radio & User Behavior in ${CompanyPeriodLabel}`} text="Identify heavy users, high-use radios, multi-talkgroup activity, and cross-region behavior." collapsed={isSectionCollapsed("users")} onToggle={() => toggleSection("users")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportUtilizationXlsx} /><ExportButton kind="pdf" label="PDF" onClick={exportUtilizationPdf} /></>} />
       <section id="users-content" className={`behavior-grid ${isSectionCollapsed("users") ? "section-content-collapsed" : ""}`}>
         <article className="table-card">
@@ -3840,55 +3226,12 @@ export default function App() {
       </>
       )}
 
-      {showOverviewTab && (
-      <>
-      <SectionTitle id="records" eyebrow="Source records" title={`Filtered Calls Register in selected period (${CompanyPeriodLabel})`} text="Fixed-height rows are shown without table scrolling. Exports include every filtered row." collapsed={isSectionCollapsed("records")} onToggle={() => toggleSection("records")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportRowsXlsx} /><ExportButton kind="pdf" label="PDF" onClick={exportRowsPdfPage} /></>} />
-      <section id="records-content" className={`records-card ${isSectionCollapsed("records") ? "section-content-collapsed" : ""}`}>
-        <div className="records-scroll records-scroll-fixed-register fixed-row-table">
-          <table className="filtered-register-table">
-            <colgroup>
-              <col className="col-sn" />
-              <col className="col-radio-id" />
-              <col className="col-radio-alias" />
-              <col className="col-radio-type" />
-              <col className="col-employee-name" />
-              <col className="col-employee-id" />
-              <col className="col-region" />
-              <col className="col-company" />
-              <col className="col-talkgroup" />
-              <col className="col-start" />
-              <col className="col-end" />
-              <col className="col-duration" />
-              <col className="col-base-station" />
-            </colgroup>
-            <thead><tr><th>SN</th><th>Radio ID</th><th>Radio Alias</th><th>Radio Type</th><th>Employee Name</th><th>Employee ID</th><th>Region</th><th>Company</th><th>Talkgroup Alias</th><th>Start Time</th><th>End Time</th><th>Duration (s)</th><th>Base Station</th></tr></thead>
-            <tbody>
-              {pagedRecords.map((record, index) => (
-                <tr key={`${record.radioId}-${index}`}>
-                  <td>{(page - 1) * 50 + index + 1}</td><td>{record.radioId}</td><td>{record.radioAlias}</td><td>{record.mobileType}</td>
-                  <td>{record.employeeName}</td><td>{record.employeeId}</td><td>{record.region}</td><td>{record.company}</td>
-                  <td>{record.talkgroup}</td><td>{record.startTime}</td><td>{record.endTime}</td>
-                  <td>{formatNumber(record.durationSeconds)}</td><td>{record.baseStation}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="pager">
-          <button className="button" disabled={page <= 1} onClick={() => setPage((c) => Math.max(1, c - 1))}>Previous</button>
-          <span>Page {formatNumber(page)} of {formatNumber(pageCount)} - showing {formatNumber(pagedRecords.length)} rows</span>
-          <button className="button" disabled={page >= pageCount} onClick={() => setPage((c) => Math.min(pageCount, c + 1))}>Next</button>
-        </div>
-      </section>
-      </>
-      )}
-
       {isAddingMoreCdr && (
         <div className="loading-overlay" role="status" aria-live="polite">
           <div className="loading-card">
             <Activity size={28} />
-            <strong>Merging additional CDR region...</strong>
-            <span>The dashboard will refresh once the new records are added.</span>
+            <strong style={{ fontSize: "1rem", fontWeight: 700, color: "#e8f4ff" }}>Merging additional CDR region...</strong>
+            <span style={{ fontSize: "0.85rem", color: "#8aafc8" }}>The dashboard will refresh once the new records are added.</span>
           </div>
         </div>
       )}
@@ -3896,3 +3239,27 @@ export default function App() {
     </main>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
