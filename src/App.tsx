@@ -21,7 +21,6 @@ import {
   Eye,
   FileImage,
   FileText,
-  ArrowUp,
   Filter,
   Home,
   Palette,
@@ -1094,6 +1093,7 @@ function pptTextOptions(value: unknown, options: Record<string, unknown>): any {
     ...options,
     fontFace: "Arial",
     lang: hasArabicText(value) ? "ar-SA" : "en-US",
+    ...(hasArabicText(value) ? { rtlMode: true } : {}),
   };
 }
 
@@ -1935,12 +1935,12 @@ export default function App() {
     void (async () => {
       const charts = await captureKpiChartImages();
       const pptx = new pptxgen();
-      pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard";
+      pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard"; pptx.rtlMode = true;
       const tableSlide = pptx.addSlide();
       tableSlide.background = { color: "FFFFFF" };
       tableSlide.addText(exportTitle("KPI Measurements"), pptTextOptions(exportTitle("KPI Measurements"), { x: 0.3, y: 0.18, w: 12.7, h: 0.36, fontSize: 18, bold: true, align: "center", color: "111111" }));
-      const tableX = 0.18; const tableY = 0.7; const colW = [1.45, 0.86, 0.75, 0.86, 1.02, 1.08, 1.08, 1.45, 0.55]; const rowH = kpiExportTableRows.map((_, i) => i === 0 ? 0.58 : 0.38);
-      kpiExportTableRows.forEach((row, ri) => { let x = tableX; row.forEach((cell, ci) => { const w = colW[ci] ?? 1; const h = rowH[ri] ?? 0.38; const isHeader = ri === 0; tableSlide.addShape(pptx.ShapeType.rect, { x, y: tableY + rowH.slice(0, ri).reduce((s, v) => s + v, 0), w, h, fill: { color: isHeader ? "FFF200" : "FFFFFF" }, line: { color: "111111", width: 0.5 } }); tableSlide.addText(String(cell ?? ""), pptTextOptions(cell, { x: x + 0.02, y: tableY + rowH.slice(0, ri).reduce((s, v) => s + v, 0) + 0.03, w: w - 0.04, h: h - 0.06, fontSize: isHeader ? 5.6 : 6.1, bold: isHeader, align: "center", valign: "mid", color: "111111", fit: "shrink", margin: 0 })); x += w; }); });
+      const pptTableRows = kpiExportTableRows.map((row, ri) => row.map((cell) => ({ text: String(cell), options: pptTextOptions(cell, { bold: ri === 0, fill: { color: ri === 0 ? "FFF200" : "FFFFFF" }, color: "111111" }) })));
+      tableSlide.addTable(pptTableRows, { x: 0.18, y: 0.7, w: 12.98, h: 6.25, fontFace: "Arial", fontSize: 5.7, color: "111111", margin: 0.02, align: "center", valign: "mid", border: { type: "solid", color: "111111", pt: 0.5 }, fill: { color: "FFFFFF" }, autoFit: false, colW: [1.45, 0.86, 0.75, 0.86, 1.02, 1.08, 1.08, 1.45, 0.55], rowH: kpiExportTableRows.map((_, i) => i === 0 ? 0.58 : 0.38), bold: false, fit: "shrink" } as any);
       const addImageSlide = (title: string, image: string) => {
         const slide = pptx.addSlide();
         slide.background = { color: "0F1B24" };
@@ -2354,9 +2354,8 @@ export default function App() {
 
   const exportMonthlyCompanyPpt = useCallback(() => {
     void (async () => {
-      const chartPng = await captureMonthlyCompanyChart();
-      const { companies, rows, totals } = monthlyCompanyPivot;
-      const pptx = new pptxgen(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard";
+      const { companies, periodType, rows, totals } = monthlyCompanyPivot;
+      const pptx = new pptxgen(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard"; pptx.rtlMode = true;
       const tableSlide = pptx.addSlide();
       tableSlide.addText(exportTitle("Calls and Duration per Company - Table"), pptTextOptions(exportTitle("Calls and Duration per Company - Table"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" }));
       const pptRows = [["Period", ...companies.flatMap((c) => [`${c} Calls`, `${c} Duration`])], ...rows.map((r) => [r.label, ...r.values.flatMap((v) => [formatNumber(v.calls), formatNumber(v.durationSeconds)])]), ["Total", ...companies.flatMap((c) => { const t = totals.get(c) ?? { calls: 0, durationSeconds: 0 }; return [formatNumber(t.calls), formatNumber(t.durationSeconds)]; })]];
@@ -2364,10 +2363,10 @@ export default function App() {
       pptRows.forEach((row, ri) => { row.forEach((cell, ci) => { const isH = ri === 0 || ri === pptRows.length - 1; tableSlide.addShape(pptx.ShapeType.rect, { x: tableX + ci * colW, y: tableY + ri * rowH, w: colW, h: rowH, fill: { color: isH ? "FFF200" : "FFFFFF" }, line: { color: "111111", width: 0.5 } }); tableSlide.addText(cell, pptTextOptions(cell, { x: tableX + ci * colW + 0.01, y: tableY + ri * rowH + 0.02, w: colW - 0.02, h: rowH - 0.04, fontSize: ri === 0 ? 5.7 : 6.3, bold: isH, align: "center", valign: "mid", color: "111111", fit: "shrink", margin: 0 })); }); });
       const chartSlide = pptx.addSlide();
       chartSlide.addText(exportTitle("Calls and Duration per Company - Chart"), pptTextOptions(exportTitle("Calls and Duration per Company - Chart"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" }));
-      chartSlide.addImage({ data: chartPng, x: 0.35, y: 0.72, w: 12.65, h: 6.35 });
+      chartSlide.addChart("bar", [{ name: "Calls", labels: monthlyCompanyChartData.map((r) => r.category), values: monthlyCompanyChartData.map((r) => r.calls) }, { name: "Duration Seconds", labels: monthlyCompanyChartData.map((r) => r.category), values: monthlyCompanyChartData.map((r) => r.durationSeconds) }], { x: 0.45, y: 0.75, w: 12.4, h: 6.25, showLegend: true, showTitle: false, catAxisLabelRotate: 270, valAxisLabelColor: "111111", catAxisLabelColor: "111111", chartColors: ["2D86B4", "8FD0E8"] });
       await pptx.writeFile({ fileName: "calls-duration-per-company.pptx" });
     })();
-  }, [captureMonthlyCompanyChart, exportTitle, monthlyCompanyPivot]);
+  }, [exportTitle, monthlyCompanyChartData, monthlyCompanyPivot]);
 
   const openMonthlyCompanyTable = useCallback(() => {
     const w = window.open("", "cdr-monthly-company-table", "width=1400,height=800,scrollbars=yes,resizable=yes");
@@ -2689,9 +2688,6 @@ export default function App() {
                   <h2>Filtered Calls Register</h2>
                   <span>{formatNumber(filtered.length)} filtered rows from {formatNumber(records.length)} source rows.</span>
                 </div>
-              </div>
-              <div className="section-title-actions">
-                <button className="button small section-top-button" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}><ArrowUp size={15} /><span>Top</span></button>
               </div>
             </div>
             <div className="records-scroll records-scroll-fixed-register fixed-row-table">
@@ -3243,8 +3239,6 @@ export default function App() {
     </main>
   );
 }
-
-
 
 
 
