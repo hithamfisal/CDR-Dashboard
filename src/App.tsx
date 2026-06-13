@@ -1739,6 +1739,14 @@ export default function App() {
           onExportKpiXlsx={exportKpiXlsx}
           onExportKpiPdf={exportKpiPdf}
           onExportKpiPpt={exportKpiPpt}
+          onOpenCompanyContribution={openMonthlyCompanyTable}
+          onExportCompanyContributionXlsx={exportMonthlyCompanyXlsx}
+          onExportCompanyContributionPdf={exportMonthlyCompanyPdf}
+          onExportCompanyContributionPpt={exportMonthlyCompanyPpt}
+          onExportRegionPerformanceXlsx={exportRegionPerformanceXlsx}
+          onExportRegionPerformancePdf={exportRegionPerformancePdf}
+          onExportTalkgroupEfficiencyXlsx={exportTalkgroupEfficiencyXlsx}
+          onExportTalkgroupEfficiencyPdf={exportTalkgroupEfficiencyPdf}
           onExportUtilizationXlsx={exportUtilizationXlsx}
           onExportUtilizationPdf={exportUtilizationPdf}
           onExportUnmatchedFleetmapXlsx={exportUnmatchedFleetmapXlsx}
@@ -1845,7 +1853,6 @@ export default function App() {
         text="Unique raw Caller Numbers that did not match Master/Fixed Fleetmap Radio ID, or matched with incomplete fleetmap details."
         collapsed={isSectionCollapsed("unmatchedFleetmap")}
         onToggle={() => toggleSection("unmatchedFleetmap")}
-        actions={<ExportButton kind="xlsx" label="Export Report" onClick={exportUnmatchedFleetmapXlsx} />}
       />
       <section id="unmatchedFleetmap-content" className={`unmatched-fleetmap-report-section ${isSectionCollapsed("unmatchedFleetmap") ? "section-content-collapsed" : ""}`}>
         <article className="table-card wide-table-card unmatched-fleetmap-report-card">
@@ -1897,7 +1904,7 @@ export default function App() {
       )}
 
       {showCompanyTab && (
-      <><SectionTitle id="regionPerformance" eyebrow="Regional deck" title={`Region Performance in ${CompanyPeriodLabel}`} text="Compare regional calls, duration, traffic, active radios, talkgroups, companies, and peak operating periods." collapsed={isSectionCollapsed("regionPerformance")} onToggle={() => toggleSection("regionPerformance")} actions={<><ExportButton kind="xlsx" label="Region XLSX" onClick={exportRegionPerformanceXlsx} /><ExportButton kind="pdf" label="Region PDF" onClick={exportRegionPerformancePdf} /></>} />
+      <><SectionTitle id="regionPerformance" eyebrow="Regional deck" title={`Region Performance in ${CompanyPeriodLabel}`} text="Compare regional calls, duration, traffic, active radios, talkgroups, companies, and peak operating periods." collapsed={isSectionCollapsed("regionPerformance")} onToggle={() => toggleSection("regionPerformance")} />
       <section id="regionPerformance-content" className={`region-performance-section ${isSectionCollapsed("regionPerformance") ? "section-content-collapsed" : ""}`}>
         <article className="table-card wide-table-card">
           <h3>Region Performance Matrix</h3>
@@ -1914,7 +1921,7 @@ export default function App() {
 
       {showCompanyTab && (
       <>
-      <SectionTitle id="talkgroupEfficiency" eyebrow="Talkgroup deck" title={`Talkgroup Efficiency in ${CompanyPeriodLabel}`} text="Rank talkgroups by traffic, active radios, active users, average duration, and peak operating context." collapsed={isSectionCollapsed("talkgroupEfficiency")} onToggle={() => toggleSection("talkgroupEfficiency")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportTalkgroupEfficiencyXlsx} /><ExportButton kind="pdf" label="PDF" onClick={exportTalkgroupEfficiencyPdf} /></>} />
+      <SectionTitle id="talkgroupEfficiency" eyebrow="Talkgroup deck" title={`Talkgroup Efficiency in ${CompanyPeriodLabel}`} text="Rank talkgroups by traffic, active radios, active users, average duration, and peak operating context." collapsed={isSectionCollapsed("talkgroupEfficiency")} onToggle={() => toggleSection("talkgroupEfficiency")} />
       <section id="talkgroupEfficiency-content" className={`talkgroup-efficiency-section ${isSectionCollapsed("talkgroupEfficiency") ? "section-content-collapsed" : ""}`}>
         <article className="table-card wide-table-card">
           <h3>Talkgroup Efficiency Matrix</h3>
@@ -2026,7 +2033,7 @@ export default function App() {
       )}
 
       {showChartsTab && (
-      <><SectionTitle id="Company" eyebrow="Company deck" title={`Company contribution in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Company")} onToggle={() => toggleSection("Company")} actions={<><ExportButton kind="view" label="View" onClick={openMonthlyCompanyTable} /><ExportButton kind="xlsx" label="XLSX" onClick={exportMonthlyCompanyXlsx} /><ExportButton kind="ppt" label="PPT" onClick={exportMonthlyCompanyPpt} /><ExportButton kind="pdf" label="PDF" onClick={exportMonthlyCompanyPdf} /></>} />
+      <><SectionTitle id="Company" eyebrow="Company deck" title={`Company contribution in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Company")} onToggle={() => toggleSection("Company")} />
       <section id="Company-content" className={`chart-grid dashboard-chart-grid company-chart-grid ${isSectionCollapsed("Company") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card Company-card company-talkgroups" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Talkgroups per Company</h3>
@@ -2210,7 +2217,7 @@ export default function App() {
 
       {showCompanyTab && (
       <>
-      <SectionTitle id="users" eyebrow="Behavior deck" title={`Radio & User Behavior in ${CompanyPeriodLabel}`} text="Identify heavy users, high-use radios, multi-talkgroup activity, and cross-region behavior." collapsed={isSectionCollapsed("users")} onToggle={() => toggleSection("users")} actions={<><ExportButton kind="xlsx" label="XLSX" onClick={exportUtilizationXlsx} /><ExportButton kind="pdf" label="PDF" onClick={exportUtilizationPdf} /></>} />
+      <SectionTitle id="users" eyebrow="Behavior deck" title={`Radio & User Behavior in ${CompanyPeriodLabel}`} text="Identify heavy users, high-use radios, multi-talkgroup activity, and cross-region behavior." collapsed={isSectionCollapsed("users")} onToggle={() => toggleSection("users")} />
       <section id="users-content" className={`behavior-grid ${isSectionCollapsed("users") ? "section-content-collapsed" : ""}`}>
         <article className="table-card">
           <h3>Radio Behavior Insights</h3>

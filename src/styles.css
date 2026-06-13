@@ -4223,6 +4223,30 @@ body:has(.light-background-theme) {
   font-weight: 800 !important;
 }
 
+.export-center-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin-top: 14px !important;
+}
+
+.export-center-grid .export-center-subgroup {
+  margin-top: 0 !important;
+  padding: 14px !important;
+  border: 1px solid rgba(77, 178, 232, 0.22) !important;
+  border-radius: 14px !important;
+  background: rgba(6, 25, 39, 0.42) !important;
+}
+
+.export-center-subgroup-wide {
+  grid-column: 1 / -1 !important;
+}
+
+.app-shell.light-background-theme .export-center-grid .export-center-subgroup {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(0, 119, 190, 0.18) !important;
+}
+
 .app-shell .performance-chart-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
@@ -12935,5 +12959,20 @@ body,
 .app-shell .chart-grid,
 .app-shell .table-card {
   margin-top: 2px !important;
+}
+
+/* Reports export center buttons align from the left edge of each group box. */
+.app-shell .export-center-card .export-center-actions {
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+}
+
+.app-shell .export-center-card .export-button {
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+.app-shell .export-center-card .export-button span {
+  text-align: left !important;
 }
 
