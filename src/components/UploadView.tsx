@@ -9,6 +9,7 @@ type UploadViewProps = {
   onUploadMasterFleetmap: (event: ChangeEvent<HTMLInputElement>) => void;
   onUploadFixedFleetmap: (event: ChangeEvent<HTMLInputElement>) => void;
   onLoadSaved: () => void;
+  onLoadSample: () => void;
   onConfirmUpload: () => void;
   onClearStagedUpload: () => void;
   savedWorkbook: SavedWorkbookMeta | null;
@@ -33,6 +34,7 @@ export function UploadView({
   onUploadMasterFleetmap,
   onUploadFixedFleetmap,
   onLoadSaved,
+  onLoadSample,
   onConfirmUpload,
   onClearStagedUpload,
   savedWorkbook,
@@ -115,6 +117,16 @@ export function UploadView({
                 >
                   <HardDrive size={18} />
                   <span>{isLoadingSaved ? "Opening..." : "Continue previous workbook"}</span>
+                </button>
+
+                <button
+                  className="followup-action-button followup-sample-button"
+                  type="button"
+                  onClick={onLoadSample}
+                  disabled={isLoadingSaved || isParsing || masterFleetmap.isParsing || fixedFleetmap.isParsing}
+                >
+                  <FileSpreadsheet size={18} />
+                  <span>Load sample data</span>
                 </button>
                 
                 <div className="followup-staged-actions">

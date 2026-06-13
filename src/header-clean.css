@@ -13,8 +13,8 @@
   isolation: isolate !important;
   width: 100% !important;
   max-width: none !important;
-  margin: 0 0 22px !important;
-  padding: 18px 18px 20px !important;
+  margin: 0 0 2px !important;
+  padding: 18px 18px 2px !important;
   border: 0 !important;
   border-radius: 0 !important;
   background: var(--cdr-page-bg, #020914) !important;
@@ -393,7 +393,7 @@
   .app-shell.dark-background-theme .cdr-command-shell,
   .app-shell.light-background-theme .cdr-command-shell,
   .app-shell.se-theme .cdr-command-shell {
-    padding: 10px !important;
+    padding: 10px 10px 2px !important;
   }
 
   .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,

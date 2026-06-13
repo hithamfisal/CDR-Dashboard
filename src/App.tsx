@@ -281,6 +281,68 @@ export default function App() {
     finally { setIsLoadingSaved(false); }
   }, []);
 
+  const handleLoadSampleData = useCallback(async () => {
+    const sampleFleetmaps = [
+      { name: "Master Fleetmap.xlsx", source: "master" as const },
+      { name: "Fixed Fleetmap.xlsx", source: "fixed" as const },
+    ];
+    const sampleCallLogs = ["calllog East.csv", "calllog North.csv", "calllog South.csv", "calllog West.csv"];
+    const fetchSampleFile = async (fileName: string) => {
+      const response = await fetch(`/Samples/${encodeURIComponent(fileName)}`);
+      if (!response.ok) throw new Error(`Sample file could not be loaded: ${fileName}`);
+      const blob = await response.blob();
+      return new File([blob], fileName, { type: blob.type || (fileName.toLowerCase().endsWith(".csv") ? "text/csv" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") });
+    };
+
+    setError("");
+    setIsParsing(true);
+    setStagedTrafficUpload(null);
+    setMasterFleetmap((current) => ({ ...current, isParsing: true }));
+    setFixedFleetmap((current) => ({ ...current, isParsing: true }));
+    try {
+      const { mergeCdrIntoData, parseFleetmap, parseRawSystemWorkbook, readWorkbookFromUploadedFile } = await loadWorkbookParser();
+      const [masterFile, fixedFile] = await Promise.all(sampleFleetmaps.map((sample) => fetchSampleFile(sample.name)));
+      const [masterWorkbook, fixedWorkbook] = await Promise.all([
+        readWorkbookFromUploadedFile(masterFile),
+        readWorkbookFromUploadedFile(fixedFile),
+      ]);
+      const [masterRecords, fixedRecords] = await Promise.all([
+        parseFleetmap(masterWorkbook, "master"),
+        parseFleetmap(fixedWorkbook, "fixed"),
+      ]);
+      const loadedAt = new Date().toLocaleString("en-GB");
+      const masterMeta: FleetmapMeta = { fileName: masterFile.name, loadedAt };
+      const fixedMeta: FleetmapMeta = { fileName: fixedFile.name, loadedAt };
+      setMasterFleetmap({ records: masterRecords, meta: masterMeta, isParsing: false });
+      setFixedFleetmap({ records: fixedRecords, meta: fixedMeta, isParsing: false });
+      try { await saveFleetmapToBrowser(SAVED_MASTER_FLEETMAP_KEY, masterRecords, masterMeta); } catch { /* ignore */ }
+      try { await saveFleetmapToBrowser(SAVED_FIXED_FLEETMAP_KEY, fixedRecords, fixedMeta); } catch { /* ignore */ }
+
+      const combinedFleetmap = unionFleetmapRecords(masterRecords, fixedRecords);
+      const callLogFiles = await Promise.all(sampleCallLogs.map(fetchSampleFile));
+      let merged: DashboardData | null = null;
+      for (const file of callLogFiles) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        const workbook = await readWorkbookFromUploadedFile(file);
+        const parsed = await parseRawSystemWorkbook(workbook, file.name, combinedFleetmap);
+        merged = merged ? mergeCdrIntoData(merged, parsed) : parsed;
+      }
+      if (!merged) throw new Error("Sample call logs could not be parsed.");
+      merged.fileName = `${callLogFiles.length} sample raw system call logs merged`;
+      setData(merged);
+      setFilters(EMPTY_FILTERS);
+      setPage(1);
+      try { await saveWorkbookToBrowser(merged); setSavedWorkbook(workbookMeta(merged)); }
+      catch { setSavedWorkbookMeta(null); setSavedWorkbook(null); }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Sample data could not be loaded.");
+    } finally {
+      setIsParsing(false);
+      setMasterFleetmap((current) => ({ ...current, isParsing: false }));
+      setFixedFleetmap((current) => ({ ...current, isParsing: false }));
+    }
+  }, []);
+
   const records = data?.records ?? [];
   const talkgroupLabels = useMemo(() => ({ [NUMERIC_TALKGROUP_FILTER]: "Numeric group" }), []);
   const options = useMemo(() => buildFilterOptions(records, filters.year), [filters.year, records]);
@@ -1473,6 +1535,7 @@ export default function App() {
       onUploadMasterFleetmap={handleUploadMasterFleetmap}
       onUploadFixedFleetmap={handleUploadFixedFleetmap}
       onLoadSaved={handleLoadSavedWorkbook}
+      onLoadSample={handleLoadSampleData}
       onConfirmUpload={handleConfirmStagedUpload}
       onClearStagedUpload={handleClearStagedUpload}
       savedWorkbook={savedWorkbook}

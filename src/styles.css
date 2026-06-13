@@ -12899,3 +12899,41 @@ body,
   margin: 1px 0 7px !important;
 }
 
+/* Final compact command/filter spacing */
+.app-shell .cdr-command-shell,
+.app-shell.dark-background-theme .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell {
+  margin-bottom: 1px !important;
+  padding-bottom: 0 !important;
+}
+
+.app-shell .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.light-background-theme .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .cdr-banner-control-bar {
+  min-height: 0 !important;
+  height: auto !important;
+  margin-top: 6px !important;
+  margin-bottom: 0 !important;
+  padding: 8px 16px 6px !important;
+  align-items: center !important;
+}
+
+.app-shell .cdr-command-shell > .cdr-banner-control-bar .cdr-control-actions {
+  transform: none !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell .filters-panel {
+  margin-bottom: 0 !important;
+}
+
+.app-shell .reports-tab-panel,
+.app-shell .hero-panel,
+.app-shell .section-title,
+.app-shell .chart-grid,
+.app-shell .table-card {
+  margin-top: 2px !important;
+}
+
