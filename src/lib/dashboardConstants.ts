@@ -16,11 +16,11 @@ export const SECTION_NAV_ITEMS = [
 ];
 
 export const DASHBOARD_TABS = [
-  { id: "overview", label: "Overview & Records" },
+  { id: "overview", label: "Overview" },
   { id: "charts", label: "Charts" },
   { id: "fleet", label: "Fleet Activation" },
-  { id: "company", label: "Company, Talkgroup & Users" },
-  { id: "kpi", label: "Performance KPI" },
+  { id: "company", label: "ٌRegions, Co., TG & Users" },
+  { id: "kpi", label: "Performance & KPI" },
   { id: "reports", label: "Reports" },
 ] as const;
 

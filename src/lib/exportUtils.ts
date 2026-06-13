@@ -44,6 +44,43 @@ export async function downloadWorkbookData(fileName: string, sheetName: string, 
   downloadBlob(fileName, new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
 }
 
+function safeSheetName(value: string, usedNames: Set<string>) {
+  const base = value.replace(/[\\/?*[\]:]/g, " ").replace(/\s+/g, " ").trim().slice(0, 31) || "Chart Data";
+  let name = base;
+  let index = 2;
+  while (usedNames.has(name)) {
+    const suffix = ` ${index}`;
+    name = `${base.slice(0, 31 - suffix.length)}${suffix}`;
+    index += 1;
+  }
+  usedNames.add(name);
+  return name;
+}
+
+export async function downloadWorkbookDatasets(fileName: string, title: string, datasets: Record<string, ChartExportDataset>) {
+  const XLSX = await import("xlsx");
+  const workbook = XLSX.utils.book_new();
+  const usedSheetNames = new Set<string>();
+  const entries = Object.entries(datasets).filter(([, dataset]) => dataset.headers.length > 0);
+
+  const indexRows = entries.map(([name], index) => [index + 1, name]);
+  const indexSheet = XLSX.utils.aoa_to_sheet([[title], [], ["SN", "Chart Data Sheet"], ...indexRows]);
+  indexSheet["!cols"] = [{ wch: 8 }, { wch: 42 }];
+  XLSX.utils.book_append_sheet(workbook, indexSheet, safeSheetName("Index", usedSheetNames));
+
+  entries.forEach(([name, dataset]) => {
+    const worksheet = XLSX.utils.aoa_to_sheet([[name], [], dataset.headers, ...dataset.rows]);
+    worksheet["!cols"] = dataset.headers.map((header, index) => {
+      const max = Math.max(`${header}`.length, ...dataset.rows.map((row) => `${row[index] ?? ""}`.length));
+      return { wch: Math.min(42, Math.max(12, max + 2)) };
+    });
+    XLSX.utils.book_append_sheet(workbook, worksheet, safeSheetName(name, usedSheetNames));
+  });
+
+  const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  downloadBlob(fileName, new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+}
+
 export function fileSlug(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 90) || "cdr-export";
 }

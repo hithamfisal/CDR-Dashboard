@@ -4210,6 +4210,23 @@ body:has(.light-background-theme) {
   margin-top: 14px !important;
 }
 
+.export-center-subgroup {
+  margin-top: 16px !important;
+  padding-top: 14px !important;
+  border-top: 1px solid rgba(77, 178, 232, 0.24) !important;
+}
+
+.export-center-subgroup h4 {
+  margin: 0 0 8px !important;
+  color: var(--cdr-text-strong, #e8f4ff) !important;
+  font-size: var(--cdr-size-body, 14px) !important;
+  font-weight: 800 !important;
+}
+
+.app-shell .performance-chart-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
 /* Keep filters as the global control strip for all tabs. */
 .app-shell[class*="active-tab-"] > .filters-panel {
   display: grid !important;

@@ -3,6 +3,11 @@ import { ExportButton } from "./DashboardUi";
 import { FilteredCallsRegister } from "./FilteredCallsRegister";
 import type { CallRecord } from "../types/dashboard";
 
+type ChartExportItem = {
+  label: string;
+  onClick: () => void;
+};
+
 type ReportsPanelProps = {
   showRegister: boolean;
   pagedRecords: CallRecord[];
@@ -22,6 +27,8 @@ type ReportsPanelProps = {
   onExportUtilizationXlsx: () => void;
   onExportUtilizationPdf: () => void;
   onExportUnmatchedFleetmapXlsx: () => void;
+  onExportChartDataXlsx: () => void;
+  chartExportItems: ChartExportItem[];
 };
 
 function ReportsPanelComponent({
@@ -43,6 +50,8 @@ function ReportsPanelComponent({
   onExportUtilizationXlsx,
   onExportUtilizationPdf,
   onExportUnmatchedFleetmapXlsx,
+  onExportChartDataXlsx,
+  chartExportItems,
 }: ReportsPanelProps) {
   return (
     <section id="reportsTabPanel" className="reports-tab-panel">
@@ -59,6 +68,15 @@ function ReportsPanelComponent({
           <ExportButton kind="xlsx" label="Utilization Report" onClick={onExportUtilizationXlsx} />
           <ExportButton kind="pdf" label="Utilization Report" onClick={onExportUtilizationPdf} />
           <ExportButton kind="xlsx" label="Unmatched Report" onClick={onExportUnmatchedFleetmapXlsx} />
+          <ExportButton kind="xlsx" label="All Charts Data" onClick={onExportChartDataXlsx} />
+        </div>
+        <div className="export-center-subgroup">
+          <h4>Separate Chart Data Exports</h4>
+          <div className="export-center-actions">
+            {chartExportItems.map((item) => (
+              <ExportButton key={item.label} kind="xlsx" label={item.label} onClick={item.onClick} />
+            ))}
+          </div>
         </div>
       </article>
       {showRegister && (

@@ -60,71 +60,73 @@ export function UploadView({
           </button>
 
           <div className="followup-upload-left">
-            <p className="followup-eyebrow"><UploadCloud size={14} /> CDR WORKBOOKS UPLOAD</p>
-            <h1><span>Load the CDR Traffic Workbook</span></h1>
+            <p className="followup-eyebrow"><UploadCloud size={22} /> CDR WORKBOOKS UPLOAD</p>
+            <h1><span>Traffic Workbook</span></h1>
             <p className="followup-lead">
-              Start with Master and Fixed Fleetmap, then upload processed CDR files or raw system call logs.
+              Select processed CDR files or RAW system call logs & Select Master and Fixed Fleetmap .
             </p>
 
-            <div className="followup-primary-actions">
-              <label className="followup-action-button followup-primary-upload">
-                <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={onUploadCdr} />
-                <FileSpreadsheet size={18} />
-                <span>{stagedTrafficUpload?.mode === "cdr" ? `${stagedCount} CDR selected` : "Select CDR workbook"}</span>
-              </label>
+            <div className="followup-control-stack">
+              <div className="followup-primary-actions">
+                <label className="followup-action-button followup-primary-upload">
+                  <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={onUploadCdr} />
+                  <FileSpreadsheet size={18} />
+                  <span>{stagedTrafficUpload?.mode === "cdr" ? `${stagedCount} CDR selected` : "Select CDR workbook"}</span>
+                </label>
 
-              <label className="followup-action-button">
-                <input type="file" accept=".csv,.xlsx,.xls,.xlsm,.xlsb" multiple onChange={onUploadRawSystem} />
-                <FileText size={18} />
-                <span>{stagedTrafficUpload?.mode === "raw" ? `${stagedCount} raw selected` : "Select raw call log"}</span>
-              </label>
-            </div>
-
-            <div className="followup-mini-grid">
-              <label className={`followup-mini-card ${masterFleetmap.meta ? "loaded" : ""}`}>
-                <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadMasterFleetmap} />
-                <Users size={18} />
-                <div>
-                  <strong>{masterFleetmap.isParsing ? "Reading..." : masterFleetmap.meta?.fileName ?? "Master Fleetmap"}</strong>
-                  <span>{masterFleetmap.meta ? `${formatNumber(masterFleetmap.records.length)} radios saved` : "Company, region and users"}</span>
-                </div>
-              </label>
-
-              <label className={`followup-mini-card ${fixedFleetmap.meta ? "loaded" : ""}`}>
-                <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadFixedFleetmap} />
-                <Radio size={18} />
-                <div>
-                  <strong>{fixedFleetmap.isParsing ? "Reading..." : fixedFleetmap.meta?.fileName ?? "Fixed Fleetmap"}</strong>
-                  <span>{fixedFleetmap.meta ? `${formatNumber(fixedFleetmap.records.length)} radios saved` : "Fixed radio reference"}</span>
-                </div>
-              </label>
-            </div>
-
-            <div className={`followup-staged-upload ${stagedTrafficUpload ? "has-files" : ""}`}>
-              <div>
-                <strong>{stagedTrafficUpload ? `${stagedCount} ${stagedKind}${stagedCount > 1 ? "s" : ""} ready` : "No main file selected yet"}</strong>
-                <span>{stagedTrafficUpload ? stagedNames : "Select a CDR workbook or raw call log, then press Upload selected."}</span>
+                <label className="followup-action-button">
+                  <input type="file" accept=".csv,.xlsx,.xls,.xlsm,.xlsb" multiple onChange={onUploadRawSystem} />
+                  <FileText size={18} />
+                  <span>{stagedTrafficUpload?.mode === "raw" ? `${stagedCount} raw selected` : "Select raw call log"}</span>
+                </label>
               </div>
-              
-              <button
-                className="followup-action-button"
-                type="button"
-                onClick={onLoadSaved}
-                disabled={!savedWorkbook || isLoadingSaved || isParsing}
-              >
-                <HardDrive size={18} />
-                <span>{isLoadingSaved ? "Opening..." : "Continue previous workbook"}</span>
-              </button>
-              
-              <div className="followup-staged-actions">
-                <button className="followup-action-button followup-confirm-upload" type="button" onClick={onConfirmUpload} disabled={!stagedTrafficUpload || isParsing || isLoadingSaved}>
-                  <UploadCloud size={18} />
-                  <span>{isParsing ? "Uploading..." : "Upload selected"}</span>
+
+              <div className="followup-mini-grid">
+                <label className={`followup-mini-card ${masterFleetmap.meta ? "loaded" : ""}`}>
+                  <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadMasterFleetmap} />
+                  <Users size={18} />
+                  <div>
+                    <strong>{masterFleetmap.isParsing ? "Reading..." : masterFleetmap.meta?.fileName ?? "Master Fleetmap"}</strong>
+                    <span>{masterFleetmap.meta ? `${formatNumber(masterFleetmap.records.length)} radios saved` : "Company, region and users"}</span>
+                  </div>
+                </label>
+
+                <label className={`followup-mini-card ${fixedFleetmap.meta ? "loaded" : ""}`}>
+                  <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadFixedFleetmap} />
+                  <Radio size={18} />
+                  <div>
+                    <strong>{fixedFleetmap.isParsing ? "Reading..." : fixedFleetmap.meta?.fileName ?? "Fixed Fleetmap"}</strong>
+                    <span>{fixedFleetmap.meta ? `${formatNumber(fixedFleetmap.records.length)} radios saved` : "Fixed radio reference"}</span>
+                  </div>
+                </label>
+              </div>
+
+              <div className={`followup-staged-upload ${stagedTrafficUpload ? "has-files" : ""}`}>
+                <div>
+                  <strong>{stagedTrafficUpload ? `${stagedCount} ${stagedKind}${stagedCount > 1 ? "s" : ""} ready` : "No main file selected yet"}</strong>
+                  <span>{stagedTrafficUpload ? stagedNames : "Select a CDR workbook or raw call log, then press Upload selected."}</span>
+                </div>
+                
+                <button
+                  className="followup-action-button"
+                  type="button"
+                  onClick={onLoadSaved}
+                  disabled={!savedWorkbook || isLoadingSaved || isParsing}
+                >
+                  <HardDrive size={18} />
+                  <span>{isLoadingSaved ? "Opening..." : "Continue previous workbook"}</span>
                 </button>
-                <button className="followup-action-button followup-clear-upload" type="button" onClick={onClearStagedUpload} disabled={!stagedTrafficUpload || isParsing}>
-                  <X size={18} />
-                  <span>Clear</span>
-                </button>
+                
+                <div className="followup-staged-actions">
+                  <button className="followup-action-button followup-confirm-upload" type="button" onClick={onConfirmUpload} disabled={!stagedTrafficUpload || isParsing || isLoadingSaved}>
+                    <UploadCloud size={18} />
+                    <span>{isParsing ? "Uploading..." : "Upload selected"}</span>
+                  </button>
+                  <button className="followup-action-button followup-clear-upload" type="button" onClick={onClearStagedUpload} disabled={!stagedTrafficUpload || isParsing}>
+                    <X size={18} />
+                    <span>Clear</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
