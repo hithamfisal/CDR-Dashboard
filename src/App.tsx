@@ -1,17 +1,26 @@
-﻿import { CSSProperties, ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CSSProperties, ChangeEvent, ReactNode, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { ChartLegend, ExportButton, SectionTitle } from "./components/DashboardUi";
-import { MultiSelectFilter } from "./components/MultiSelectFilter";
+import { DashboardFilters } from "./components/DashboardFilters";
+import { DashboardTabs } from "./components/DashboardTabs";
 import { chartLabel, formatDecimal, formatNumber, formatPercent, secondsToClock, sumValues } from "./lib/formatters";
 import { captureElementPng } from "./lib/capture";
 import { getSavedWorkbookMeta, loadFleetmapFromBrowser, loadWorkbookFromBrowser, saveFleetmapToBrowser, saveWorkbookToBrowser, setSavedWorkbookMeta, themeClass, useTheme, workbookMeta } from "./lib/browserCache";
-import { CHART_COLORS, COLORS, COMPANY_COLORS, DASHBOARD_TABS, EMPTY_FILTERS, FLEETMAP_HEADER_ALIASES, HEADER_ALIASES, MOBILE_TYPE_COLORS, MOBILE_TYPE_LABELS, NUMERIC_TALKGROUP_FILTER, RAW_SYSTEM_HEADER_ALIASES, SAVED_FIXED_FLEETMAP_KEY, SAVED_MASTER_FLEETMAP_KEY, SAVED_WORKBOOK_DB, SAVED_WORKBOOK_KEY, SAVED_WORKBOOK_META_KEY, SAVED_WORKBOOK_STORE, SECTION_NAV_ITEMS, TOOLTIP_STYLE } from "./lib/dashboardConstants";
-import type { CallRecord, ChartExportDataset, DashboardData, DashboardTab, Filters, FleetmapMeta, FleetmapRecord, FleetmapState, LookupRecord, NativeChartConfig, NativeChartSeries, Ranking, RawRow, SavedWorkbookMeta, StagedTrafficUpload, ThemeName } from "./types/dashboard";
+import { CHART_COLORS, COLORS, DASHBOARD_TABS, EMPTY_FILTERS, MOBILE_TYPE_LABELS, NUMERIC_TALKGROUP_FILTER, SAVED_FIXED_FLEETMAP_KEY, SAVED_MASTER_FLEETMAP_KEY, SAVED_WORKBOOK_DB, SAVED_WORKBOOK_KEY, SAVED_WORKBOOK_META_KEY, SAVED_WORKBOOK_STORE, SECTION_NAV_ITEMS, TOOLTIP_STYLE } from "./lib/dashboardConstants";
+import type { CallRecord, ChartExportDataset, DashboardData, DashboardTab, Filters, FleetmapMeta, FleetmapRecord, FleetmapState, NativeChartConfig, Ranking, SavedWorkbookMeta, StagedTrafficUpload, ThemeName } from "./types/dashboard";
 import { OverviewSummaryCards } from "./components/OverviewSummaryCards";
+import { ReportsPanel } from "./components/ReportsPanel";
 import { UploadView } from "./components/UploadView";
-import ExcelJS from "exceljs";
-import JSZip from "jszip";
-import { jsPDF } from "jspdf";
-import pptxgen from "pptxgenjs";
+import { WorkbookHero } from "./components/WorkbookHero";
+import { CallsDurationPerformanceChart, CompanyPerformanceTooltip, KpiBarLabel, KpiLineLabel, MobileTypeOverlayBarShape, MobileTypeTooltip, OverlayBarShape, PieDecimalLabel, PointValueLabel, RadioTooltip, RightValueLabel, TalkgroupTooltip, TopValueLabel } from "./components/ChartParts";
+import { filterCallRecords } from "./lib/filterRecords";
+import { calculateMetrics, calculateRankings, modeBy } from "./lib/analytics";
+import { monthSortValue, weekSortValue } from "./lib/dateSort";
+import { buildFilterOptions, uniqueOptions } from "./lib/filterOptions";
+import { companyColor, companyMetricColor, dataKey, mobileTypeColor, mobileTypeKey, shortMonthLabel, truncateLabel } from "./lib/chartHelpers";
+import { cleanText, isKnownLabel, normalizeRadioKey, parseDate, parseNumber, weekLabelFromDate } from "./lib/recordUtils";
+import { applyWorkbookArabicSupport, csvEscape, downloadBlob, downloadDataUrl, downloadText, downloadWorkbookData, ensurePdfArabicFont, escapeXml, excelColumnName, excelRange, exportIconSvg, fileSlug, htmlEscape, patchWorkbookWithNativeCharts, pdfText, pptTextOptions } from "./lib/exportUtils";
+import { usePagedItems } from "./hooks/usePagination";
+import type ExcelJS from "exceljs";
 import {
   Activity,
   AlertTriangle,
@@ -27,9 +36,7 @@ import {
   Presentation,
   RefreshCw,
   Search,
-  ShieldCheck,
   UploadCloud,
-  X,
 } from "lucide-react";
 import {
   Area,
@@ -49,1122 +56,34 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import * as XLSX from "xlsx";
-
-
-function normalizeHeader(value: unknown) {
-  return `${value ?? ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-function cleanText(value: unknown, fallback = "Unknown") {
-  const text = `${value ?? ""}`.replace(/\s+/g, " ").trim();
-  return text || fallback;
-}
-
-function normalizeRadioKey(value: unknown) {
-  return `${value ?? ""}`
-    .replace(/^\uFEFF/, "")
-    .replace(/^,+|,+$/g, "")
-    .replace(/^["']+|["']+$/g, "")
-    .replace(/\.0$/, "")
-    .replace(/[\s,"]/g, "")
-    .trim();
-}
-
-function cleanRawSystemValue(value: unknown, fallback = "") {
-  const text = `${value ?? ""}`
-    .replace(/^\uFEFF/, "")
-    .replace(/^,+/, "")
-    .replace(/\t/g, "")
-    .trim()
-    .replace(/^["']+|["']+$/g, "")
-    .trim();
-  return text || fallback;
-}
-
-function numericText(value: unknown) {
-  const text = `${value ?? ""}`
-    .replace(/^\ufeff/, "")
-    .replace(/^,+|,+$/g, "")
-    .replace(/	/g, "")
-    .trim()
-    .replace(/^["']+|["']+$/g, "")
-    .trim();
-  return /^\d+(?:\.\d+)?$/.test(text) ? text : "";
-}
-
-function excelSerialNumber(value: unknown) {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  const text = numericText(value);
-  if (!text) return null;
-  const numeric = Number(text);
-  return Number.isFinite(numeric) ? numeric : null;
-}
-
-function isLikelyExcelDateSerial(value: unknown) {
-  const numeric = excelSerialNumber(value);
-  return numeric !== null && numeric >= 20000 && numeric <= 80000;
-}
-
-function dateFromExcelSerial(value: unknown) {
-  const numeric = excelSerialNumber(value);
-  if (numeric === null) return null;
-  const parsed = XLSX.SSF.parse_date_code(numeric);
-  if (!parsed) return null;
-  return new Date(parsed.y, parsed.m - 1, parsed.d, parsed.H ?? 0, parsed.M ?? 0, parsed.S ?? 0);
-}
-
-function normalizeRawSystemCsvText(text: string) {
-  return text
-    .replace(/^\uFEFF/, "")
-    .replace(/\r\n/g, "\n")
-    .replace(/\r/g, "\n")
-    .replace(/\t,/g, ",")
-    .replace(/\t/g, "");
-}
-
-async function readWorkbookFromUploadedFile(file: File) {
-  const isCsv = /\.csv$/i.test(file.name) || /csv/i.test(file.type);
-  if (isCsv) {
-    const text = await file.text();
-    return XLSX.read(normalizeRawSystemCsvText(text), { type: "string", cellDates: false, raw: false });
-  }
-  return XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
-}
-
-function isKnownLabel(value: string) {
-  return !["", "unknown", "not found"].includes(`${value ?? ""}`.trim().toLowerCase());
-}
-
-function findValue(row: RawRow, aliases: string[]) {
-  const entries = Object.keys(row).map((key) => ({ key, normalized: normalizeHeader(key) }));
-  for (const alias of aliases) {
-    const target = normalizeHeader(alias);
-    const exact = entries.find((entry) => entry.normalized === target);
-    if (exact) return row[exact.key];
-  }
-  for (const alias of aliases) {
-    const target = normalizeHeader(alias);
-    const loose = entries.find((entry) => entry.normalized.includes(target));
-    if (loose) return row[loose.key];
-  }
-  return undefined;
-}
-
-function parseNumber(value: unknown, fallback = 0) {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  const numeric = Number(`${value ?? ""}`.replace(/,/g, "").trim());
-  return Number.isFinite(numeric) ? numeric : fallback;
-}
-
-function parseDuration(value: unknown) {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    if (value > 0 && value < 2) return Math.round(value * 86400);
-    return value;
-  }
-  const text = `${value ?? ""}`.trim();
-  const parts = text.split(":").map(Number);
-  if (parts.length === 3 && parts.every(Number.isFinite)) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-  return parseNumber(value, 0);
-}
-
-function parseDurationSeconds(row: RawRow) {
-  const secondsRaw = findValue(row, ["durationseconds", "duration seconds", "duration sec", "duration (sec)", "seconds"]);
-  if (secondsRaw !== undefined && `${secondsRaw}`.trim() !== "") return parseNumber(secondsRaw, 0);
-  return parseDuration(findValue(row, ["duration", "call duration"]));
-}
-
-function parseDate(value: unknown) {
-  if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
-
-  // XLSX can read CSV date/time cells as Excel serial values or numeric strings.
-  // Handle both number and string forms before falling back to JavaScript Date parsing.
-  if (isLikelyExcelDateSerial(value)) {
-    const excelDate = dateFromExcelSerial(value);
-    if (excelDate && !Number.isNaN(excelDate.getTime())) return excelDate;
-  }
-
-  const text = `${value ?? ""}`
-    .replace(/^\ufeff/, "")
-    .replace(/^,+|,+$/g, "")
-    .replace(/	/g, "")
-    .trim()
-    .replace(/^["']+|["']+$/g, "")
-    .trim();
-
-  const dayFirst = /^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(text);
-  if (dayFirst) {
-    const yearRaw = Number(dayFirst[3]);
-    const year = yearRaw < 100 ? 2000 + yearRaw : yearRaw;
-    return new Date(year, Number(dayFirst[2]) - 1, Number(dayFirst[1]), Number(dayFirst[4] ?? 0), Number(dayFirst[5] ?? 0), Number(dayFirst[6] ?? 0));
-  }
-
-  const isoLike = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(text);
-  if (isoLike) {
-    return new Date(Number(isoLike[1]), Number(isoLike[2]) - 1, Number(isoLike[3]), Number(isoLike[4] ?? 0), Number(isoLike[5] ?? 0), Number(isoLike[6] ?? 0));
-  }
-
-  const date = new Date(text);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function formatDate(value: unknown) {
-  const date = parseDate(value);
-  return date ? date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : cleanText(value);
-}
-
-function formatDateNumeric(value: unknown) {
-  const date = value instanceof Date ? value : parseDate(value);
-  return date ? date.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : cleanText(value);
-}
-
-function formatDateTime(value: unknown) {
-  const date = parseDate(value);
-  if (!date) return cleanText(value, "");
-  return date.toLocaleString("en-GB", {
-    day: "2-digit", month: "2-digit", year: "numeric",
-    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
-  });
-}
-
-function formatTimeValue(value: unknown) {
-  const numeric = excelSerialNumber(value);
-  if (numeric !== null) {
-    const parsed = XLSX.SSF.parse_date_code(numeric);
-    if (parsed) {
-      const hours = Math.floor(parsed.H ?? 0);
-      const minutes = Math.floor(parsed.M ?? 0);
-      const seconds = Math.floor(parsed.S ?? 0);
-      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    }
-    const secondsOfDay = Math.round((numeric % 1) * 86400);
-    const hours = Math.floor(secondsOfDay / 3600);
-    const minutes = Math.floor((secondsOfDay % 3600) / 60);
-    const seconds = secondsOfDay % 60;
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  }
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    return value.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
-  }
-  const date = parseDate(value);
-  if (date) return date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
-  const time = /(\d{1,2}):(\d{2})(?::(\d{2}))?/.exec(`${value ?? ""}`);
-  if (time) return `${String(Number(time[1])).padStart(2, "0")}:${time[2]}:${time[3] ?? "00"}`;
-  return cleanText(value, "");
-}
-
-function formatSourceDateTime(value: unknown) {
-  const text = cleanRawSystemValue(value, "") || cleanText(value, "");
-  const time = formatTimeValue(value);
-  const parsed = parseDate(value);
-  const textHasDate = /\d{1,2}[/-]\d{1,2}[/-]\d{2,4}/.test(text)
-    || /^\d{4}-\d{1,2}-\d{1,2}/.test(text)
-    || value instanceof Date
-    || isLikelyExcelDateSerial(value);
-  if (parsed && textHasDate) return formatDateTime(parsed);
-  if (time && textHasDate) return `${formatDateNumeric(parsed ?? value)} ${time}`;
-  return text || formatDateTime(value);
-}
-
-function combineDateAndTime(dateValue: unknown, timeValue: unknown) {
-  const parsedTimeDate = parseDate(timeValue);
-  const text = cleanText(timeValue, "");
-  const textHasDate = /\d{1,2}[/-]\d{1,2}[/-]\d{2,4}/.test(text) || timeValue instanceof Date || (typeof timeValue === "number" && timeValue >= 1);
-  if (textHasDate && parsedTimeDate) return formatDateTime(parsedTimeDate);
-  const date = parseDate(dateValue);
-  const time = formatTimeValue(timeValue);
-  if (date && time) return `${formatDateNumeric(date)} ${time}`;
-  return formatSourceDateTime(timeValue);
-}
-
-function monthLabel(value: unknown, dateRaw: unknown) {
-  const explicit = cleanText(value, "");
-  if (explicit) return explicit;
-  const date = parseDate(dateRaw);
-  return date ? date.toLocaleDateString("en-GB", { month: "short", year: "numeric" }) : "Unknown";
-}
-
-function yearLabel(value: unknown, dateRaw: unknown) {
-  const explicit = cleanText(value, "");
-  if (/^(19|20)\d{2}$/.test(explicit)) return explicit;
-  const date = parseDate(dateRaw);
-  return date ? `${date.getFullYear()}` : explicit || "Unknown";
-}
-
-function hourLabel(value: unknown) {
-  if (typeof value === "number" && Number.isFinite(value)) return `${String(value).padStart(2, "0")}:00`;
-  const text = cleanText(value);
-  return /^\d{1,2}$/.test(text) ? `${text.padStart(2, "0")}:00` : text;
-}
-
-function companyFromRadioId(radioId: string, company: string) {
-  const currentCompany = cleanText(company, "Unknown");
-  if (!["", "unknown", "not found"].includes(currentCompany.toLowerCase())) return currentCompany;
-  const firstDigit = /^\s*([1-4])/.exec(radioId)?.[1];
-  const fallback: Record<string, string> = {
-    "1": "HSSE", "2": "GENERATION", "3": "NATIONAL GRID", "4": "DISTRIBUTION & CUSTOMER SERVICES",
-  };
-  return firstDigit ? fallback[firstDigit] ?? currentCompany : currentCompany;
-}
-
-function mobileTypeFromRadioId(radioId: string, mobileType: string) {
-  const currentType = cleanText(mobileType, "Unknown");
-  if (!["", "unknown", "not found"].includes(currentType.toLowerCase())) return currentType;
-  const thirdDigit = `${radioId ?? ""}`.trim().charAt(2);
-  const fallback: Record<string, string> = {
-    "1": MOBILE_TYPE_LABELS[0],
-    "2": MOBILE_TYPE_LABELS[1],
-    "3": MOBILE_TYPE_LABELS[2],
-    "4": MOBILE_TYPE_LABELS[3],
-    "5": MOBILE_TYPE_LABELS[4],
-  };
-  return thirdDigit ? fallback[thirdDigit] ?? currentType : currentType;
-}
-
-function baseStationOrRadioType(baseStation: string, mobileType: string) {
-  return isKnownLabel(baseStation) ? baseStation : (isKnownLabel(mobileType) ? mobileType : "Unknown");
-}
-
-// Fleetmap helpers
-
-function parseFleetmap(workbook: XLSX.WorkBook, source: "master" | "fixed"): FleetmapRecord[] {
-  const preferred = workbook.SheetNames.find((n) => /fleet|master|fixed|lookup/i.test(n));
-  const sheetName = preferred ?? workbook.SheetNames[0];
-  const rows = XLSX.utils.sheet_to_json<RawRow>(workbook.Sheets[sheetName], { defval: "", raw: true });
-  return rows
-    .map((row): FleetmapRecord => {
-      const radioId   = cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.radioId), "");
-      const company   = cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.company), "");
-      const mobileType = cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.mobileType), "");
-      return {
-        radioId,
-        radioAlias:   cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.radioAlias), ""),
-        employeeName: cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.employeeName), ""),
-        employeeId:   cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.employeeId), ""),
-        company:      companyFromRadioId(radioId, company),
-        region:       cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.region), ""),
-        talkgroup:    cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.talkgroup), ""),
-        mobileType:   mobileTypeFromRadioId(radioId, mobileType),
-        source,
-      };
-    })
-    .filter((r) => r.radioId && r.radioId !== "Unknown");
-}
-
-function unionFleetmaps(master: FleetmapRecord[], fixed: FleetmapRecord[]): FleetmapRecord[] {
-  const map = new Map<string, FleetmapRecord>();
-  [...master, ...fixed].forEach((rec) => { if (!map.has(rec.radioId)) map.set(rec.radioId, rec); });
-  return [...map.values()];
-}
-
-// Workbook parser
-
-function parseWorkbook(workbook: XLSX.WorkBook, fileName: string, fleetmap: FleetmapRecord[] = []): DashboardData {
-  const sourceSheet = workbook.SheetNames.includes("Raw_Data") ? "Raw_Data" : workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sourceSheet];
-  const rows = XLSX.utils.sheet_to_json<RawRow>(worksheet, { defval: "", raw: true });
-
-  const fleetIndex = new Map<string, FleetmapRecord>();
-  fleetmap.forEach((rec) => fleetIndex.set(normalizeRadioKey(rec.radioId), rec));
-
-  const lookupRows = workbook.SheetNames.includes("lookup")
-    ? XLSX.utils.sheet_to_json<RawRow>(workbook.Sheets.lookup, { defval: "", raw: true })
-    : [];
-
-  const pickFleet = (cdrValue: string, fleetValue: string | undefined, fallback: string) =>
-    isKnownLabel(cdrValue) ? cdrValue : (fleetValue && isKnownLabel(fleetValue) ? fleetValue : fallback);
-
-  const records = rows
-    .map((row): CallRecord => {
-      const dateRaw = findValue(row, HEADER_ALIASES.callDate);
-      const startRaw = findValue(row, HEADER_ALIASES.startTime);
-      const endRaw = findValue(row, HEADER_ALIASES.endTime);
-      const durationSeconds = parseDurationSeconds(row);
-      const radioId = cleanText(findValue(row, HEADER_ALIASES.radioId));
-      const fleet = fleetIndex.get(normalizeRadioKey(radioId));
-
-      const rawCompany    = cleanText(findValue(row, HEADER_ALIASES.company),    "Unknown");
-      const rawMobileType = cleanText(findValue(row, HEADER_ALIASES.mobileType), "Unknown");
-      const rawAlias      = cleanText(findValue(row, HEADER_ALIASES.radioAlias), "Not labelled");
-      const rawEmpName    = cleanText(findValue(row, HEADER_ALIASES.employeeName),"Unknown");
-      const rawEmpId      = cleanText(findValue(row, HEADER_ALIASES.employeeId),  "Unknown");
-      const rawRegion     = cleanText(findValue(row, HEADER_ALIASES.region),      "Unknown");
-      const rawTalkgroup  = cleanText(findValue(row, HEADER_ALIASES.talkgroup),   "Unknown");
-      const rawCallType = cleanText(findValue(row, HEADER_ALIASES.callType), "Unknown");
-      const rawDuplexType = cleanText(findValue(row, HEADER_ALIASES.duplexType), "Unknown");
-      const rawCallPriority = cleanText(findValue(row, HEADER_ALIASES.callPriority), "Unknown");
-      const rawEncrypted = cleanText(findValue(row, HEADER_ALIASES.encrypted), "Unknown");
-      const mappedMobileType = mobileTypeFromRadioId(radioId, pickFleet(rawMobileType, fleet?.mobileType, "Unknown"));
-      const mappedBaseStation = baseStationOrRadioType(cleanText(findValue(row, HEADER_ALIASES.baseStation), "Unknown"), mappedMobileType);
-
-      return {
-        radioId,
-        radioAlias:   pickFleet(rawAlias,     fleet?.radioAlias,   "Not labelled"),
-        mobileType:   mappedMobileType,
-        employeeName: pickFleet(rawEmpName,   fleet?.employeeName, "Unknown"),
-        employeeId:   pickFleet(rawEmpId,     fleet?.employeeId,   "Unknown"),
-        region:       pickFleet(rawRegion,    fleet?.region,       "Unknown"),
-        company:      companyFromRadioId(radioId, pickFleet(rawCompany, fleet?.company, "Unknown")),
-        talkgroup:    pickFleet(rawTalkgroup, fleet?.talkgroup,    "Unknown"),
-        callDate:     formatDate(dateRaw),
-        startTime:    combineDateAndTime(dateRaw, startRaw),
-        endTime:      combineDateAndTime(dateRaw, endRaw),
-        year:         yearLabel(findValue(row, HEADER_ALIASES.year), dateRaw),
-        month:        monthLabel(findValue(row, HEADER_ALIASES.month), dateRaw),
-        week:         cleanText(findValue(row, HEADER_ALIASES.week), "Unknown"),
-        hour:         hourLabel(findValue(row, HEADER_ALIASES.hour)),
-        durationSeconds,
-        trafficHours: parseNumber(findValue(row, HEADER_ALIASES.trafficHours), durationSeconds / 3600),
-        baseStation:  mappedBaseStation,
-        callType: rawCallType,
-        duplexType: rawDuplexType,
-        callPriority: rawCallPriority,
-        encrypted: rawEncrypted,
-      };
-    })
-    .filter((record) => record.radioId !== "Unknown" || record.company !== "Unknown" || record.durationSeconds > 0);
-
-  const lookupRecords = lookupRows
-    .map((row): LookupRecord => {
-      const radioId = cleanText(findValue(row, HEADER_ALIASES.radioId), "");
-      const company = cleanText(findValue(row, HEADER_ALIASES.company), "");
-      return { radioId, company: companyFromRadioId(radioId, company), region: cleanText(findValue(row, HEADER_ALIASES.region), ""), talkgroup: cleanText(findValue(row, HEADER_ALIASES.talkgroup), "") };
-    })
-    .filter((record) => record.radioId && record.company);
-
-  const fleetAsLookup: LookupRecord[] = fleetmap
-    .filter((r) => r.radioId && r.company)
-    .map((r) => ({ radioId: r.radioId, company: r.company, region: r.region, talkgroup: r.talkgroup }));
-
-  const lookupMap = new Map<string, LookupRecord>();
-  [...lookupRecords, ...fleetAsLookup].forEach((rec) => { if (!lookupMap.has(rec.radioId)) lookupMap.set(rec.radioId, rec); });
-  const combinedLookup = [...lookupMap.values()];
-
-  const warnings: string[] = [];
-  if (!workbook.SheetNames.includes("Raw_Data")) warnings.push("Raw_Data sheet was not found. The first sheet was used.");
-  if (!workbook.SheetNames.includes("lookup") && fleetmap.length === 0) warnings.push("No lookup sheet or fleetmap loaded. KPI activated users will fall back to calling radio users.");
-  if (records.length === 0) warnings.push("No CDR rows could be parsed. Check the header row.");
-  if (records.some((record) => record.durationSeconds <= 0)) warnings.push("Some rows have zero or missing duration.");
-
-  return {
-    fileName,
-    sourceSheet,
-    loadedAt: new Date().toLocaleString("en-GB"),
-    rawRows: rows.length,
-    records,
-    lookupRecords: combinedLookup,
-    fleetmapRecords: fleetmap,
-    cdrSources: [{ fileName, rawRows: rows.length, loadedAt: new Date().toLocaleString("en-GB"), recordCount: records.length }],
-    warnings,
-  };
-}
-
-
-
-function isRawSystemWorkbook(workbook: XLSX.WorkBook) {
-  const sourceSheet = workbook.SheetNames[0];
-  if (!sourceSheet) return false;
-  const worksheet = workbook.Sheets[sourceSheet];
-  const rows = XLSX.utils.sheet_to_json<RawRow>(worksheet, { defval: "", raw: true });
-  if (rows.length === 0) return false;
-  const sample = rows.slice(0, 5);
-  return sample.some((row) => {
-    const callerNumber = findValue(row, RAW_SYSTEM_HEADER_ALIASES.callerNumber);
-    const startTime = findValue(row, RAW_SYSTEM_HEADER_ALIASES.startTime);
-    const endTime = findValue(row, RAW_SYSTEM_HEADER_ALIASES.endTime);
-    const duration = findValue(row, RAW_SYSTEM_HEADER_ALIASES.durationSeconds);
-    const baseStation = findValue(row, RAW_SYSTEM_HEADER_ALIASES.baseStation);
-    return callerNumber !== undefined && startTime !== undefined && (endTime !== undefined || duration !== undefined || baseStation !== undefined);
-  });
-}
-
-function parseUploadedTrafficWorkbook(workbook: XLSX.WorkBook, fileName: string, fleetmap: FleetmapRecord[] = []): DashboardData {
-  return isRawSystemWorkbook(workbook)
-    ? parseRawSystemWorkbook(workbook, fileName, fleetmap)
-    : parseWorkbook(workbook, fileName, fleetmap);
-}
-
-function parseRawSystemWorkbook(workbook: XLSX.WorkBook, fileName: string, fleetmap: FleetmapRecord[] = []): DashboardData {
-  const sourceSheet = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sourceSheet];
-  const rows = XLSX.utils.sheet_to_json<RawRow>(worksheet, { defval: "", raw: true });
-
-  const fleetIndex = new Map<string, FleetmapRecord>();
-  fleetmap.forEach((rec) => fleetIndex.set(normalizeRadioKey(rec.radioId), rec));
-
-  const records = rows
-    .map((row): CallRecord => {
-      const startRaw = cleanRawSystemValue(findValue(row, RAW_SYSTEM_HEADER_ALIASES.startTime));
-      const endRaw = cleanRawSystemValue(findValue(row, RAW_SYSTEM_HEADER_ALIASES.endTime));
-      const durationSeconds = parseNumber(cleanRawSystemValue(findValue(row, RAW_SYSTEM_HEADER_ALIASES.durationSeconds)), 0);
-      const radioId = normalizeRadioKey(findValue(row, RAW_SYSTEM_HEADER_ALIASES.callerNumber));
-      const fleet = fleetIndex.get(normalizeRadioKey(radioId));
-      const hasFleetMatch = Boolean(fleet);
-      const mappedRegion = hasFleetMatch
-        ? (fleet?.region && isKnownLabel(fleet.region) ? fleet.region : "Unknown")
-        : "Unmatched Fleetmap";
-      const rawAlias = cleanRawSystemValue(findValue(row, RAW_SYSTEM_HEADER_ALIASES.callerAlias), "Not labelled");
-      const rawTalkgroup = cleanRawSystemValue(
-        findValue(row, RAW_SYSTEM_HEADER_ALIASES.calleeAlias),
-        cleanRawSystemValue(findValue(row, RAW_SYSTEM_HEADER_ALIASES.calleeNumber), "Unknown")
-      );
-      const rawCallType = cleanText(findValue(row, RAW_SYSTEM_HEADER_ALIASES.callType), "Unknown");
-      const rawDuplexType = cleanText(findValue(row, RAW_SYSTEM_HEADER_ALIASES.duplexType), "Unknown");
-      const rawCallPriority = cleanText(findValue(row, RAW_SYSTEM_HEADER_ALIASES.callPriority), "Unknown");
-      const rawEncrypted = cleanText(findValue(row, RAW_SYSTEM_HEADER_ALIASES.encrypted), "Unknown");
-      const parsedStart = parseDate(startRaw);
-
-      const preferKnown = (primary: string, fallbackValue: string | undefined, fallback = "Unknown") =>
-        isKnownLabel(primary) ? primary : (fallbackValue && isKnownLabel(fallbackValue) ? fallbackValue : fallback);
-      const mappedMobileType = mobileTypeFromRadioId(radioId, fleet?.mobileType ?? "Unknown");
-      const mappedBaseStation = baseStationOrRadioType(cleanRawSystemValue(findValue(row, RAW_SYSTEM_HEADER_ALIASES.baseStation), "Unknown"), mappedMobileType);
-
-      return {
-        radioId,
-        radioAlias: preferKnown(rawAlias, fleet?.radioAlias, "Not labelled"),
-        mobileType: mappedMobileType,
-        employeeName: fleet?.employeeName && isKnownLabel(fleet.employeeName) ? fleet.employeeName : "Unknown",
-        employeeId: fleet?.employeeId && isKnownLabel(fleet.employeeId) ? fleet.employeeId : "Unknown",
-        region: mappedRegion,
-        company: companyFromRadioId(radioId, fleet?.company ?? "Unknown"),
-        talkgroup: preferKnown(rawTalkgroup, fleet?.talkgroup, "Unknown"),
-        callDate: formatDate(startRaw),
-        startTime: formatSourceDateTime(startRaw),
-        endTime: formatSourceDateTime(endRaw),
-        year: parsedStart ? `${parsedStart.getFullYear()}` : yearLabel("", startRaw),
-        month: monthLabel("", startRaw),
-        week: weekLabelFromDate(startRaw),
-        hour: parsedStart ? `${String(parsedStart.getHours()).padStart(2, "0")}:00` : hourLabel(startRaw),
-        durationSeconds,
-        trafficHours: durationSeconds / 3600,
-        baseStation: mappedBaseStation,
-        callType: rawCallType,
-        duplexType: rawDuplexType,
-        callPriority: rawCallPriority,
-        encrypted: rawEncrypted,
-      };
-    })
-    .filter((record) => record.radioId !== "Unknown" || record.durationSeconds > 0);
-
-  const lookupRecords: LookupRecord[] = fleetmap
-    .filter((r) => r.radioId && r.company)
-    .map((r) => ({ radioId: r.radioId, company: r.company, region: r.region, talkgroup: r.talkgroup }));
-
-  const warnings: string[] = [];
-  if (fleetmap.length === 0) warnings.push("Raw system file was loaded without Master/Fixed Fleetmap. Company, region, user and radio type lookup may be incomplete.");
-  if (records.length === 0) warnings.push("No raw system call rows could be parsed. Check the raw file headers.");
-  if (records.some((record) => record.durationSeconds <= 0)) warnings.push("Some raw rows have zero or missing duration.");
-  const unmatchedRows = records.filter((record) => record.region === "Unmatched Fleetmap" || record.company === "Unknown").length;
-  if (unmatchedRows > 0) warnings.push(`${formatNumber(unmatchedRows)} raw rows could not be matched to Master/Fixed Fleetmap lookup. Check whether those Caller Numbers exist in the fleetmap.`);
-
-  return {
-    fileName,
-    sourceSheet,
-    loadedAt: new Date().toLocaleString("en-GB"),
-    rawRows: rows.length,
-    records,
-    lookupRecords,
-    fleetmapRecords: fleetmap,
-    cdrSources: [{ fileName, rawRows: rows.length, loadedAt: new Date().toLocaleString("en-GB"), recordCount: records.length }],
-    warnings,
-  };
-}
-
-function combineDashboardWarnings(warnings: string[]) {
-  const rawUnmatchedPattern = /^(\d[\d,]*) raw rows could not be matched to Master\/Fixed Fleetmap lookup\. Check whether those Caller Numbers exist in the fleetmap\.$/;
-  let rawUnmatchedTotal = 0;
-  const otherWarnings: string[] = [];
-
-  warnings.forEach((warning) => {
-    const match = rawUnmatchedPattern.exec(warning);
-    if (match) {
-      rawUnmatchedTotal += Number(match[1].replace(/,/g, ""));
-    } else if (!otherWarnings.includes(warning)) {
-      otherWarnings.push(warning);
-    }
-  });
-
-  if (rawUnmatchedTotal > 0) {
-    otherWarnings.push(`${new Intl.NumberFormat("en-US").format(rawUnmatchedTotal)} raw rows could not be matched to Master/Fixed Fleetmap lookup. Check whether those Caller Numbers exist in the fleetmap.`);
-  }
-
-  return otherWarnings;
-}
-
-function mergeCdrIntoData(base: DashboardData, addition: DashboardData): DashboardData {
-  return {
-    ...base,
-    records:    [...base.records, ...addition.records],
-    rawRows:    base.rawRows + addition.rawRows,
-    cdrSources: [...base.cdrSources, ...addition.cdrSources],
-    warnings:   combineDashboardWarnings([...base.warnings, ...addition.warnings]),
-    loadedAt:   new Date().toLocaleString("en-GB"),
-  };
-}
-
-function modeBy<T extends string>(records: CallRecord[], getValue: (record: CallRecord) => T) {
-  const counts = new Map<T, { count: number; durationSeconds: number }>();
-  records.forEach((record) => {
-    const value = getValue(record);
-    const current = counts.get(value) ?? { count: 0, durationSeconds: 0 };
-    current.count += 1;
-    current.durationSeconds += record.durationSeconds;
-    counts.set(value, current);
-  });
-  return [...counts.entries()].sort((a, b) => b[1].count - a[1].count || b[1].durationSeconds - a[1].durationSeconds)[0];
-}
-
-
-function KpiBarLabel(props: any) {
-  const value = Number(props.value ?? 0);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  const x = Number(props.x ?? 0) + Number(props.width ?? 0) / 2;
-  const y = Number(props.y ?? 0) - 8;
-  return <text x={x} y={y} textAnchor="middle" fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={11} fontWeight={900}>{chartLabel(value)}</text>;
-}
-
-function KpiLineLabel(props: any) {
-  const value = Number(props.value ?? 0);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  const x = Number(props.x ?? 0);
-  const y = Number(props.y ?? 0) - 16;
-  return <text x={x} y={y} textAnchor="middle" fill={CHART_COLORS.duration} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={11} fontWeight={900}>{chartLabel(value)}</text>;
-}
-
-function TopValueLabel(props: any) {
-  const value = Number(props.value ?? 0);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  const x = Number(props.x ?? 0) + Number(props.width ?? 0) / 2;
-  const y = Number(props.y ?? 0) - 7;
-  return <text x={x} y={y} textAnchor="middle" fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={10} fontWeight={900}>{chartLabel(value)}</text>;
-}
-
-function RightValueLabel(props: any) {
-  const value = Number(props.value ?? 0);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  const x = Number(props.x ?? 0) + Number(props.width ?? 0) + 8;
-  const y = Number(props.y ?? 0) + Number(props.height ?? 0) / 2 + 4;
-  return <text x={x} y={y} textAnchor="start" fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={10} fontWeight={900}>{chartLabel(value)}</text>;
-}
-
-function PointValueLabel(props: any) {
-  const value = Number(props.value ?? 0);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  const x = Number(props.x ?? 0);
-  const y = Number(props.y ?? 0) - 12;
-  return <text x={x} y={y} textAnchor="middle" fill={props.fill ?? CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={10} fontWeight={900}>{chartLabel(value)}</text>;
-}
-
-function PieValueLabel(props: any) {
-  const value = Number(props.value ?? 0);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  return <text x={props.x} y={props.y} textAnchor="middle" dominantBaseline="central" fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={10} fontWeight={900}>{chartLabel(value)}</text>;
-}
-
-function PieDurationLabel(props: any) {
-  const value = Number(props.value ?? 0);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  return <text x={props.x} y={props.y} textAnchor="middle" dominantBaseline="central" fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={10} fontWeight={900}>{secondsToClock(value)}</text>;
-}
-
-function PieDecimalLabel(props: any) {
-  const value = Number(props.value ?? 0);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  return <text x={props.x} y={props.y} textAnchor="middle" dominantBaseline="central" fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={10} fontWeight={900}>{formatDecimal(value, 2)}</text>;
-}
-
-function CompanyPerformanceTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
-  const row = payload[0]?.payload ?? {};
-  return (
-    <div className="custom-tooltip">
-      <strong>{row.name ?? label}</strong>
-      <span>Calls: {formatNumber(row.calls ?? 0)}</span>
-      <span>Duration: {secondsToClock(row.durationSeconds ?? 0)}</span>
-    </div>
-  );
-}
-
-function TalkgroupTooltip({ active, payload }: any) {
-  if (!active || !payload?.length) return null;
-  const row = payload[0]?.payload;
-  if (!row) return null;
-  return (
-    <div className="custom-tooltip">
-      <strong>{row.name}</strong>
-      <span>Total talkgroups: {formatNumber(row.total ?? 0)}</span>
-      <span>Used talkgroups: {formatNumber(row.used ?? 0)}</span>
-    </div>
-  );
-}
-
-function RadioTooltip({ active, payload }: any) {
-  if (!active || !payload?.length) return null;
-  const row = payload[0]?.payload;
-  if (!row) return null;
-  return (
-    <div className="custom-tooltip">
-      <strong>{row.name}</strong>
-      <span>Total radios: {formatNumber(row.total ?? 0)}</span>
-      <span>Radios made calls: {formatNumber(row.used ?? 0)}</span>
-    </div>
-  );
-}
-
-function MobileTypeTooltip({ active, payload, label, mobileTypes = [] }: any) {
-  if (!active || !payload?.length) return null;
-  const row = payload[0]?.payload ?? {};
-  return (
-    <div className="custom-tooltip">
-      <strong>{row.name ?? label}</strong>
-      <span>Total radios: {formatNumber(row.total ?? 0)}</span>
-      {mobileTypes.map((type: string) => (
-        <span key={type}>{type}: {formatNumber(row[mobileTypeKey(type)] ?? 0)}</span>
-      ))}
-    </div>
-  );
-}
-function CallsDurationPerformanceChart({ title, data, height = 360, xTickFormatter = (value: unknown) => truncateLabel(value, 18), gradientId }: { title: string; data: Ranking[]; height?: number; xTickFormatter?: (value: unknown) => string; gradientId: string }) {
-  return (
-    <>
-      <h3>{title}</h3>
-      <ResponsiveContainer width="100%" height={height}>
-        <ComposedChart data={data} margin={{ left: 0, right: 8, top: 18, bottom: 0 }}>
-          <defs>
-            <linearGradient id={`${gradientId}Calls`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={CHART_COLORS.callsLight} stopOpacity={0.98} />
-              <stop offset="55%" stopColor={CHART_COLORS.calls} stopOpacity={0.9} />
-              <stop offset="100%" stopColor={CHART_COLORS.callsDeep} stopOpacity={0.76} />
-            </linearGradient>
-            <filter id={`${gradientId}Glow`} x="-40%" y="-40%" width="180%" height="180%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-          </defs>
-          <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" vertical={false} opacity={0.32} />
-          <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 10 }} interval={0} angle={-35} textAnchor="end" tickMargin={10} height={72} tickFormatter={xTickFormatter} />
-          <YAxis yAxisId="calls" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={chartLabel} />
-          <YAxis yAxisId="duration" orientation="right" tick={{ fill: CHART_COLORS.durationDeep, fontSize: 11 }} tickFormatter={chartLabel} />
-          <Tooltip content={<CompanyPerformanceTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-          <Bar yAxisId="calls" dataKey="calls" name="Calls" fill={`url(#${gradientId}Calls)`} radius={[8, 8, 0, 0]} maxBarSize={42}>
-            <LabelList dataKey="calls" content={TopValueLabel} />
-          </Bar>
-          <Line yAxisId="duration" type="monotone" dataKey="durationSeconds" name="Duration seconds" stroke={CHART_COLORS.duration} strokeWidth={4} dot={{ r: 5, fill: CHART_COLORS.duration, stroke: CHART_COLORS.durationLight, strokeWidth: 2 }} activeDot={{ r: 8 }} style={{ filter: `url(#${gradientId}Glow)` }}>
-            <LabelList dataKey="durationSeconds" content={(props) => <PointValueLabel {...props} fill={CHART_COLORS.duration} />} />
-          </Line>
-        </ComposedChart>
-      </ResponsiveContainer>
-      <ChartLegend items={[{ name: "Total calls", color: CHART_COLORS.calls }, { name: "Total duration", color: CHART_COLORS.duration }]} />
-    </>
-  );
-}
-
-function MobileTypeOverlayBarShape(props: any) {
-  const { x, y, width, height, value, payload, mobileTypes = [] } = props;
-  const total = Number(value ?? 0);
-  if (!height || height <= 0 || total <= 0) return <g />;
-  const safeY = Math.max(y, 6);
-  const safeHeight = Math.max(0, height - (safeY - y));
-  const wideW = Math.min(Math.max(width * 0.78, 34), 64);
-  const cx = x + width / 2;
-  const activeTypes = mobileTypes.filter((type: string) => Number(payload[mobileTypeKey(type)] ?? 0) > 0);
-  const narrowW = Math.max(5, Math.min(13, (wideW - 8) / Math.max(1, activeTypes.length)));
-  const groupW = activeTypes.length ? activeTypes.length * narrowW + (activeTypes.length - 1) * 3 : 0;
-  const startX = cx - groupW / 2;
-  return (
-    <g>
-      <rect x={cx - wideW / 2} y={safeY} width={wideW} height={safeHeight} fill={CHART_COLORS.total} opacity={0.9} rx={5} />
-      <text x={cx} y={Math.max(12, safeY - 7)} textAnchor="middle" fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={9} fontWeight={900}>{chartLabel(total)}</text>
-      {activeTypes.map((type: string, index: number) => {
-        const typeValue = Number(payload[mobileTypeKey(type)] ?? 0);
-        const barHeight = Math.min(safeHeight, (typeValue / total) * safeHeight);
-        const barX = startX + index * (narrowW + 3);
-        const barY = y + height - barHeight;
-        const labelX = barX + narrowW / 2;
-        const labelY = barY + barHeight / 2;
-        return (
-          <g key={type}>
-            <rect x={barX} y={barY} width={narrowW} height={barHeight} fill={mobileTypeColor(type)} rx={3} />
-            {typeValue > 0 && barHeight > 18 && (
-              <text x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" transform={`rotate(-90 ${labelX} ${labelY})`} fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={8} fontWeight={900}>{chartLabel(typeValue)}</text>
-            )}
-          </g>
-        );
-      })}
-    </g>
-  );
-}
-
-function OverlayBarShape(props: any) {
-  const { x, y, width, height, value, payload, totalColor, usedColor } = props;
-  if (!height || height <= 0) return <g />;
-  const wideW = Math.min(width * 0.85, 48);
-  const narrowW = Math.min(width * 0.42, 22);
-  const cx = x + width / 2;
-  const usedVal = payload.used ?? 0;
-  const safeY = Math.max(y, 4);
-  const safeHeight = Math.max(0, height - (safeY - y));
-  const usedH = safeHeight > 0 && value > 0 ? Math.min(safeHeight, (usedVal / value) * safeHeight) : 0;
-  const usedY = y + height - usedH;
-  const totalLabelY = Math.max(12, safeY - 6);
-  const usedLabelX = cx + narrowW / 2 + 10;
-  const usedLabelY = usedY + usedH / 2;
-  return (
-    <g>
-      <rect x={cx - wideW / 2} y={safeY} width={wideW} height={safeHeight} fill={totalColor} rx={4} />
-      <rect x={cx - narrowW / 2} y={usedY} width={narrowW} height={usedH} fill={usedColor} rx={3} />
-      <text x={cx} y={totalLabelY} textAnchor="middle" fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={9} fontWeight={900}>{chartLabel(value)}</text>
-      {usedVal > 0 && (
-        <text x={usedLabelX} y={usedLabelY} textAnchor="middle" dominantBaseline="central" transform={`rotate(-90 ${usedLabelX} ${usedLabelY})`} fill={CHART_COLORS.label} stroke={CHART_COLORS.labelStroke} strokeWidth={3} paintOrder="stroke" fontSize={9} fontWeight={900}>{chartLabel(usedVal)}</text>
-      )}
-    </g>
-  );
-}
-
-function truncateLabel(value: unknown, max = 24) {
-  const text = `${value ?? "Unknown"}`;
-  return text.length > max ? `${text.slice(0, max - 3)}...` : text;
-}
-
-function shortMonthLabel(value: unknown) {
-  return `${value ?? "Unknown"}`.replace(/\s+/g, " ").trim().replace(/^([A-Za-z]{3})[a-z]*\s+((?:19|20)\d{2})$/, "$1 $2");
-}
-
-function hexToRgb(hex: string) {
-  const clean = hex.replace("#", "");
-  const value = Number.parseInt(clean, 16);
-  return { r: (value >> 16) & 255, g: (value >> 8) & 255, b: value & 255 };
-}
-
-function colorMix(hex: string, target: "light" | "dark") {
-  const { r, g, b } = hexToRgb(hex);
-  const amount = target === "light" ? 0.28 : -0.18;
-  const mix = (channel: number) => {
-    const next = amount >= 0 ? channel + (255 - channel) * amount : channel * (1 + amount);
-    return Math.round(Math.max(0, Math.min(255, next))).toString(16).padStart(2, "0");
-  };
-  return `#${mix(r)}${mix(g)}${mix(b)}`;
-}
-
-function companyColor(company: string) {
-  let hash = 0;
-  for (const char of company) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return COMPANY_COLORS[hash % COMPANY_COLORS.length];
-}
-
-function companyMetricColor(company: string, metric: "duration" | "calls") {
-  return colorMix(companyColor(company), metric === "duration" ? "light" : "dark");
-}
-
-function dataKey(value: string) {
-  return `m_${value.replace(/[^a-zA-Z0-9]/g, "_")}`;
-}
-
-function mobileTypeKey(value: string) {
-  return `type_${value.replace(/[^a-zA-Z0-9]/g, "_")}`;
-}
-
-function mobileTypeColor(type: string) {
-  const knownIndex = MOBILE_TYPE_LABELS.indexOf(type);
-  if (knownIndex >= 0) return MOBILE_TYPE_COLORS[knownIndex % MOBILE_TYPE_COLORS.length];
-  let hash = 0;
-  for (const char of type) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return COLORS[hash % COLORS.length];
-}
-
-function monthSortValue(label: string) {
-  const text = `${label ?? ""}`.toLowerCase();
-  if (!text || text === "unknown") return Number.MAX_SAFE_INTEGER;
-  const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-  const monthIndex = months.findIndex((month) => text.includes(month));
-  const numericMonth = /(?:^|\D)(1[0-2]|0?[1-9])(?:\D|$)/.exec(text)?.[1];
-  const index = monthIndex >= 0 ? monthIndex : numericMonth ? Number(numericMonth) - 1 : 99;
-  const year = /(19|20)\d{2}/.exec(text)?.[0];
-  return (year ? Number(year) * 12 : 0) + index;
-}
-
-function weekSortValue(label: string) {
-  const text = `${label ?? ""}`.trim();
-  const lower = text.toLowerCase();
-  if (!lower || lower === "unknown") return Number.MAX_SAFE_INTEGER;
-
-  // Preferred format: Week 2 of Jan 2026 / Week 2 of January 2026
-  const formatted = /week\s*(\d+)\s*of\s*([a-z]+)\s*((?:19|20)\d{2})/i.exec(text);
-  if (formatted) {
-    const week = Number(formatted[1]);
-    const monthText = formatted[2].slice(0, 3).toLowerCase();
-    const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-    const monthIndex = months.indexOf(monthText);
-    const year = Number(formatted[3]);
-    if (monthIndex >= 0 && Number.isFinite(week) && Number.isFinite(year)) {
-      return year * 100 + monthIndex * 6 + week;
-    }
-  }
-
-  const numeric = /\d+/.exec(text)?.[0];
-  return numeric ? Number(numeric) : Number.MAX_SAFE_INTEGER - 1;
-}
-
-function weekLabelFromDate(value: unknown) {
-  const date = parseDate(value);
-  if (!date) return "Unknown";
-  const weekOfMonth = Math.ceil(date.getDate() / 7);
-  const monthYear = date.toLocaleDateString("en-GB", { month: "short", year: "numeric" });
-  return `Week ${weekOfMonth} of ${monthYear}`;
-}
-
-function groupBy(records: CallRecord[], getName: (record: CallRecord) => string): Ranking[] {
-  const map = new Map<string, { calls: number; durationSeconds: number; trafficHours: number; radios: Set<string> }>();
-  records.forEach((record) => {
-    const name = getName(record) || "Unknown";
-    const current = map.get(name) ?? { calls: 0, durationSeconds: 0, trafficHours: 0, radios: new Set<string>() };
-    current.calls += 1;
-    current.durationSeconds += record.durationSeconds;
-    current.trafficHours += record.trafficHours;
-    current.radios.add(record.radioId);
-    map.set(name, current);
-  });
-  return [...map.entries()]
-    .map(([name, value]) => ({ name, calls: value.calls, durationSeconds: value.durationSeconds, trafficHours: value.trafficHours, radios: value.radios.size }))
-    .sort((a, b) => b.calls - a.calls || b.durationSeconds - a.durationSeconds);
-}
-
-function uniqueOptions(records: CallRecord[], getValue: (record: CallRecord) => string, sortAsMonth = false) {
-  const values = Array.from(new Set(records.map(getValue).filter(Boolean)));
-  return values.sort((a, b) => sortAsMonth ? monthSortValue(a) - monthSortValue(b) || a.localeCompare(b) : a.localeCompare(b));
-}
-
-function csvEscape(value: unknown) {
-  const text = `${value ?? ""}`.replace(/\r?\n/g, " ");
-  return /[",]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-}
-
-function downloadText(fileName: string, text: string) {
-  const blob = new Blob(["\ufeff", text], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url; link.download = fileName;
-  document.body.appendChild(link); link.click(); link.remove();
-  URL.revokeObjectURL(url);
-}
-
-function downloadBlob(fileName: string, blob: Blob) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url; link.download = fileName;
-  document.body.appendChild(link); link.click(); link.remove();
-  URL.revokeObjectURL(url);
-}
-
-function downloadDataUrl(fileName: string, dataUrl: string) {
-  const link = document.createElement("a");
-  link.href = dataUrl; link.download = fileName;
-  document.body.appendChild(link); link.click(); link.remove();
-}
-
-function downloadWorkbookData(fileName: string, sheetName: string, title: string, dataset: ChartExportDataset) {
-  const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.aoa_to_sheet([[title], [], dataset.headers, ...dataset.rows]);
-  worksheet["!cols"] = dataset.headers.map((header, index) => {
-    const maxLength = Math.max(`${header}`.length, ...dataset.rows.slice(0, 200).map((row) => `${row[index] ?? ""}`.length));
-    return { wch: Math.min(Math.max(maxLength + 2, 12), 34) };
-  });
-  worksheet["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: Math.max(0, dataset.headers.length - 1) } }];
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName.slice(0, 31) || "Chart Data");
-  const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  downloadBlob(fileName, new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
-}
-
-function fileSlug(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 90) || "dashboard-card";
-}
-
-function exportIconSvg(kind: "png" | "xlsx" | "ppt" | "pdf" | "view" | "csv") {
-  if (kind === "view") return `<svg class="file-export-svg file-export-svg-view" viewBox="0 0 64 64" aria-hidden="true"><path d="M6 32s9-16 26-16 26 16 26 16-9 16-26 16S6 32 6 32Z"/><circle cx="32" cy="32" r="8"/></svg>`;
-  if (kind === "png") return `<svg class="file-export-svg file-export-svg-png" viewBox="0 0 64 64" aria-hidden="true"><path class="file-page" d="M14 5h25l11 11v43H14Z"/><path class="file-fold" d="M39 5v12h11"/><circle class="file-mark" cx="25" cy="24" r="5"/><path class="file-mark" d="m18 49 11-13 7 8 5-6 8 11Z"/></svg>`;
-  const meta = {
-    pdf: { label: "PDF", color: "#ef1b2d", grid: false, chart: false },
-    xlsx: { label: "XLSX", color: "#21a366", grid: false, chart: false },
-    csv: { label: "CSV", color: "#45c957", grid: true, chart: false },
-    ppt: { label: "PPTX", color: "#d6421f", grid: false, chart: true },
-  }[kind];
-  const grid = meta.grid ? `<path class="file-grid" d="M22 36h20M22 44h20M22 52h20M29 30v27M37 30v27"/>` : "";
-  const chart = meta.chart ? `<path class="file-chart" d="M28 48a10 10 0 1 0 10-10v10Z"/><path class="file-chart" d="M39 37a10 10 0 0 1 9 9h-9Z"/>` : "";
-  const lines = !meta.grid && !meta.chart ? `<path class="file-lines" d="M21 23h22M21 30h22M21 37h18"/>` : "";
-  return `<svg class="file-export-svg file-export-svg-${kind}" viewBox="0 0 64 64" aria-hidden="true" style="--file-color:${meta.color}"><path class="file-page" d="M14 5h25l11 11v43H14Z"/><path class="file-fold" d="M39 5v12h11"/>${lines}${grid}${chart}<rect class="file-ribbon" x="6" y="34" width="52" height="20" rx="3"/><text class="file-label" x="32" y="49" text-anchor="middle">${meta.label}</text></svg>`;
-}
-function escapeXml(value: unknown) {
-  return `${value ?? ""}`.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
-}
-
-function htmlEscape(value: unknown) {
-  return `${value ?? ""}`.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-}
-
-const ARABIC_TEXT_RE = /[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]/;
-const PDF_ARABIC_FONT = "TahomaArabic";
-const PDF_ARABIC_FONT_FILE = "tahoma.ttf";
-let pdfArabicFontBase64: string | null = null;
-let pdfArabicFontLoadPromise: Promise<string | null> | null = null;
-
-function hasArabicText(value: unknown) {
-  return ARABIC_TEXT_RE.test(`${value ?? ""}`);
-}
-
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  const chunkSize = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    const chunk = bytes.subarray(i, i + chunkSize);
-    binary += String.fromCharCode(...chunk);
-  }
-  return btoa(binary);
-}
-
-function loadPdfArabicFontBase64() {
-  if (pdfArabicFontBase64) return Promise.resolve(pdfArabicFontBase64);
-  if (!pdfArabicFontLoadPromise) {
-    pdfArabicFontLoadPromise = fetch(`/assets/${PDF_ARABIC_FONT_FILE}`)
-      .then((response) => response.ok ? response.arrayBuffer() : null)
-      .then((buffer) => {
-        pdfArabicFontBase64 = buffer ? arrayBufferToBase64(buffer) : null;
-        return pdfArabicFontBase64;
-      })
-      .catch(() => null);
-  }
-  return pdfArabicFontLoadPromise;
-}
-
-async function ensurePdfArabicFont(pdf: jsPDF) {
-  const fontBase64 = await loadPdfArabicFontBase64();
-  if (!fontBase64) return;
-  const pdfWithFont = pdf as unknown as {
-    addFileToVFS: (fileName: string, data: string) => void;
-    addFont: (fileName: string, fontName: string, fontStyle: string) => void;
-  };
-  pdfWithFont.addFileToVFS(PDF_ARABIC_FONT_FILE, fontBase64);
-  pdfWithFont.addFont(PDF_ARABIC_FONT_FILE, PDF_ARABIC_FONT, "normal");
-  pdfWithFont.addFont(PDF_ARABIC_FONT_FILE, PDF_ARABIC_FONT, "bold");
-}
-
-function applyWorkbookArabicSupport(workbook: ExcelJS.Workbook) {
-  workbook.eachSheet((worksheet) => {
-    worksheet.eachRow((row) => {
-      row.eachCell((cell) => {
-        const rtl = hasArabicText(cell.value);
-        cell.font = { ...(cell.font ?? {}), name: "Arial" };
-        cell.alignment = {
-          ...(cell.alignment ?? {}),
-          wrapText: true,
-          vertical: cell.alignment?.vertical ?? "middle",
-          readingOrder: rtl ? "rtl" : "ltr",
-        } as Partial<ExcelJS.Alignment>;
-      });
-    });
-  });
-}
-
-function pdfExportText(pdf: jsPDF, value: unknown) {
-  const text = `${value ?? ""}`;
-  return hasArabicText(text) && typeof (pdf as unknown as { processArabic?: (txt: string) => string }).processArabic === "function"
-    ? (pdf as unknown as { processArabic: (txt: string) => string }).processArabic(text)
-    : text;
-}
-
-function pdfText(pdf: jsPDF, value: unknown, x: number, y: number, options?: Parameters<jsPDF["text"]>[3]) {
-  const rtl = hasArabicText(value);
-  const api = pdf as unknown as { setR2L?: (enabled: boolean) => void; getR2L?: () => boolean };
-  const previousR2L = api.getR2L?.() ?? false;
-  const previousFont = pdf.getFont();
-  if (rtl) {
-    api.setR2L?.(true);
-    if (pdfArabicFontBase64) pdf.setFont(PDF_ARABIC_FONT, previousFont.fontStyle === "bold" ? "bold" : "normal");
-  }
-  pdf.text(pdfExportText(pdf, value), x, y, { ...(options ?? {}), ...(rtl ? { isInputRtl: true, isOutputRtl: true } : {}) } as Parameters<jsPDF["text"]>[3]);
-  if (rtl) {
-    api.setR2L?.(previousR2L);
-    pdf.setFont(previousFont.fontName, previousFont.fontStyle);
-  }
-}
-
-function pptTextOptions(value: unknown, options: Record<string, unknown>): any {
-  return {
-    ...options,
-    fontFace: "Arial",
-    lang: hasArabicText(value) ? "ar-SA" : "en-US",
-    ...(hasArabicText(value) ? { rtlMode: true } : {}),
-  };
-}
-
-function excelColumnName(index: number) {
-  let value = index; let name = "";
-  while (value > 0) { const r = (value - 1) % 26; name = String.fromCharCode(65 + r) + name; value = Math.floor((value - 1) / 26); }
-  return name;
-}
-
-function excelRange(sheetName: string, col: number, startRow: number, endRow: number) {
-  const safeName = sheetName.replace(/'/g, "''");
-  return `'${safeName}'!$${excelColumnName(col)}$${startRow}:$${excelColumnName(col)}$${endRow}`;
-}
-
-
-function nativeSeriesXml(series: NativeChartSeries, index: number, categoriesRef: string, chartType: "bar" | "line" | "doughnut") {
-  const shape = `<c:spPr><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill><a:ln><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill></a:ln></c:spPr>`;
-  const marker = chartType === "line" ? `<c:marker><c:symbol val="circle"/><c:size val="6"/><c:spPr><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill><a:ln><a:solidFill><a:srgbClr val="${series.color}"/></a:solidFill></a:ln></c:spPr></c:marker>` : "";
-  const dPts = chartType === "doughnut" ? COLORS.map((color, i) => `<c:dPt><c:idx val="${i}"/><c:spPr><a:solidFill><a:srgbClr val="${color.replace("#", "")}"/></a:solidFill></c:spPr></c:dPt>`).join("") : "";
-  return `<c:ser><c:idx val="${index}"/><c:order val="${index}"/><c:tx><c:v>${escapeXml(series.name)}</c:v></c:tx>${shape}${marker}${dPts}<c:cat><c:strRef><c:f>${escapeXml(categoriesRef)}</c:f></c:strRef></c:cat><c:val><c:numRef><c:f>${escapeXml(series.valuesRef)}</c:f></c:numRef></c:val></c:ser>`;
-}
-
-function nativeChartXml(config: NativeChartConfig) {
-  const series = config.series.map((item, index) => nativeSeriesXml(item, index, config.categoriesRef, config.type)).join("");
-  const chartBody = config.type === "bar"
-    ? `<c:barChart><c:barDir val="bar"/><c:grouping val="clustered"/><c:varyColors val="0"/>${series}<c:dLbls><c:showVal val="1"/><c:showLegendKey val="0"/><c:showCatName val="0"/><c:showSerName val="0"/></c:dLbls><c:axId val="10"/><c:axId val="20"/></c:barChart>`
-    : config.type === "line"
-      ? `<c:lineChart><c:grouping val="standard"/><c:varyColors val="0"/>${series}<c:dLbls><c:showVal val="1"/><c:showLegendKey val="0"/><c:showCatName val="0"/><c:showSerName val="0"/></c:dLbls><c:axId val="10"/><c:axId val="20"/></c:lineChart>`
-      : `<c:doughnutChart><c:varyColors val="1"/>${series}<c:dLbls><c:showVal val="1"/><c:showLeaderLines val="1"/><c:showLegendKey val="0"/><c:showCatName val="0"/><c:showSerName val="0"/><c:showPercent val="0"/></c:dLbls><c:holeSize val="55"/></c:doughnutChart>`;
-  const axes = config.type === "doughnut" ? "" : `<c:catAx><c:axId val="10"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="l"/><c:tickLblPos val="nextTo"/><c:crossAx val="20"/><c:crosses val="autoZero"/></c:catAx><c:valAx><c:axId val="20"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="b"/><c:majorGridlines/><c:numFmt formatCode="#,##0" sourceLinked="0"/><c:tickLblPos val="nextTo"/><c:crossAx val="10"/><c:crosses val="autoZero"/></c:valAx>`;
-  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><c:date1904 val="0"/><c:lang val="en-US"/><c:roundedCorners val="0"/><c:chart><c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" b="1" sz="1400"/><a:t>${escapeXml(config.title)}</a:t></a:r></a:p></c:rich></c:tx><c:layout/></c:title><c:plotArea><c:layout/>${chartBody}${axes}</c:plotArea><c:legend><c:legendPos val="r"/><c:layout/></c:legend><c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/></c:chart></c:chartSpace>`;
-}
-
-async function patchWorkbookWithNativeCharts(buffer: ExcelJS.Buffer, configs: NativeChartConfig[]) {
-  const zip = await JSZip.loadAsync(buffer);
-  const contentTypePath = "[Content_Types].xml";
-  let contentTypes = await zip.file(contentTypePath)?.async("string");
-  for (const config of configs) {
-    const chartPath = `xl/charts/chart${config.chartIndex}.xml`;
-    const drawingPath = `xl/drawings/drawing${config.chartIndex}.xml`;
-    const drawingRelPath = `xl/drawings/_rels/drawing${config.chartIndex}.xml.rels`;
-    const sheetRelPath = `xl/worksheets/_rels/sheet${config.sheetIndex}.xml.rels`;
-    const sheetPath = `xl/worksheets/sheet${config.sheetIndex}.xml`;
-    const from = config.from ?? { col: 4, row: 1 };
-    const to = config.to ?? { col: 14, row: 24 };
-    zip.file(chartPath, nativeChartXml(config));
-    zip.file(drawingPath, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><xdr:twoCellAnchor><xdr:from><xdr:col>${from.col}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${from.row}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from><xdr:to><xdr:col>${to.col}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${to.row}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to><xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="2" name="${escapeXml(config.title)}"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1"/></a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>`);
-    zip.file(drawingRelPath, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="../charts/chart${config.chartIndex}.xml"/></Relationships>`);
-    const sheetRelXml = await zip.file(sheetRelPath)?.async("string");
-    const existingRids = [...(sheetRelXml ?? "").matchAll(/Id="rId(\d+)"/g)].map((m) => Number(m[1]));
-    const nextRid = `rId${Math.max(0, ...existingRids) + 1}`;
-    const drawingRel = `<Relationship Id="${nextRid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing${config.chartIndex}.xml"/>`;
-    zip.file(sheetRelPath, sheetRelXml ? sheetRelXml.replace("</Relationships>", `${drawingRel}</Relationships>`) : `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${drawingRel}</Relationships>`);
-    const sheetXml = await zip.file(sheetPath)?.async("string");
-    if (sheetXml && !sheetXml.includes("<drawing ")) {
-      const withNs = sheetXml.includes("xmlns:r=") ? sheetXml : sheetXml.replace("<worksheet ", '<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ');
-      zip.file(sheetPath, withNs.replace("</worksheet>", `<drawing r:id="${nextRid}"/></worksheet>`));
-    }
-    if (contentTypes) {
-      const chartOverride = `<Override PartName="/${chartPath}" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>`;
-      const drawingOverride = `<Override PartName="/${drawingPath}" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>`;
-      if (!contentTypes.includes(chartPath)) contentTypes = contentTypes.replace("</Types>", `${chartOverride}</Types>`);
-      if (!contentTypes.includes(drawingPath)) contentTypes = contentTypes.replace("</Types>", `${drawingOverride}</Types>`);
-    }
-  }
-  if (contentTypes) zip.file(contentTypePath, contentTypes);
-  return zip.generateAsync({ type: "blob" });
-}
 
 
 // Shared sub-components
+
+async function loadExcelJS() {
+  return (await import("exceljs")).default;
+}
+
+async function loadJsPdf() {
+  return (await import("jspdf")).jsPDF;
+}
+
+async function loadPptxgen() {
+  return (await import("pptxgenjs")).default;
+}
+
+async function loadWorkbookParser() {
+  return import("./lib/workbookParser");
+}
+
+function unionFleetmapRecords(master: FleetmapRecord[], fixed: FleetmapRecord[]): FleetmapRecord[] {
+  const map = new Map<string, FleetmapRecord>();
+  [...master, ...fixed].forEach((record) => {
+    const radioKey = normalizeRadioKey(record.radioId);
+    if (isKnownLabel(radioKey) && !map.has(radioKey)) map.set(radioKey, record);
+  });
+  return [...map.values()];
+}
 
 // Main App
 
@@ -1187,6 +106,10 @@ export default function App() {
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
     () => new Set()
   );
+  const handleTabChange = useCallback((tab: DashboardTab) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const scrollToSection = useCallback((id: string) => {
     setActiveSection(id);
@@ -1242,8 +165,9 @@ export default function App() {
     setError("");
     setMasterFleetmap((s) => ({ ...s, isParsing: true }));
     try {
+      const { parseFleetmap, readWorkbookFromUploadedFile } = await loadWorkbookParser();
       const workbook = await readWorkbookFromUploadedFile(file);
-      const records = parseFleetmap(workbook, "master");
+      const records = await parseFleetmap(workbook, "master");
       const meta: FleetmapMeta = { fileName: file.name, loadedAt: new Date().toLocaleString("en-GB") };
       setMasterFleetmap({ records, meta, isParsing: false });
       try { await saveFleetmapToBrowser(SAVED_MASTER_FLEETMAP_KEY, records, meta); } catch { /* ignore */ }
@@ -1259,8 +183,9 @@ export default function App() {
     setError("");
     setFixedFleetmap((s) => ({ ...s, isParsing: true }));
     try {
+      const { parseFleetmap, readWorkbookFromUploadedFile } = await loadWorkbookParser();
       const workbook = await readWorkbookFromUploadedFile(file);
-      const records = parseFleetmap(workbook, "fixed");
+      const records = await parseFleetmap(workbook, "fixed");
       const meta: FleetmapMeta = { fileName: file.name, loadedAt: new Date().toLocaleString("en-GB") };
       setFixedFleetmap({ records, meta, isParsing: false });
       try { await saveFleetmapToBrowser(SAVED_FIXED_FLEETMAP_KEY, records, meta); } catch { /* ignore */ }
@@ -1296,14 +221,15 @@ export default function App() {
     const files = stagedTrafficUpload.files;
     setError(""); setIsParsing(true);
     try {
-      const combinedFleetmap = unionFleetmaps(masterFleetmap.records, fixedFleetmap.records);
+      const { mergeCdrIntoData, parseRawSystemWorkbook, parseUploadedTrafficWorkbook, readWorkbookFromUploadedFile } = await loadWorkbookParser();
+      const combinedFleetmap = unionFleetmapRecords(masterFleetmap.records, fixedFleetmap.records);
       let merged: DashboardData | null = null;
       for (const file of files) {
         await new Promise((resolve) => requestAnimationFrame(resolve));
         const workbook = await readWorkbookFromUploadedFile(file);
         const parsed = stagedTrafficUpload.mode === "raw"
-          ? parseRawSystemWorkbook(workbook, file.name, combinedFleetmap)
-          : parseUploadedTrafficWorkbook(workbook, file.name, combinedFleetmap);
+          ? await parseRawSystemWorkbook(workbook, file.name, combinedFleetmap)
+          : await parseUploadedTrafficWorkbook(workbook, file.name, combinedFleetmap);
         merged = merged ? mergeCdrIntoData(merged, parsed) : parsed;
       }
       if (!merged) return;
@@ -1327,12 +253,13 @@ export default function App() {
     if (files.length === 0 || !data) return;
     setError(""); setIsAddingMoreCdr(true);
     try {
-      const combinedFleetmap = unionFleetmaps(masterFleetmap.records, fixedFleetmap.records);
+      const { mergeCdrIntoData, parseUploadedTrafficWorkbook, readWorkbookFromUploadedFile } = await loadWorkbookParser();
+      const combinedFleetmap = unionFleetmapRecords(masterFleetmap.records, fixedFleetmap.records);
       let merged: DashboardData = data;
       for (const file of files) {
         await new Promise((resolve) => requestAnimationFrame(resolve));
         const workbook = await readWorkbookFromUploadedFile(file);
-        const parsed = parseUploadedTrafficWorkbook(workbook, file.name, combinedFleetmap);
+        const parsed = await parseUploadedTrafficWorkbook(workbook, file.name, combinedFleetmap);
         merged = mergeCdrIntoData(merged, parsed);
       }
       merged.fileName = `${merged.cdrSources.length} CDR files merged`;
@@ -1356,67 +283,37 @@ export default function App() {
 
   const records = data?.records ?? [];
   const talkgroupLabels = useMemo(() => ({ [NUMERIC_TALKGROUP_FILTER]: "Numeric group" }), []);
-  const options = useMemo(() => ({
-    region: uniqueOptions(records, (r) => r.region),
-    year: uniqueOptions(records, (r) => r.year).sort((a, b) => Number(a) - Number(b) || a.localeCompare(b)),
-    company: uniqueOptions(records, (r) => r.company),
-    month: uniqueOptions(filters.year.length ? records.filter((r) => filters.year.includes(r.year)) : records, (r) => r.month, true),
-    baseStation: uniqueOptions(records, (r) => r.baseStation),
-    talkgroup: [
-      ...uniqueOptions(records, (r) => r.talkgroup).filter((t) => !/^\d+$/.test(t)),
-      ...(records.some((r) => /^\d+$/.test(r.talkgroup)) ? [NUMERIC_TALKGROUP_FILTER] : []),
-    ],
-  }), [filters.year, records]);
+  const options = useMemo(() => buildFilterOptions(records, filters.year), [filters.year, records]);
+  const updateSearchFilter = useCallback((search: string) => {
+    setFilters((current) => ({ ...current, search }));
+    setPage(1);
+  }, []);
 
-  const filtered = useMemo(() => {
-    const search = filters.search.trim().toLowerCase();
-    const validMonths = new Set(options.month);
-    return records.filter((record) => {
-      if (filters.region.length && !filters.region.includes(record.region)) return false;
-      if (filters.year.length && !filters.year.includes(record.year)) return false;
-      if (filters.company.length && !filters.company.includes(record.company)) return false;
-      if (filters.month.length && (!validMonths.has(record.month) || !filters.month.includes(record.month))) return false;
-      if (filters.baseStation.length && !filters.baseStation.includes(record.baseStation)) return false;
-      if (filters.talkgroup.length) {
-        const numericMatch = filters.talkgroup.includes(NUMERIC_TALKGROUP_FILTER) && /^\d+$/.test(record.talkgroup);
-        if (!numericMatch && !filters.talkgroup.includes(record.talkgroup)) return false;
-      }
-      if (!search) return true;
-      return [record.radioId, record.radioAlias, record.employeeName, record.employeeId].join(" ").toLowerCase().includes(search);
-    });
-  }, [filters, options.month, records]);
+  const updateArrayFilter = useCallback((key: Exclude<keyof Filters, "search">, value: string[]) => {
+    setFilters((current) => ({ ...current, [key]: value }));
+    setPage(1);
+  }, []);
 
-  const pagedRecords = useMemo(() => filtered.slice((page - 1) * 50, page * 50), [filtered, page]);
-  const pageCount = Math.max(1, Math.ceil(filtered.length / 50));
+  const resetAllFilters = useCallback(() => {
+    setFilters(EMPTY_FILTERS);
+    setPage(1);
+  }, []);
 
-  const metrics = useMemo(() => {
-    const totalCalls = filtered.length;
-    const totalDuration = filtered.reduce((sum, r) => sum + r.durationSeconds, 0);
-    const trafficHours = filtered.reduce((sum, r) => sum + r.trafficHours, 0);
-    const radios = new Set(filtered.map((r) => r.radioId).filter(isKnownLabel)).size;
-    const companies = new Set(filtered.map((r) => r.company)).size;
-    const regions = new Set(filtered.map((r) => r.region)).size;
-    const talkgroups = new Set(filtered.map((r) => r.talkgroup).filter(isKnownLabel)).size;
-    const stations = new Set(filtered.map((r) => r.baseStation)).size;
-    const averageDuration = totalCalls ? totalDuration / totalCalls : 0;
-    return { totalCalls, totalDuration, trafficHours, radios, companies, regions, talkgroups, stations, averageDuration };
-  }, [filtered]);
+  const deferredFilters = useDeferredValue(filters);
+  const deferredMonthOptions = useDeferredValue(options.month);
+  const filtered = useMemo(
+    () => filterCallRecords(records, deferredFilters, deferredMonthOptions),
+    [deferredFilters, deferredMonthOptions, records]
+  );
+  const { pageCount, pagedItems: pagedRecords, previousPage: goToPreviousPage, nextPage: goToNextPage } = usePagedItems(filtered, page, setPage, 50);
+  const toggleReportsCdrRegister = useCallback(() => {
+    setShowReportsCdrRegister((current) => !current);
+    window.setTimeout(() => document.getElementById("reports-cdr-register")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+  }, []);
 
-  const rankings = useMemo(() => ({
-    company:    groupBy(filtered, (r) => r.company),
-    station:    groupBy(filtered, (r) => r.baseStation),
-    talkgroup:  groupBy(filtered, (r) => r.talkgroup),
-    region:     groupBy(filtered, (r) => r.region),
-    mobileType: groupBy(filtered, (r) => r.mobileType),
-    radio:      groupBy(filtered, (r) => `${r.radioId} - ${r.radioAlias}`),
-    user:       groupBy(filtered, (r) => `${r.employeeName} - ${r.employeeId}`),
-    hour:       groupBy(filtered, (r) => r.hour).sort((a, b) => a.name.localeCompare(b.name)),
-    month:      groupBy(filtered, (r) => r.month).sort((a, b) => monthSortValue(a.name) - monthSortValue(b.name) || a.name.localeCompare(b.name)),
-    callType:   groupBy(filtered, (r) => r.callType || "Unknown"),
-    duplexType: groupBy(filtered, (r) => r.duplexType || "Unknown"),
-    callPriority: groupBy(filtered, (r) => r.callPriority || "Unknown"),
-    encrypted: groupBy(filtered, (r) => r.encrypted || "Unknown"),
-  }), [filtered]);
+  const metrics = useMemo(() => calculateMetrics(filtered), [filtered]);
+
+  const rankings = useMemo(() => calculateRankings(filtered), [filtered]);
 
   const regionPerformanceRows = useMemo(() => {
     const map = new Map<string, { name: string; calls: number; durationSeconds: number; trafficHours: number; radios: Set<string>; talkgroups: Set<string>; companies: Set<string>; stations: Set<string>; hours: Map<string, number>; companyCalls: Map<string, number> }>();
@@ -1450,7 +347,7 @@ export default function App() {
   }, [filtered]);
 
   const fleetActivation = useMemo(() => {
-    const liveFleetmap = unionFleetmaps(masterFleetmap.records, fixedFleetmap.records);
+    const liveFleetmap = unionFleetmapRecords(masterFleetmap.records, fixedFleetmap.records);
     const savedFleetmap = data?.fleetmapRecords ?? [];
     const lookupFleetmapFallback: FleetmapRecord[] = (data?.lookupRecords ?? []).map((record) => ({
       radioId: record.radioId,
@@ -1855,6 +752,7 @@ export default function App() {
 
   const exportKpiXlsx = useCallback(() => {
     void (async () => {
+      const ExcelJS = await loadExcelJS();
       const workbook = new ExcelJS.Workbook();
       workbook.creator = "CDR Dashboard";
       const worksheet = workbook.addWorksheet("KPI Measurements", { views: [{ showGridLines: false }] });
@@ -1890,6 +788,7 @@ export default function App() {
   const exportKpiPdf = useCallback(() => {
     void (async () => {
       const charts = await captureKpiChartImages();
+      const jsPDF = await loadJsPdf();
       const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
@@ -1934,13 +833,14 @@ export default function App() {
   const exportKpiPpt = useCallback(() => {
     void (async () => {
       const charts = await captureKpiChartImages();
+      const pptxgen = await loadPptxgen();
       const pptx = new pptxgen();
-      pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard"; pptx.rtlMode = true;
+      pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard";
       const tableSlide = pptx.addSlide();
       tableSlide.background = { color: "FFFFFF" };
       tableSlide.addText(exportTitle("KPI Measurements"), pptTextOptions(exportTitle("KPI Measurements"), { x: 0.3, y: 0.18, w: 12.7, h: 0.36, fontSize: 18, bold: true, align: "center", color: "111111" }));
-      const pptTableRows = kpiExportTableRows.map((row, ri) => row.map((cell) => ({ text: String(cell), options: pptTextOptions(cell, { bold: ri === 0, fill: { color: ri === 0 ? "FFF200" : "FFFFFF" }, color: "111111" }) })));
-      tableSlide.addTable(pptTableRows, { x: 0.18, y: 0.7, w: 12.98, h: 6.25, fontFace: "Arial", fontSize: 5.7, color: "111111", margin: 0.02, align: "center", valign: "mid", border: { type: "solid", color: "111111", pt: 0.5 }, fill: { color: "FFFFFF" }, autoFit: false, colW: [1.45, 0.86, 0.75, 0.86, 1.02, 1.08, 1.08, 1.45, 0.55], rowH: kpiExportTableRows.map((_, i) => i === 0 ? 0.58 : 0.38), bold: false, fit: "shrink" } as any);
+      const tableX = 0.18; const tableY = 0.7; const colW = [1.45, 0.86, 0.75, 0.86, 1.02, 1.08, 1.08, 1.45, 0.55]; const rowH = kpiExportTableRows.map((_, i) => i === 0 ? 0.58 : 0.38);
+      kpiExportTableRows.forEach((row, ri) => { let x = tableX; row.forEach((cell, ci) => { const w = colW[ci] ?? 1; const h = rowH[ri] ?? 0.38; const isHeader = ri === 0; tableSlide.addShape(pptx.ShapeType.rect, { x, y: tableY + rowH.slice(0, ri).reduce((s, v) => s + v, 0), w, h, fill: { color: isHeader ? "FFF200" : "FFFFFF" }, line: { color: "111111", width: 0.5 } }); tableSlide.addText(String(cell ?? ""), pptTextOptions(cell, { x: x + 0.02, y: tableY + rowH.slice(0, ri).reduce((s, v) => s + v, 0) + 0.03, w: w - 0.04, h: h - 0.06, fontSize: isHeader ? 5.6 : 6.1, bold: isHeader, align: "center", valign: "mid", color: "111111", fit: "shrink", margin: 0 })); x += w; }); });
       const addImageSlide = (title: string, image: string) => {
         const slide = pptx.addSlide();
         slide.background = { color: "0F1B24" };
@@ -2059,6 +959,7 @@ export default function App() {
 
   const exportRowsXlsx = useCallback(() => {
     void (async () => {
+      const ExcelJS = await loadExcelJS();
       const workbook = new ExcelJS.Workbook(); workbook.creator = "CDR Dashboard";
       const border = { top: { style: "thin" as const }, left: { style: "thin" as const }, bottom: { style: "thin" as const }, right: { style: "thin" as const } };
       const titleFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FF1F4E79" } };
@@ -2103,6 +1004,7 @@ export default function App() {
 
   const exportTablePdf = useCallback((fileName: string, title: string, headers: string[], rows: (string | number)[][]) => {
     void (async () => {
+      const jsPDF = await loadJsPdf();
       const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
       await ensurePdfArabicFont(pdf);
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -2145,6 +1047,7 @@ export default function App() {
 
   const exportRowsPdfPage = useCallback(() => {
     void (async () => {
+      const jsPDF = await loadJsPdf();
       const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
       await ensurePdfArabicFont(pdf);
       const pageWidth = pdf.internal.pageSize.getWidth(); const margin = 18; const tableWidth = pageWidth - margin * 2;
@@ -2162,6 +1065,7 @@ export default function App() {
   }, [cdrSummaryRows, exportTitle, page, pagedRecords]);
   const exportUtilizationXlsx = useCallback(() => {
     void (async () => {
+      const ExcelJS = await loadExcelJS();
       const workbook = new ExcelJS.Workbook(); workbook.creator = "CDR Dashboard";
       const border = { top: { style: "thin" as const }, left: { style: "thin" as const }, bottom: { style: "thin" as const }, right: { style: "thin" as const } };
       const headerFill = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFFFF00" } };
@@ -2182,32 +1086,35 @@ export default function App() {
   }, [exportTitle, rankings.user, topRadioUsers]);
 
   const exportUtilizationPdf = useCallback(() => {
-    const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-    const pageWidth = pdf.internal.pageSize.getWidth(); const margin = 24;
-    const drawTable = (title: string, headers: string[], rows: (string | number)[][], startY: number, widths: number[]) => {
-      pdf.setFont("helvetica", "bold"); pdf.setFontSize(13);
-      pdfText(pdf, title, pageWidth / 2, startY, { align: "center" });
-      let y = startY + 16;
-      const tableW = widths.reduce((s, w) => s + w, 0); const startX = (pageWidth - tableW) / 2; const rowHeight = 18;
-      [headers, ...rows].forEach((row, ri) => {
-        let x = startX;
-        row.forEach((cell, ci) => {
-          const width = widths[ci];
-          pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff");
-          pdf.rect(x, y, width, rowHeight, "FD");
-          pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 7 : 7.5); pdf.setTextColor(0, 0, 0);
-          pdfText(pdf, cell, x + width / 2, y + 12, { align: "center", maxWidth: width - 4 });
-          x += width;
+    void (async () => {
+      const jsPDF = await loadJsPdf();
+      const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth(); const margin = 24;
+      const drawTable = (title: string, headers: string[], rows: (string | number)[][], startY: number, widths: number[]) => {
+        pdf.setFont("helvetica", "bold"); pdf.setFontSize(13);
+        pdfText(pdf, title, pageWidth / 2, startY, { align: "center" });
+        let y = startY + 16;
+        const tableW = widths.reduce((s, w) => s + w, 0); const startX = (pageWidth - tableW) / 2; const rowHeight = 18;
+        [headers, ...rows].forEach((row, ri) => {
+          let x = startX;
+          row.forEach((cell, ci) => {
+            const width = widths[ci];
+            pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff");
+            pdf.rect(x, y, width, rowHeight, "FD");
+            pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 7 : 7.5); pdf.setTextColor(0, 0, 0);
+            pdfText(pdf, cell, x + width / 2, y + 12, { align: "center", maxWidth: width - 4 });
+            x += width;
+          });
+          y += rowHeight;
         });
-        y += rowHeight;
-      });
-      return y;
-    };
-    pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
-    pdfText(pdf, exportTitle("Top radios and employee utilization"), pageWidth / 2, 26, { align: "center" });
-    const nextY = drawTable("Top Radios", ["Radio ID & Alias", "Employee Name", "Company", "Total Calls", "Total Duration"], topRadioUsers.map((item) => [`${item.radioId} - ${item.radioAlias}`, item.employeeName, item.company, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), 52, [170, 160, 130, 80, 95]);
-    drawTable("Top Users", ["User", "Total Calls", "Total Duration"], rankings.user.slice(0, 10).map((item) => [item.name, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), nextY + 28, [360, 95, 110]);
-    pdf.save("top-radios-users.pdf");
+        return y;
+      };
+      pdf.setFont("helvetica", "bold"); pdf.setFontSize(16);
+      pdfText(pdf, exportTitle("Top radios and employee utilization"), pageWidth / 2, 26, { align: "center" });
+      const nextY = drawTable("Top Radios", ["Radio ID & Alias", "Employee Name", "Company", "Total Calls", "Total Duration"], topRadioUsers.map((item) => [`${item.radioId} - ${item.radioAlias}`, item.employeeName, item.company, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), 52, [170, 160, 130, 80, 95]);
+      drawTable("Top Users", ["User", "Total Calls", "Total Duration"], rankings.user.slice(0, 10).map((item) => [item.name, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), nextY + 28, [360, 95, 110]);
+      pdf.save("top-radios-users.pdf");
+    })();
   }, [exportTitle, rankings.user, topRadioUsers]);
 
   const monthlyCompanyPivot = useMemo(() => {
@@ -2236,6 +1143,7 @@ export default function App() {
   }, [monthlyCompanyRows]);
 
   const patchWorkbookWithNativeChart = useCallback(async (buffer: ExcelJS.Buffer) => {
+    const { default: JSZip } = await import("jszip");
     const zip = await JSZip.loadAsync(buffer);
     const lastRow = Math.max(2, monthlyCompanyChartData.length + 1);
     const categoriesRef = `'ChartData'!$A$2:$A$${lastRow}`;
@@ -2287,6 +1195,7 @@ export default function App() {
 
   const exportMonthlyCompanyXlsx = useCallback(async () => {
     const { companies, periodType, rows, totals } = monthlyCompanyPivot;
+    const ExcelJS = await loadExcelJS();
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Calls Duration Pivot", { views: [{ showGridLines: false }] });
     const chartData = workbook.addWorksheet("ChartData", { state: "hidden" });
@@ -2312,6 +1221,7 @@ export default function App() {
     const { companies, periodType, rows, totals } = monthlyCompanyPivot;
     void (async () => {
       const chartPng = await captureMonthlyCompanyChart();
+      const jsPDF = await loadJsPdf();
       const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
       const pageWidth = pdf.internal.pageSize.getWidth(); const pageHeight = pdf.internal.pageSize.getHeight(); const margin = 24;
       const totalCols = 1 + companies.length * 2; const cellW = Math.min(86, (pageWidth - margin * 2) / totalCols);
@@ -2354,8 +1264,10 @@ export default function App() {
 
   const exportMonthlyCompanyPpt = useCallback(() => {
     void (async () => {
-      const { companies, periodType, rows, totals } = monthlyCompanyPivot;
-      const pptx = new pptxgen(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard"; pptx.rtlMode = true;
+      const chartPng = await captureMonthlyCompanyChart();
+      const { companies, rows, totals } = monthlyCompanyPivot;
+      const pptxgen = await loadPptxgen();
+      const pptx = new pptxgen(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "CDR Dashboard";
       const tableSlide = pptx.addSlide();
       tableSlide.addText(exportTitle("Calls and Duration per Company - Table"), pptTextOptions(exportTitle("Calls and Duration per Company - Table"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" }));
       const pptRows = [["Period", ...companies.flatMap((c) => [`${c} Calls`, `${c} Duration`])], ...rows.map((r) => [r.label, ...r.values.flatMap((v) => [formatNumber(v.calls), formatNumber(v.durationSeconds)])]), ["Total", ...companies.flatMap((c) => { const t = totals.get(c) ?? { calls: 0, durationSeconds: 0 }; return [formatNumber(t.calls), formatNumber(t.durationSeconds)]; })]];
@@ -2363,10 +1275,10 @@ export default function App() {
       pptRows.forEach((row, ri) => { row.forEach((cell, ci) => { const isH = ri === 0 || ri === pptRows.length - 1; tableSlide.addShape(pptx.ShapeType.rect, { x: tableX + ci * colW, y: tableY + ri * rowH, w: colW, h: rowH, fill: { color: isH ? "FFF200" : "FFFFFF" }, line: { color: "111111", width: 0.5 } }); tableSlide.addText(cell, pptTextOptions(cell, { x: tableX + ci * colW + 0.01, y: tableY + ri * rowH + 0.02, w: colW - 0.02, h: rowH - 0.04, fontSize: ri === 0 ? 5.7 : 6.3, bold: isH, align: "center", valign: "mid", color: "111111", fit: "shrink", margin: 0 })); }); });
       const chartSlide = pptx.addSlide();
       chartSlide.addText(exportTitle("Calls and Duration per Company - Chart"), pptTextOptions(exportTitle("Calls and Duration per Company - Chart"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" }));
-      chartSlide.addChart("bar", [{ name: "Calls", labels: monthlyCompanyChartData.map((r) => r.category), values: monthlyCompanyChartData.map((r) => r.calls) }, { name: "Duration Seconds", labels: monthlyCompanyChartData.map((r) => r.category), values: monthlyCompanyChartData.map((r) => r.durationSeconds) }], { x: 0.45, y: 0.75, w: 12.4, h: 6.25, showLegend: true, showTitle: false, catAxisLabelRotate: 270, valAxisLabelColor: "111111", catAxisLabelColor: "111111", chartColors: ["2D86B4", "8FD0E8"] });
+      chartSlide.addImage({ data: chartPng, x: 0.35, y: 0.72, w: 12.65, h: 6.35 });
       await pptx.writeFile({ fileName: "calls-duration-per-company.pptx" });
     })();
-  }, [exportTitle, monthlyCompanyChartData, monthlyCompanyPivot]);
+  }, [captureMonthlyCompanyChart, exportTitle, monthlyCompanyPivot]);
 
   const openMonthlyCompanyTable = useCallback(() => {
     const w = window.open("", "cdr-monthly-company-table", "width=1400,height=800,scrollbars=yes,resizable=yes");
@@ -2424,7 +1336,7 @@ export default function App() {
       const actions = document.createElement("div"); actions.className = "chart-export-actions";
       card.insertBefore(titleRow, heading); titleRow.appendChild(heading); titleRow.appendChild(actions); titleRows.push(titleRow);
       const dataset = chartExportDatasets[title];
-      if (dataset) { const xlsxButton = document.createElement("button"); xlsxButton.type = "button"; xlsxButton.className = "button small quick-card-export quick-card-export-xlsx"; xlsxButton.innerHTML = `${exportIconSvg("xlsx")}<span>XLSX</span>`; xlsxButton.title = `Export ${title} data`; xlsxButton.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); downloadWorkbookData(`${fileSlug(exportTitle(title))}.xlsx`, title, exportTitle(title), dataset); }); actions.appendChild(xlsxButton); buttons.push(xlsxButton); }
+      if (dataset) { const xlsxButton = document.createElement("button"); xlsxButton.type = "button"; xlsxButton.className = "button small quick-card-export quick-card-export-xlsx"; xlsxButton.innerHTML = `${exportIconSvg("xlsx")}<span>XLSX</span>`; xlsxButton.title = `Export ${title} data`; xlsxButton.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); void downloadWorkbookData(`${fileSlug(exportTitle(title))}.xlsx`, title, exportTitle(title), dataset); }); actions.appendChild(xlsxButton); buttons.push(xlsxButton); }
       const button = document.createElement("button"); button.type = "button"; button.className = "button small quick-card-export"; button.innerHTML = `${exportIconSvg("png")}<span>PNG</span>`; button.title = `Export ${title}`;
       button.addEventListener("click", async (e) => { e.preventDefault(); e.stopPropagation(); const exportButtons = Array.from(card.querySelectorAll<HTMLElement>(".quick-card-export")); exportButtons.forEach((b) => { b.style.visibility = "hidden"; }); try { await new Promise((resolve) => requestAnimationFrame(resolve)); const image = await captureElementPng(card, "#0f1b24"); downloadDataUrl(`${fileSlug(exportTitle(title))}.png`, image); } finally { exportButtons.forEach((b) => { b.style.visibility = ""; }); } });
       actions.appendChild(button); buttons.push(button);
@@ -2596,139 +1508,56 @@ export default function App() {
           </div>
         </div>
 
-      <nav className="dashboard-tabs" aria-label="Dashboard tabs">
-        {DASHBOARD_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            className={`dashboard-tab ${activeTab === tab.id ? "active" : ""}`}
-            type="button"
-            onClick={() => { setActiveTab(tab.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+      <DashboardTabs tabs={DASHBOARD_TABS} activeTab={activeTab} onChange={handleTabChange} />
 
-      <section id="filters" className="filters-panel">
-        <label className="search-box search-compact">
-          <span>Search Radio / User</span>
-          <Search size={16} />
-          <input value={filters.search} onChange={(e) => { setFilters((c) => ({ ...c, search: e.target.value })); setPage(1); }} placeholder="Radio ID, alias, user, employee ID" />
-        </label>
-        <MultiSelectFilter className="filter-compact" label="Region" value={filters.region} options={options.region} onChange={(region) => { setFilters((c) => ({ ...c, region })); setPage(1); }} />
-        <MultiSelectFilter className="filter-compact" label="Year" value={filters.year} options={options.year} onChange={(year) => { setFilters((c) => ({ ...c, year })); setPage(1); }} />
-        <MultiSelectFilter className="filter-compact" label="Month" value={filters.month} options={options.month} onChange={(month) => { setFilters((c) => ({ ...c, month })); setPage(1); }} />
-        <MultiSelectFilter className="filter-company" label="Company" value={filters.company} options={options.company} onChange={(company) => { setFilters((c) => ({ ...c, company })); setPage(1); }} />
-        <MultiSelectFilter className="filter-xwide" label="Base Station" value={filters.baseStation} options={options.baseStation} onChange={(baseStation) => { setFilters((c) => ({ ...c, baseStation })); setPage(1); }} />
-        <MultiSelectFilter className="filter-wide" label="Talkgroup" value={filters.talkgroup} options={options.talkgroup} optionLabels={talkgroupLabels} onChange={(talkgroup) => { setFilters((c) => ({ ...c, talkgroup })); setPage(1); }} />
-        <button className="button reset-filter-button" onClick={() => { setFilters(EMPTY_FILTERS); setPage(1); }}><X size={16} /> Reset Filters</button>
-        <span className="filter-count" style={{ fontSize: "0.8rem", fontWeight: 600, color: "#7ecef4" }}>{formatNumber(filtered.length)} from {formatNumber(records.length)} - {formatPercent(filteredShare)}</span>
+      <DashboardFilters
+        filters={filters}
+        options={options}
+        talkgroupLabels={talkgroupLabels}
+        filteredCount={filtered.length}
+        recordsCount={records.length}
+        filteredShare={filteredShare}
+        formatNumber={formatNumber}
+        formatPercent={formatPercent}
+        onSearchChange={updateSearchFilter}
+        onArrayFilterChange={updateArrayFilter}
+        onReset={resetAllFilters}
+      />
       </section>
 
-      </section>
-
-      <section id="command" className="hero-panel">
-        <div className="hero-main hero-main-with-icon">
-          <img className="hero-call-icon" src="/assets/call.png" alt="Calls under analysis" />
-          <div className="hero-profile-copy">
-            <p className="eyebrow" style={{ fontSize: "18px", fontWeight: 900, letterSpacing: "0.08em", color: "#7ecef4", textTransform: "uppercase" }}>Uploaded workbook profile</p>
-            <h2 style={{ fontSize: "18px", fontWeight: 900, color: "#ffffff", lineHeight: 1.0 }}>{formatNumber(metrics.totalCalls)}</h2>
-            <p className="hero-subtitle" style={{ fontSize: "14px", fontWeight: 500, color: "#a8c8e8" }}>Calls under Analysis</p>
-          </div>
-        </div>
-        <div className="workbook-card">
-          <ShieldCheck size={28} />
-          <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", color: "#7ecef4", textTransform: "uppercase" }}>Workbook</span>
-          <strong style={{ fontSize: "0.95rem", fontWeight: 700, color: "#e8f4ff" }}>{data.fileName}</strong>
-          <p style={{ fontSize: "0.82rem", color: "#8aafc8" }}>{formatNumber(data.rawRows)} records - loaded {data.loadedAt}</p>
-          {data.cdrSources.length > 1 && (
-            <ul className="cdr-sources-list">
-              {data.cdrSources.map((src, i) => (
-                <li key={`${src.fileName}-${i}`} style={{ fontSize: "0.8rem", color: "#8aafc8" }}><strong style={{ color: "#c8e0f4" }}>{src.fileName}</strong> - {formatNumber(src.recordCount)} rows</li>
-              ))}
-            </ul>
-          )}
-          {(masterFleetmap.meta || fixedFleetmap.meta) && (
-            <p className="fleetmap-status" style={{ fontSize: "0.8rem", color: "#7ecef4" }}>
-              Fleetmap: {masterFleetmap.meta ? `Master (${formatNumber(masterFleetmap.records.length)})` : "-"}
-              {" + "}
-              {fixedFleetmap.meta ? `Fixed (${formatNumber(fixedFleetmap.records.length)})` : "-"}
-            </p>
-          )}
-        </div>
-      </section>
-
+      <WorkbookHero
+        data={data}
+        metrics={metrics}
+        masterFleetmap={masterFleetmap}
+        fixedFleetmap={fixedFleetmap}
+        formatNumber={formatNumber}
+      />
       {data.warnings.length > 0 && (
         <div className="warning-strip" style={{ fontSize: "0.85rem", fontWeight: 600, color: "#ffe082" }}><AlertTriangle size={18} /> {data.warnings.join(" ")}</div>
       )}
 
       {showReportsTab && (
-      <section id="reportsTabPanel" className="reports-tab-panel">
-        <article className="table-card export-center-card">
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#e8f4ff" }}>Reports & Export Center</h3>
-          <p className="table-note" style={{ fontSize: "0.85rem", color: "#8aafc8" }}>Export the current filtered dashboard view, KPI data, row register, utilization analysis, and unmatched fleetmap report.</p>
-          <div className="export-center-actions">
-            <ExportButton kind="xlsx" label="CDR Report" onClick={exportRowsXlsx} />
-            <ExportButton kind="pdf" label="CDR Report" onClick={exportRowsPdfPage} />
-            <ExportButton kind="view" label="CDR View" onClick={() => { setShowReportsCdrRegister((current) => !current); window.setTimeout(() => document.getElementById("reports-cdr-register")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }} />
-            <ExportButton kind="xlsx" label="KPI Report" onClick={exportKpiXlsx} />
-            <ExportButton kind="pdf" label="KPI Report" onClick={exportKpiPdf} />
-            <ExportButton kind="ppt" label="KPI Report" onClick={exportKpiPpt} />
-            <ExportButton kind="xlsx" label="Utilization Report" onClick={exportUtilizationXlsx} />
-            <ExportButton kind="pdf" label="Utilization Report" onClick={exportUtilizationPdf} />
-            <ExportButton kind="xlsx" label="Unmatched Report" onClick={exportUnmatchedFleetmapXlsx} />
-          </div>
-        </article>
-              {showReportsCdrRegister && (
-          <article id="reports-cdr-register" className="records-card reports-cdr-register">
-            <div className="section-title reports-register-title">
-              <div className="section-title-heading">
-                <div className="section-title-copy">
-                  <p>CDR View</p>
-                  <h2>Filtered Calls Register</h2>
-                  <span>{formatNumber(filtered.length)} filtered rows from {formatNumber(records.length)} source rows.</span>
-                </div>
-              </div>
-            </div>
-            <div className="records-scroll records-scroll-fixed-register fixed-row-table">
-              <table className="filtered-register-table">
-                <colgroup>
-                  <col className="col-sn" />
-                  <col className="col-radio-id" />
-                  <col className="col-radio-alias" />
-                  <col className="col-radio-type" />
-                  <col className="col-employee-name" />
-                  <col className="col-employee-id" />
-                  <col className="col-region" />
-                  <col className="col-company" />
-                  <col className="col-talkgroup" />
-                  <col className="col-start" />
-                  <col className="col-end" />
-                  <col className="col-duration" />
-                  <col className="col-base-station" />
-                </colgroup>
-                <thead><tr><th>SN</th><th>Radio ID</th><th>Radio Alias</th><th>Radio Type</th><th>Employee Name</th><th>Employee ID</th><th>Region</th><th>Company</th><th>Talkgroup Alias</th><th>Start Time</th><th>End Time</th><th>Duration (s)</th><th>Base Station</th></tr></thead>
-                <tbody>
-                  {pagedRecords.map((record, index) => (
-                    <tr key={`reports-${record.radioId}-${index}`}>
-                      <td>{(page - 1) * 50 + index + 1}</td><td>{record.radioId}</td><td>{record.radioAlias}</td><td>{record.mobileType}</td>
-                      <td>{record.employeeName}</td><td>{record.employeeId}</td><td>{record.region}</td><td>{record.company}</td>
-                      <td>{record.talkgroup}</td><td>{record.startTime}</td><td>{record.endTime}</td>
-                      <td>{formatNumber(record.durationSeconds)}</td><td>{record.baseStation}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="pager">
-              <button className="button" disabled={page <= 1} onClick={() => setPage((c) => Math.max(1, c - 1))}>Previous</button>
-              <span>Page {formatNumber(page)} of {formatNumber(pageCount)} - showing {formatNumber(pagedRecords.length)} rows</span>
-              <button className="button" disabled={page >= pageCount} onClick={() => setPage((c) => Math.min(pageCount, c + 1))}>Next</button>
-            </div>
-          </article>
-        )}      </section>
+        <ReportsPanel
+          showRegister={showReportsCdrRegister}
+          pagedRecords={pagedRecords}
+          totalFiltered={filtered.length}
+          totalRecords={records.length}
+          page={page}
+          pageCount={pageCount}
+          formatNumber={formatNumber}
+          onToggleRegister={toggleReportsCdrRegister}
+          onPreviousPage={goToPreviousPage}
+          onNextPage={goToNextPage}
+          onExportRowsXlsx={exportRowsXlsx}
+          onExportRowsPdf={exportRowsPdfPage}
+          onExportKpiXlsx={exportKpiXlsx}
+          onExportKpiPdf={exportKpiPdf}
+          onExportKpiPpt={exportKpiPpt}
+          onExportUtilizationXlsx={exportUtilizationXlsx}
+          onExportUtilizationPdf={exportUtilizationPdf}
+          onExportUnmatchedFleetmapXlsx={exportUnmatchedFleetmapXlsx}
+        />
       )}
-
       {showOverviewTab && (
       <>      <OverviewSummaryCards
         metrics={metrics}
@@ -3239,6 +2068,18 @@ export default function App() {
     </main>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

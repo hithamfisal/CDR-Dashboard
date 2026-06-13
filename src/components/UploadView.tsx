@@ -61,7 +61,7 @@ export function UploadView({
 
           <div className="followup-upload-left">
             <p className="followup-eyebrow"><UploadCloud size={14} /> CDR WORKBOOKS UPLOAD</p>
-            <h1><span>Load the CDR traffic workbook</span></h1>
+            <h1><span>Load the CDR Traffic Workbook</span></h1>
             <p className="followup-lead">
               Start with Master and Fixed Fleetmap, then upload processed CDR files or raw system call logs.
             </p>
@@ -78,36 +78,7 @@ export function UploadView({
                 <FileText size={18} />
                 <span>{stagedTrafficUpload?.mode === "raw" ? `${stagedCount} raw selected` : "Select raw call log"}</span>
               </label>
-
-              <button
-                className="followup-action-button"
-                type="button"
-                onClick={onLoadSaved}
-                disabled={!savedWorkbook || isLoadingSaved || isParsing}
-              >
-                <HardDrive size={18} />
-                <span>{isLoadingSaved ? "Opening..." : "Continue previous workbook"}</span>
-              </button>
             </div>
-
-            <div className={`followup-staged-upload ${stagedTrafficUpload ? "has-files" : ""}`}>
-              <div>
-                <strong>{stagedTrafficUpload ? `${stagedCount} ${stagedKind}${stagedCount > 1 ? "s" : ""} ready` : "No main file selected yet"}</strong>
-                <span>{stagedTrafficUpload ? stagedNames : "Select a CDR workbook or raw call log, then press Upload selected."}</span>
-              </div>
-              <div className="followup-staged-actions">
-                <button className="followup-action-button followup-confirm-upload" type="button" onClick={onConfirmUpload} disabled={!stagedTrafficUpload || isParsing || isLoadingSaved}>
-                  <UploadCloud size={18} />
-                  <span>{isParsing ? "Uploading..." : "Upload selected"}</span>
-                </button>
-                <button className="followup-action-button followup-clear-upload" type="button" onClick={onClearStagedUpload} disabled={!stagedTrafficUpload || isParsing}>
-                  <X size={18} />
-                  <span>Clear</span>
-                </button>
-              </div>
-            </div>
-
-            <p className="followup-drop-note">REFERENCE FILES & DATA SOURCES</p>
 
             <div className="followup-mini-grid">
               <label className={`followup-mini-card ${masterFleetmap.meta ? "loaded" : ""}`}>
@@ -128,6 +99,38 @@ export function UploadView({
                 </div>
               </label>
             </div>
+
+            <div className={`followup-staged-upload ${stagedTrafficUpload ? "has-files" : ""}`}>
+              <div>
+                <strong>{stagedTrafficUpload ? `${stagedCount} ${stagedKind}${stagedCount > 1 ? "s" : ""} ready` : "No main file selected yet"}</strong>
+                <span>{stagedTrafficUpload ? stagedNames : "Select a CDR workbook or raw call log, then press Upload selected."}</span>
+              </div>
+              
+              <button
+                className="followup-action-button"
+                type="button"
+                onClick={onLoadSaved}
+                disabled={!savedWorkbook || isLoadingSaved || isParsing}
+              >
+                <HardDrive size={18} />
+                <span>{isLoadingSaved ? "Opening..." : "Continue previous workbook"}</span>
+              </button>
+              
+              <div className="followup-staged-actions">
+                <button className="followup-action-button followup-confirm-upload" type="button" onClick={onConfirmUpload} disabled={!stagedTrafficUpload || isParsing || isLoadingSaved}>
+                  <UploadCloud size={18} />
+                  <span>{isParsing ? "Uploading..." : "Upload selected"}</span>
+                </button>
+                <button className="followup-action-button followup-clear-upload" type="button" onClick={onClearStagedUpload} disabled={!stagedTrafficUpload || isParsing}>
+                  <X size={18} />
+                  <span>Clear</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="followup-upload-visual" aria-hidden="true">
+            <img src="/assets/h.png" alt="" />
           </div>
         </div>
       </section>
@@ -145,4 +148,3 @@ export function UploadView({
     </main>
   );
 }
-

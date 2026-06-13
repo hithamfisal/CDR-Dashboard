@@ -671,3 +671,254 @@ body:has(.upload-shell.dark-background-theme) {
     flex: 1 1 0 !important;
   }
 }
+
+/* Final upload arrangement: left command area + right visual panel */
+.upload-shell .followup-upload-shell {
+  align-items: center !important;
+  justify-content: center !important;
+  padding: clamp(18px, 2vw, 30px) !important;
+}
+
+.upload-shell .followup-upload-card,
+.upload-shell.light-background-theme .followup-upload-card,
+.upload-shell.dark-background-theme .followup-upload-card {
+  width: min(100%, 1760px) !important;
+  min-height: auto !important;
+  grid-template-columns: minmax(0, 1.05fr) minmax(520px, 0.95fr) !important;
+  gap: clamp(22px, 2.4vw, 42px) !important;
+  align-items: center !important;
+  padding: clamp(28px, 3vw, 50px) clamp(24px, 2.5vw, 38px) !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: #f7fbff !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-card {
+  background: #06131f !important;
+}
+
+.upload-shell .followup-upload-card::after,
+.upload-shell.light-background-theme .followup-upload-card::after,
+.upload-shell.dark-background-theme .followup-upload-card::after {
+  content: none !important;
+  display: none !important;
+}
+
+.upload-shell .followup-upload-left {
+  max-width: 930px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  justify-content: center !important;
+  --upload-control-width: min(100%, 720px);
+}
+
+.upload-shell .followup-theme-button,
+.upload-shell.light-background-theme .followup-theme-button,
+.upload-shell.dark-background-theme .followup-theme-button {
+  top: clamp(14px, 1.8vw, 24px) !important;
+  left: clamp(14px, 1.8vw, 24px) !important;
+  right: auto !important;
+  min-height: 42px !important;
+  padding: 0 18px !important;
+}
+
+.upload-shell .followup-eyebrow {
+  margin: 0 0 16px !important;
+}
+
+.upload-shell .followup-upload-left h1 {
+  max-width: 100% !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  font-size: clamp(3.8rem, 4.9vw, 5.75rem) !important;
+  line-height: 0.95 !important;
+  letter-spacing: -0.035em !important;
+}
+
+.upload-shell .followup-lead {
+  max-width: 760px !important;
+  margin: 14px 0 16px !important;
+  font-size: clamp(1.05rem, 1.15vw, 1.28rem) !important;
+  line-height: 1.42 !important;
+}
+
+.upload-shell .followup-primary-actions,
+.upload-shell .followup-mini-grid {
+  width: var(--upload-control-width) !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+.upload-shell .followup-mini-grid {
+  margin-top: 10px !important;
+}
+
+.upload-shell .followup-primary-actions .followup-action-button,
+.upload-shell .followup-mini-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  max-height: 68px !important;
+  border-radius: 14px !important;
+}
+
+.upload-shell .followup-primary-actions .followup-action-button,
+.upload-shell .followup-mini-grid .followup-mini-card {
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 16px !important;
+  text-align: left !important;
+}
+
+.upload-shell .followup-mini-grid .followup-mini-card > div {
+  min-width: 0 !important;
+}
+
+.upload-shell .followup-primary-actions .followup-action-button span,
+.upload-shell .followup-mini-grid .followup-mini-card strong,
+.upload-shell .followup-mini-grid .followup-mini-card span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.upload-shell .followup-mini-grid .followup-mini-card strong {
+  font-size: 0.82rem !important;
+  line-height: 1.15 !important;
+}
+
+.upload-shell .followup-mini-grid .followup-mini-card span {
+  margin-top: 2px !important;
+  font-size: 0.78rem !important;
+  line-height: 1.15 !important;
+}
+
+.upload-shell .followup-action-button,
+.upload-shell .followup-mini-card {
+  border-color: rgba(28, 109, 151, 0.32) !important;
+  background: rgba(242, 249, 253, 0.78) !important;
+}
+
+.upload-shell.dark-background-theme .followup-action-button,
+.upload-shell.dark-background-theme .followup-mini-card {
+  border-color: rgba(60, 183, 234, 0.38) !important;
+  background: rgba(6, 31, 49, 0.78) !important;
+}
+
+.upload-shell .followup-drop-note {
+  display: none !important;
+}
+
+.upload-shell .followup-staged-upload,
+.upload-shell.light-background-theme .followup-staged-upload,
+.upload-shell.dark-background-theme .followup-staged-upload {
+  width: min(100%, 720px) !important;
+  width: var(--upload-control-width) !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(96px, 0.5fr) !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-top: 10px !important;
+  padding: 12px !important;
+  border-radius: 16px !important;
+}
+
+.upload-shell .followup-staged-upload > div:first-child {
+  grid-column: 1 / -1 !important;
+  min-width: 0 !important;
+}
+
+.upload-shell .followup-staged-upload > .followup-action-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 46px !important;
+}
+
+.upload-shell .followup-staged-actions {
+  grid-column: 2 / 4 !important;
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(96px, 0.5fr) !important;
+  gap: 10px !important;
+}
+
+.upload-shell .followup-staged-actions .followup-action-button {
+  min-height: 46px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.upload-shell .followup-upload-visual,
+.upload-shell.light-background-theme .followup-upload-visual,
+.upload-shell.dark-background-theme .followup-upload-visual {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  min-height: 0 !important;
+  height: clamp(300px, 25vw, 390px) !important;
+  width: 100% !important;
+  align-self: start !important;
+  margin-top: clamp(130px, 10vw, 180px) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+.upload-shell .followup-upload-visual img,
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+@media (max-width: 1280px) {
+  .upload-shell .followup-upload-card,
+  .upload-shell.light-background-theme .followup-upload-card,
+  .upload-shell.dark-background-theme .followup-upload-card {
+    grid-template-columns: 1fr !important;
+    padding: 84px 24px 28px !important;
+  }
+
+  .upload-shell .followup-upload-left h1 {
+    white-space: normal !important;
+    font-size: clamp(3.2rem, 8vw, 5.8rem) !important;
+  }
+
+  .upload-shell .followup-upload-visual {
+    margin-top: 0 !important;
+    height: min(46vw, 430px) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .upload-shell .followup-upload-card,
+  .upload-shell.light-background-theme .followup-upload-card,
+  .upload-shell.dark-background-theme .followup-upload-card {
+    padding: 72px 16px 20px !important;
+  }
+
+  .upload-shell .followup-primary-actions,
+  .upload-shell .followup-mini-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .upload-shell .followup-staged-actions {
+    grid-column: auto !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .upload-shell .followup-upload-visual {
+    height: 240px !important;
+  }
+}

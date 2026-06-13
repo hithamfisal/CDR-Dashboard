@@ -1,4 +1,4 @@
-import react from "@vitejs/plugin-react";
+﻿import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -9,10 +9,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          spreadsheet: ["xlsx"],
-          charts: ["recharts"]
+          charts: ["recharts"],
+          spreadsheet: ["xlsx", "exceljs"],
+          exports: ["jspdf", "pptxgenjs", "html2canvas", "jszip"]
         }
       }
     }
   }
 });
+
+
+

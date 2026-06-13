@@ -27,7 +27,7 @@ function FileTypeIcon({ kind }: { kind: ExportKind }) {
   );
 }
 
-export function ExportButton({ kind, label, onClick, title }: { kind: ExportKind; label: string; onClick: () => void; title?: string }) {
+export function ExportButton({ kind, label, onClick, title }: { kind: ExportKind; label: string; onClick: () => void | Promise<void>; title?: string }) {
   return <button className={`button small export-button export-button-${kind}`} type="button" onClick={onClick} title={title ?? label}><FileTypeIcon kind={kind} /><span>{label}</span></button>;
 }
 
