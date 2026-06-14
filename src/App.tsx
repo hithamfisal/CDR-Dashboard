@@ -7,10 +7,10 @@ import { captureElementPng } from "./lib/capture";
 import { getSavedWorkbookMeta, loadFleetmapFromBrowser, loadWorkbookFromBrowser, saveFleetmapToBrowser, saveWorkbookToBrowser, setSavedWorkbookMeta, themeClass, useTheme, workbookMeta } from "./lib/browserCache";
 import { CHART_COLORS, COLORS, DASHBOARD_TABS, EMPTY_FILTERS, MOBILE_TYPE_LABELS, NUMERIC_TALKGROUP_FILTER, SAVED_FIXED_FLEETMAP_KEY, SAVED_MASTER_FLEETMAP_KEY, SAVED_WORKBOOK_DB, SAVED_WORKBOOK_KEY, SAVED_WORKBOOK_META_KEY, SAVED_WORKBOOK_STORE, SECTION_NAV_ITEMS, TOOLTIP_STYLE } from "./lib/dashboardConstants";
 import type { CallRecord, ChartExportDataset, DashboardData, DashboardTab, Filters, FleetmapMeta, FleetmapRecord, FleetmapState, NativeChartConfig, Ranking, SavedWorkbookMeta, StagedTrafficUpload, ThemeName } from "./types/dashboard";
-import { OverviewSummaryCards } from "./components/OverviewSummaryCards";
 import { ReportsPanel } from "./components/ReportsPanel";
 import { UploadView } from "./components/UploadView";
 import { WorkbookHero } from "./components/WorkbookHero";
+import { ModernOverview } from "./components/ModernOverview";
 import { CallsDurationPerformanceChart, CompanyPerformanceTooltip, KpiBarLabel, KpiLineLabel, MobileTypeOverlayBarShape, MobileTypeTooltip, OverlayBarShape, PieDecimalLabel, PointValueLabel, RadioTooltip, RightValueLabel, TalkgroupTooltip, TopValueLabel } from "./components/ChartParts";
 import { filterCallRecords } from "./lib/filterRecords";
 import { calculateMetrics, calculateRankings, modeBy } from "./lib/analytics";
@@ -1659,42 +1659,47 @@ export default function App() {
               </g>
             </svg>
           </div>
-          <div className="followup-header-badge followup-header-badge-left">
-            {/* <img src="/assets/se-logo.png" alt="Saudi Energy" /> */}
-          </div>
+          {/* <div className="followup-header-badge followup-header-badge-left">
+            <img src="/assets/nasco-logo.png" alt="NASCO" />
+          </div> */}
 
           <div className="followup-dashboard-title">
-            <h1 style={{ fontSize: "clamp(1.3rem, 2.5vw, 2rem)", fontWeight: 900, color: "#ffffff", letterSpacing: "0.02em" }}>CDR Traffic Dashboard</h1>
+            <h1 style={{ fontSize: "clamp(3rem, 2.5vw, 4rem)", fontWeight: 900, color: "#ffffff", letterSpacing: "0.02em" }}>CDR Traffic Dashboard</h1>
             <p style={{ fontSize: "0.72rem", fontWeight: 700, color: "#7ecef4", letterSpacing: "0.14em", textTransform: "uppercase" }}>CALL DETAIL RECORD ANALYTICS</p>
           </div>
 
-          <div className="followup-header-badge followup-header-badge-right">
-            {/* <img src="/assets/nasco-logo.png" alt="NASCO" /> */}
-          </div>
+          {/* <div className="followup-header-badge followup-header-badge-right">
+            <img src="/assets/se-logo.png" alt="Saudi Energy" />
+          </div> */}
         </header>
 
-        <div className="cdr-banner-control-bar">
-          <div className="cdr-control-actions" aria-label="Dashboard quick actions">
-            <button className="button small theme-toggle cdr-action-pill cdr-action-primary" type="button" onClick={toggleTheme}>
-              <Palette size={18} /> {isDark ? "Light Theme" : "Dark Theme"}
-            </button>
-            <button className="button small cdr-action-pill" type="button" onClick={() => { setData(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-              <Home size={18} /> Home
-            </button>
-            <button className="button small cdr-action-pill" type="button" onClick={() => { setActiveTab("company"); window.setTimeout(() => document.getElementById("regionPerformance")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }}>
-              <UploadCloud size={18} /> Add Region ({formatNumber(metrics.regions)})
-            </button>
-            <label className="button small cdr-action-pill cdr-action-file" title="Add new workbook files to the current dashboard">
-              <RefreshCw size={18} /> New workbook(s)
-              <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={handleAddMoreCdr} />
-            </label>
-            <button className="button small cdr-action-pill cdr-action-primary" type="button" onClick={exportKpiPdf}>
-              <FileText size={18} /> Dashboard PDF
-            </button>
+      <DashboardTabs
+        tabs={DASHBOARD_TABS}
+        activeTab={activeTab}
+        onChange={handleTabChange}
+        actions={(
+          <div className="cdr-banner-control-bar">
+            <div className="cdr-control-actions" aria-label="Dashboard quick actions">
+              <button className="button small theme-toggle cdr-action-pill cdr-action-primary" type="button" onClick={toggleTheme}>
+                <Palette size={18} /> {isDark ? "Light Theme" : "Dark Theme"}
+              </button>
+              <button className="button small cdr-action-pill" type="button" onClick={() => { setData(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                <Home size={18} /> Home
+              </button>
+              <button className="button small cdr-action-pill" type="button" onClick={() => { setActiveTab("company"); window.setTimeout(() => document.getElementById("regionPerformance")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }}>
+                <UploadCloud size={18} /> Add Region ({formatNumber(metrics.regions)})
+              </button>
+              <label className="button small cdr-action-pill cdr-action-file" title="Add new workbook files to the current dashboard">
+                <RefreshCw size={18} /> New workbook(s)
+                <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={handleAddMoreCdr} />
+              </label>
+              <button className="button small cdr-action-pill cdr-action-primary" type="button" onClick={exportKpiPdf}>
+                <FileText size={18} /> Dashboard PDF
+              </button>
+            </div>
           </div>
-        </div>
-
-      <DashboardTabs tabs={DASHBOARD_TABS} activeTab={activeTab} onChange={handleTabChange} />
+        )}
+      />
 
       <DashboardFilters
         filters={filters}
@@ -1711,13 +1716,15 @@ export default function App() {
       />
       </section>
 
-      <WorkbookHero
-        data={data}
-        metrics={metrics}
-        masterFleetmap={masterFleetmap}
-        fixedFleetmap={fixedFleetmap}
-        formatNumber={formatNumber}
-      />
+      {!showOverviewTab && (
+        <WorkbookHero
+          data={data}
+          metrics={metrics}
+          masterFleetmap={masterFleetmap}
+          fixedFleetmap={fixedFleetmap}
+          formatNumber={formatNumber}
+        />
+      )}
       {data.warnings.length > 0 && (
         <div className="warning-strip" style={{ fontSize: "0.85rem", fontWeight: 600, color: "#ffe082" }}><AlertTriangle size={18} /> {data.warnings.join(" ")}</div>
       )}
@@ -1755,44 +1762,41 @@ export default function App() {
         />
       )}
       {showOverviewTab && (
-      <>      <OverviewSummaryCards
-        metrics={metrics}
-        maxDuration={maxDuration}
-        minDuration={minDuration}
-        peakRadioName={peakRadioEntry?.[0] ?? "--"}
-        peakUserParts={peakUserParts}
-        topCompany={topCompany}
-        topTalkgroup={topTalkgroup}
-        topStation={topStation}
-        peakMonthName={peakMonthEntry?.[0] ?? "--"}
-        peakWeekName={peakWeekEntry?.[0] ?? "--"}
-        peakDayName={peakDayEntry?.[0] ?? "--"}
-        peakHour={peakHour}
-        peakTrafficHour={peakTrafficHour}
-        peakHourAvgDuration={peakHourAvgDuration}
-        trafficIntensity={trafficIntensity}
-        qualityScore={qualityScore}
-        qualityIssues={qualityIssues}
-        recordsCount={records.length}
-        formatNumber={formatNumber}
-        formatDecimal={formatDecimal}
-        secondsToClock={secondsToClock}
-      />
+        <>
+          <ModernOverview
+            metrics={metrics}
+            rankings={rankings}
+            filteredCount={filtered.length}
+            totalCount={records.length}
+            periodLabel={CompanyPeriodLabel}
+            loadedAt={data.loadedAt}
+            data={data}
+            masterFleetmap={masterFleetmap}
+            fixedFleetmap={fixedFleetmap}
+            maxDuration={maxDuration}
+            minDuration={minDuration}
+            qualityScore={qualityScore}
+            qualityIssues={qualityIssues}
+            peakUserParts={peakUserParts}
+            peakWeekName={peakWeekEntry?.[0] ?? "Unknown"}
+            peakDayName={peakDayEntry?.[0] ?? "Unknown"}
+            trafficIntensity={trafficIntensity}
+          />
 
-      {filtered.length === 0 && (
-        <div className="empty-state" role="status">
-          <Search size={34} />
-          <strong style={{ fontSize: "1.1rem", fontWeight: 700, color: "#e8f4ff" }}>No records found</strong>
-          <span style={{ fontSize: "0.9rem", color: "#8aafc8" }}>Try changing or resetting your filters.</span>
-        </div>
-      )}
-      </>
+          {filtered.length === 0 && (
+            <div className="empty-state" role="status">
+              <Search size={34} />
+              <strong style={{ fontSize: "1.1rem", fontWeight: 700, color: "#e8f4ff" }}>No records found</strong>
+              <span style={{ fontSize: "0.9rem", color: "#8aafc8" }}>Try changing or resetting your filters.</span>
+            </div>
+          )}
+        </>
       )}
 
       {showFleetTab && (
       <>
       <SectionTitle id="networkUtilization" eyebrow="Fleet activation" title={`Network Utilization & Fleet Activation in ${CompanyPeriodLabel}`} text="Compare registered fleetmap radios against radios that made calls in the filtered period." collapsed={isSectionCollapsed("networkUtilization")} onToggle={() => toggleSection("networkUtilization")} />
-      <section id="networkUtilization-content" className={`network-utilization-section ${isSectionCollapsed("networkUtilization") ? "section-content-collapsed" : ""}`}>
+      <section id="networkUtilization-content" className={`network-utilization-section fleet-activation-panel ${isSectionCollapsed("networkUtilization") ? "section-content-collapsed" : ""}`}>
         <div className="summary-cards network-utilization-cards">
           <div className="summary-card yellow"><span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#b0b8c8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Registered Radios</span><strong style={{ fontSize: "1.6rem", fontWeight: 900, color: "#ffe082" }}>{formatNumber(fleetActivation.registeredCount)}</strong><small style={{ fontSize: "0.75rem", color: "#8aafc8" }}>From fleetmap</small></div>
           <div className="summary-card green"><span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#b0b8c8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Active Registered</span><strong style={{ fontSize: "1.6rem", fontWeight: 900, color: "#69f0ae" }}>{formatNumber(fleetActivation.activeRegisteredCount)}</strong><small style={{ fontSize: "0.75rem", color: "#8aafc8" }}>Made calls</small></div>
@@ -1800,7 +1804,7 @@ export default function App() {
           <div className="summary-card green"><span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#b0b8c8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Activation %</span><strong style={{ fontSize: "1.6rem", fontWeight: 900, color: "#69f0ae" }}>{formatDecimal(fleetActivation.activationRate, 1)}%</strong><small style={{ fontSize: "0.75rem", color: "#8aafc8" }}>Active / registered</small></div>
           <div className="summary-card yellow"><span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#b0b8c8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Traffic / Active Radio</span><strong style={{ fontSize: "1.6rem", fontWeight: 900, color: "#ffe082" }}>{formatDecimal(trafficIntensity.trafficPerRadio, 2)}</strong><small style={{ fontSize: "0.75rem", color: "#8aafc8" }}>Erlangs per radio</small></div>
         </div>
-        <div className="quality-grid">
+        <div className="quality-grid fleet-activation-tables">
           <article className="table-card inactive-radio-table-card">
             <h3>Inactive Radios by Company</h3>
             <table className="inactive-radio-table">
@@ -1854,63 +1858,68 @@ export default function App() {
         collapsed={isSectionCollapsed("unmatchedFleetmap")}
         onToggle={() => toggleSection("unmatchedFleetmap")}
       />
-      <section id="unmatchedFleetmap-content" className={`unmatched-fleetmap-report-section ${isSectionCollapsed("unmatchedFleetmap") ? "section-content-collapsed" : ""}`}>
-        <article className="table-card wide-table-card unmatched-fleetmap-report-card">
-          <h3>Unmatched Raw Caller Numbers</h3>
-          <p className="table-note">
-            {unmatchedFleetmapReportRows.length
-              ? `${formatNumber(unmatchedFleetmapReportRows.length)} unique Caller Number(s) need fleetmap review.`
-              : "No unmatched Caller Numbers found in the current selected period."}
-          </p>
-          <div className="table-wrap unmatched-fleetmap-table-wrap">
-            <table className="unmatched-fleetmap-table">
-              <thead>
-                <tr>
-                  <th>Caller Number</th>
-                  <th>Caller Alias</th>
-                  <th>Talkgroup</th>
-                  <th>Calls</th>
-                  <th>Total Duration</th>
-                  <th>First Seen</th>
-                  <th>Last Seen</th>
-                  <th>Base Stations</th>
-                  <th>Reason</th>
-                </tr>
-              </thead>
-              <tbody>
-                {unmatchedFleetmapReportRows.length ? unmatchedFleetmapReportRows.map((row) => (
-                  <tr key={row.callerNumber}>
-                    <td>{row.callerNumber}</td>
-                    <td>{row.callerAlias}</td>
-                    <td>{row.talkgroup}</td>
-                    <td>{formatNumber(row.calls)}</td>
-                    <td>{secondsToClock(row.totalDuration)}</td>
-                    <td>{row.firstSeen}</td>
-                    <td>{row.lastSeen}</td>
-                    <td>{row.baseStationsText}</td>
-                    <td>{row.reason}</td>
-                  </tr>
-                )) : (
+      <section id="unmatchedFleetmap-content" className={`unmatched-fleetmap-report-section fleet-unmatched-section ${isSectionCollapsed("unmatchedFleetmap") ? "section-content-collapsed" : ""}`}>
+        <div className="fleet-unmatched-layout">
+          <article className="table-card wide-table-card unmatched-fleetmap-report-card">
+            <h3>Unmatched Raw Caller Numbers</h3>
+            <p className="table-note">
+              {unmatchedFleetmapReportRows.length
+                ? `${formatNumber(unmatchedFleetmapReportRows.length)} unique Caller Number(s) need fleetmap review.`
+                : "No unmatched Caller Numbers found in the current selected period."}
+            </p>
+            <div className="table-wrap unmatched-fleetmap-table-wrap">
+              <table className="unmatched-fleetmap-table">
+                <thead>
                   <tr>
-                    <td colSpan={9}>All raw Caller Numbers are matched to the Master/Fixed Fleetmap for the current filters.</td>
+                    <th>Caller Number</th>
+                    <th>Caller Alias</th>
+                    <th>Talkgroup</th>
+                    <th>Calls</th>
+                    <th>Total Duration</th>
+                    <th>First Seen</th>
+                    <th>Last Seen</th>
+                    <th>Base Stations</th>
+                    <th>Reason</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </article>
+                </thead>
+                <tbody>
+                  {unmatchedFleetmapReportRows.length ? unmatchedFleetmapReportRows.map((row) => (
+                    <tr key={row.callerNumber}>
+                      <td>{row.callerNumber}</td>
+                      <td>{row.callerAlias}</td>
+                      <td>{row.talkgroup}</td>
+                      <td>{formatNumber(row.calls)}</td>
+                      <td>{secondsToClock(row.totalDuration)}</td>
+                      <td>{row.firstSeen}</td>
+                      <td>{row.lastSeen}</td>
+                      <td>{row.baseStationsText}</td>
+                      <td>{row.reason}</td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan={9}>All raw Caller Numbers are matched to the Master/Fixed Fleetmap for the current filters.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </article>
+          <aside className="fleet-radio-showcase" aria-label="Hytera radio fleet visual">
+            <img src="/assets/radio.png" alt="Hytera radio on display stand" />
+          </aside>
+        </div>
       </section>
       </>
       )}
 
       {showCompanyTab && (
-      <><SectionTitle id="regionPerformance" eyebrow="Regional deck" title={`Region Performance in ${CompanyPeriodLabel}`} text="Compare regional calls, duration, traffic, active radios, talkgroups, companies, and peak operating periods." collapsed={isSectionCollapsed("regionPerformance")} onToggle={() => toggleSection("regionPerformance")} />
-      <section id="regionPerformance-content" className={`region-performance-section ${isSectionCollapsed("regionPerformance") ? "section-content-collapsed" : ""}`}>
-        <article className="table-card wide-table-card">
+      <>
+      <section id="regionPerformance-content" className="region-performance-section company-matrix-section">
+        <article className="table-card wide-table-card company-matrix-card region-matrix-card">
           <h3>Region Performance Matrix</h3>
-          <div className="records-scroll small">
+          <div className="records-scroll small company-matrix-scroll">
             <table>
-              <thead><tr><th>Region</th><th>Calls</th><th>Total Duration</th><th>Traffic</th><th>Active Radios</th><th>Talkgroups</th><th>Companies</th><th>Base Stations</th><th>Avg Duration</th><th>Peak Hour</th><th>Top Company</th></tr></thead>
+              <thead><tr><th>Region</th><th>Calls</th><th>Total Duration</th><th>Traffic</th><th>Active Radios</th><th>TGs</th><th>Companies</th><th>BS</th><th>Avg Duration</th><th>Peak Hour</th><th>Top Company</th></tr></thead>
               <tbody>{regionPerformanceRows.map((row) => <tr key={row.name}><td>{row.name}</td><td>{formatNumber(row.calls)}</td><td>{secondsToClock(row.durationSeconds)}</td><td>{formatDecimal(row.trafficHours, 2)}</td><td>{formatNumber(row.radios)}</td><td>{formatNumber(row.talkgroups)}</td><td>{formatNumber(row.companies)}</td><td>{formatNumber(row.stations)}</td><td>{secondsToClock(row.averageDuration)}</td><td>{row.peakHour}</td><td>{row.topCompany}</td></tr>)}</tbody>
             </table>
           </div>
@@ -1921,13 +1930,12 @@ export default function App() {
 
       {showCompanyTab && (
       <>
-      <SectionTitle id="talkgroupEfficiency" eyebrow="Talkgroup deck" title={`Talkgroup Efficiency in ${CompanyPeriodLabel}`} text="Rank talkgroups by traffic, active radios, active users, average duration, and peak operating context." collapsed={isSectionCollapsed("talkgroupEfficiency")} onToggle={() => toggleSection("talkgroupEfficiency")} />
-      <section id="talkgroupEfficiency-content" className={`talkgroup-efficiency-section ${isSectionCollapsed("talkgroupEfficiency") ? "section-content-collapsed" : ""}`}>
-        <article className="table-card wide-table-card">
-          <h3>Talkgroup Efficiency Matrix</h3>
-          <div className="records-scroll small no-scroll-table fixed-row-table">
+      <section id="talkgroupEfficiency-content" className="talkgroup-efficiency-section company-matrix-section">
+        <article className="table-card wide-table-card company-matrix-card tg-efficiency-card">
+          <h3>TG Efficiency Matrix</h3>
+          <div className="records-scroll small no-scroll-table fixed-row-table company-matrix-scroll">
             <table>
-              <thead><tr><th>Talkgroup</th><th>Calls</th><th>Duration</th><th>Traffic</th><th>Active Radios</th><th>Active Users</th><th>Avg Duration</th><th>Peak Hour</th><th>Peak Region</th><th>Peak Company</th></tr></thead>
+              <thead><tr><th>TG</th><th>Calls</th><th>Duration</th><th>Traffic</th><th>Active Radios</th><th>Active Users</th><th>Avg Duration</th><th>Peak Hour</th><th>Peak Region</th><th>Peak Company</th></tr></thead>
               <tbody>{talkgroupEfficiencyRows.map((row) => <tr key={row.name}><td>{row.name}</td><td>{formatNumber(row.calls)}</td><td>{secondsToClock(row.durationSeconds)}</td><td>{formatDecimal(row.trafficHours, 2)}</td><td>{formatNumber(row.radios)}</td><td>{formatNumber(row.users)}</td><td>{secondsToClock(row.averageDuration)}</td><td>{row.peakHour}</td><td>{row.peakRegion}</td><td>{row.peakCompany}</td></tr>)}</tbody>
             </table>
           </div>
@@ -2033,51 +2041,68 @@ export default function App() {
       )}
 
       {showChartsTab && (
-      <><SectionTitle id="Company" eyebrow="Company deck" title={`Company contribution in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Company")} onToggle={() => toggleSection("Company")} />
-      <section id="Company-content" className={`chart-grid dashboard-chart-grid company-chart-grid ${isSectionCollapsed("Company") ? "section-content-collapsed" : ""}`}>
-        <article className="chart-card Company-card company-talkgroups" style={{ minWidth: 0, overflow: "hidden" }}>
-          <h3>Talkgroups per Company</h3>
-          <p>Total {formatNumber(sumValues(CompanyChartData.totalTalkgroups))} &nbsp;-&nbsp; Used {formatNumber(sumValues(CompanyChartData.talkgroupsUsed))}</p>
-          <ChartLegend items={[{ name: "Total talkgroups", color: CHART_COLORS.total }, { name: "Used talkgroups", color: CHART_COLORS.used }]} />
-          <ResponsiveContainer width="100%" height={340}>
-            <BarChart data={CompanyChartData.totalTalkgroups.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.talkgroupsUsed.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
-              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
-              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={40} tickMargin={0} tickFormatter={(v) => truncateLabel(v, 12)} />
-              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.35)]} allowDataOverflow={false} />
-              <Tooltip content={<TalkgroupTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar dataKey="total" name="total" shape={(props: any) => <OverlayBarShape {...props} totalColor={CHART_COLORS.total} usedColor={CHART_COLORS.used} />}><LabelList dataKey="total" content={() => null} /></Bar>
+      <>
+      <section id="Charts-content" className="chart-grid charts-highlight-row">
+        <article className="chart-card charts-top-company">
+          <h3>Top Companies by Calls</h3>
+          <ResponsiveContainer width="100%" height={230}>
+            <BarChart layout="vertical" data={rankings.company.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
+              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" width={118} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 16)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Bar dataKey="calls" fill={CHART_COLORS.usedGreen}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
             </BarChart>
           </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.usedGreen }]} />
         </article>
-        <article className="chart-card Company-card company-radios" style={{ minWidth: 0, overflow: "hidden" }}>
-          <h3>Radios per Company</h3>
-          <p>Total {formatNumber(sumValues(CompanyChartData.totalUsers))} &nbsp;-&nbsp; Made Calls {formatNumber(sumValues(CompanyChartData.callingUsers))}</p>
-          <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.totalGreen }, { name: "Radios made calls", color: CHART_COLORS.usedGreen }]} />
-          <ResponsiveContainer width="100%" height={340}>
-            <BarChart data={CompanyChartData.totalUsers.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.callingUsers.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
-              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
-              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={40} tickMargin={0} tickFormatter={(v) => truncateLabel(v, 12)} />
-              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.35)]} allowDataOverflow={false} />
-              <Tooltip content={<RadioTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar dataKey="total" name="total" shape={(props: any) => <OverlayBarShape {...props} totalColor={CHART_COLORS.totalGreen} usedColor={CHART_COLORS.usedGreen} />}><LabelList dataKey="total" content={() => null} /></Bar>
+        <article className="chart-card charts-top-station">
+          <h3>Top BS by Calls</h3>
+          <ResponsiveContainer width="100%" height={230}>
+            <BarChart layout="vertical" data={rankings.station.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
+              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" width={122} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 16)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Bar dataKey="calls" fill={CHART_COLORS.duration}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
             </BarChart>
           </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.duration }]} />
         </article>
-        <article className="chart-card Company-card company-radio-type" style={{ minWidth: 0, overflow: "hidden" }}>
-          <h3>Radios Type per Company</h3>
-          <p>Total radios {formatNumber(mobileTypeByCompany.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
+        <article className="chart-card charts-top-talkgroup">
+          <h3>Top TG by Calls</h3>
+          <ResponsiveContainer width="100%" height={230}>
+            <BarChart layout="vertical" data={rankings.talkgroup.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
+              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" width={122} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 16)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Bar dataKey="calls" fill={CHART_COLORS.calls}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.calls }]} />
+        </article>
+        <article className="chart-card charts-encrypted">
+          <CallsDurationPerformanceChart title="Encrypted" data={rankings.encrypted} height={230} gradientId="encryptedPerformance" />
+        </article>
+      </section>
+
+      <section id="General-content" className="chart-grid charts-reference-grid">
+        <article className="chart-card general-mobile-type charts-radio-month">
+          <h3>Radio Type per Month</h3>
+          <p>Total radios {formatNumber(mobileTypeByMonth.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
           <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.total }, ...mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))]} />
           <ResponsiveContainer width="100%" height={340}>
-            <BarChart data={mobileTypeByCompany} margin={{ left: 0, right: 0, top: 14, bottom: 0 }} barCategoryGap="14%" barGap={2}>
+            <BarChart data={mobileTypeByMonth} margin={{ left: 0, right: 0, top: 14, bottom: 0 }} barCategoryGap="12%" barGap={2}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
-              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={44} tickMargin={2} tickFormatter={(v) => truncateLabel(v, 12)} />
+              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={52} tickMargin={8} tickFormatter={shortMonthLabel} />
               <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.28)]} />
               <Tooltip content={(props) => <MobileTypeTooltip {...props} mobileTypes={mobileTypes} />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
               <Bar dataKey="total" name="Total radios" maxBarSize={72} shape={(props: any) => <MobileTypeOverlayBarShape {...props} mobileTypes={mobileTypes} />}><LabelList dataKey="total" content={() => null} /></Bar>
             </BarChart>
           </ResponsiveContainer>
         </article>
-        <article className="chart-card wide monthly-Company-card" ref={monthlyCompanyChartRef}>
+        <article className="chart-card monthly-Company-card charts-calls-duration" ref={monthlyCompanyChartRef}>
           <h3>Calls and Duration per Company</h3>
           <div className="company-color-legend">
             {[...new Set(monthlyCompanyRows.map((r) => r.company))].map((company) => (
@@ -2104,6 +2129,69 @@ export default function App() {
           </ResponsiveContainer>
           <ChartLegend items={[{ name: "Duration seconds", color: CHART_COLORS.duration }, { name: "No. of calls", color: CHART_COLORS.callsDeep }]} />
         </article>
+        <article className="chart-card charts-call-type">
+          <CallsDurationPerformanceChart title="Call Type" data={rankings.callType} height={220} gradientId="callTypePerformance" />
+        </article>
+        <article className="chart-card charts-duplex">
+          <h3>Duplex Type</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={rankings.duplexType} margin={{ left: 0, right: 8, top: 18, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
+              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={54} tickFormatter={(v) => truncateLabel(v, 18)} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={chartLabel} />
+              <Tooltip content={<CompanyPerformanceTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="durationSeconds" name="Duration seconds" fill={CHART_COLORS.duration} radius={[8, 8, 0, 0]} maxBarSize={58}>
+                <LabelList dataKey="durationSeconds" content={TopValueLabel} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Duration seconds", color: CHART_COLORS.duration }]} />
+        </article>
+        <article className="chart-card Company-card company-talkgroups charts-talkgroups" style={{ minWidth: 0, overflow: "hidden" }}>
+          <h3>Talkgroups per Company</h3>
+          <p>Total {formatNumber(sumValues(CompanyChartData.totalTalkgroups))} &nbsp;-&nbsp; Used {formatNumber(sumValues(CompanyChartData.talkgroupsUsed))}</p>
+          <ChartLegend items={[{ name: "Total talkgroups", color: CHART_COLORS.total }, { name: "Used talkgroups", color: CHART_COLORS.used }]} />
+          <ResponsiveContainer width="100%" height={340}>
+            <BarChart data={CompanyChartData.totalTalkgroups.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.talkgroupsUsed.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
+              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={40} tickMargin={0} tickFormatter={(v) => truncateLabel(v, 12)} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.35)]} allowDataOverflow={false} />
+              <Tooltip content={<TalkgroupTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="total" name="total" shape={(props: any) => <OverlayBarShape {...props} totalColor={CHART_COLORS.total} usedColor={CHART_COLORS.used} />}><LabelList dataKey="total" content={() => null} /></Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </article>
+        <article className="chart-card Company-card company-radios charts-radios" style={{ minWidth: 0, overflow: "hidden" }}>
+          <h3>Radios per Company</h3>
+          <p>Total {formatNumber(sumValues(CompanyChartData.totalUsers))} &nbsp;-&nbsp; Made Calls {formatNumber(sumValues(CompanyChartData.callingUsers))}</p>
+          <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.totalGreen }, { name: "Radios made calls", color: CHART_COLORS.usedGreen }]} />
+          <ResponsiveContainer width="100%" height={340}>
+            <BarChart data={CompanyChartData.totalUsers.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.callingUsers.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
+              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={40} tickMargin={0} tickFormatter={(v) => truncateLabel(v, 12)} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.35)]} allowDataOverflow={false} />
+              <Tooltip content={<RadioTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="total" name="total" shape={(props: any) => <OverlayBarShape {...props} totalColor={CHART_COLORS.totalGreen} usedColor={CHART_COLORS.usedGreen} />}><LabelList dataKey="total" content={() => null} /></Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </article>
+        <article className="chart-card Company-card company-radio-type charts-radio-type-company" style={{ minWidth: 0, overflow: "hidden" }}>
+          <h3>Radios Type per Company</h3>
+          <p>Total radios {formatNumber(mobileTypeByCompany.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
+          <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.total }, ...mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))]} />
+          <ResponsiveContainer width="100%" height={340}>
+            <BarChart data={mobileTypeByCompany} margin={{ left: 0, right: 0, top: 14, bottom: 0 }} barCategoryGap="14%" barGap={2}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
+              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={44} tickMargin={2} tickFormatter={(v) => truncateLabel(v, 12)} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.28)]} />
+              <Tooltip content={(props) => <MobileTypeTooltip {...props} mobileTypes={mobileTypes} />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="total" name="Total radios" maxBarSize={72} shape={(props: any) => <MobileTypeOverlayBarShape {...props} mobileTypes={mobileTypes} />}><LabelList dataKey="total" content={() => null} /></Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </article>
+        <article className="chart-card charts-priority">
+          <CallsDurationPerformanceChart title="Call Priority" data={rankings.callPriority} height={260} gradientId="callPriorityPerformance" />
+        </article>
       </section>
       </>
       )}
@@ -2122,9 +2210,9 @@ export default function App() {
       </>
       )}
 
-      {showChartsTab && (
+      {false && showChartsTab && (
       <>
-      <SectionTitle id="General" eyebrow="General" title={`General Charts in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("General")} onToggle={() => toggleSection("General")} />
+      <SectionTitle id="General" eyebrow="General" title={`General Charts in ${CompanyPeriodLabel}`} text="Monthly radio activity and source call attributes from the filtered CDR records." collapsed={isSectionCollapsed("General")} onToggle={() => toggleSection("General")} />
       <section id="General-content" className={`chart-grid dashboard-chart-grid general-chart-grid ${isSectionCollapsed("General") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card general-mobile-type wide">
           <h3>Radio Type per Month</h3>
@@ -2169,8 +2257,8 @@ export default function App() {
       </>
       )}
 
-      {showChartsTab && (
-      <><SectionTitle id="Charts" eyebrow="Top 10" title={`Top 10 per Calls in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Charts")} onToggle={() => toggleSection("Charts")} />
+      {false && showChartsTab && (
+      <><SectionTitle id="Charts" eyebrow="Top 10" title={`Top 10 per Calls in ${CompanyPeriodLabel}`} text="Highest call contributors by company, base station, and talkgroup." collapsed={isSectionCollapsed("Charts")} onToggle={() => toggleSection("Charts")} />
       <section id="Charts-content" className={`chart-grid top-10-row ${isSectionCollapsed("Charts") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card">
           <h3>Top Companies by Calls</h3>
@@ -2217,20 +2305,19 @@ export default function App() {
 
       {showCompanyTab && (
       <>
-      <SectionTitle id="users" eyebrow="Behavior deck" title={`Radio & User Behavior in ${CompanyPeriodLabel}`} text="Identify heavy users, high-use radios, multi-talkgroup activity, and cross-region behavior." collapsed={isSectionCollapsed("users")} onToggle={() => toggleSection("users")} />
-      <section id="users-content" className={`behavior-grid ${isSectionCollapsed("users") ? "section-content-collapsed" : ""}`}>
-        <article className="table-card">
+      <section id="users-content" className="behavior-grid company-behavior-grid">
+        <article className="table-card company-behavior-card">
           <h3>Radio Behavior Insights</h3>
-          <div className="records-scroll small no-scroll-table fixed-row-table">
+          <div className="records-scroll small no-scroll-table fixed-row-table company-matrix-scroll">
             <table>
-              <thead><tr><th>Radio ID</th><th>Alias</th><th>Company</th><th>Calls</th><th>Duration</th><th>Avg Duration</th><th>Talkgroups</th><th>Base Stations</th></tr></thead>
+              <thead><tr><th>Radio ID</th><th>Alias</th><th>Company</th><th>Calls</th><th>Duration</th><th>Avg Duration</th><th>TGs</th><th>BS</th></tr></thead>
               <tbody>{radioBehaviorRows.map((item) => <tr key={item.radioId}><td>{item.radioId}</td><td>{item.alias}</td><td>{item.company}</td><td>{formatNumber(item.calls)}</td><td>{secondsToClock(item.durationSeconds)}</td><td>{secondsToClock(item.averageDuration)}</td><td>{formatNumber(item.talkgroups)}</td><td>{formatNumber(item.stations)}</td></tr>)}</tbody>
             </table>
           </div>
         </article>
-        <article className="table-card user-behavior-table-card">
+        <article className="table-card user-behavior-table-card company-behavior-card">
           <h3>User Behavior Insights</h3>
-          <div className="records-scroll small no-scroll-table fixed-row-table">
+          <div className="records-scroll small no-scroll-table fixed-row-table company-matrix-scroll">
             <table>
               <colgroup>
                 <col className="user-col" />
@@ -2241,7 +2328,7 @@ export default function App() {
                 <col className="compact-col" />
                 <col className="compact-col" />
               </colgroup>
-              <thead><tr><th>User</th><th>Calls</th><th>Duration</th><th>Avg Duration</th><th>Radios</th><th>Talkgroups</th><th>Base Stations</th></tr></thead>
+              <thead><tr><th>User</th><th>Calls</th><th>Duration</th><th>Avg Duration</th><th>Radios</th><th>TGs</th><th>BS</th></tr></thead>
               <tbody>{userBehaviorRows.map((item) => <tr key={item.name}><td>{item.name}</td><td>{formatNumber(item.calls)}</td><td>{secondsToClock(item.durationSeconds)}</td><td>{secondsToClock(item.averageDuration)}</td><td>{formatNumber(item.radios)}</td><td>{formatNumber(item.talkgroups)}</td><td>{formatNumber(item.stations)}</td></tr>)}</tbody>
             </table>
           </div>
