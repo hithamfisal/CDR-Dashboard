@@ -51,7 +51,13 @@ import {
   LineChart,
   Pie,
   PieChart,
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
   ResponsiveContainer,
+  Treemap,
   Tooltip,
   XAxis,
   YAxis,
@@ -83,6 +89,63 @@ function unionFleetmapRecords(master: FleetmapRecord[], fixed: FleetmapRecord[])
     if (isKnownLabel(radioKey) && !map.has(radioKey)) map.set(radioKey, record);
   });
   return [...map.values()];
+}
+
+const COMPANY_TREEMAP_COLORS = ["#22d3ee", "#4ade80", "#facc15", "#fb923c", "#60a5fa", "#a78bfa", "#f472b6", "#2dd4bf"];
+const REGION_RADAR_COLORS = ["#22d3ee", "#4ade80", "#facc15", "#fb923c"];
+const REGION_RADAR_ORDER = ["South", "West", "East", "North"];
+
+function CompanyTreemapTile(props: any) {
+  const { x = 0, y = 0, width = 0, height = 0, name = "", calls = 0, payload, index = 0 } = props;
+  const fill = payload?.fill ?? props.fill ?? COMPANY_TREEMAP_COLORS[0];
+  const tileName = payload?.name ?? name;
+  const tileCalls = Number(payload?.calls ?? calls ?? props.value ?? 0);
+  if (width < 8 || height < 8) return null;
+  const innerWidth = Math.max(0, width - 6);
+  const innerHeight = Math.max(0, height - 6);
+  const fontSize = width > 122 && height > 54 ? 12 : width > 78 && height > 34 ? 10 : 8;
+  const maxChars = Math.max(3, Math.floor((innerWidth - 14) / (fontSize * 0.58)));
+  const showName = innerWidth > 30 && innerHeight > 20;
+  const showValue = innerWidth > 62 && innerHeight > 38;
+  const clipId = `company-treemap-clip-${index}-${Math.round(x)}-${Math.round(y)}`.replace(/[^a-zA-Z0-9_-]/g, "");
+  return (
+    <g>
+      <defs>
+        <clipPath id={clipId}>
+          <rect x={x + 3} y={y + 3} width={innerWidth} height={innerHeight} rx={9} ry={9} />
+        </clipPath>
+      </defs>
+      <title>{`${tileName}: ${formatNumber(tileCalls)} calls`}</title>
+      <rect x={x + 3} y={y + 3} width={innerWidth} height={innerHeight} rx={9} ry={9} fill={fill} fillOpacity={0.94} stroke="rgba(237,246,250,0.34)" strokeWidth={1.2} />
+      <rect x={x + 3} y={y + 3} width={innerWidth} height={innerHeight} rx={9} ry={9} fill="#06131d" fillOpacity={0.08} />
+      <g clipPath={`url(#${clipId})`}>
+        {showName && (
+          <text x={x + 10} y={y + fontSize + 10} fill="#06131d" fontSize={fontSize} fontWeight={900}>
+            {truncateLabel(String(tileName), maxChars)}
+          </text>
+        )}
+        {showValue && (
+          <text x={x + 10} y={y + fontSize * 2 + 16} fill="#06131d" fontSize={Math.max(8, fontSize - 1)} fontWeight={850}>
+            {formatNumber(tileCalls)} calls
+          </text>
+        )}
+      </g>
+    </g>
+  );
+}
+
+function RegionRadarTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="radar-tooltip">
+      <strong>{label}</strong>
+      {payload.map((item: any) => (
+        <span key={item.dataKey} style={{ color: item.color }}>
+          {item.name}: {item.payload?.[`${item.dataKey}RawText`] ?? formatDecimal(Number(item.value), 1)}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 // Main App
@@ -407,6 +470,65 @@ export default function App() {
       topCompany: [...row.companyCalls.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? "--",
     })).sort((a, b) => b.calls - a.calls || b.durationSeconds - a.durationSeconds);
   }, [filtered]);
+
+  const topCompanyTreemapData = useMemo(() => rankings.company.slice(0, 10).map((row, index) => ({
+    name: row.name,
+    calls: row.calls,
+    size: row.calls,
+    fill: COMPANY_TREEMAP_COLORS[index % COMPANY_TREEMAP_COLORS.length],
+  })), [rankings.company]);
+
+  const regionRadarSeries = useMemo(() => REGION_RADAR_ORDER.map((name, index) => ({
+    name,
+    key: dataKey(`region_${name}`),
+    color: REGION_RADAR_COLORS[index % REGION_RADAR_COLORS.length],
+  })), []);
+
+  const regionRadarData = useMemo(() => {
+    const rowByRegion = new Map(regionPerformanceRows.map((row) => [row.name.toLowerCase(), row]));
+    const regionAliases = new Map(REGION_RADAR_ORDER.map((name) => [name.toLowerCase(), name]));
+    const hourlyCalls = new Map<string, Map<string, number>>();
+    filtered.forEach((record) => {
+      const regionName = regionAliases.get(cleanText(record.region, "Unknown").toLowerCase());
+      if (!regionName) return;
+      const hour = cleanText(record.hour, "Unknown");
+      const regionHours = hourlyCalls.get(regionName) ?? new Map<string, number>();
+      regionHours.set(hour, (regionHours.get(hour) ?? 0) + 1);
+      hourlyCalls.set(regionName, regionHours);
+    });
+    const peakHourCalls = new Map(REGION_RADAR_ORDER.map((region) => [
+      region,
+      Math.max(0, ...[...(hourlyCalls.get(region)?.values() ?? [])]),
+    ]));
+    const rawByRegion = new Map(regionRadarSeries.map((series) => {
+      const row = rowByRegion.get(series.name.toLowerCase());
+      return [series.name, {
+        calls: row?.calls ?? 0,
+        durationSeconds: row?.durationSeconds ?? 0,
+        averageDuration: row?.averageDuration ?? 0,
+        peakHourCalls: peakHourCalls.get(series.name) ?? 0,
+        talkgroups: row?.talkgroups ?? 0,
+      }];
+    }));
+    const metricsForRadar = [
+      { key: "calls", label: "Total Calls", format: (value: number) => formatNumber(value) },
+      { key: "durationSeconds", label: "Total Duration", format: (value: number) => secondsToClock(value) },
+      { key: "averageDuration", label: "Avg Duration/Call", format: (value: number) => secondsToClock(value) },
+      { key: "peakHourCalls", label: "Peak Hour Calls", format: (value: number) => formatNumber(value) },
+      { key: "talkgroups", label: "Unique Talkgroups", format: (value: number) => formatNumber(value) },
+    ] as const;
+
+    return metricsForRadar.map((metric) => {
+      const maxValue = Math.max(1, ...regionRadarSeries.map((series) => rawByRegion.get(series.name)?.[metric.key] ?? 0));
+      const point: Record<string, string | number> = { metric: metric.label };
+      regionRadarSeries.forEach((series) => {
+        const raw = rawByRegion.get(series.name)?.[metric.key] ?? 0;
+        point[series.key] = (raw / maxValue) * 100;
+        point[`${series.key}RawText`] = metric.format(raw);
+      });
+      return point;
+    });
+  }, [filtered, regionPerformanceRows, regionRadarSeries]);
 
   const fleetActivation = useMemo(() => {
     const liveFleetmap = unionFleetmapRecords(masterFleetmap.records, fixedFleetmap.records);
@@ -1771,6 +1893,7 @@ export default function App() {
             periodLabel={CompanyPeriodLabel}
             loadedAt={data.loadedAt}
             data={data}
+            filteredRecords={filtered}
             masterFleetmap={masterFleetmap}
             fixedFleetmap={fixedFleetmap}
             maxDuration={maxDuration}
@@ -2045,16 +2168,19 @@ export default function App() {
       <section id="Charts-content" className="chart-grid charts-highlight-row">
         <article className="chart-card charts-top-company">
           <h3>Top Companies by Calls</h3>
-          <ResponsiveContainer width="100%" height={230}>
-            <BarChart layout="vertical" data={rankings.company.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
-              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
-              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
-              <YAxis type="category" dataKey="name" width={118} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 16)} interval={0} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
-              <Bar dataKey="calls" fill={CHART_COLORS.usedGreen}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
-            </BarChart>
+          <ResponsiveContainer width="100%" height={250}>
+            <Treemap
+              data={topCompanyTreemapData}
+              dataKey="size"
+              nameKey="name"
+              aspectRatio={4 / 3}
+              stroke="rgba(237,246,250,0.2)"
+              content={<CompanyTreemapTile />}
+            >
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string, item: any) => [formatNumber(item?.payload?.calls ?? v), "Calls"]} />
+            </Treemap>
           </ResponsiveContainer>
-          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.usedGreen }]} />
+          <ChartLegend items={topCompanyTreemapData.map((item) => ({ name: `${truncateLabel(item.name, 20)} (${formatNumber(item.calls)})`, color: item.fill }))} />
         </article>
         <article className="chart-card charts-top-station">
           <h3>Top BS by Calls</h3>
@@ -2200,7 +2326,21 @@ export default function App() {
       <>
       <SectionTitle id="Performance" eyebrow="Performance" title={`Calls & Duration Performance in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Performance")} onToggle={() => toggleSection("Performance")} />
       <section id="Performance-content" className={`chart-grid performance-chart-grid ${isSectionCollapsed("Performance") ? "section-content-collapsed" : ""}`}>
-        <article className="chart-card performance-region"><CallsDurationPerformanceChart title="Regions Performance" data={rankings.region} gradientId="performanceRegion" /></article>
+        <article className="chart-card performance-region region-radar-card">
+          <h3>Regions Performance</h3>
+          <ResponsiveContainer width="100%" height={350}>
+            <RadarChart data={regionRadarData} outerRadius="74%">
+              <PolarGrid stroke={CHART_COLORS.grid} strokeOpacity={0.48} />
+              <PolarAngleAxis dataKey="metric" tick={{ fill: CHART_COLORS.axis, fontSize: 11, fontWeight: 700 }} />
+              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: CHART_COLORS.axis, fontSize: 10 }} tickFormatter={(value) => `${formatDecimal(Number(value), 0)}%`} />
+              <Tooltip content={<RegionRadarTooltip />} />
+              {regionRadarSeries.map((series) => (
+                <Radar key={series.key} name={series.name} dataKey={series.key} stroke={series.color} fill={series.color} fillOpacity={0.16} strokeWidth={2.4} dot={{ r: 3, fill: series.color }} />
+              ))}
+            </RadarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={regionRadarSeries.map((series) => ({ name: series.name, color: series.color }))} />
+        </article>
         <article className="chart-card performance-month"><CallsDurationPerformanceChart title="Monthly Performance" data={rankings.month} gradientId="performanceMonth" xTickFormatter={shortMonthLabel} /></article>
         <article className="chart-card performance-company"><CallsDurationPerformanceChart title="Companies Performance" data={rankings.company} gradientId="performanceCompany" /></article>
         <article className="chart-card performance-talkgroup"><CallsDurationPerformanceChart title="Talkgroups Performance" data={rankings.talkgroup.slice(0, 12)} gradientId="performanceTalkgroup" /></article>

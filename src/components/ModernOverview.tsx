@@ -19,7 +19,7 @@ import {
   PhoneIncoming,
   Waves,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import {
   Area,
   AreaChart,
@@ -36,7 +36,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { DashboardData, FleetmapState, Metrics, QualityIssue, Ranking, TrafficIntensity } from "../types/dashboard";
+import type { CallRecord, DashboardData, FleetmapState, Metrics, QualityIssue, Ranking, TrafficIntensity } from "../types/dashboard";
 import { chartLabel, formatDecimal, formatNumber, secondsToClock } from "../lib/formatters";
 import { shortMonthLabel, truncateLabel } from "../lib/chartHelpers";
 import { CHART_COLORS, COLORS, TOOLTIP_STYLE } from "../lib/dashboardConstants";
@@ -59,6 +59,7 @@ type ModernOverviewProps = {
   periodLabel: string;
   loadedAt: string;
   data: DashboardData;
+  filteredRecords: CallRecord[];
   masterFleetmap: FleetmapState;
   fixedFleetmap: FleetmapState;
   maxDuration: number;
@@ -72,6 +73,72 @@ type ModernOverviewProps = {
 };
 
 const kpiPalette = ["cyan", "green", "amber", "blue", "purple", "teal", "red"] as const;
+const callTypeSeries = [
+  { key: "phoneCall", name: "Phone Call", color: "#22d3ee" },
+  { key: "groupCall", name: "Group Call", color: "#4ade80" },
+  { key: "environmentalListening", name: "Environmental Listening", color: "#facc15" },
+  { key: "individualCall", name: "Individual Call", color: "#fb923c" },
+  { key: "networkWide", name: "Network-wide", color: "#a78bfa" },
+  { key: "broadcast", name: "Broadcast", color: "#f472b6" },
+];
+const monthBuckets = [
+  { label: "Jan", match: "jan" },
+  { label: "Feb", match: "feb" },
+  { label: "Mar", match: "mar" },
+  { label: "Apr", match: "apr" },
+  { label: "May", match: "may" },
+  { label: "Jun", match: "jun" },
+  { label: "Jul", match: "jul" },
+  { label: "Aug", match: "aug" },
+  { label: "Sep", match: "sep" },
+  { label: "Oct", match: "oct" },
+  { label: "Nov", match: "nov" },
+  { label: "Dec", match: "dec" },
+];
+
+function monthIndexFromRecord(record: CallRecord) {
+  const text = `${record.month || record.callDate || ""}`.trim().toLowerCase();
+  const explicit = monthBuckets.findIndex((month) => text.startsWith(month.match) || text.includes(` ${month.match}`));
+  if (explicit >= 0) return explicit;
+  const parsed = new Date(record.callDate);
+  return Number.isNaN(parsed.getTime()) ? -1 : parsed.getMonth();
+}
+
+function normalizeCallTypeKey(value: string) {
+  const text = `${value || ""}`.toLowerCase();
+  if (text.includes("broadcast")) return "broadcast";
+  if (text.includes("network")) return "networkWide";
+  if (text.includes("environment") || text.includes("listen")) return "environmentalListening";
+  if (text.includes("individual") || text.includes("private")) return "individualCall";
+  if (text.includes("group")) return "groupCall";
+  return "phoneCall";
+}
+
+function StackedPercentLabel(props: any) {
+  const { x = 0, y = 0, width = 0, height = 0, value = 0 } = props;
+  const numeric = Number(value);
+  if (numeric < 9 || width < 18 || height < 18) return null;
+  return (
+    <text x={x + width / 2} y={y + height / 2 + 4} textAnchor="middle" fill="#06131d" fontSize={10} fontWeight={900}>
+      {formatDecimal(numeric, 0)}%
+    </text>
+  );
+}
+
+function CallTypeMixTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  const visible = payload.filter((item: any) => Number(item.value) > 0);
+  return (
+    <div className="modern-calltype-tooltip">
+      <strong>{label}</strong>
+      {visible.map((item: any) => (
+        <span key={item.dataKey} style={{ color: item.color }}>
+          {item.name}: {formatDecimal(Number(item.value), 1)}% ({formatNumber(Number(item.payload?.[`${item.dataKey}Count`] ?? 0))})
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function MiniSparkline({ data, color }: { data: Ranking[]; color: string }) {
   const spark = data.slice(-8).map((item) => ({ name: item.name, value: item.calls }));
@@ -216,6 +283,7 @@ export function ModernOverview({
   periodLabel,
   loadedAt,
   data,
+  filteredRecords,
   masterFleetmap,
   fixedFleetmap,
   maxDuration,
@@ -229,14 +297,12 @@ export function ModernOverview({
 }: ModernOverviewProps) {
   const topHour = [...rankings.hour].sort((a, b) => b.calls - a.calls)[0];
   const filteredPct = totalCount ? (filteredCount / totalCount) * 100 : 0;
-  const callTypeTotal = rankings.callType.reduce((sum, item) => sum + item.calls, 0);
   const monthlyTrend = rankings.month.map((item) => ({
     ...item,
     durationMinutes: item.durationSeconds / 60,
   }));
   const tgTop = rankings.talkgroup.slice(0, 7);
   const tgTotal = tgTop.reduce((sum, item) => sum + item.calls, 0);
-  const callTypeTop = rankings.callType.slice(0, 6);
   const topCompany = rankings.company[0];
   const topStation = rankings.station[0];
   const topTalkgroup = rankings.talkgroup[0];
@@ -247,6 +313,33 @@ export function ModernOverview({
   const peakHourAvgDuration = topHour?.calls ? topHour.durationSeconds / topHour.calls : 0;
   const masterCount = masterFleetmap.records.length;
   const fixedCount = fixedFleetmap.records.length;
+  const callTypeMonthlyMix = useMemo(() => {
+    const rows = monthBuckets.map((month) => {
+      const row: Record<string, string | number> = { month: month.label, total: 0 };
+      callTypeSeries.forEach((series) => {
+        row[series.key] = 0;
+        row[`${series.key}Count`] = 0;
+      });
+      return row;
+    });
+    filteredRecords.forEach((record) => {
+      const monthIndex = monthIndexFromRecord(record);
+      if (monthIndex < 0) return;
+      const typeKey = normalizeCallTypeKey(record.callType);
+      const row = rows[monthIndex];
+      row[typeKey] = Number(row[typeKey] ?? 0) + 1;
+      row[`${typeKey}Count`] = Number(row[`${typeKey}Count`] ?? 0) + 1;
+      row.total = Number(row.total ?? 0) + 1;
+    });
+    return rows.map((row) => {
+      const total = Number(row.total) || 0;
+      callTypeSeries.forEach((series) => {
+        const count = Number(row[`${series.key}Count`] ?? 0);
+        row[series.key] = total ? (count / total) * 100 : 0;
+      });
+      return row;
+    });
+  }, [filteredRecords]);
 
   const kpis = [
     { label: "Total Calls", value: formatNumber(metrics.totalCalls), detail: periodLabel, icon: <PhoneCall size={26} />, color: "#1dd6c5", tone: "cyan" as const },
@@ -397,21 +490,23 @@ export function ModernOverview({
         </ModernPanel>
 
         <ModernPanel title="Call Type Distribution" className="modern-panel-call-type">
-          <div className="modern-donut-layout modern-donut-compact">
-            <div className="modern-donut-chart">
-              <ResponsiveContainer width="100%" height={172}>
-                <PieChart>
-                  <Pie data={callTypeTop} dataKey="calls" nameKey="name" innerRadius={40} outerRadius={64} paddingAngle={2} label={PieValueLabel} labelLine={false}>
-                    {callTypeTop.map((item, index) => <Cell key={item.name} fill={COLORS[index % COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => formatNumber(value)} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="modern-donut-center"><strong>{formatNumber(callTypeTotal)}</strong><span>Total</span></div>
-            </div>
-            <div className="modern-legend-list">
-              {callTypeTop.map((item, index) => (
-                <p key={item.name}><i style={{ background: COLORS[index % COLORS.length] }} />{item.name}</p>
+          <div className="modern-calltype-stack-layout">
+            <ResponsiveContainer width="100%" height={172}>
+              <BarChart data={callTypeMonthlyMix} margin={{ left: 0, right: 8, top: 12, bottom: 0 }}>
+                <CartesianGrid stroke="#20313e" strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: CHART_COLORS.axis, fontSize: 10, fontWeight: 700 }} interval={0} />
+                <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 10 }} width={38} domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+                <Tooltip content={<CallTypeMixTooltip />} />
+                {callTypeSeries.map((series) => (
+                  <Bar key={series.key} dataKey={series.key} name={series.name} stackId="callType" fill={series.color}>
+                    <LabelList dataKey={series.key} content={StackedPercentLabel} />
+                  </Bar>
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="modern-calltype-stack-legend">
+              {callTypeSeries.map((series) => (
+                <p key={series.key}><i style={{ background: series.color }} />{series.name}</p>
               ))}
             </div>
           </div>
