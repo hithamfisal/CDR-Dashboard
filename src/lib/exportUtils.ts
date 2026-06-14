@@ -18,11 +18,16 @@ export function downloadText(fileName: string, text: string) {
 }
 
 export function downloadBlob(fileName: string, blob: Blob) {
+  window.dispatchEvent(new CustomEvent("cdr-report-generated-file", { detail: { fileName, blob, mimeType: blob.type } }));
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url; link.download = fileName;
   document.body.appendChild(link); link.click(); link.remove();
   URL.revokeObjectURL(url);
+}
+
+export function downloadPdf(pdf: jsPDF, fileName: string) {
+  downloadBlob(fileName, pdf.output("blob"));
 }
 
 export function downloadDataUrl(fileName: string, dataUrl: string) {

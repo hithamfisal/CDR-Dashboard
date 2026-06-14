@@ -27,8 +27,34 @@ function FileTypeIcon({ kind }: { kind: ExportKind }) {
   );
 }
 
-export function ExportButton({ kind, label, onClick, title }: { kind: ExportKind; label: string; onClick: () => void | Promise<void>; title?: string }) {
-  return <button className={`button small export-button export-button-${kind}`} type="button" onClick={onClick} title={title ?? label}><FileTypeIcon kind={kind} /><span>{label}</span></button>;
+export function ExportButton({
+  kind,
+  label,
+  onClick,
+  title,
+  report,
+  className = "",
+}: {
+  kind: ExportKind;
+  label: string;
+  onClick: () => void | Promise<void>;
+  title?: string;
+  report?: string;
+  className?: string;
+}) {
+  return (
+    <button
+      className={`button small export-button export-button-${kind} ${className}`.trim()}
+      type="button"
+      onClick={onClick}
+      title={title ?? label}
+      data-report={report ?? label}
+      data-format={kind}
+      data-label={label}
+    >
+      <FileTypeIcon kind={kind} /><span>{label}</span>
+    </button>
+  );
 }
 
 export function SectionTitle({ id, eyebrow, title, text, actions, collapsed = false, onToggle }: { id?: string; eyebrow: string; title: string; text?: string; actions?: ReactNode; collapsed?: boolean; onToggle?: () => void }) {

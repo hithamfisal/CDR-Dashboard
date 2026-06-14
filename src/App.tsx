@@ -18,7 +18,7 @@ import { monthSortValue, weekSortValue } from "./lib/dateSort";
 import { buildFilterOptions, uniqueOptions } from "./lib/filterOptions";
 import { companyColor, companyMetricColor, dataKey, mobileTypeColor, mobileTypeKey, shortMonthLabel, truncateLabel } from "./lib/chartHelpers";
 import { cleanText, isKnownLabel, normalizeRadioKey, parseDate, parseNumber, weekLabelFromDate } from "./lib/recordUtils";
-import { applyWorkbookArabicSupport, csvEscape, downloadBlob, downloadDataUrl, downloadText, downloadWorkbookData, ensurePdfArabicFont, escapeXml, excelColumnName, excelRange, exportIconSvg, fileSlug, htmlEscape, patchWorkbookWithNativeCharts, pdfText, pptTextOptions } from "./lib/exportUtils";
+import { applyWorkbookArabicSupport, csvEscape, downloadBlob, downloadDataUrl, downloadPdf, downloadText, downloadWorkbookData, ensurePdfArabicFont, escapeXml, excelColumnName, excelRange, exportIconSvg, fileSlug, htmlEscape, patchWorkbookWithNativeCharts, pdfText, pptTextOptions } from "./lib/exportUtils";
 import { usePagedItems } from "./hooks/usePagination";
 import type ExcelJS from "exceljs";
 import {
@@ -974,6 +974,7 @@ export default function App() {
       const charts = await captureKpiChartImages();
       const jsPDF = await loadJsPdf();
       const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+      await ensurePdfArabicFont(pdf);
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 24;
@@ -1010,7 +1011,7 @@ export default function App() {
       };
       drawKpiTable();
       charts.forEach((chart) => addImagePage(chart.title, chart.image));
-      pdf.save("kpi-table-and-charts.pdf");
+      downloadPdf(pdf, "kpi-table-and-charts.pdf");
     })();
   }, [captureKpiChartImages, exportTitle, kpiExportTableRows]);
 
@@ -1215,7 +1216,7 @@ export default function App() {
       };
       drawRow(headers, true);
       rows.forEach((row) => drawRow(row));
-      pdf.save(fileName);
+      downloadPdf(pdf, fileName);
     })();
   }, [exportTitle]);
 
@@ -1244,7 +1245,7 @@ export default function App() {
       cdrSummaryRows.forEach((row, index) => { const col = index % summaryCols; const rowIndex = Math.floor(index / summaryCols); const x = margin + col * (summaryCellWidth + summaryGap); const sy = y + rowIndex * summaryRowHeight; pdf.setDrawColor(20, 36, 48); pdf.setFillColor("#ffffff"); pdf.rect(x, sy, summaryCellWidth, summaryRowHeight, "FD"); pdf.setFillColor("#fff200"); pdf.rect(x, sy, summaryCellWidth * 0.45, summaryRowHeight, "FD"); pdf.setFont("helvetica", "bold"); pdf.setFontSize(6.5); pdf.setTextColor(0, 0, 0); pdfText(pdf, row[0], x + 4, sy + 11.5, { maxWidth: summaryCellWidth * 0.45 - 8 }); pdf.setFont("helvetica", "normal"); pdf.setFontSize(6.5); pdfText(pdf, row[1], x + summaryCellWidth * 0.45 + 4, sy + 11.5, { maxWidth: summaryCellWidth * 0.55 - 8 }); });
       y += Math.ceil(cdrSummaryRows.length / summaryCols) * summaryRowHeight + 10; const rowHeight = 8.5;
       allRows.forEach((row, ri) => { let x = margin; row.forEach((cell, ci) => { const width = colWidths[ci]; pdf.setDrawColor(20, 36, 48); pdf.setFillColor(ri === 0 ? "#fff200" : "#ffffff"); pdf.rect(x, y, width, rowHeight, "FD"); pdf.setFont("helvetica", ri === 0 ? "bold" : "normal"); pdf.setFontSize(ri === 0 ? 4.2 : 4.35); pdf.setTextColor(0, 0, 0); pdfText(pdf, cell, x + width / 2, y + 6, { align: "center", maxWidth: width - 2 }); x += width; }); y += rowHeight; });
-      pdf.save(`premium-cdr-filtered-records-page-${page}.pdf`);
+      downloadPdf(pdf, `premium-cdr-filtered-records-page-${page}.pdf`);
     })();
   }, [cdrSummaryRows, exportTitle, page, pagedRecords]);
   const exportUtilizationXlsx = useCallback(() => {
@@ -1297,7 +1298,7 @@ export default function App() {
       pdfText(pdf, exportTitle("Top radios and employee utilization"), pageWidth / 2, 26, { align: "center" });
       const nextY = drawTable("Top Radios", ["Radio ID & Alias", "Employee Name", "Company", "Total Calls", "Total Duration"], topRadioUsers.map((item) => [`${item.radioId} - ${item.radioAlias}`, item.employeeName, item.company, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), 52, [170, 160, 130, 80, 95]);
       drawTable("Top Users", ["User", "Total Calls", "Total Duration"], rankings.user.slice(0, 10).map((item) => [item.name, formatNumber(item.calls), secondsToClock(item.durationSeconds)]), nextY + 28, [360, 95, 110]);
-      pdf.save("top-radios-users.pdf");
+      downloadPdf(pdf, "top-radios-users.pdf");
     })();
   }, [exportTitle, rankings.user, topRadioUsers]);
 
@@ -1442,7 +1443,7 @@ export default function App() {
       const maxW = pageWidth - margin * 2; const maxH = samePage ? remainingHeight : pageHeight - margin * 2;
       const ratio = Math.min(maxW / props.width, maxH / props.height);
       pdf.addImage(chartPng, "PNG", (pageWidth - props.width * ratio) / 2, samePage ? chartTop : (pageHeight - props.height * ratio) / 2, props.width * ratio, props.height * ratio);
-      pdf.save("calls-duration-per-company.pdf");
+      downloadPdf(pdf, "calls-duration-per-company.pdf");
     })();
   }, [captureMonthlyCompanyChart, exportTitle, monthlyCompanyPivot]);
 
@@ -2069,7 +2070,7 @@ export default function App() {
 
       {showKpiTab && (
       <>
-      <SectionTitle id="kpi" eyebrow="KPI Metrics" title="KPI Measurements" collapsed={isSectionCollapsed("kpi")} onToggle={() => toggleSection("kpi")} />
+      <SectionTitle id="kpi" eyebrow="1" title="Key KPI Profiles: Aggregate Metrics" text={`Data grid and KPI chart profiles in ${CompanyPeriodLabel}.`} collapsed={isSectionCollapsed("kpi")} onToggle={() => toggleSection("kpi")} />
       <section id="kpi-content" className={`kpi-grid ${isSectionCollapsed("kpi") ? "section-content-collapsed" : ""}`}>
         <article className="table-card kpi-table kpi-measurements-table-card">
           <h3>KPI Measurements</h3>
@@ -2100,7 +2101,7 @@ export default function App() {
             </table>
           </div>
         </article>
-        <article className="chart-card" ref={kpiAverageChartRef}>
+        <article className="chart-card kpi-average-card" ref={kpiAverageChartRef}>
           <h3>KPI Average Duration per Company</h3>
           <ResponsiveContainer width="100%" height={Math.max(340, kpiRows.length * 34)}>
             <BarChart layout="vertical" data={kpiRows} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
@@ -2113,7 +2114,7 @@ export default function App() {
           </ResponsiveContainer>
           <ChartLegend items={[{ name: "Average duration per activated user", color: CHART_COLORS.calls }]} />
         </article>
-        <article className="chart-card" ref={kpiCallsDurationChartRef}>
+        <article className="chart-card kpi-calls-duration-card" ref={kpiCallsDurationChartRef}>
           <h3>KPI Calls and Duration per Company</h3>
           <ResponsiveContainer width="100%" height={390}>
             <ComposedChart data={kpiRows} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
@@ -2128,7 +2129,7 @@ export default function App() {
           </ResponsiveContainer>
           <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.calls }, { name: "Duration seconds", color: CHART_COLORS.duration }]} />
         </article>
-        <article className="chart-card monthly-kpi-card" ref={monthlyKpiChartRef}>
+        <article className="chart-card monthly-kpi-card kpi-monthly-card" ref={monthlyKpiChartRef}>
           <h3>Monthly KPI</h3><p>(Avg. call duration per company) in sec</p>
           <ResponsiveContainer width="100%" height={430}>
             <LineChart data={monthlyKpi.rows} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
@@ -2145,7 +2146,7 @@ export default function App() {
           </ResponsiveContainer>
           <div className="chart-legend">{monthlyKpi.months.map((m) => <span key={m.key}><i style={{ background: m.color }} />{shortMonthLabel(m.name)}</span>)}</div>
         </article>
-        <article className="chart-card monthly-kpi-card" ref={kpiTotalAvgChartRef}>
+        <article className="chart-card monthly-kpi-card kpi-total-avg-card" ref={kpiTotalAvgChartRef}>
           <h3>KPI Total Avg. Duration</h3><p>Average call duration by month in sec</p>
           <div className="Company-pie-layout">
             <ResponsiveContainer width="64%" height={430}>
@@ -2324,10 +2325,11 @@ export default function App() {
 
       {showKpiTab && (
       <>
-      <SectionTitle id="Performance" eyebrow="Performance" title={`Calls & Duration Performance in ${CompanyPeriodLabel}`} collapsed={isSectionCollapsed("Performance")} onToggle={() => toggleSection("Performance")} />
+      <SectionTitle id="Performance" eyebrow="2" title="Performance Dimensions: Deep Dive" text={`Calls, duration, and utilization dimensions in ${CompanyPeriodLabel}.`} collapsed={isSectionCollapsed("Performance")} onToggle={() => toggleSection("Performance")} />
       <section id="Performance-content" className={`chart-grid performance-chart-grid ${isSectionCollapsed("Performance") ? "section-content-collapsed" : ""}`}>
         <article className="chart-card performance-region region-radar-card">
           <h3>Regions Performance</h3>
+          <p>Normalized view across calls, duration, peak hour, and TG activity.</p>
           <ResponsiveContainer width="100%" height={350}>
             <RadarChart data={regionRadarData} outerRadius="74%">
               <PolarGrid stroke={CHART_COLORS.grid} strokeOpacity={0.48} />

@@ -12976,6 +12976,319 @@ body,
   text-align: left !important;
 }
 
+/* Reports tab: report-management flow */
+.app-shell.active-tab-reports .reports-tab-panel {
+  gap: 10px !important;
+  margin-top: 4px !important;
+}
+
+.app-shell .report-management-card,
+.app-shell .export-center-card {
+  padding: clamp(14px, 1vw, 20px) !important;
+  border-radius: 10px !important;
+}
+
+.app-shell .report-management-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  margin-bottom: 12px !important;
+}
+
+.app-shell .report-management-header h3,
+.app-shell .export-center-card h3 {
+  margin: 0 0 6px !important;
+  color: var(--theme-text, #f4fbff) !important;
+  font-size: clamp(18px, 1.2vw, 24px) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+}
+
+.app-shell .report-management-header p,
+.app-shell .export-center-card .table-note {
+  margin: 0 !important;
+  color: var(--theme-muted, #9eb9ca) !important;
+  font-size: clamp(12px, 0.72vw, 14px) !important;
+  font-weight: 750 !important;
+}
+
+.app-shell .report-search-box {
+  width: min(280px, 34vw) !important;
+  min-height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(125, 211, 252, 0.26) !important;
+  background: rgba(4, 20, 33, 0.72) !important;
+  color: var(--theme-text, #edf8ff) !important;
+}
+
+.app-shell .report-search-box input {
+  width: 100% !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  color: inherit !important;
+  font: inherit !important;
+  font-weight: 750 !important;
+}
+
+.app-shell .report-management-grid {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 0.38fr) minmax(0, 1fr) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+.app-shell .report-generator-panel {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.app-shell .generate-report-tile {
+  min-height: 126px !important;
+  display: grid !important;
+  place-items: center !important;
+  gap: 10px !important;
+  border: 1px solid rgba(45, 212, 191, 0.72) !important;
+  border-radius: 10px !important;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(45, 212, 191, 0.34), transparent 34%),
+    linear-gradient(135deg, rgba(14, 47, 64, 0.92), rgba(7, 25, 38, 0.92)) !important;
+  color: #f3fbff !important;
+  font-size: clamp(16px, 1vw, 20px) !important;
+  font-weight: 950 !important;
+  box-shadow:
+    0 0 0 1px rgba(236, 72, 153, 0.38),
+    0 0 28px rgba(45, 212, 191, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  cursor: pointer !important;
+}
+
+.app-shell .generate-report-tile svg {
+  width: 48px !important;
+  height: 48px !important;
+  padding: 10px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(125, 211, 252, 0.48) !important;
+  color: #7dd3fc !important;
+  background: rgba(3, 14, 24, 0.38) !important;
+  box-shadow: 0 0 22px rgba(45, 212, 191, 0.32) !important;
+}
+
+.app-shell .report-generation-form,
+.app-shell .generated-reports-panel {
+  padding: 14px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(77, 178, 232, 0.24) !important;
+  background:
+    linear-gradient(145deg, rgba(12, 42, 56, 0.82), rgba(5, 21, 34, 0.82)),
+    radial-gradient(circle at 10% 0, rgba(45, 212, 191, 0.12), transparent 36%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.app-shell .report-generation-form {
+  display: grid !important;
+  gap: 11px !important;
+}
+
+.app-shell .report-generation-form h4,
+.app-shell .generated-reports-title h4,
+.app-shell .export-center-subgroup h4 {
+  margin: 0 !important;
+  color: var(--theme-text, #edf8ff) !important;
+  font-size: clamp(13px, 0.82vw, 16px) !important;
+  font-weight: 950 !important;
+}
+
+.app-shell .report-generation-form label {
+  display: grid !important;
+  gap: 6px !important;
+  color: var(--theme-muted, #a7c1d2) !important;
+  font-size: clamp(11px, 0.68vw, 13px) !important;
+  font-weight: 850 !important;
+}
+
+.app-shell .report-generation-form select,
+.app-shell .report-generation-form input {
+  height: 40px !important;
+  width: 100% !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(125, 211, 252, 0.28) !important;
+  background: rgba(4, 18, 29, 0.82) !important;
+  color: var(--theme-text, #edf8ff) !important;
+  padding: 0 10px !important;
+  font-size: clamp(12px, 0.72vw, 14px) !important;
+  font-weight: 750 !important;
+}
+
+.app-shell .generated-reports-panel {
+  min-height: 300px !important;
+  display: grid !important;
+  grid-template-rows: auto 1fr !important;
+}
+
+.app-shell .generated-reports-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 10px !important;
+}
+
+.app-shell .generated-reports-title span {
+  color: var(--theme-muted, #a7c1d2) !important;
+  font-size: clamp(11px, 0.65vw, 13px) !important;
+  font-weight: 850 !important;
+}
+
+.app-shell .generated-reports-table-wrap {
+  overflow: auto !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(125, 211, 252, 0.18) !important;
+}
+
+.app-shell .generated-preview-notice {
+  margin: 0 0 10px !important;
+  padding: 9px 11px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(245, 158, 11, 0.32) !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: var(--theme-text, #f8fbff) !important;
+  font-size: clamp(11px, 0.66vw, 13px) !important;
+  font-weight: 800 !important;
+}
+
+.app-shell .generated-reports-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+}
+
+.app-shell .generated-reports-table th,
+.app-shell .generated-reports-table td {
+  height: 34px !important;
+  padding: 7px 10px !important;
+  border: 1px solid rgba(125, 211, 252, 0.12) !important;
+  color: var(--theme-text, #edf8ff) !important;
+  font-size: clamp(11px, 0.65vw, 13px) !important;
+  vertical-align: middle !important;
+}
+
+.app-shell .generated-reports-table th {
+  background: rgba(72, 196, 255, 0.09) !important;
+  font-weight: 950 !important;
+  text-align: center !important;
+}
+
+.app-shell .generated-reports-table td {
+  font-weight: 500 !important;
+  text-align: center !important;
+}
+
+.app-shell .generated-reports-table th:first-child,
+.app-shell .generated-reports-table td:first-child {
+  text-align: left !important;
+  width: 44% !important;
+}
+
+.app-shell .generated-reports-table td:last-child {
+  width: 168px !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .generated-reports-table td button {
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  margin: 0 2px !important;
+  border-radius: 7px !important;
+  border: 1px solid rgba(125, 211, 252, 0.22) !important;
+  background: rgba(4, 18, 29, 0.76) !important;
+  color: var(--theme-text, #edf8ff) !important;
+  cursor: pointer !important;
+}
+
+.app-shell .generated-reports-table td button.history-view-limited {
+  opacity: 0.72 !important;
+  color: var(--theme-muted, #9fb7c8) !important;
+}
+
+.app-shell .generated-reports-empty {
+  height: 94px !important;
+  color: var(--theme-muted, #a7c1d2) !important;
+  text-align: center !important;
+}
+
+.app-shell.active-tab-reports .export-center-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.app-shell.active-tab-reports .export-center-grid .export-center-subgroup {
+  min-height: 118px !important;
+  border-radius: 10px !important;
+  background:
+    linear-gradient(145deg, rgba(6, 25, 39, 0.72), rgba(3, 15, 25, 0.72)) !important;
+}
+
+.app-shell.active-tab-reports .export-center-actions {
+  gap: 7px !important;
+  margin-top: 10px !important;
+}
+
+.app-shell.active-tab-reports .export-center-actions .export-button {
+  min-height: 42px !important;
+  border-radius: 999px !important;
+}
+
+.app-shell.active-tab-reports .reports-export-groups-hidden {
+  display: none !important;
+}
+
+.app-shell.light-background-theme .report-search-box,
+.app-shell.light-background-theme .report-generation-form select,
+.app-shell.light-background-theme .report-generation-form input,
+.app-shell.light-background-theme .generated-reports-table td button {
+  background: rgba(255, 255, 255, 0.88) !important;
+  color: #0b2738 !important;
+}
+
+.app-shell.light-background-theme .report-generation-form,
+.app-shell.light-background-theme .generated-reports-panel,
+.app-shell.light-background-theme.active-tab-reports .export-center-grid .export-center-subgroup {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-color: rgba(0, 119, 190, 0.22) !important;
+}
+
+.app-shell.light-background-theme .generated-reports-table th {
+  background: rgba(14, 165, 233, 0.14) !important;
+  color: #0b2738 !important;
+}
+
+.app-shell.light-background-theme .generated-reports-table td {
+  color: #0b2738 !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .report-management-grid,
+  .app-shell.active-tab-reports .export-center-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell .report-management-header {
+    flex-direction: column !important;
+  }
+
+  .app-shell .report-search-box {
+    width: 100% !important;
+  }
+}
+
 /* V6 command-center overview preview */
 .modern-overview-shell {
   width: 100%;
@@ -14733,6 +15046,683 @@ body,
     grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
     max-width: none;
+  }
+}
+
+/* Final V6 polish: Fleet Activation + Regions/Co/TG & Users tabs */
+.app-shell.active-tab-fleet .fleet-activation-panel {
+  gap: clamp(10px, 0.7vw, 14px) !important;
+}
+
+.app-shell.active-tab-fleet .network-utilization-cards {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
+  gap: clamp(8px, 0.62vw, 12px) !important;
+  align-items: stretch !important;
+}
+
+.app-shell.active-tab-fleet .network-utilization-cards > .summary-card {
+  min-height: clamp(82px, 5.4vw, 98px) !important;
+  padding: clamp(8px, 0.58vw, 12px) clamp(8px, 0.62vw, 13px) !important;
+  border-radius: 10px !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}
+
+.app-shell.active-tab-fleet .network-utilization-cards > .summary-card span {
+  font-size: clamp(10px, 0.62vw, 12px) !important;
+  font-weight: 850 !important;
+  line-height: 1.12 !important;
+  text-align: center !important;
+}
+
+.app-shell.active-tab-fleet .network-utilization-cards > .summary-card strong {
+  font-size: clamp(19px, 1.55vw, 29px) !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+.app-shell.active-tab-fleet .network-utilization-cards > .summary-card small {
+  font-size: clamp(9px, 0.56vw, 11px) !important;
+  font-weight: 750 !important;
+  line-height: 1.12 !important;
+  text-align: center !important;
+}
+
+.app-shell.active-tab-fleet .fleet-activation-tables {
+  grid-template-columns: repeat(2, minmax(280px, 1fr)) !important;
+  gap: clamp(10px, 0.72vw, 14px) !important;
+}
+
+.app-shell.active-tab-fleet .fleet-activation-tables .table-card,
+.app-shell.active-tab-fleet .unmatched-fleetmap-report-card {
+  padding: clamp(10px, 0.72vw, 14px) !important;
+  overflow: hidden !important;
+}
+
+.app-shell.active-tab-fleet .inactive-radio-table {
+  width: 100% !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell.active-tab-fleet .inactive-radio-table th,
+.app-shell.active-tab-fleet .inactive-radio-table td {
+  height: 30px !important;
+  padding: 6px 9px !important;
+  border: 1px solid rgba(116, 181, 214, 0.18) !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+.app-shell.active-tab-fleet .inactive-radio-table th:first-child,
+.app-shell.active-tab-fleet .inactive-radio-table td:first-child {
+  text-align: left !important;
+  width: 62% !important;
+}
+
+.app-shell.active-tab-fleet .inactive-radio-table th {
+  background: rgba(72, 196, 255, 0.1) !important;
+  color: var(--theme-text, #edf8ff) !important;
+}
+
+.app-shell.active-tab-fleet .fleet-unmatched-section {
+  margin-top: 8px !important;
+}
+
+.app-shell.active-tab-fleet .fleet-unmatched-layout {
+  grid-template-columns: minmax(0, 1fr) clamp(240px, 18vw, 340px) !important;
+  gap: clamp(10px, 0.72vw, 14px) !important;
+  align-items: stretch !important;
+}
+
+.app-shell.active-tab-fleet .unmatched-fleetmap-table-wrap {
+  max-height: clamp(260px, 24vw, 390px) !important;
+  overflow: auto !important;
+}
+
+.app-shell.active-tab-fleet .unmatched-fleetmap-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+}
+
+.app-shell.active-tab-fleet .unmatched-fleetmap-table th,
+.app-shell.active-tab-fleet .unmatched-fleetmap-table td {
+  padding: 6px 8px !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.active-tab-fleet .unmatched-fleetmap-table th:nth-child(2),
+.app-shell.active-tab-fleet .unmatched-fleetmap-table td:nth-child(2),
+.app-shell.active-tab-fleet .unmatched-fleetmap-table th:nth-child(9),
+.app-shell.active-tab-fleet .unmatched-fleetmap-table td:nth-child(9) {
+  max-width: 220px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell.active-tab-fleet .fleet-radio-showcase {
+  min-height: 0 !important;
+  aspect-ratio: 0.72 / 1 !important;
+  align-self: stretch !important;
+}
+
+.app-shell.active-tab-fleet .fleet-radio-showcase img {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.32)) !important;
+}
+
+.app-shell.light-background-theme.active-tab-fleet .inactive-radio-table th {
+  background: rgba(0, 127, 200, 0.11) !important;
+  color: #092033 !important;
+}
+
+.app-shell.light-background-theme.active-tab-fleet .inactive-radio-table td,
+.app-shell.light-background-theme.active-tab-fleet .unmatched-fleetmap-table td {
+  color: #0b2638 !important;
+}
+
+.app-shell.active-tab-company > #regionPerformance-content,
+.app-shell.active-tab-company > #talkgroupEfficiency-content,
+.app-shell.active-tab-company > #users-content.company-behavior-grid {
+  margin-bottom: clamp(10px, 0.72vw, 14px) !important;
+}
+
+.app-shell.active-tab-company > #users-content.company-behavior-grid {
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr) !important;
+  gap: clamp(10px, 0.72vw, 14px) !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card,
+.app-shell.active-tab-company .company-behavior-card {
+  padding: clamp(10px, 0.72vw, 14px) !important;
+  border-radius: 10px !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card h3,
+.app-shell.active-tab-company .company-behavior-card h3 {
+  margin-bottom: 9px !important;
+  font-size: clamp(15px, 0.98vw, 18px) !important;
+}
+
+.app-shell.active-tab-company .company-matrix-scroll {
+  max-width: 100% !important;
+  overflow: auto !important;
+  scrollbar-gutter: stable both-edges !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card table,
+.app-shell.active-tab-company .company-behavior-card table {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell.active-tab-company .region-matrix-card table {
+  min-width: 1040px !important;
+}
+
+.app-shell.active-tab-company .tg-efficiency-card table {
+  min-width: 980px !important;
+}
+
+.app-shell.active-tab-company .company-behavior-card table {
+  min-width: 650px !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card th,
+.app-shell.active-tab-company .company-behavior-card th {
+  height: 32px !important;
+  padding: 7px 9px !important;
+  font-size: clamp(11px, 0.68vw, 13px) !important;
+  font-weight: 950 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card td,
+.app-shell.active-tab-company .company-behavior-card td {
+  height: 29px !important;
+  padding: 6px 9px !important;
+  font-size: clamp(10px, 0.6vw, 12px) !important;
+  font-weight: 450 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card th:first-child,
+.app-shell.active-tab-company .company-matrix-card td:first-child,
+.app-shell.active-tab-company .company-behavior-card th:first-child,
+.app-shell.active-tab-company .company-behavior-card td:first-child,
+.app-shell.active-tab-company .company-behavior-card th:nth-child(2),
+.app-shell.active-tab-company .company-behavior-card td:nth-child(2),
+.app-shell.active-tab-company .company-behavior-card th:nth-child(3),
+.app-shell.active-tab-company .company-behavior-card td:nth-child(3) {
+  text-align: left !important;
+}
+
+.app-shell.active-tab-company .region-matrix-card th:nth-child(11),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(11),
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(10),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(10),
+.app-shell.active-tab-company .company-behavior-card th:nth-child(2),
+.app-shell.active-tab-company .company-behavior-card td:nth-child(2),
+.app-shell.active-tab-company .company-behavior-card th:nth-child(3),
+.app-shell.active-tab-company .company-behavior-card td:nth-child(3) {
+  max-width: 210px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card tbody tr:nth-child(even) td,
+.app-shell.active-tab-company .company-behavior-card tbody tr:nth-child(even) td {
+  background: rgba(72, 196, 255, 0.035) !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card tbody tr:hover td,
+.app-shell.active-tab-company .company-behavior-card tbody tr:hover td {
+  background: rgba(72, 196, 255, 0.1) !important;
+}
+
+@media (max-width: 1280px) {
+  .app-shell.active-tab-fleet .network-utilization-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell.active-tab-company > #users-content.company-behavior-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .app-shell.active-tab-fleet .network-utilization-cards,
+  .app-shell.active-tab-fleet .fleet-activation-tables,
+  .app-shell.active-tab-fleet .fleet-unmatched-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell.active-tab-fleet .fleet-radio-showcase {
+    aspect-ratio: 16 / 10 !important;
+  }
+}
+
+/* Final V6 polish: Performance & KPI tab */
+.app-shell.active-tab-kpi .kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(10px, 0.72vw, 14px) !important;
+  margin-bottom: clamp(12px, 0.9vw, 18px) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card {
+  grid-column: 1 / -1 !important;
+  padding: clamp(10px, 0.72vw, 14px) !important;
+  overflow: hidden !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card .records-scroll {
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(116, 181, 214, 0.18) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th,
+.app-shell.active-tab-kpi .kpi-measurements-table td {
+  height: 31px !important;
+  padding: 6px 9px !important;
+  border: 1px solid rgba(116, 181, 214, 0.18) !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th {
+  font-size: clamp(11px, 0.7vw, 13px) !important;
+  font-weight: 950 !important;
+  background: rgba(72, 196, 255, 0.1) !important;
+  color: var(--theme-text, #edf8ff) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table td {
+  font-size: clamp(10px, 0.6vw, 12px) !important;
+  font-weight: 450 !important;
+  color: var(--theme-text, #f4fbff) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th:first-child,
+.app-shell.active-tab-kpi .kpi-measurements-table td:first-child {
+  text-align: left !important;
+  min-width: 170px !important;
+  max-width: 260px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card,
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card {
+  min-height: 430px !important;
+  padding: clamp(11px, 0.78vw, 15px) !important;
+  border-radius: 10px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card h3,
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card h3 {
+  margin-bottom: 4px !important;
+  font-size: clamp(15px, 0.98vw, 18px) !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card p,
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card p {
+  margin: 0 0 8px !important;
+  color: var(--theme-muted, #9fb7c8) !important;
+  font-size: clamp(10px, 0.62vw, 12px) !important;
+  font-weight: 750 !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+}
+
+.app-shell.active-tab-kpi .kpi-average-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-calls-duration-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-monthly-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-total-avg-card .recharts-responsive-container {
+  min-height: 350px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-calls-duration-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-monthly-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-total-avg-card .recharts-responsive-container {
+  min-height: 400px !important;
+}
+
+.app-shell.active-tab-kpi .chart-legend,
+.app-shell.active-tab-kpi .company-color-legend {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 7px 12px !important;
+  margin-top: 6px !important;
+  font-size: clamp(10px, 0.62vw, 12px) !important;
+}
+
+.app-shell.active-tab-kpi .Company-pie-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 170px) !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.app-shell.active-tab-kpi .Company-pie-layout .recharts-responsive-container {
+  width: 100% !important;
+}
+
+.app-shell.active-tab-kpi .kpi-total-avg-legend {
+  align-self: center !important;
+  max-height: 390px !important;
+  overflow: auto !important;
+  justify-content: flex-start !important;
+}
+
+.app-shell.active-tab-kpi .performance-chart-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(10px, 0.72vw, 14px) !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card {
+  grid-column: span 2 !important;
+  min-height: 470px !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card .recharts-responsive-container {
+  min-height: 386px !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card .chart-legend {
+  justify-content: center !important;
+}
+
+.app-shell.active-tab-kpi .recharts-wrapper text {
+  paint-order: stroke !important;
+  stroke: rgba(3, 12, 20, 0.55) !important;
+  stroke-width: 2px !important;
+  stroke-linejoin: round !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi .kpi-measurements-table th {
+  background: rgba(0, 127, 200, 0.11) !important;
+  color: #092033 !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi .kpi-measurements-table td,
+.app-shell.light-background-theme.active-tab-kpi .kpi-grid > .chart-card p,
+.app-shell.light-background-theme.active-tab-kpi .performance-chart-grid > .chart-card p {
+  color: #24485b !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi .recharts-wrapper text {
+  stroke: rgba(255, 255, 255, 0.65) !important;
+}
+
+@media (max-width: 1280px) {
+  .app-shell.active-tab-kpi .performance-chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell.active-tab-kpi .region-radar-card {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .app-shell.active-tab-kpi .kpi-grid,
+  .app-shell.active-tab-kpi .performance-chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell.active-tab-kpi .Company-pie-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Final V6 KPI Hub layout: reference-style analytics board */
+.app-shell.active-tab-kpi #kpi.section-title,
+.app-shell.active-tab-kpi #Performance.section-title {
+  align-items: center !important;
+  margin: clamp(8px, 0.62vw, 12px) 0 8px !important;
+  padding: 8px 12px !important;
+  min-height: 38px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(72, 196, 255, 0.26) !important;
+  background:
+    linear-gradient(90deg, rgba(18, 159, 216, 0.25), rgba(4, 22, 35, 0.86) 34%, rgba(4, 22, 35, 0.94)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.18) !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-heading,
+.app-shell.active-tab-kpi #Performance .section-title-heading {
+  align-items: center !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-copy,
+.app-shell.active-tab-kpi #Performance .section-title-copy {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-copy p,
+.app-shell.active-tab-kpi #Performance .section-title-copy p {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  background: linear-gradient(135deg, #22d3ee, #3b82f6) !important;
+  color: #03131f !important;
+  font-weight: 950 !important;
+  font-size: 14px !important;
+  letter-spacing: 0 !important;
+  line-height: 1 !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-copy h2,
+.app-shell.active-tab-kpi #Performance .section-title-copy h2 {
+  margin: 0 !important;
+  color: var(--theme-text, #edf8ff) !important;
+  font-size: clamp(17px, 1.12vw, 23px) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.015em !important;
+  line-height: 1.05 !important;
+  text-transform: uppercase !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-copy span,
+.app-shell.active-tab-kpi #Performance .section-title-copy span {
+  margin-left: auto !important;
+  color: var(--theme-muted, #a7c1d2) !important;
+  font-size: clamp(10px, 0.62vw, 12px) !important;
+  font-weight: 750 !important;
+  line-height: 1.2 !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid {
+  grid-template-columns: minmax(360px, 1.25fr) minmax(245px, 0.82fr) minmax(275px, 0.93fr) !important;
+  grid-template-areas:
+    "kpiTable kpiAvg kpiCalls"
+    "kpiMonthly kpiMonthly kpiDonut" !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+  margin-bottom: 10px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card {
+  grid-area: kpiTable !important;
+  grid-column: auto !important;
+  min-height: 330px !important;
+  padding: 10px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-average-card {
+  grid-area: kpiAvg !important;
+  min-height: 330px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-calls-duration-card {
+  grid-area: kpiCalls !important;
+  min-height: 330px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-monthly-card {
+  grid-area: kpiMonthly !important;
+  min-height: 410px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-total-avg-card {
+  grid-area: kpiDonut !important;
+  min-height: 410px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card,
+.app-shell.active-tab-kpi .kpi-measurements-table-card {
+  padding: 10px !important;
+  border-radius: 8px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card h3,
+.app-shell.active-tab-kpi .kpi-measurements-table-card h3 {
+  margin-bottom: 5px !important;
+  font-size: clamp(12px, 0.78vw, 15px) !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card p {
+  margin-bottom: 5px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card .records-scroll {
+  max-height: 286px !important;
+  overflow: auto !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th,
+.app-shell.active-tab-kpi .kpi-measurements-table td {
+  height: 27px !important;
+  padding: 5px 7px !important;
+  font-size: clamp(9.5px, 0.55vw, 11.5px) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th:first-child,
+.app-shell.active-tab-kpi .kpi-measurements-table td:first-child {
+  min-width: 150px !important;
+  max-width: 230px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-average-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-calls-duration-card .recharts-responsive-container {
+  min-height: 275px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-monthly-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-total-avg-card .recharts-responsive-container {
+  min-height: 355px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-total-avg-card .Company-pie-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(128px, 170px) !important;
+  gap: 8px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-total-avg-legend {
+  max-height: 346px !important;
+}
+
+.app-shell.active-tab-kpi .performance-chart-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
+  gap: 10px !important;
+}
+
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card {
+  min-height: 360px !important;
+  padding: 10px !important;
+  border-radius: 8px !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card {
+  grid-column: auto !important;
+  min-height: 390px !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .performance-chart-grid .recharts-responsive-container {
+  min-height: 300px !important;
+}
+
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card h3 {
+  font-size: clamp(12px, 0.78vw, 15px) !important;
+  text-transform: uppercase !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi #kpi.section-title,
+.app-shell.light-background-theme.active-tab-kpi #Performance.section-title {
+  background:
+    linear-gradient(90deg, rgba(14, 165, 233, 0.18), rgba(255, 255, 255, 0.94) 34%, rgba(235, 248, 255, 0.96)) !important;
+  border-color: rgba(0, 111, 174, 0.2) !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi #kpi .section-title-copy h2,
+.app-shell.light-background-theme.active-tab-kpi #Performance .section-title-copy h2 {
+  color: #092033 !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi #kpi .section-title-copy span,
+.app-shell.light-background-theme.active-tab-kpi #Performance .section-title-copy span {
+  color: #315d73 !important;
+}
+
+@media (max-width: 1280px) {
+  .app-shell.active-tab-kpi .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-areas:
+      "kpiTable kpiTable"
+      "kpiAvg kpiCalls"
+      "kpiMonthly kpiDonut" !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell.active-tab-kpi .kpi-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "kpiTable"
+      "kpiAvg"
+      "kpiCalls"
+      "kpiMonthly"
+      "kpiDonut" !important;
+  }
+
+  .app-shell.active-tab-kpi .performance-chart-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
