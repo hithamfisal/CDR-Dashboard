@@ -2262,30 +2262,33 @@ export default function App() {
 
         <article className="chart-card monthly-Company-card charts-calls-duration" ref={monthlyCompanyChartRef} style={{ display: "flex", flexDirection: "column" }}>
           <h3>Calls and Duration per Company</h3>
-          <div className="company-color-legend">
+          <div className="company-color-legend" style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px", marginBottom: 6 }}>
             {[...new Set(monthlyCompanyRows.map((r) => r.company))].map((company) => (
-              <span key={company}><i style={{ background: companyColor(company) }} />{company}</span>
+              <span key={company} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#c8dce8" }}>
+                <i style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: companyColor(company), flexShrink: 0 }} />
+                {company}
+              </span>
             ))}
           </div>
-          <ResponsiveContainer width="100%" height={400} style={{ flex: 1, minHeight: 0 }}>
-            <BarChart data={monthlyCompanyRows} margin={{ left: 0, right: 0, top: 0, bottom: 0 }} barCategoryGap="20%">
-              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} />
-              <XAxis xAxisId="company" dataKey="companyLabel" interval={0} angle={-90} textAnchor="end" height={112} tickMargin={8} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
-              <XAxis xAxisId="month" dataKey="periodLabel" interval={0} axisLine={false} tickLine={false} height={28} tick={{ fill: CHART_COLORS.axis, fontSize: 12, fontWeight: 700 }} />
-              <YAxis yAxisId="duration" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={chartLabel} />
-              <YAxis yAxisId="calls" orientation="right" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={chartLabel} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string) => [formatNumber(v), name]} labelFormatter={(_, payload) => { const r = payload?.[0]?.payload; return r ? `${r.periodType} ${r.period} - ${r.company}` : ""; }} />
-              <Bar xAxisId="company" yAxisId="duration" dataKey="durationSeconds" name="Duration (Sec)" maxBarSize={28}>
+          <ResponsiveContainer width="100%" style={{ flex: 1, minHeight: 0 }}>
+            <BarChart data={monthlyCompanyRows} margin={{ left: 8, right: 16, top: 18, bottom: 4 }} barCategoryGap="18%" barGap={2}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.25} vertical={false} />
+              <XAxis xAxisId="company" dataKey="companyLabel" interval={0} angle={-55} textAnchor="end" height={90} tickMargin={6} tick={{ fill: CHART_COLORS.axis, fontSize: 10 }} axisLine={false} tickLine={false} />
+              <XAxis xAxisId="month" dataKey="periodLabel" interval={0} axisLine={{ stroke: "rgba(100,160,200,0.25)" }} tickLine={false} height={22} tick={{ fill: "#7eb8d4", fontSize: 11, fontWeight: 700 }} />
+              <YAxis yAxisId="duration" tick={{ fill: CHART_COLORS.axis, fontSize: 10 }} tickFormatter={chartLabel} axisLine={false} tickLine={false} width={42} />
+              <YAxis yAxisId="calls" orientation="right" tick={{ fill: CHART_COLORS.axis, fontSize: 10 }} tickFormatter={chartLabel} axisLine={false} tickLine={false} width={42} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string) => [formatNumber(v), name]} labelFormatter={(_, payload) => { const r = payload?.[0]?.payload; return r ? `${r.periodType} ${r.period} — ${r.company}` : ""; }} />
+              <Bar xAxisId="company" yAxisId="duration" dataKey="durationSeconds" name="Duration (Sec)" maxBarSize={22} radius={[3, 3, 0, 0]}>
                 {monthlyCompanyRows.map((entry) => <Cell key={`dur-${entry.period}-${entry.company}`} fill={companyMetricColor(entry.company, "duration")} />)}
                 <LabelList dataKey="durationSeconds" content={TopValueLabel} />
               </Bar>
-              <Bar xAxisId="company" yAxisId="calls" dataKey="calls" name="No. of Calls" maxBarSize={28}>
+              <Bar xAxisId="company" yAxisId="calls" dataKey="calls" name="No. of Calls" maxBarSize={22} radius={[3, 3, 0, 0]}>
                 {monthlyCompanyRows.map((entry) => <Cell key={`calls-${entry.period}-${entry.company}`} fill={companyMetricColor(entry.company, "calls")} />)}
                 <LabelList dataKey="calls" content={(props) => <TopValueLabel {...props} />} />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <ChartLegend items={[{ name: "Duration seconds", color: CHART_COLORS.duration }, { name: "No. of calls", color: CHART_COLORS.callsDeep }]} />
+          <ChartLegend items={[{ name: "Duration (Sec)", color: CHART_COLORS.duration }, { name: "No. of Calls", color: CHART_COLORS.callsDeep }]} />
         </article>
         <article className="chart-card general-mobile-type charts-radio-month" style={{ display: "flex", flexDirection: "column" }}>
           <h3>Radio Type per Month</h3>

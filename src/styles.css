@@ -14492,7 +14492,7 @@ body,
      Row 3: topTalkgroup, topCompany (centre), topStation equal thirds, tgDistribution right
      Row 4: talkgroups, radios, radioTypes equal thirds */
   grid-template-areas:
-    "callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth"
+    "callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth"
     "callType callType callType callType callType callType callType callType callType callType callType callType callType callType callType callType callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution"
     "duplex duplex duplex duplex duplex encrypted encrypted encrypted encrypted encrypted priority priority priority priority priority priority callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution"
     "topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topCompany topCompany topCompany topCompany topCompany topCompany topStation topStation topStation topStation topStation topStation tgDistribution tgDistribution tgDistribution tgDistribution tgDistribution tgDistribution"
@@ -14700,7 +14700,7 @@ body,
   .app-shell.active-tab-charts .charts-arranged-grid {
     grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
     grid-template-areas:
-      "callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth"
+      "callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration radioMonth radioMonth radioMonth radioMonth"
       "callType callType callType callType callType callType callType callType callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution"
       "duplex duplex duplex encrypted encrypted encrypted priority priority priority callTypeDistribution callTypeDistribution callTypeDistribution"
       "topTalkgroup topTalkgroup topTalkgroup topCompany topCompany topCompany topStation topStation topStation tgDistribution tgDistribution tgDistribution"
