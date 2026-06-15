@@ -14433,22 +14433,242 @@ body,
 .app-shell.active-tab-charts .charts-highlight-row {
   width: 100% !important;
   display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: 10px !important;
-  margin: 0 0 12px !important;
+  grid-template-columns: minmax(360px, 1.35fr) minmax(260px, 1fr) minmax(260px, 1fr) minmax(230px, 0.86fr) !important;
+  gap: 12px !important;
+  margin: 0 0 14px !important;
 }
 
 .app-shell.active-tab-charts .charts-highlight-row .chart-card {
-  min-height: 318px !important;
-  padding: 10px !important;
+  min-height: 368px !important;
+  padding: 12px !important;
 }
 
 .app-shell.active-tab-charts .charts-highlight-row .chart-card .recharts-responsive-container {
-  min-height: 244px !important;
+  min-height: 286px !important;
 }
 
 .app-shell.active-tab-charts .charts-highlight-row .chart-legend {
-  margin-top: 3px !important;
+  margin-top: 4px !important;
+  max-height: 54px !important;
+  overflow: hidden !important;
+  align-content: flex-start !important;
+}
+
+.app-shell.active-tab-charts .charts-top-company {
+  min-width: 0 !important;
+}
+
+.app-shell.active-tab-charts .charts-top-company .chart-legend {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 4px 8px !important;
+}
+
+.app-shell.active-tab-charts .charts-top-company .chart-legend span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* V7 Charts tab — exact layout matching reference image */
+
+/* ── Layout (24-col grid) ──────────────────────────────────────────────────────────
+   Row 1: callsDuration (cols 1-10) | radioMonth (cols 11-24)
+   Row 2: callType wide (cols 1-16)  | callTypeDistribution (cols 17-24, spans rows 2-3)
+   Row 3: duplex (1-5) | encrypted (6-10) | priority (11-16) | callTypeDistribution cont.
+   Row 4: topTalkgroup (1-6) | topCompany (7-12) | topStation (13-18) | tgDistribution (19-24)
+   Row 5: talkgroups (1-8) | radios (9-16) | radioTypes (17-24)
+──────────────────────────────────────────────────────────────────────────── */
+.app-shell.active-tab-charts .charts-arranged-grid {
+  width: 100% !important;
+  display: grid !important;
+  /* 24 equal columns for fine-grained control */
+  grid-template-columns: repeat(24, minmax(0, 1fr)) !important;
+  /* Row 1: callsDuration ~40% left, radioMonth ~60% right
+     Row 2a: callType wide left (spans rows 2-4), priority/duplex/encrypted 3-up middle, callTypeDistribution right (spans rows 2-4)
+     Row 2b: (callType continues) duplex middle (callTypeDistribution continues)
+     Row 2c: (callType continues) encrypted middle (callTypeDistribution continues)
+     Row 3: topTalkgroup, topCompany (centre), topStation equal thirds, tgDistribution right
+     Row 4: talkgroups, radios, radioTypes equal thirds */
+  grid-template-areas:
+    "callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth"
+    "callType callType callType callType callType callType callType callType callType callType callType callType callType callType callType callType callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution"
+    "duplex duplex duplex duplex duplex encrypted encrypted encrypted encrypted encrypted priority priority priority priority priority priority callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution"
+    "topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topCompany topCompany topCompany topCompany topCompany topCompany topStation topStation topStation topStation topStation topStation tgDistribution tgDistribution tgDistribution tgDistribution tgDistribution tgDistribution"
+    "talkgroups talkgroups talkgroups talkgroups talkgroups talkgroups talkgroups talkgroups radios radios radios radios radios radios radios radios radioTypes radioTypes radioTypes radioTypes radioTypes radioTypes radioTypes radioTypes" !important;
+  grid-auto-rows: auto !important;
+  gap: 12px !important;
+  margin: 0 0 14px !important;
+  align-items: stretch !important;
+}
+
+.app-shell.active-tab-charts .charts-arranged-grid > .chart-card {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  padding: 12px !important;
+}
+
+.app-shell.active-tab-charts .charts-arranged-grid .recharts-responsive-container {
+  min-height: 180px !important;
+}
+
+.app-shell.active-tab-charts .charts-arranged-grid .chart-legend,
+.app-shell.active-tab-charts .charts-arranged-grid .company-color-legend {
+  margin-top: 4px !important;
+  align-content: flex-start !important;
+}
+
+/* Row 1 — top two charts, equal halves, tall containers */
+.app-shell.active-tab-charts .charts-calls-duration {
+  grid-area: callsDuration !important;
+  min-height: 420px !important;
+  height: 420px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+.app-shell.active-tab-charts .charts-calls-duration .recharts-responsive-container {
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+.app-shell.active-tab-charts .charts-radio-month {
+  grid-area: radioMonth !important;
+  min-height: 420px !important;
+  height: 420px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+.app-shell.active-tab-charts .charts-radio-month .recharts-responsive-container {
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+/* Row 2 — callType wide top, 3 small panels below, callTypeDistribution spans rows 2-3 */
+.app-shell.active-tab-charts .charts-call-type {
+  grid-area: callType !important;
+  min-height: 240px !important;
+}
+.app-shell.active-tab-charts .charts-call-type .recharts-responsive-container {
+  min-height: 180px !important;
+}
+.app-shell.active-tab-charts .charts-priority {
+  grid-area: priority !important;
+  min-height: 180px !important;
+}
+.app-shell.active-tab-charts .charts-duplex {
+  grid-area: duplex !important;
+  min-height: 180px !important;
+}
+.app-shell.active-tab-charts .charts-encrypted {
+  grid-area: encrypted !important;
+  min-height: 180px !important;
+}
+.app-shell.active-tab-charts .charts-priority .recharts-responsive-container,
+.app-shell.active-tab-charts .charts-duplex .recharts-responsive-container,
+.app-shell.active-tab-charts .charts-encrypted .recharts-responsive-container {
+  min-height: 120px !important;
+}
+.app-shell.active-tab-charts .charts-call-type-distribution {
+  grid-area: callTypeDistribution !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+.app-shell.active-tab-charts .charts-call-type-distribution .recharts-responsive-container {
+  flex: 1 1 0 !important;
+  min-height: 300px !important;
+  height: auto !important;
+}
+
+/* Row 3 — top performers, equal thirds + tgDistribution */
+.app-shell.active-tab-charts .charts-top-talkgroup {
+  grid-area: topTalkgroup !important;
+  min-height: 280px !important;
+}
+.app-shell.active-tab-charts .charts-top-company {
+  grid-area: topCompany !important;
+  min-height: 280px !important;
+}
+.app-shell.active-tab-charts .charts-top-station {
+  grid-area: topStation !important;
+  min-height: 280px !important;
+}
+.app-shell.active-tab-charts .charts-tg-distribution {
+  grid-area: tgDistribution !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 280px !important;
+}
+.app-shell.active-tab-charts .charts-tg-distribution .recharts-responsive-container {
+  flex: 1 1 0 !important;
+  min-height: 180px !important;
+  height: auto !important;
+}
+
+/* Row 4 — company breakdowns, equal thirds */
+.app-shell.active-tab-charts .charts-talkgroups {
+  grid-area: talkgroups !important;
+  min-height: 280px !important;
+}
+.app-shell.active-tab-charts .charts-radios {
+  grid-area: radios !important;
+  min-height: 280px !important;
+}
+.app-shell.active-tab-charts .charts-radio-type-company {
+  grid-area: radioTypes !important;
+  min-height: 280px !important;
+}
+
+.app-shell.active-tab-charts .charts-top-company .chart-legend,
+.app-shell.active-tab-charts .charts-call-type-distribution .chart-legend,
+.app-shell.active-tab-charts .charts-tg-distribution .chart-legend {
+  max-height: 62px !important;
+  overflow: hidden !important;
+}
+
+.app-shell.active-tab-charts .charts-donut-layout {
+  display: grid !important;
+  grid-template-columns: minmax(150px, 1fr) minmax(130px, 0.9fr) !important;
+  gap: 8px !important;
+  align-items: center !important;
+  min-height: 246px !important;
+}
+
+.app-shell.active-tab-charts .charts-donut-chart {
+  position: relative !important;
+  min-width: 0 !important;
+}
+
+.app-shell.active-tab-charts .charts-donut-center {
+  position: absolute !important;
+  inset: 50% auto auto 50% !important;
+  transform: translate(-50%, -50%) !important;
+  display: grid !important;
+  place-items: center !important;
+  pointer-events: none !important;
+}
+
+.app-shell.active-tab-charts .charts-donut-center strong {
+  color: var(--text-strong) !important;
+  font-size: clamp(13px, 1vw, 20px) !important;
+  font-weight: 900 !important;
+}
+
+.app-shell.active-tab-charts .charts-donut-center span {
+  color: var(--text-muted) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+}
+
+.app-shell.active-tab-charts .charts-tg-distribution .chart-legend {
+  display: grid !important;
+  gap: 5px !important;
 }
 
 .app-shell.active-tab-charts .charts-reference-grid {
@@ -14465,60 +14685,28 @@ body,
   align-items: stretch !important;
 }
 
-.app-shell.active-tab-charts .charts-radio-month {
-  grid-area: radioMonth !important;
-  min-height: 506px !important;
-}
-
-.app-shell.active-tab-charts .charts-calls-duration {
-  grid-area: callsDuration !important;
-  min-height: 506px !important;
-  grid-column: auto !important;
-}
-
-.app-shell.active-tab-charts .charts-call-type {
-  grid-area: callType !important;
-  min-height: 248px !important;
-}
-
-.app-shell.active-tab-charts .charts-duplex {
-  grid-area: duplex !important;
-  min-height: 248px !important;
-}
-
-.app-shell.active-tab-charts .charts-talkgroups {
-  grid-area: talkgroups !important;
-}
-
-.app-shell.active-tab-charts .charts-radios {
-  grid-area: radios !important;
-}
-
-.app-shell.active-tab-charts .charts-radio-type-company {
-  grid-area: radioTypes !important;
-}
-
-.app-shell.active-tab-charts .charts-priority {
-  grid-area: priority !important;
-}
-
-.app-shell.active-tab-charts .charts-call-type .recharts-responsive-container,
-.app-shell.active-tab-charts .charts-duplex .recharts-responsive-container,
-.app-shell.active-tab-charts .charts-priority .recharts-responsive-container {
-  min-height: 196px !important;
-}
-
-.app-shell.active-tab-charts .charts-radio-month .recharts-responsive-container,
-.app-shell.active-tab-charts .charts-calls-duration .recharts-responsive-container {
-  min-height: 410px !important;
-}
-
 .app-shell.active-tab-charts .charts-reference-grid .chart-card {
   min-width: 0 !important;
   height: 100% !important;
 }
 
 @media (max-width: 1500px) {
+  .app-shell.active-tab-charts .charts-arranged-grid .charts-call-type-distribution,
+  .app-shell.active-tab-charts .charts-arranged-grid .charts-tg-distribution,
+  .app-shell.active-tab-charts .charts-arranged-grid .charts-call-type {
+    min-height: 0 !important;
+  }
+
+  .app-shell.active-tab-charts .charts-arranged-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    grid-template-areas:
+      "callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth"
+      "callType callType callType callType callType callType callType callType callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution"
+      "duplex duplex duplex encrypted encrypted encrypted priority priority priority callTypeDistribution callTypeDistribution callTypeDistribution"
+      "topTalkgroup topTalkgroup topTalkgroup topCompany topCompany topCompany topStation topStation topStation tgDistribution tgDistribution tgDistribution"
+      "talkgroups talkgroups talkgroups talkgroups radios radios radios radios radioTypes radioTypes radioTypes radioTypes" !important;
+  }
+
   .app-shell.active-tab-charts .charts-highlight-row {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
@@ -14531,14 +14719,35 @@ body,
       "radioTypes callType"
       "duplex priority" !important;
   }
-
-  .app-shell.active-tab-charts .charts-radio-month,
-  .app-shell.active-tab-charts .charts-calls-duration {
-    min-height: 420px !important;
-  }
 }
 
 @media (max-width: 860px) {
+  .app-shell.active-tab-charts .charts-arranged-grid .charts-call-type-distribution,
+  .app-shell.active-tab-charts .charts-arranged-grid .charts-tg-distribution,
+  .app-shell.active-tab-charts .charts-arranged-grid .charts-call-type {
+    grid-row: auto !important;
+    height: auto !important;
+  }
+
+  .app-shell.active-tab-charts .charts-arranged-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "callsDuration"
+      "radioMonth"
+      "callType"
+      "priority"
+      "duplex"
+      "encrypted"
+      "callTypeDistribution"
+      "topTalkgroup"
+      "topCompany"
+      "topStation"
+      "tgDistribution"
+      "talkgroups"
+      "radios"
+      "radioTypes" !important;
+  }
+
   .app-shell.active-tab-charts .charts-highlight-row,
   .app-shell.active-tab-charts .charts-reference-grid {
     grid-template-columns: 1fr !important;
@@ -15725,4 +15934,3 @@ body,
     grid-template-columns: 1fr !important;
   }
 }
-

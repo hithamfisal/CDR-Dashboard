@@ -11,7 +11,7 @@ import { ReportsPanel } from "./components/ReportsPanel";
 import { UploadView } from "./components/UploadView";
 import { WorkbookHero } from "./components/WorkbookHero";
 import { ModernOverview } from "./components/ModernOverview";
-import { CallsDurationPerformanceChart, CompanyPerformanceTooltip, KpiBarLabel, KpiLineLabel, MobileTypeOverlayBarShape, MobileTypeTooltip, OverlayBarShape, PieDecimalLabel, PointValueLabel, RadioTooltip, RightValueLabel, TalkgroupTooltip, TopValueLabel } from "./components/ChartParts";
+import { CallsDurationPerformanceChart, CompanyPerformanceTooltip, KpiBarLabel, KpiLineLabel, MobileTypeOverlayBarShape, MobileTypeTooltip, OverlayBarShape, PieDecimalLabel, PieValueLabel, PointValueLabel, RadioTooltip, RightValueLabel, TalkgroupTooltip, TopValueLabel } from "./components/ChartParts";
 import { filterCallRecords } from "./lib/filterRecords";
 import { calculateMetrics, calculateRankings, modeBy } from "./lib/analytics";
 import { monthSortValue, weekSortValue } from "./lib/dateSort";
@@ -94,6 +94,66 @@ function unionFleetmapRecords(master: FleetmapRecord[], fixed: FleetmapRecord[])
 const COMPANY_TREEMAP_COLORS = ["#22d3ee", "#4ade80", "#facc15", "#fb923c", "#60a5fa", "#a78bfa", "#f472b6", "#2dd4bf"];
 const REGION_RADAR_COLORS = ["#22d3ee", "#4ade80", "#facc15", "#fb923c"];
 const REGION_RADAR_ORDER = ["South", "West", "East", "North"];
+const CALL_TYPE_SERIES = [
+  { key: "phoneCall", name: "Phone Call", color: "#22d3ee" },
+  { key: "groupCall", name: "Group Call", color: "#4ade80" },
+  { key: "environmentalListening", name: "Environmental Listening", color: "#facc15" },
+  { key: "individualCall", name: "Individual Call", color: "#fb923c" },
+  { key: "networkWide", name: "Network-wide", color: "#a78bfa" },
+  { key: "broadcast", name: "Broadcast", color: "#f472b6" },
+];
+const MONTH_BUCKETS = [
+  { label: "Jan", match: "jan" },
+  { label: "Feb", match: "feb" },
+  { label: "Mar", match: "mar" },
+  { label: "Apr", match: "apr" },
+  { label: "May", match: "may" },
+  { label: "Jun", match: "jun" },
+  { label: "Jul", match: "jul" },
+  { label: "Aug", match: "aug" },
+  { label: "Sep", match: "sep" },
+  { label: "Oct", match: "oct" },
+  { label: "Nov", match: "nov" },
+  { label: "Dec", match: "dec" },
+];
+
+function callTypeMonthIndex(record: CallRecord) {
+  const text = `${record.month || record.callDate || ""}`.trim().toLowerCase();
+  const explicit = MONTH_BUCKETS.findIndex((month) => text.startsWith(month.match) || text.includes(` ${month.match}`));
+  if (explicit >= 0) return explicit;
+  const parsed = new Date(record.callDate);
+  return Number.isNaN(parsed.getTime()) ? -1 : parsed.getMonth();
+}
+
+function callTypeMixKey(value: string) {
+  const text = `${value || ""}`.toLowerCase();
+  if (text.includes("broadcast")) return "broadcast";
+  if (text.includes("network")) return "networkWide";
+  if (text.includes("environment") || text.includes("listen")) return "environmentalListening";
+  if (text.includes("individual") || text.includes("private")) return "individualCall";
+  if (text.includes("group")) return "groupCall";
+  return "phoneCall";
+}
+
+function StackedPercentLabel(props: any) {
+  const { x = 0, y = 0, width = 0, height = 0, value = 0 } = props;
+  const numeric = Number(value);
+  if (numeric < 9 || width < 18 || height < 18) return null;
+  return <text x={x + width / 2} y={y + height / 2 + 4} textAnchor="middle" fill="#06131d" fontSize={9} fontWeight={900}>{formatDecimal(numeric, 0)}%</text>;
+}
+
+function CallTypeMixTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  const visible = payload.filter((item: any) => Number(item.value) > 0);
+  return (
+    <div className="custom-tooltip">
+      <strong>{label}</strong>
+      {visible.map((item: any) => (
+        <span key={item.dataKey} style={{ color: item.color }}>{item.name}: {formatDecimal(Number(item.value), 1)}% ({formatNumber(Number(item.payload?.[`${item.dataKey}Count`] ?? 0))})</span>
+      ))}
+    </div>
+  );
+}
 
 function CompanyTreemapTile(props: any) {
   const { x = 0, y = 0, width = 0, height = 0, name = "", calls = 0, payload, index = 0 } = props;
@@ -103,10 +163,10 @@ function CompanyTreemapTile(props: any) {
   if (width < 8 || height < 8) return null;
   const innerWidth = Math.max(0, width - 6);
   const innerHeight = Math.max(0, height - 6);
-  const fontSize = width > 122 && height > 54 ? 12 : width > 78 && height > 34 ? 10 : 8;
-  const maxChars = Math.max(3, Math.floor((innerWidth - 14) / (fontSize * 0.58)));
-  const showName = innerWidth > 30 && innerHeight > 20;
-  const showValue = innerWidth > 62 && innerHeight > 38;
+  const fontSize = width > 128 && height > 58 ? 12 : width > 82 && height > 34 ? 10 : 8;
+  const maxChars = Math.max(3, Math.floor((innerWidth - 14) / (fontSize * 0.56)));
+  const showName = innerWidth > 26 && innerHeight > 18;
+  const showValue = innerWidth > 42 && innerHeight > 28;
   const clipId = `company-treemap-clip-${index}-${Math.round(x)}-${Math.round(y)}`.replace(/[^a-zA-Z0-9_-]/g, "");
   return (
     <g>
@@ -477,6 +537,36 @@ export default function App() {
     size: row.calls,
     fill: COMPANY_TREEMAP_COLORS[index % COMPANY_TREEMAP_COLORS.length],
   })), [rankings.company]);
+
+  const topTalkgroupDistribution = useMemo(() => rankings.talkgroup.slice(0, 8), [rankings.talkgroup]);
+  const topTalkgroupDistributionTotal = useMemo(() => topTalkgroupDistribution.reduce((sum, item) => sum + item.calls, 0), [topTalkgroupDistribution]);
+  const callTypeMonthlyMix = useMemo(() => {
+    const rows = MONTH_BUCKETS.map((month) => {
+      const row: Record<string, string | number> = { month: month.label, total: 0 };
+      CALL_TYPE_SERIES.forEach((series) => {
+        row[series.key] = 0;
+        row[`${series.key}Count`] = 0;
+      });
+      return row;
+    });
+    filtered.forEach((record) => {
+      const monthIndex = callTypeMonthIndex(record);
+      if (monthIndex < 0) return;
+      const key = callTypeMixKey(record.callType);
+      const row = rows[monthIndex];
+      row[key] = Number(row[key] ?? 0) + 1;
+      row[`${key}Count`] = Number(row[`${key}Count`] ?? 0) + 1;
+      row.total = Number(row.total ?? 0) + 1;
+    });
+    return rows.map((row) => {
+      const total = Number(row.total) || 0;
+      CALL_TYPE_SERIES.forEach((series) => {
+        const count = Number(row[`${series.key}Count`] ?? 0);
+        row[series.key] = total ? (count / total) * 100 : 0;
+      });
+      return row;
+    });
+  }, [filtered]);
 
   const regionRadarSeries = useMemo(() => REGION_RADAR_ORDER.map((name, index) => ({
     name,
@@ -2168,77 +2258,16 @@ export default function App() {
 
       {showChartsTab && (
       <>
-      <section id="Charts-content" className="chart-grid charts-highlight-row">
-        <article className="chart-card charts-top-company">
-          <h3>Top Companies by Calls</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <Treemap
-              data={topCompanyTreemapData}
-              dataKey="size"
-              nameKey="name"
-              aspectRatio={4 / 3}
-              stroke="rgba(237,246,250,0.2)"
-              content={<CompanyTreemapTile />}
-            >
-              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string, item: any) => [formatNumber(item?.payload?.calls ?? v), "Calls"]} />
-            </Treemap>
-          </ResponsiveContainer>
-          <ChartLegend items={topCompanyTreemapData.map((item) => ({ name: `${truncateLabel(item.name, 20)} (${formatNumber(item.calls)})`, color: item.fill }))} />
-        </article>
-        <article className="chart-card charts-top-station">
-          <h3>Top BS by Calls</h3>
-          <ResponsiveContainer width="100%" height={230}>
-            <BarChart layout="vertical" data={rankings.station.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
-              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
-              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
-              <YAxis type="category" dataKey="name" width={122} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 16)} interval={0} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
-              <Bar dataKey="calls" fill={CHART_COLORS.duration}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.duration }]} />
-        </article>
-        <article className="chart-card charts-top-talkgroup">
-          <h3>Top TG by Calls</h3>
-          <ResponsiveContainer width="100%" height={230}>
-            <BarChart layout="vertical" data={rankings.talkgroup.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
-              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
-              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
-              <YAxis type="category" dataKey="name" width={122} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 16)} interval={0} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
-              <Bar dataKey="calls" fill={CHART_COLORS.calls}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.calls }]} />
-        </article>
-        <article className="chart-card charts-encrypted">
-          <CallsDurationPerformanceChart title="Encrypted" data={rankings.encrypted} height={230} gradientId="encryptedPerformance" />
-        </article>
-      </section>
+      <section id="Charts-content" className="chart-grid charts-arranged-grid">
 
-      <section id="General-content" className="chart-grid charts-reference-grid">
-        <article className="chart-card general-mobile-type charts-radio-month">
-          <h3>Radio Type per Month</h3>
-          <p>Total radios {formatNumber(mobileTypeByMonth.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
-          <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.total }, ...mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))]} />
-          <ResponsiveContainer width="100%" height={340}>
-            <BarChart data={mobileTypeByMonth} margin={{ left: 0, right: 0, top: 14, bottom: 0 }} barCategoryGap="12%" barGap={2}>
-              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
-              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={52} tickMargin={8} tickFormatter={shortMonthLabel} />
-              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.28)]} />
-              <Tooltip content={(props) => <MobileTypeTooltip {...props} mobileTypes={mobileTypes} />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar dataKey="total" name="Total radios" maxBarSize={72} shape={(props: any) => <MobileTypeOverlayBarShape {...props} mobileTypes={mobileTypes} />}><LabelList dataKey="total" content={() => null} /></Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </article>
-        <article className="chart-card monthly-Company-card charts-calls-duration" ref={monthlyCompanyChartRef}>
+        <article className="chart-card monthly-Company-card charts-calls-duration" ref={monthlyCompanyChartRef} style={{ display: "flex", flexDirection: "column" }}>
           <h3>Calls and Duration per Company</h3>
           <div className="company-color-legend">
             {[...new Set(monthlyCompanyRows.map((r) => r.company))].map((company) => (
               <span key={company}><i style={{ background: companyColor(company) }} />{company}</span>
             ))}
           </div>
-          <ResponsiveContainer width="100%" height={430}>
+          <ResponsiveContainer width="100%" height={400} style={{ flex: 1, minHeight: 0 }}>
             <BarChart data={monthlyCompanyRows} margin={{ left: 0, right: 0, top: 0, bottom: 0 }} barCategoryGap="20%">
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} />
               <XAxis xAxisId="company" dataKey="companyLabel" interval={0} angle={-90} textAnchor="end" height={112} tickMargin={8} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
@@ -2258,8 +2287,28 @@ export default function App() {
           </ResponsiveContainer>
           <ChartLegend items={[{ name: "Duration seconds", color: CHART_COLORS.duration }, { name: "No. of calls", color: CHART_COLORS.callsDeep }]} />
         </article>
+        <article className="chart-card general-mobile-type charts-radio-month" style={{ display: "flex", flexDirection: "column" }}>
+          <h3>Radio Type per Month</h3>
+          <p>Total radios {formatNumber(mobileTypeByMonth.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
+          <ChartLegend items={mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))} />
+          <ResponsiveContainer width="100%" style={{ flex: 1, minHeight: 0 }}>
+            <LineChart data={mobileTypeByMonth} margin={{ left: 0, right: 16, top: 14, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
+              <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={52} tickMargin={8} tickFormatter={shortMonthLabel} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.18)]} />
+              <Tooltip content={(props) => <MobileTypeTooltip {...props} mobileTypes={mobileTypes} />} />
+              {mobileTypes.map((type) => (
+                <Line key={type} type="monotone" dataKey={mobileTypeKey(type)} name={type} stroke={mobileTypeColor(type)} strokeWidth={2.2} dot={{ r: 3, fill: mobileTypeColor(type) }} activeDot={{ r: 5 }} />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </article>
+
         <article className="chart-card charts-call-type">
-          <CallsDurationPerformanceChart title="Call Type" data={rankings.callType} height={220} gradientId="callTypePerformance" />
+          <CallsDurationPerformanceChart title="Call Type" data={rankings.callType} height={200} gradientId="callTypePerformance" />
+        </article>
+        <article className="chart-card charts-priority">
+          <CallsDurationPerformanceChart title="Call Priority" data={rankings.callPriority} height={220} gradientId="callPriorityPerformance" />
         </article>
         <article className="chart-card charts-duplex">
           <h3>Duplex Type</h3>
@@ -2276,6 +2325,81 @@ export default function App() {
           </ResponsiveContainer>
           <ChartLegend items={[{ name: "Duration seconds", color: CHART_COLORS.duration }]} />
         </article>
+        <article className="chart-card charts-encrypted">
+          <CallsDurationPerformanceChart title="Encrypted" data={rankings.encrypted} height={220} gradientId="encryptedPerformance" />
+        </article>
+        <article className="chart-card charts-call-type-distribution" style={{ display: "flex", flexDirection: "column" }}>
+          <h3>Call Type Distribution</h3>
+          <ResponsiveContainer width="100%" style={{ flex: 1, minHeight: 0 }}>
+            <BarChart data={callTypeMonthlyMix} margin={{ left: 0, right: 8, top: 12, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
+              <XAxis dataKey="month" tick={{ fill: CHART_COLORS.axis, fontSize: 10, fontWeight: 700 }} interval={0} />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 10 }} width={38} domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+              <Tooltip content={<CallTypeMixTooltip />} />
+              {CALL_TYPE_SERIES.map((series) => (
+                <Bar key={series.key} dataKey={series.key} name={series.name} stackId="callType" fill={series.color}>
+                  <LabelList dataKey={series.key} content={StackedPercentLabel} />
+                </Bar>
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={CALL_TYPE_SERIES.map((series) => ({ name: series.name, color: series.color }))} />
+        </article>
+
+        <article className="chart-card charts-top-talkgroup">
+          <h3>Top TG by Calls</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart layout="vertical" data={rankings.talkgroup.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
+              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" width={122} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 16)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Bar dataKey="calls" fill={CHART_COLORS.calls}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.calls }]} />
+        </article>
+        <article className="chart-card charts-top-company">
+          <h3>Top Companies by Calls</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <Treemap data={topCompanyTreemapData} dataKey="size" nameKey="name" aspectRatio={4 / 3} stroke="rgba(237,246,250,0.2)" content={<CompanyTreemapTile />}>
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string, item: any) => [formatNumber(item?.payload?.calls ?? v), "Calls"]} />
+            </Treemap>
+          </ResponsiveContainer>
+          <ChartLegend items={topCompanyTreemapData.map((item) => ({ name: `${truncateLabel(item.name, 20)} (${formatNumber(item.calls)})`, color: item.fill }))} />
+        </article>
+        <article className="chart-card charts-top-station">
+          <h3>Top BS by Calls</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart layout="vertical" data={rankings.station.slice(0, 10)} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
+              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} />
+              <YAxis type="category" dataKey="name" width={122} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 16)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Bar dataKey="calls" fill={CHART_COLORS.duration}><LabelList dataKey="calls" content={RightValueLabel} /></Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={[{ name: "Calls", color: CHART_COLORS.duration }]} />
+        </article>
+        <article className="chart-card charts-tg-distribution">
+          <h3>Call Distribution by TG</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart layout="vertical" data={topTalkgroupDistribution} margin={{ left: 0, right: 32, top: 8, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} horizontal={false} />
+              <XAxis type="number" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => formatNumber(v)} />
+              <YAxis type="category" dataKey="name" width={120} tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={(v) => truncateLabel(v, 16)} interval={0} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatNumber(v)} />
+              <Bar dataKey="calls" radius={[0, 6, 6, 0]} maxBarSize={28}>
+                {topTalkgroupDistribution.map((item, index) => (
+                  <Cell key={item.name} fill={COLORS[index % COLORS.length]} />
+                ))}
+                <LabelList dataKey="calls" content={RightValueLabel} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <ChartLegend items={topTalkgroupDistribution.map((item, index) => ({ name: `${truncateLabel(item.name, 18)} (${formatNumber(item.calls)})`, color: COLORS[index % COLORS.length] }))} />
+        </article>
+
         <article className="chart-card Company-card company-talkgroups charts-talkgroups" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Talkgroups per Company</h3>
           <p>Total {formatNumber(sumValues(CompanyChartData.totalTalkgroups))} &nbsp;-&nbsp; Used {formatNumber(sumValues(CompanyChartData.talkgroupsUsed))}</p>
@@ -2318,9 +2442,6 @@ export default function App() {
             </BarChart>
           </ResponsiveContainer>
         </article>
-        <article className="chart-card charts-priority">
-          <CallsDurationPerformanceChart title="Call Priority" data={rankings.callPriority} height={260} gradientId="callPriorityPerformance" />
-        </article>
       </section>
       </>
       )}
@@ -2361,15 +2482,17 @@ export default function App() {
         <article className="chart-card general-mobile-type wide">
           <h3>Radio Type per Month</h3>
           <p>Total radios {formatNumber(mobileTypeByMonth.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
-          <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.total }, ...mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))]} />
+          <ChartLegend items={mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))} />
           <ResponsiveContainer width="100%" height={340}>
-            <BarChart data={mobileTypeByMonth} margin={{ left: 0, right: 0, top: 14, bottom: 0 }} barCategoryGap="12%" barGap={2}>
+            <LineChart data={mobileTypeByMonth} margin={{ left: 0, right: 16, top: 14, bottom: 0 }}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
               <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={52} tickMargin={8} tickFormatter={shortMonthLabel} />
-              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.28)]} />
-              <Tooltip content={(props) => <MobileTypeTooltip {...props} mobileTypes={mobileTypes} />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-              <Bar dataKey="total" name="Total radios" maxBarSize={72} shape={(props: any) => <MobileTypeOverlayBarShape {...props} mobileTypes={mobileTypes} />}><LabelList dataKey="total" content={() => null} /></Bar>
-            </BarChart>
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatNumber(v)} domain={[0, (dm: number) => Math.ceil(dm * 1.18)]} />
+              <Tooltip content={(props) => <MobileTypeTooltip {...props} mobileTypes={mobileTypes} />} />
+              {mobileTypes.map((type) => (
+                <Line key={type} type="monotone" dataKey={mobileTypeKey(type)} name={type} stroke={mobileTypeColor(type)} strokeWidth={2.2} dot={{ r: 3, fill: mobileTypeColor(type) }} activeDot={{ r: 5 }} />
+              ))}
+            </LineChart>
           </ResponsiveContainer>
         </article>
         <article className="chart-card">
@@ -2494,39 +2617,3 @@ export default function App() {
     </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
