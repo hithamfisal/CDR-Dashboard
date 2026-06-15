@@ -30,6 +30,14 @@ export function downloadPdf(pdf: jsPDF, fileName: string) {
   downloadBlob(fileName, pdf.output("blob"));
 }
 
+export async function downloadPptx(pptx: { write: (options: Record<string, unknown>) => Promise<unknown> }, fileName: string) {
+  const output = await pptx.write({ outputType: "blob" });
+  const blob = output instanceof Blob
+    ? output
+    : new Blob([output as BlobPart], { type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" });
+  downloadBlob(fileName, blob);
+}
+
 export function downloadDataUrl(fileName: string, dataUrl: string) {
   const link = document.createElement("a");
   link.href = dataUrl; link.download = fileName;

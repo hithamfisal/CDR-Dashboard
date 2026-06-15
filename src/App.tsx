@@ -18,7 +18,7 @@ import { monthSortValue, weekSortValue } from "./lib/dateSort";
 import { buildFilterOptions, uniqueOptions } from "./lib/filterOptions";
 import { companyColor, companyMetricColor, dataKey, mobileTypeColor, mobileTypeKey, shortMonthLabel, truncateLabel } from "./lib/chartHelpers";
 import { cleanText, isKnownLabel, normalizeRadioKey, parseDate, parseNumber, weekLabelFromDate } from "./lib/recordUtils";
-import { applyWorkbookArabicSupport, csvEscape, downloadBlob, downloadDataUrl, downloadPdf, downloadText, downloadWorkbookData, ensurePdfArabicFont, escapeXml, excelColumnName, excelRange, exportIconSvg, fileSlug, htmlEscape, patchWorkbookWithNativeCharts, pdfText, pptTextOptions } from "./lib/exportUtils";
+import { applyWorkbookArabicSupport, csvEscape, downloadBlob, downloadDataUrl, downloadPdf, downloadPptx, downloadText, downloadWorkbookData, ensurePdfArabicFont, escapeXml, excelColumnName, excelRange, exportIconSvg, fileSlug, htmlEscape, patchWorkbookWithNativeCharts, pdfText, pptTextOptions } from "./lib/exportUtils";
 import { usePagedItems } from "./hooks/usePagination";
 import type ExcelJS from "exceljs";
 import {
@@ -1033,7 +1033,7 @@ export default function App() {
         slide.addImage({ data: image, x: 0.35, y: 0.72, w: 12.65, h: 6.35 });
       };
       charts.forEach((chart) => addImageSlide(chart.title, chart.image));
-      await pptx.writeFile({ fileName: "kpi-table-and-charts.pptx" });
+      await downloadPptx(pptx, "kpi-table-and-charts.pptx");
     })();
   }, [captureKpiChartImages, exportTitle, kpiExportTableRows]);
 
@@ -1274,6 +1274,7 @@ export default function App() {
     void (async () => {
       const jsPDF = await loadJsPdf();
       const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+      await ensurePdfArabicFont(pdf);
       const pageWidth = pdf.internal.pageSize.getWidth(); const margin = 24;
       const drawTable = (title: string, headers: string[], rows: (string | number)[][], startY: number, widths: number[]) => {
         pdf.setFont("helvetica", "bold"); pdf.setFontSize(13);
@@ -1408,6 +1409,7 @@ export default function App() {
       const chartPng = await captureMonthlyCompanyChart();
       const jsPDF = await loadJsPdf();
       const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+      await ensurePdfArabicFont(pdf);
       const pageWidth = pdf.internal.pageSize.getWidth(); const pageHeight = pdf.internal.pageSize.getHeight(); const margin = 24;
       const totalCols = 1 + companies.length * 2; const cellW = Math.min(86, (pageWidth - margin * 2) / totalCols);
       const tableW = cellW * totalCols; const startX = (pageWidth - tableW) / 2; const rowH = 28;
@@ -1461,7 +1463,7 @@ export default function App() {
       const chartSlide = pptx.addSlide();
       chartSlide.addText(exportTitle("Calls and Duration per Company - Chart"), pptTextOptions(exportTitle("Calls and Duration per Company - Chart"), { x: 0.3, y: 0.18, w: 12.7, h: 0.35, fontSize: 18, bold: true, align: "center", color: "111111" }));
       chartSlide.addImage({ data: chartPng, x: 0.35, y: 0.72, w: 12.65, h: 6.35 });
-      await pptx.writeFile({ fileName: "calls-duration-per-company.pptx" });
+      await downloadPptx(pptx, "calls-duration-per-company.pptx");
     })();
   }, [captureMonthlyCompanyChart, exportTitle, monthlyCompanyPivot]);
 
@@ -1490,7 +1492,7 @@ export default function App() {
       "Monthly Performance": rankingDataset(rankings.month),
       "Radios per Month": { headers: ["Month", "Radios", "Share"], rows: radioMonths.map((r) => [r.name, r.radios, formatPercent(r.share, 2)]) },
       "Radio Type per Month": mobileDataset(mobileTypeByMonth, "Month"),
-      "Region  Performance": rankingDataset(rankings.region),
+      "Region Performance": rankingDataset(rankings.region),
       "Calls per Month": rankingDataset(rankings.month),
       "Base Station Performance": rankingDataset(rankings.station.slice(0, 12)),
       "Talkgroup Performance": rankingDataset(rankings.talkgroup.slice(0, 12)),

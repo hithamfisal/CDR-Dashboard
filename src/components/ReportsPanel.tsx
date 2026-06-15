@@ -215,7 +215,7 @@ function ReportsPanelComponent({
         { id: "tg-efficiency-pdf", group: "Performance", label: "TG Efficiency", kind: "pdf" as ExportKind, onClick: onExportTalkgroupEfficiencyPdf },
         ...chartActions([
           "Monthly Performance",
-          "Region  Performance",
+          "Region Performance",
           { source: "Base Station Performance", label: "BS Performance" },
           { source: "Company Calls & Duration Performance", label: "Co. Performance" },
           { source: "Talkgroup Performance", label: "TG Performance" },
@@ -282,18 +282,34 @@ function ReportsPanelComponent({
   const [selectedReportId, setSelectedReportId] = useState(() => reportActions[0]?.id ?? "");
   const [generatedReports, setGeneratedReports] = useState<GeneratedReport[]>([]);
   const [previewNotice, setPreviewNotice] = useState("");
+  const [reportSearch, setReportSearch] = useState("");
   const selectedReport = reportActions.find((action) => action.id === selectedReportId) ?? reportActions[0];
+  const visibleGeneratedReports = useMemo(() => {
+    const query = reportSearch.trim().toLowerCase();
+    if (!query) return generatedReports;
+    return generatedReports.filter((report) => `${report.fileName} ${report.format} ${report.generatedAt}`.toLowerCase().includes(query));
+  }, [generatedReports, reportSearch]);
 
   const runReportAction = useCallback(async (action: ReportAction) => {
     setPreviewNotice("");
-    const generatedFilePromise = action.kind === "view" || action.kind === "ppt"
+    const generatedFilePromise = action.kind === "view"
       ? Promise.resolve(null)
-      : waitForGeneratedFile();
-    await action.onClick();
+      : waitForGeneratedFile(30000);
+    try {
+      await action.onClick();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown export error";
+      setPreviewNotice(`${action.label} could not be generated. ${message}`);
+      return;
+    }
     const generatedFile = await generatedFilePromise;
+    if (action.kind !== "view" && !generatedFile) {
+      setPreviewNotice(`${action.label} was requested, but no generated file was captured. Try the export again after the dashboard finishes rendering.`);
+      return;
+    }
     const fileUrl = generatedFile?.blob ? URL.createObjectURL(generatedFile.blob) : undefined;
     const format = formatNameByKind[action.kind];
-    setGeneratedReports((current) => [{
+    const newReport: GeneratedReport = {
       id: `${action.id}-${Date.now()}`,
       actionId: action.id,
       fileName: generatedFile?.fileName ?? `${safeFileName(action.label)}.${timestampForFile()}.${fileExtensionByKind[action.kind]}`,
@@ -303,7 +319,14 @@ function ReportsPanelComponent({
       blob: generatedFile?.blob,
       fileUrl,
       mimeType: generatedFile?.mimeType,
-    }, ...current].slice(0, 10));
+    };
+    setGeneratedReports((current) => {
+      const next = [newReport, ...current];
+      next.slice(10).forEach((item) => {
+        if (item.fileUrl) URL.revokeObjectURL(item.fileUrl);
+      });
+      return next.slice(0, 10);
+    });
   }, []);
 
   const renderActionButton = (action: ReportAction) => (
@@ -360,7 +383,7 @@ function ReportsPanelComponent({
           </div>
           <label className="report-search-box">
             <Search size={16} />
-            <input type="search" placeholder="Search reports" aria-label="Search reports" />
+            <input type="search" placeholder="Search reports" aria-label="Search reports" value={reportSearch} onChange={(event) => setReportSearch(event.target.value)} />
           </label>
         </div>
 
@@ -397,7 +420,7 @@ function ReportsPanelComponent({
           <div className="generated-reports-panel">
             <div className="generated-reports-title">
               <h4>Generated Reports History</h4>
-              <span>{generatedReports.length} recent</span>
+              <span>{reportSearch ? `${visibleGeneratedReports.length} / ${generatedReports.length}` : generatedReports.length} recent</span>
             </div>
             {previewNotice && <div className="generated-preview-notice">{previewNotice}</div>}
             <div className="generated-reports-table-wrap">
@@ -406,9 +429,9 @@ function ReportsPanelComponent({
                   <tr><th>File Name</th><th>Generated Date</th><th>Format</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
-                  {generatedReports.length === 0 ? (
-                    <tr><td colSpan={4} className="generated-reports-empty">No reports generated in this session yet.</td></tr>
-                  ) : generatedReports.map((report) => (
+                  {visibleGeneratedReports.length === 0 ? (
+                    <tr><td colSpan={4} className="generated-reports-empty">{generatedReports.length === 0 ? "No reports generated in this session yet." : "No generated reports match your search."}</td></tr>
+                  ) : visibleGeneratedReports.map((report) => (
                     <tr key={report.id}>
                       <td>{report.fileName}</td>
                       <td>{report.generatedAt}</td>
