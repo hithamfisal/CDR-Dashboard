@@ -425,7 +425,7 @@ export function ModernOverview({
 
       <section className="modern-dashboard-grid">
         <ModernPanel title="Call Volume Over Time" className="modern-panel-wide">
-          <ResponsiveContainer width="100%" height={188}>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={monthlyTrend} margin={{ left: 4, right: 22, top: 18, bottom: 2 }}>
               <CartesianGrid stroke="#20313e" strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} tickFormatter={shortMonthLabel} interval={0} />
@@ -445,7 +445,7 @@ export function ModernOverview({
         <ModernPanel title="Call Distribution by TG" className="modern-panel-tg">
           <div className="modern-donut-layout">
             <div className="modern-donut-chart">
-              <ResponsiveContainer width="100%" height={188}>
+              <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie data={tgTop} dataKey="calls" nameKey="name" innerRadius={42} outerRadius={70} paddingAngle={2} label={PieValueLabel} labelLine={false}>
                     {tgTop.map((item, index) => <Cell key={item.name} fill={COLORS[index % COLORS.length]} />)}
@@ -460,7 +460,7 @@ export function ModernOverview({
         </ModernPanel>
 
         <ModernPanel title="Busy Hour Profile" className="modern-panel-busy">
-          <ResponsiveContainer width="100%" height={188}>
+          <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={rankings.hour} margin={{ left: 0, right: 18, top: 18, bottom: 4 }}>
               <CartesianGrid stroke="#20313e" strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} interval={2} />

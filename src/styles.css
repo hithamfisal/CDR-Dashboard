@@ -13663,10 +13663,10 @@ body,
 }
 
 .app-shell.active-tab-overview .modern-dashboard-grid {
-  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1.04fr) minmax(0, 1.04fr) minmax(250px, 0.78fr) !important;
+  grid-template-columns: 1.5fr 1fr 1.5fr !important;
   grid-template-areas:
-    "volume tg busy topbs"
-    "companies companies users calltype" !important;
+    "volume tg busy"
+    "topbs companies users" !important;
   grid-auto-rows: minmax(216px, auto) !important;
   gap: 7px !important;
 }
@@ -13684,7 +13684,7 @@ body,
 .app-shell.active-tab-overview .modern-panel-top-bs { grid-area: topbs !important; }
 .app-shell.active-tab-overview .modern-panel-companies { grid-area: companies !important; }
 .app-shell.active-tab-overview .modern-panel-users { grid-area: users !important; }
-.app-shell.active-tab-overview .modern-panel-call-type { grid-area: calltype !important; }
+.app-shell.active-tab-overview .modern-panel-call-type { display: none !important; }
 
 .app-shell.active-tab-overview .modern-panel-head {
   margin-bottom: 4px !important;
@@ -13737,9 +13737,9 @@ body,
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     grid-template-areas:
       "volume tg"
-      "busy topbs"
-      "companies users"
-      "calltype calltype" !important;
+      "busy busy"
+      "topbs companies"
+      "users users" !important;
   }
 }
 
@@ -14068,10 +14068,10 @@ body,
 
 /* V6 Overview table-row refinement: keep the three ranking tables together and auto-fit their content. */
 .app-shell.active-tab-overview .modern-dashboard-grid {
-  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  grid-template-columns: 1.5fr 1fr 1.5fr !important;
   grid-template-areas:
-    "volume volume volume tg tg tg busy busy busy calltype calltype calltype"
-    "topbs topbs topbs topbs companies companies companies companies users users users users" !important;
+    "volume tg busy"
+    "topbs companies users" !important;
   grid-auto-rows: auto !important;
   align-items: stretch !important;
 }
@@ -14144,7 +14144,7 @@ body,
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     grid-template-areas:
       "volume tg"
-      "busy calltype"
+      "busy busy"
       "topbs companies"
       "users users" !important;
   }
