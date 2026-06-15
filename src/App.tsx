@@ -2236,7 +2236,7 @@ export default function App() {
               ))}
             </LineChart>
           </ResponsiveContainer>
-          <div className="chart-legend">{monthlyKpi.months.map((m) => <span key={m.key}><i style={{ background: m.color }} />{shortMonthLabel(m.name)}</span>)}</div>
+          <ChartLegend items={monthlyKpi.months.map((m) => ({ name: shortMonthLabel(m.name), color: m.color }))} />
         </article>
         <article className="chart-card monthly-kpi-card kpi-total-avg-card" ref={kpiTotalAvgChartRef}>
           <h3>KPI Total Avg. Duration</h3><p>Average call duration by month in sec</p>
@@ -2292,7 +2292,7 @@ export default function App() {
         </article>
         <article className="chart-card general-mobile-type charts-radio-month" style={{ display: "flex", flexDirection: "column" }}>
           <h3>Radio Type per Month</h3>
-          <p>Total radios {formatNumber(mobileTypeByMonth.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
+          {/* <p>Total radios {formatNumber(mobileTypeByMonth.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p> */}
           <ChartLegend items={mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))} />
           <ResponsiveContainer width="100%" style={{ flex: 1, minHeight: 0 }}>
             <LineChart data={mobileTypeByMonth} margin={{ left: 0, right: 16, top: 14, bottom: 0 }}>
@@ -2369,7 +2369,7 @@ export default function App() {
               <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string, item: any) => [formatNumber(item?.payload?.calls ?? v), "Calls"]} />
             </Treemap>
           </ResponsiveContainer>
-          <ChartLegend items={topCompanyTreemapData.map((item) => ({ name: `${truncateLabel(item.name, 20)} (${formatNumber(item.calls)})`, color: item.fill }))} />
+          <ChartLegend items={topCompanyTreemapData.map((item) => ({ name: truncateLabel(item.name, 20), color: item.fill }))} />
         </article>
         <article className="chart-card charts-top-station">
           <h3>Top BS by Calls</h3>
@@ -2400,12 +2400,12 @@ export default function App() {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <ChartLegend items={topTalkgroupDistribution.map((item, index) => ({ name: `${truncateLabel(item.name, 18)} (${formatNumber(item.calls)})`, color: COLORS[index % COLORS.length] }))} />
+          <ChartLegend items={topTalkgroupDistribution.map((item, index) => ({ name: truncateLabel(item.name, 18), color: COLORS[index % COLORS.length] }))} />
         </article>
 
         <article className="chart-card Company-card company-talkgroups charts-talkgroups" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Talkgroups per Company</h3>
-          <p>Total {formatNumber(sumValues(CompanyChartData.totalTalkgroups))} &nbsp;-&nbsp; Used {formatNumber(sumValues(CompanyChartData.talkgroupsUsed))}</p>
+          {/* <p>Total {formatNumber(sumValues(CompanyChartData.totalTalkgroups))} &nbsp;-&nbsp; Used {formatNumber(sumValues(CompanyChartData.talkgroupsUsed))}</p> */}
           <ChartLegend items={[{ name: "Total talkgroups", color: CHART_COLORS.total }, { name: "Used talkgroups", color: CHART_COLORS.used }]} />
           <ResponsiveContainer width="100%" height={340}>
             <BarChart data={CompanyChartData.totalTalkgroups.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.talkgroupsUsed.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
@@ -2419,7 +2419,7 @@ export default function App() {
         </article>
         <article className="chart-card Company-card company-radios charts-radios" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Radios per Company</h3>
-          <p>Total {formatNumber(sumValues(CompanyChartData.totalUsers))} &nbsp;-&nbsp; Made Calls {formatNumber(sumValues(CompanyChartData.callingUsers))}</p>
+          {/* <p>Total {formatNumber(sumValues(CompanyChartData.totalUsers))} &nbsp;-&nbsp; Made Calls {formatNumber(sumValues(CompanyChartData.callingUsers))}</p> */}
           <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.totalGreen }, { name: "Radios made calls", color: CHART_COLORS.usedGreen }]} />
           <ResponsiveContainer width="100%" height={340}>
             <BarChart data={CompanyChartData.totalUsers.map((item) => ({ name: item.name, total: item.value, used: CompanyChartData.callingUsers.find((u) => u.name === item.name)?.value ?? 0 }))} margin={{ left: 0, right: 0, top: 12, bottom: 0 }}>
@@ -2433,9 +2433,9 @@ export default function App() {
         </article>
         <article className="chart-card Company-card company-radio-type charts-radio-type-company" style={{ minWidth: 0, overflow: "hidden" }}>
           <h3>Radios Type per Company</h3>
-          <p>Total radios {formatNumber(mobileTypeByCompany.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p>
+          {/* <p>Total radios {formatNumber(mobileTypeByCompany.reduce((s, r) => s + Number(r.total ?? 0), 0))}</p> */}
           <ChartLegend items={[{ name: "Total radios", color: CHART_COLORS.total }, ...mobileTypes.map((type) => ({ name: type, color: mobileTypeColor(type) }))]} />
-          <ResponsiveContainer width="100%" height={340}>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={mobileTypeByCompany} margin={{ left: 0, right: 0, top: 14, bottom: 0 }} barCategoryGap="14%" barGap={2}>
               <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" opacity={0.32} vertical={false} />
               <XAxis dataKey="name" tick={{ fill: CHART_COLORS.axis, fontSize: 9 }} axisLine={false} tickLine={false} interval={0} angle={-45} textAnchor="end" height={44} tickMargin={2} tickFormatter={(v) => truncateLabel(v, 12)} />

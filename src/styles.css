@@ -845,15 +845,18 @@ body:has(.se-theme) {
   font-size: 11px;
 }
 .chart-legend i,
-.company-color-legend i,
-.chart-legend span::before {
+.company-color-legend i {
   content: "";
   display: inline-block;
   width: 9px;
   height: 9px;
   margin-right: 5px;
   border-radius: 2px;
-  background: currentColor;
+  flex-shrink: 0;
+}
+
+.chart-legend span::before {
+  display: none !important;
 }
 .chart-legend span,
 .company-color-legend span { display: inline-flex; align-items: center; }
@@ -14495,8 +14498,8 @@ body,
     "callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth radioMonth"
     "callType callType callType callType callType callType callType callType callType callType callType callType callType callType callType callType callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution"
     "duplex duplex duplex duplex duplex encrypted encrypted encrypted encrypted encrypted priority priority priority priority priority priority callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution"
-    "topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topCompany topCompany topCompany topCompany topCompany topCompany topStation topStation topStation topStation topStation topStation tgDistribution tgDistribution tgDistribution tgDistribution tgDistribution tgDistribution"
-    "talkgroups talkgroups talkgroups talkgroups talkgroups talkgroups talkgroups talkgroups radios radios radios radios radios radios radios radios radioTypes radioTypes radioTypes radioTypes radioTypes radioTypes radioTypes radioTypes" !important;
+    "topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topTalkgroup topCompany topCompany topCompany topCompany topCompany topCompany topCompany topCompany topStation topStation topStation topStation topStation topStation topStation topStation"
+    "talkgroups talkgroups talkgroups talkgroups talkgroups talkgroups radios radios radios radios radios radios radioTypes radioTypes radioTypes radioTypes radioTypes radioTypes tgDistribution tgDistribution tgDistribution tgDistribution tgDistribution tgDistribution" !important;
   grid-auto-rows: auto !important;
   gap: 12px !important;
   margin: 0 0 14px !important;
@@ -14703,8 +14706,8 @@ body,
       "callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration callsDuration radioMonth radioMonth radioMonth radioMonth"
       "callType callType callType callType callType callType callType callType callTypeDistribution callTypeDistribution callTypeDistribution callTypeDistribution"
       "duplex duplex duplex encrypted encrypted encrypted priority priority priority callTypeDistribution callTypeDistribution callTypeDistribution"
-      "topTalkgroup topTalkgroup topTalkgroup topCompany topCompany topCompany topStation topStation topStation tgDistribution tgDistribution tgDistribution"
-      "talkgroups talkgroups talkgroups talkgroups radios radios radios radios radioTypes radioTypes radioTypes radioTypes" !important;
+      "topTalkgroup topTalkgroup topTalkgroup topTalkgroup topCompany topCompany topCompany topCompany topStation topStation topStation topStation"
+      "talkgroups talkgroups talkgroups radios radios radios radioTypes radioTypes radioTypes tgDistribution tgDistribution tgDistribution" !important;
   }
 
   .app-shell.active-tab-charts .charts-highlight-row {
