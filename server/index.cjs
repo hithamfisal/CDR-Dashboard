@@ -31,8 +31,10 @@ const DB_USER = process.env.MYSQL_USER || "root";
 const DB_PASSWORD = process.env.MYSQL_PASSWORD || "";
 const DB_NAME = process.env.MYSQL_DATABASE || "cdr_dashboard";
 const ALLOW_ORIGIN = process.env.CDR_ALLOWED_ORIGIN || "*";
-const sessions = new Map();
 const SESSION_TTL_MS = Number(process.env.CDR_SESSION_TTL_HOURS || 8) * 60 * 60 * 1000;
+const SESSION_SECRET =
+  process.env.CDR_SESSION_SECRET ||
+  sha256(`${DB_USER}:${DB_PASSWORD}:${DB_HOST}:${DB_PORT}:${DB_NAME}:cdr-session-secret`);
 
 const DEFAULT_SETTINGS = {
   companyName: "CDR Traffic Intelligence",
@@ -92,27 +94,45 @@ function toCamelSettings(row) {
   };
 }
 
+function encodeSessionPayload(payload) {
+  return Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
+}
+
+function signSessionPayload(encodedPayload) {
+  return crypto.createHmac("sha256", SESSION_SECRET).update(encodedPayload).digest("base64url");
+}
+
 function makeSession(user) {
-  const token = crypto.randomBytes(32).toString("hex");
-  sessions.set(token, {
+  const payload = {
     role: user.role,
     username: user.username,
     expiresAt: Date.now() + SESSION_TTL_MS,
-  });
-  return token;
+  };
+  const encodedPayload = encodeSessionPayload(payload);
+  return `${encodedPayload}.${signSessionPayload(encodedPayload)}`;
 }
 
 function getSession(req) {
   const token = req.headers["x-cdr-session"];
-  if (!token || typeof token !== "string") return null;
-  const session = sessions.get(token);
-  if (!session) return null;
-  if (session.expiresAt < Date.now()) {
-    sessions.delete(token);
+  if (!token || typeof token !== "string" || !token.includes(".")) return null;
+  const [encodedPayload, signature] = token.split(".");
+  const expectedSignature = signSessionPayload(encodedPayload);
+  const signatureBuffer = Buffer.from(signature || "");
+  const expectedBuffer = Buffer.from(expectedSignature);
+  if (signatureBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(signatureBuffer, expectedBuffer)) {
     return null;
   }
-  session.expiresAt = Date.now() + SESSION_TTL_MS;
-  return session;
+  try {
+    const payload = JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8"));
+    if (!payload || payload.expiresAt < Date.now()) return null;
+    return {
+      role: payload.role,
+      username: payload.username,
+      expiresAt: payload.expiresAt,
+    };
+  } catch {
+    return null;
+  }
 }
 
 function requireRole(req, allowedRoles) {
@@ -187,17 +207,19 @@ async function writeAudit(pool, session, action, details = "") {
 }
 
 async function createPool() {
-  const rootConnection = await mysql.createConnection({
-    host: DB_HOST,
-    port: DB_PORT,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    multipleStatements: true,
-  });
-  await rootConnection.query(
-    `CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`,
-  );
-  await rootConnection.end();
+  if (process.env.CDR_SKIP_CREATE_DATABASE !== "1") {
+    const rootConnection = await mysql.createConnection({
+      host: DB_HOST,
+      port: DB_PORT,
+      user: DB_USER,
+      password: DB_PASSWORD,
+      multipleStatements: true,
+    });
+    await rootConnection.query(
+      `CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`,
+    );
+    await rootConnection.end();
+  }
 
   const pool = mysql.createPool({
     host: DB_HOST,
@@ -348,6 +370,17 @@ async function updateSettings(pool, settings) {
 }
 
 async function readJson(req) {
+  if (req.body != null) {
+    if (typeof req.body === "object" && !Buffer.isBuffer(req.body)) return req.body;
+    const parsedBody = Buffer.isBuffer(req.body) ? req.body.toString("utf8") : String(req.body || "");
+    if (!parsedBody) return {};
+    try {
+      return JSON.parse(parsedBody);
+    } catch {
+      throw Object.assign(new Error("Invalid JSON body."), { statusCode: 400 });
+    }
+  }
+
   return new Promise((resolve, reject) => {
     let body = "";
     req.on("data", (chunk) => {
@@ -571,7 +604,20 @@ async function main() {
   });
 }
 
-main().catch((error) => {
-  console.error("Failed to start CDR MySQL API:", error);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error("Failed to start CDR MySQL API:", error);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  createPool,
+  route,
+  sendJson,
+  readSettings,
+  updateSettings,
+  ensureSchema,
+};
+
+module.exports.default = module.exports;
