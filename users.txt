@@ -1,0 +1,8 @@
+System Admin:
+admin / Admin@12345
+
+Customer Admin:
+customeradmin / CustomerAdmin@12345
+
+Customer:
+customer / Customer@12345

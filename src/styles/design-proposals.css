@@ -1,0 +1,2797 @@
+/* ========================================================================
+   CDR Dashboard Proposal Design System
+   ------------------------------------------------------------------------
+   Final UI layer: replaces legacy theme colors with proposal-based tokens.
+   The selected design is saved on <html data-design="proposalX"> and the
+   shell also receives .design-proposal-X for immediate scoped overrides.
+   ======================================================================== */
+
+:root,
+html[data-design="proposal1"],
+.design-proposal-1 {
+  --design-name: "Dark Blue";
+  --design-bg: #061424;
+  --design-bg-soft: #081b31;
+  --design-bg-radial: radial-gradient(circle at 18% 0%, rgba(39, 144, 255, 0.18), transparent 35%), linear-gradient(135deg, #06101e 0%, #08213a 52%, #061424 100%);
+  --design-header-bg: linear-gradient(135deg, rgba(7, 25, 44, 0.98), rgba(9, 41, 72, 0.94));
+  --design-nav-bg: rgba(9, 34, 61, 0.86);
+  --design-card: rgba(9, 31, 56, 0.94);
+  --design-card-2: rgba(10, 42, 74, 0.92);
+  --design-card-soft: rgba(15, 54, 92, 0.70);
+  --design-table-head: rgba(11, 45, 79, 0.98);
+  --design-table-row: rgba(8, 29, 52, 0.84);
+  --design-table-row-alt: rgba(11, 37, 65, 0.86);
+  --design-border: rgba(60, 156, 255, 0.34);
+  --design-border-strong: rgba(65, 184, 255, 0.58);
+  --design-text: #f5fbff;
+  --design-muted: #a8c7dc;
+  --design-faint: #75a6c2;
+  --design-inverted-text: #071424;
+  --design-accent: #179cff;
+  --design-accent-2: #38d5ff;
+  --design-accent-3: #7c5cff;
+  --design-success: #31e7a4;
+  --design-warning: #f5b84b;
+  --design-danger: #ff5b6d;
+  --design-active-bg: linear-gradient(135deg, #0078ff, #18c8ff);
+  --design-button-bg: linear-gradient(135deg, #0078ff, #14b8ff);
+  --design-button-text: #ffffff;
+  --design-hover: rgba(24, 200, 255, 0.18);
+  --design-selected: rgba(23, 156, 255, 0.24);
+  --design-shadow: 0 22px 58px rgba(0, 8, 24, 0.40);
+  --design-glow: 0 0 0 1px rgba(59, 171, 255, 0.22), 0 0 32px rgba(23, 156, 255, 0.14);
+  --chart-calls: #209bff;
+  --chart-calls-light: #7bd4ff;
+  --chart-calls-deep: #0b5fcf;
+  --chart-duration: #ffc44d;
+  --chart-duration-light: #ffe297;
+  --chart-duration-deep: #cc7a00;
+  --chart-total: #178bff;
+  --chart-used: #40d2ff;
+  --chart-total-green: #17b58a;
+  --chart-used-green: #6cf5b6;
+  --chart-grid: rgba(139, 189, 225, 0.28);
+  --chart-axis: #bdd8ee;
+  --chart-label: #f8fcff;
+  --chart-label-stroke: #061424;
+  --chart-tooltip-bg: #071728;
+  --chart-tooltip-border: rgba(72, 179, 255, 0.60);
+  --chart-tooltip-text: #f8fcff;
+  --chart-series-1: #179cff;
+  --chart-series-2: #38d5ff;
+  --chart-series-3: #ffc44d;
+  --chart-series-4: #7c5cff;
+  --chart-series-5: #ff5b6d;
+  --chart-series-6: #31e7a4;
+  --chart-series-7: #f97316;
+  --chart-series-8: #e879f9;
+  --chart-series-9: #5eead4;
+  --chart-series-10: #93c5fd;
+}
+
+html[data-design="proposal2"],
+.design-proposal-2 {
+  --design-name: "Light Executive";
+  --design-bg: #f4f7fb;
+  --design-bg-soft: #eef3fb;
+  --design-bg-radial: radial-gradient(circle at 8% 0%, rgba(37, 99, 235, 0.12), transparent 32%), linear-gradient(135deg, #f8fbff 0%, #eef4fb 55%, #ffffff 100%);
+  --design-header-bg: linear-gradient(135deg, #ffffff 0%, #edf5ff 100%);
+  --design-nav-bg: rgba(255, 255, 255, 0.94);
+  --design-card: rgba(255, 255, 255, 0.98);
+  --design-card-2: rgba(246, 250, 255, 0.98);
+  --design-card-soft: rgba(238, 245, 255, 0.94);
+  --design-table-head: #eaf2ff;
+  --design-table-row: #ffffff;
+  --design-table-row-alt: #f7fbff;
+  --design-border: rgba(42, 92, 170, 0.20);
+  --design-border-strong: rgba(37, 99, 235, 0.38);
+  --design-text: #0c1f35;
+  --design-muted: #4b647d;
+  --design-faint: #7890a8;
+  --design-inverted-text: #ffffff;
+  --design-accent: #2563eb;
+  --design-accent-2: #06a6d7;
+  --design-accent-3: #7c3aed;
+  --design-success: #059669;
+  --design-warning: #d97706;
+  --design-danger: #dc2626;
+  --design-active-bg: linear-gradient(135deg, #2563eb, #0ea5e9);
+  --design-button-bg: linear-gradient(135deg, #2563eb, #0ea5e9);
+  --design-button-text: #ffffff;
+  --design-hover: rgba(37, 99, 235, 0.10);
+  --design-selected: rgba(37, 99, 235, 0.14);
+  --design-shadow: 0 20px 48px rgba(15, 38, 70, 0.12);
+  --design-glow: 0 0 0 1px rgba(37, 99, 235, 0.18), 0 20px 42px rgba(37, 99, 235, 0.10);
+  --chart-calls: #2563eb;
+  --chart-calls-light: #7dd3fc;
+  --chart-calls-deep: #1d4ed8;
+  --chart-duration: #f59e0b;
+  --chart-duration-light: #fde68a;
+  --chart-duration-deep: #b45309;
+  --chart-total: #2563eb;
+  --chart-used: #06b6d4;
+  --chart-total-green: #059669;
+  --chart-used-green: #34d399;
+  --chart-grid: rgba(71, 85, 105, 0.20);
+  --chart-axis: #475569;
+  --chart-label: #0f172a;
+  --chart-label-stroke: #ffffff;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: rgba(37, 99, 235, 0.34);
+  --chart-tooltip-text: #0f172a;
+  --chart-series-1: #2563eb;
+  --chart-series-2: #06b6d4;
+  --chart-series-3: #f59e0b;
+  --chart-series-4: #7c3aed;
+  --chart-series-5: #ef4444;
+  --chart-series-6: #059669;
+  --chart-series-7: #f97316;
+  --chart-series-8: #db2777;
+  --chart-series-9: #14b8a6;
+  --chart-series-10: #64748b;
+}
+
+html[data-design="proposal3"],
+.design-proposal-3 {
+  --design-name: "Dark Emerald";
+  --design-bg: #031916;
+  --design-bg-soft: #06221e;
+  --design-bg-radial: radial-gradient(circle at 15% 0%, rgba(16, 185, 129, 0.18), transparent 34%), radial-gradient(circle at 88% 16%, rgba(20, 184, 166, 0.13), transparent 28%), linear-gradient(135deg, #031411 0%, #06352c 52%, #031916 100%);
+  --design-header-bg: linear-gradient(135deg, rgba(4, 31, 27, 0.98), rgba(7, 64, 52, 0.94));
+  --design-nav-bg: rgba(5, 42, 35, 0.90);
+  --design-card: rgba(5, 38, 32, 0.94);
+  --design-card-2: rgba(6, 54, 44, 0.92);
+  --design-card-soft: rgba(9, 78, 64, 0.64);
+  --design-table-head: rgba(6, 63, 52, 0.98);
+  --design-table-row: rgba(5, 34, 30, 0.86);
+  --design-table-row-alt: rgba(8, 48, 41, 0.88);
+  --design-border: rgba(45, 212, 191, 0.34);
+  --design-border-strong: rgba(52, 211, 153, 0.58);
+  --design-text: #ecfff9;
+  --design-muted: #a9d8cd;
+  --design-faint: #78b9ad;
+  --design-inverted-text: #031916;
+  --design-accent: #10b981;
+  --design-accent-2: #2dd4bf;
+  --design-accent-3: #34d399;
+  --design-success: #41f2a7;
+  --design-warning: #fbbf24;
+  --design-danger: #fb7185;
+  --design-active-bg: linear-gradient(135deg, #10b981, #2dd4bf);
+  --design-button-bg: linear-gradient(135deg, #10b981, #14b8a6);
+  --design-button-text: #041713;
+  --design-hover: rgba(45, 212, 191, 0.18);
+  --design-selected: rgba(16, 185, 129, 0.22);
+  --design-shadow: 0 22px 58px rgba(0, 14, 10, 0.42);
+  --design-glow: 0 0 0 1px rgba(45, 212, 191, 0.22), 0 0 34px rgba(16, 185, 129, 0.14);
+  --chart-calls: #10b981;
+  --chart-calls-light: #6ee7b7;
+  --chart-calls-deep: #047857;
+  --chart-duration: #f59e0b;
+  --chart-duration-light: #fde68a;
+  --chart-duration-deep: #b45309;
+  --chart-total: #0d9488;
+  --chart-used: #5eead4;
+  --chart-total-green: #10b981;
+  --chart-used-green: #86efac;
+  --chart-grid: rgba(148, 215, 203, 0.25);
+  --chart-axis: #b9e8dd;
+  --chart-label: #ecfff9;
+  --chart-label-stroke: #031916;
+  --chart-tooltip-bg: #041d18;
+  --chart-tooltip-border: rgba(45, 212, 191, 0.60);
+  --chart-tooltip-text: #ecfff9;
+  --chart-series-1: #10b981;
+  --chart-series-2: #2dd4bf;
+  --chart-series-3: #f59e0b;
+  --chart-series-4: #60a5fa;
+  --chart-series-5: #fb7185;
+  --chart-series-6: #84cc16;
+  --chart-series-7: #f97316;
+  --chart-series-8: #a78bfa;
+  --chart-series-9: #22d3ee;
+  --chart-series-10: #94a3b8;
+}
+
+html[data-design] body {
+  background: var(--design-bg) !important;
+  color: var(--design-text) !important;
+}
+
+.app-shell.design-proposal-1,
+.app-shell.design-proposal-2,
+.app-shell.design-proposal-3,
+.upload-shell.design-proposal-1,
+.upload-shell.design-proposal-2,
+.upload-shell.design-proposal-3,
+.local-login-shell.design-proposal-1,
+.local-login-shell.design-proposal-2,
+.local-login-shell.design-proposal-3 {
+  background: var(--design-bg-radial) !important;
+  color: var(--design-text) !important;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+.app-shell[class*="design-proposal"]::before,
+.app-shell[class*="design-proposal"]::after,
+.upload-shell[class*="design-proposal"]::before,
+.upload-shell[class*="design-proposal"]::after,
+.local-login-shell[class*="design-proposal"]::before,
+.local-login-shell[class*="design-proposal"]::after {
+  background: none !important;
+  opacity: 0 !important;
+  content: none !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-command-shell,
+.app-shell[class*="design-proposal"] .topbar,
+.app-shell[class*="design-proposal"] .cdr-navy-banner,
+.app-shell[class*="design-proposal"] .dashboard-tabs-row,
+.app-shell[class*="design-proposal"] .dashboard-tabs,
+.app-shell[class*="design-proposal"] .filters-panel,
+.upload-shell[class*="design-proposal"] .followup-upload-card,
+.local-login-shell[class*="design-proposal"] .local-login-card,
+.local-settings-panel {
+  background: var(--design-header-bg) !important;
+  border-color: var(--design-border) !important;
+  box-shadow: var(--design-shadow) !important;
+  color: var(--design-text) !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-command-shell,
+.app-shell[class*="design-proposal"] .filters-panel,
+.app-shell[class*="design-proposal"] .dashboard-tabs-row {
+  background: var(--design-nav-bg) !important;
+}
+
+.app-shell[class*="design-proposal"] .topbar,
+.app-shell[class*="design-proposal"] .cdr-navy-banner {
+  min-height: 86px;
+  display: grid !important;
+  grid-template-columns: minmax(110px, 260px) 1fr minmax(110px, 260px);
+  align-items: center !important;
+  gap: 18px;
+}
+
+.app-shell[class*="design-proposal"] .cdr-banner-art {
+  opacity: 0.28 !important;
+  mix-blend-mode: screen;
+}
+
+.design-proposal-2 .cdr-banner-art {
+  opacity: 0.08 !important;
+  mix-blend-mode: multiply;
+}
+
+.app-shell[class*="design-proposal"] .followup-dashboard-title {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  min-height: 78px;
+  color: var(--design-text) !important;
+}
+
+.app-shell[class*="design-proposal"] .followup-dashboard-title h1 {
+  color: var(--design-text) !important;
+  text-shadow: none !important;
+}
+
+.app-shell[class*="design-proposal"] .followup-dashboard-title p {
+  color: var(--design-muted) !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-header-logo {
+  height: 100% !important;
+  min-height: 76px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-header-logo-left { justify-content: flex-start !important; }
+.app-shell[class*="design-proposal"] .cdr-header-logo-right { justify-content: flex-end !important; }
+
+.app-shell[class*="design-proposal"] .cdr-header-logo img {
+  max-height: calc(100% - 14px) !important;
+  height: 72px !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.app-shell[class*="design-proposal"] .dashboard-tab,
+.app-shell[class*="design-proposal"] .button,
+.upload-shell[class*="design-proposal"] .followup-action-button,
+.upload-shell[class*="design-proposal"] .followup-theme-button,
+.local-login-shell[class*="design-proposal"] .button,
+.local-settings-panel .button {
+  background: var(--design-card-2) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: none !important;
+}
+
+.app-shell[class*="design-proposal"] .dashboard-tab:hover,
+.app-shell[class*="design-proposal"] .button:hover,
+.upload-shell[class*="design-proposal"] .followup-action-button:hover,
+.upload-shell[class*="design-proposal"] .followup-theme-button:hover,
+.local-login-shell[class*="design-proposal"] .button:hover {
+  background: var(--design-hover) !important;
+  border-color: var(--design-border-strong) !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+.app-shell[class*="design-proposal"] .dashboard-tab.active,
+.app-shell[class*="design-proposal"] .button.primary,
+.app-shell[class*="design-proposal"] .cdr-action-primary,
+.app-shell[class*="design-proposal"] .export-button,
+.upload-shell[class*="design-proposal"] .followup-primary-upload,
+.upload-shell[class*="design-proposal"] .followup-confirm-upload,
+.local-login-shell[class*="design-proposal"] .cdr-action-primary {
+  background: var(--design-active-bg) !important;
+  border-color: transparent !important;
+  color: var(--design-button-text) !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+.design-proposal-2 .dashboard-tab.active,
+.design-proposal-2 .button.primary,
+.design-proposal-2 .cdr-action-primary,
+.design-proposal-2 .export-button,
+.design-proposal-2 .followup-primary-upload,
+.design-proposal-2 .followup-confirm-upload {
+  color: #ffffff !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-page-intro,
+.app-shell[class*="design-proposal"] .workbook-card,
+.app-shell[class*="design-proposal"] .summary-card,
+.app-shell[class*="design-proposal"] .metric-card,
+.app-shell[class*="design-proposal"] .chart-card,
+.app-shell[class*="design-proposal"] .table-card,
+.app-shell[class*="design-proposal"] .records-card,
+.app-shell[class*="design-proposal"] .hero-panel,
+.app-shell[class*="design-proposal"] .filter-panel,
+.app-shell[class*="design-proposal"] .report-card,
+.app-shell[class*="design-proposal"] .report-suite,
+.app-shell[class*="design-proposal"] .warning-strip,
+.app-shell[class*="design-proposal"] [class*="card"],
+.app-shell[class*="design-proposal"] [class*="panel"],
+.upload-shell[class*="design-proposal"] .followup-upload-left,
+.upload-shell[class*="design-proposal"] .followup-upload-visual,
+.upload-shell[class*="design-proposal"] .followup-mini-card,
+.upload-shell[class*="design-proposal"] .followup-staged-upload,
+.local-login-shell[class*="design-proposal"] .local-login-brand,
+.local-settings-panel [class*="card"] {
+  background: var(--design-card) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: var(--design-shadow) !important;
+}
+
+.app-shell[class*="design-proposal"] [class*="card"]::before,
+.app-shell[class*="design-proposal"] [class*="panel"]::before,
+.upload-shell[class*="design-proposal"] [class*="card"]::before,
+.upload-shell[class*="design-proposal"] [class*="panel"]::before {
+  background: linear-gradient(90deg, var(--design-accent), transparent 70%) !important;
+  opacity: 0.25 !important;
+}
+
+.app-shell[class*="design-proposal"] h1,
+.app-shell[class*="design-proposal"] h2,
+.app-shell[class*="design-proposal"] h3,
+.app-shell[class*="design-proposal"] h4,
+.app-shell[class*="design-proposal"] strong,
+.upload-shell[class*="design-proposal"] h1,
+.upload-shell[class*="design-proposal"] h2,
+.upload-shell[class*="design-proposal"] h3,
+.upload-shell[class*="design-proposal"] strong,
+.local-login-shell[class*="design-proposal"] h1,
+.local-login-shell[class*="design-proposal"] h2,
+.local-login-shell[class*="design-proposal"] strong,
+.local-settings-panel h1,
+.local-settings-panel h2,
+.local-settings-panel h3,
+.local-settings-panel strong {
+  color: var(--design-text) !important;
+}
+
+.app-shell[class*="design-proposal"] p,
+.app-shell[class*="design-proposal"] span,
+.app-shell[class*="design-proposal"] small,
+.app-shell[class*="design-proposal"] label,
+.app-shell[class*="design-proposal"] li,
+.upload-shell[class*="design-proposal"] p,
+.upload-shell[class*="design-proposal"] span,
+.upload-shell[class*="design-proposal"] small,
+.upload-shell[class*="design-proposal"] label,
+.upload-shell[class*="design-proposal"] li,
+.local-login-shell[class*="design-proposal"] p,
+.local-login-shell[class*="design-proposal"] span,
+.local-login-shell[class*="design-proposal"] small,
+.local-login-shell[class*="design-proposal"] label,
+.local-settings-panel p,
+.local-settings-panel span,
+.local-settings-panel small,
+.local-settings-panel label {
+  color: var(--design-muted) !important;
+}
+
+.app-shell[class*="design-proposal"] a,
+.app-shell[class*="design-proposal"] .section-title p,
+.app-shell[class*="design-proposal"] .followup-eyebrow,
+.upload-shell[class*="design-proposal"] .followup-eyebrow,
+.local-login-shell[class*="design-proposal"] .local-login-brand svg,
+.local-settings-panel .local-settings-head span {
+  color: var(--design-accent-2) !important;
+}
+
+.app-shell[class*="design-proposal"] input,
+.app-shell[class*="design-proposal"] select,
+.app-shell[class*="design-proposal"] textarea,
+.app-shell[class*="design-proposal"] .multi-select-trigger,
+.upload-shell[class*="design-proposal"] input,
+.upload-shell[class*="design-proposal"] select,
+.upload-shell[class*="design-proposal"] textarea,
+.local-login-shell[class*="design-proposal"] input,
+.local-login-shell[class*="design-proposal"] select,
+.local-login-shell[class*="design-proposal"] textarea,
+.local-settings-panel input,
+.local-settings-panel select,
+.local-settings-panel textarea {
+  background: var(--design-card-2) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: none !important;
+}
+
+.design-proposal-2 input,
+.design-proposal-2 select,
+.design-proposal-2 textarea,
+.design-proposal-2 .multi-select-trigger,
+html[data-design="proposal2"] .local-settings-panel input,
+html[data-design="proposal2"] .local-settings-panel select,
+html[data-design="proposal2"] .local-settings-panel textarea {
+  background: #ffffff !important;
+  color: #0c1f35 !important;
+}
+
+.app-shell[class*="design-proposal"] input::placeholder,
+.upload-shell[class*="design-proposal"] input::placeholder,
+.local-login-shell[class*="design-proposal"] input::placeholder,
+.local-settings-panel input::placeholder {
+  color: var(--design-faint) !important;
+  opacity: 1 !important;
+}
+
+.app-shell[class*="design-proposal"] .multi-select-dropdown,
+.app-shell[class*="design-proposal"] .multi-select-menu,
+.app-shell[class*="design-proposal"] .dropdown-menu,
+.app-shell[class*="design-proposal"] option,
+.upload-shell[class*="design-proposal"] option,
+.local-login-shell[class*="design-proposal"] option {
+  background: var(--design-card) !important;
+  color: var(--design-text) !important;
+  border-color: var(--design-border) !important;
+}
+
+.app-shell[class*="design-proposal"] .multi-select-option:hover,
+.app-shell[class*="design-proposal"] .multi-select-option.is-selected,
+.app-shell[class*="design-proposal"] .multi-select-option.selected {
+  background: var(--design-selected) !important;
+  color: var(--design-text) !important;
+}
+
+.app-shell[class*="design-proposal"] table,
+.app-shell[class*="design-proposal"] .records-table,
+.app-shell[class*="design-proposal"] .data-table {
+  background: var(--design-card) !important;
+  color: var(--design-text) !important;
+  border-color: var(--design-border) !important;
+}
+
+.app-shell[class*="design-proposal"] thead,
+.app-shell[class*="design-proposal"] th,
+.app-shell[class*="design-proposal"] .table-header {
+  background: var(--design-table-head) !important;
+  color: var(--design-text) !important;
+  border-color: var(--design-border) !important;
+}
+
+.app-shell[class*="design-proposal"] tbody tr,
+.app-shell[class*="design-proposal"] td {
+  background: var(--design-table-row) !important;
+  color: var(--design-text) !important;
+  border-color: rgba(127, 160, 190, 0.16) !important;
+}
+
+.app-shell[class*="design-proposal"] tbody tr:nth-child(even) td {
+  background: var(--design-table-row-alt) !important;
+}
+
+.app-shell[class*="design-proposal"] tbody tr:hover td {
+  background: var(--design-hover) !important;
+}
+
+.app-shell[class*="design-proposal"] .badge,
+.app-shell[class*="design-proposal"] .status-badge,
+.app-shell[class*="design-proposal"] .pill,
+.app-shell[class*="design-proposal"] .chip,
+.app-shell[class*="design-proposal"] [class*="badge"],
+.app-shell[class*="design-proposal"] [class*="chip"] {
+  background: var(--design-selected) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+}
+
+.app-shell[class*="design-proposal"] .warning,
+.app-shell[class*="design-proposal"] .warning-strip,
+.app-shell[class*="design-proposal"] .status-warning {
+  color: var(--design-warning) !important;
+  border-color: rgba(245, 184, 75, 0.42) !important;
+}
+
+.app-shell[class*="design-proposal"] .error,
+.app-shell[class*="design-proposal"] .danger,
+.app-shell[class*="design-proposal"] .status-danger,
+.upload-shell[class*="design-proposal"] .toast.error {
+  color: var(--design-danger) !important;
+  border-color: rgba(255, 91, 109, 0.42) !important;
+}
+
+.app-shell[class*="design-proposal"] .success,
+.app-shell[class*="design-proposal"] .status-success,
+.upload-shell[class*="design-proposal"] .loaded {
+  color: var(--design-success) !important;
+  border-color: rgba(49, 231, 164, 0.42) !important;
+}
+
+.cdr-design-selector,
+.cdr-theme-selector {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 42px !important;
+  padding: 6px 10px !important;
+  border: 1px solid var(--design-border) !important;
+  border-radius: 18px !important;
+  background: var(--design-nav-bg) !important;
+  color: var(--design-text) !important;
+  box-shadow: var(--design-shadow) !important;
+}
+
+.cdr-design-selector-label,
+.cdr-theme-selector-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  color: var(--design-muted) !important;
+  font-weight: 900 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cdr-design-selector select,
+.cdr-theme-selector select {
+  min-width: 300px !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: var(--design-bg) !important;
+  color: var(--design-text) !important;
+  font-weight: 900 !important;
+  padding: 8px 12px !important;
+}
+
+.cdr-design-selector.compact select,
+.cdr-theme-selector.compact select {
+  min-width: 250px !important;
+}
+
+.design-proposal-2 .cdr-design-selector,
+.design-proposal-2 .cdr-theme-selector {
+  background: #ffffff !important;
+}
+
+.design-proposal-2 .cdr-design-selector select,
+.design-proposal-2 .cdr-theme-selector select {
+  background: #eef4ff !important;
+  color: #0c1f35 !important;
+}
+
+.app-shell[class*="design-proposal"] .recharts-wrapper,
+.app-shell[class*="design-proposal"] .recharts-surface {
+  color: var(--design-text) !important;
+}
+
+.app-shell[class*="design-proposal"] .recharts-text,
+.app-shell[class*="design-proposal"] .recharts-cartesian-axis-tick-value,
+.app-shell[class*="design-proposal"] .recharts-label,
+.app-shell[class*="design-proposal"] .recharts-legend-item-text {
+  fill: var(--chart-axis) !important;
+  color: var(--chart-axis) !important;
+}
+
+.app-shell[class*="design-proposal"] .recharts-cartesian-grid line {
+  stroke: var(--chart-grid) !important;
+}
+
+.app-shell[class*="design-proposal"] .recharts-tooltip-wrapper,
+.app-shell[class*="design-proposal"] .recharts-default-tooltip {
+  background: var(--chart-tooltip-bg) !important;
+  border-color: var(--chart-tooltip-border) !important;
+  color: var(--chart-tooltip-text) !important;
+}
+
+.app-shell[class*="design-proposal"] svg text {
+  fill: var(--chart-label);
+}
+
+.upload-shell[class*="design-proposal"] .followup-upload-card {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(420px, 0.92fr);
+  gap: 24px !important;
+}
+
+.upload-shell[class*="design-proposal"] .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 20px !important;
+  filter: saturate(1.05) contrast(1.04);
+}
+
+.design-proposal-2 .followup-upload-visual img {
+  filter: saturate(0.95) contrast(0.98) brightness(1.04);
+}
+
+.design-proposal-3 .followup-upload-visual img {
+  filter: saturate(1.12) hue-rotate(78deg) contrast(1.08) brightness(0.90);
+}
+
+.app-shell[class*="design-proposal"] ::-webkit-scrollbar,
+.upload-shell[class*="design-proposal"] ::-webkit-scrollbar,
+.local-login-shell[class*="design-proposal"] ::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+.app-shell[class*="design-proposal"] ::-webkit-scrollbar-track,
+.upload-shell[class*="design-proposal"] ::-webkit-scrollbar-track,
+.local-login-shell[class*="design-proposal"] ::-webkit-scrollbar-track {
+  background: var(--design-bg-soft);
+}
+
+.app-shell[class*="design-proposal"] ::-webkit-scrollbar-thumb,
+.upload-shell[class*="design-proposal"] ::-webkit-scrollbar-thumb,
+.local-login-shell[class*="design-proposal"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--design-accent), var(--design-accent-2));
+  border-radius: 999px;
+  border: 2px solid var(--design-bg-soft);
+}
+
+.design-proposal-1 .followup-dashboard-title::before,
+.design-proposal-1 .local-login-brand::before {
+  background: linear-gradient(90deg, transparent, rgba(23, 156, 255, 0.18), transparent) !important;
+}
+
+.design-proposal-2 .followup-dashboard-title::before,
+.design-proposal-2 .local-login-brand::before {
+  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.10), transparent) !important;
+}
+
+.design-proposal-3 .followup-dashboard-title::before,
+.design-proposal-3 .local-login-brand::before {
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.18), transparent) !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell[class*="design-proposal"] .topbar,
+  .app-shell[class*="design-proposal"] .cdr-navy-banner {
+    grid-template-columns: 1fr !important;
+    justify-items: center;
+  }
+  .app-shell[class*="design-proposal"] .cdr-header-logo {
+    min-height: 46px !important;
+  }
+  .app-shell[class*="design-proposal"] .cdr-header-logo img {
+    height: 46px !important;
+  }
+  .upload-shell[class*="design-proposal"] .followup-upload-card {
+    grid-template-columns: 1fr !important;
+  }
+  .cdr-design-selector select,
+  .cdr-theme-selector select {
+    min-width: 190px !important;
+  }
+}
+
+html[data-design],
+.app-shell[class*="design-proposal"],
+.upload-shell[class*="design-proposal"],
+.local-login-shell[class*="design-proposal"] {
+  --theme-page-bg: var(--design-bg) !important;
+  --theme-panel-bg: var(--design-card) !important;
+  --theme-panel-bg-strong: var(--design-card-2) !important;
+  --theme-card-bg: var(--design-card) !important;
+  --theme-card-bg-soft: var(--design-card-soft) !important;
+  --theme-text: var(--design-text) !important;
+  --theme-muted: var(--design-muted) !important;
+  --theme-border: var(--design-border) !important;
+  --theme-border-strong: var(--design-border-strong) !important;
+  --theme-shadow: var(--design-shadow) !important;
+  --theme-accent: var(--design-accent) !important;
+  --theme-accent-2: var(--design-accent-2) !important;
+  --cdr-card-title-color: var(--design-text) !important;
+  --cdr-card-subtitle-color: var(--design-muted) !important;
+}
+
+/* ========================================================================
+   FINAL PROPOSAL COVERAGE PATCH
+   Forces proposal tokens onto the high-specificity legacy header/upload/login
+   rules that previously kept old colors in the upper dashboard area.
+   ======================================================================== */
+
+html[data-design="proposal1"] body,
+html[data-design="proposal2"] body,
+html[data-design="proposal3"] body {
+  background: var(--design-bg-radial) !important;
+  color: var(--design-text) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1,
+html[data-design="proposal2"] body .app-shell.design-proposal-2,
+html[data-design="proposal3"] body .app-shell.design-proposal-3,
+html[data-design="proposal1"] body .upload-shell.design-proposal-1,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3,
+html[data-design="proposal1"] body .local-login-shell.design-proposal-1,
+html[data-design="proposal2"] body .local-login-shell.design-proposal-2,
+html[data-design="proposal3"] body .local-login-shell.design-proposal-3 {
+  background: var(--design-bg-radial) !important;
+  color: var(--design-text) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell {
+  background: var(--design-bg) !important;
+  color: var(--design-text) !important;
+  border-color: var(--design-border) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  background: var(--design-header-bg) !important;
+  border-color: var(--design-border-strong) !important;
+  color: var(--design-text) !important;
+  box-shadow: var(--design-shadow) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  background: var(--design-header-bg) !important;
+  border-color: var(--design-border-strong) !important;
+  box-shadow: 0 18px 42px rgba(15, 38, 70, 0.12) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art {
+  opacity: 0.45 !important;
+  mix-blend-mode: screen !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art {
+  opacity: 0.08 !important;
+  mix-blend-mode: multiply !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .followup-dashboard-title,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .followup-dashboard-title,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .followup-dashboard-title {
+  color: var(--design-text) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .followup-dashboard-title h1,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .followup-dashboard-title h1,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .followup-dashboard-title h1 {
+  color: var(--design-text) !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .followup-dashboard-title p,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .followup-dashboard-title p,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .followup-dashboard-title p {
+  color: var(--design-muted) !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-header-profile-band,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-header-profile-band,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-header-profile-band {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-record-card,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-source-card,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-record-card,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-source-card,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-record-card,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-source-card,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-profile-main,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-profile-card,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-profile-main,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-profile-card,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-profile-main,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-profile-card {
+  background: var(--design-card) !important;
+  border-color: var(--design-border-strong) !important;
+  color: var(--design-text) !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-record-copy span,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-source-copy span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-record-copy span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-source-copy span,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-record-copy span,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-source-copy span,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-profile-main span,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-profile-card span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-profile-main span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-profile-card span,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-profile-main span,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-profile-card span {
+  color: var(--design-accent-2) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-record-copy strong,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-source-copy strong,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-record-copy strong,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-source-copy strong,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-record-copy strong,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-source-copy strong,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-profile-main strong,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-profile-card strong,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-profile-main strong,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-profile-card strong,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-profile-main strong,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-profile-card strong {
+  color: var(--design-text) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-record-copy p,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-source-copy p,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-source-copy small,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-record-copy p,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-source-copy p,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-source-copy small,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-record-copy p,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-source-copy p,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-source-copy small,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-profile-main p,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-profile-card p,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-profile-card small,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-profile-main p,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-profile-card p,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-profile-card small,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-profile-main p,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-profile-card p,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-profile-card small {
+  color: var(--design-muted) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-profile-source-chips em,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-profile-source-chips em,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-profile-source-chips em,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .modern-source-chips em,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .modern-source-chips em,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .modern-source-chips em {
+  background: var(--design-selected) !important;
+  border-color: var(--design-border-strong) !important;
+  color: var(--design-text) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-banner-control-bar,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-banner-control-bar,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-banner-control-bar,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .dashboard-tabs,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .dashboard-tabs,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .dashboard-tabs,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .filters-panel,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .filters-panel,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .filters-panel {
+  background: var(--design-nav-bg) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: var(--design-shadow) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .dashboard-tab,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .dashboard-tab,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .dashboard-tab,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-action-pill,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-action-pill,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-action-pill {
+  background: var(--design-card-2) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: none !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .dashboard-tab.active,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .dashboard-tab.active,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .dashboard-tab.active,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-action-primary,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-action-primary,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-action-primary {
+  background: var(--design-active-bg) !important;
+  border-color: transparent !important;
+  color: var(--design-button-text) !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .dashboard-tab:hover,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .dashboard-tab:hover,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .dashboard-tab:hover,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .cdr-command-shell .cdr-action-pill:hover,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .cdr-action-pill:hover,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .cdr-command-shell .cdr-action-pill:hover {
+  background: var(--design-hover) !important;
+  border-color: var(--design-border-strong) !important;
+  color: var(--design-text) !important;
+}
+
+html[data-design="proposal1"] body .upload-shell.design-proposal-1 .followup-upload-card,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2 .followup-upload-card,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3 .followup-upload-card,
+html[data-design="proposal1"] body .upload-shell.design-proposal-1 .followup-upload-left,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2 .followup-upload-left,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3 .followup-upload-left,
+html[data-design="proposal1"] body .upload-shell.design-proposal-1 .followup-upload-visual,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2 .followup-upload-visual,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3 .followup-upload-visual,
+html[data-design="proposal1"] body .local-login-shell.design-proposal-1 .local-login-card,
+html[data-design="proposal2"] body .local-login-shell.design-proposal-2 .local-login-card,
+html[data-design="proposal3"] body .local-login-shell.design-proposal-3 .local-login-card {
+  background: var(--design-card) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: var(--design-shadow) !important;
+}
+
+html[data-design="proposal1"] body .upload-shell.design-proposal-1 .followup-upload-left h1,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2 .followup-upload-left h1,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3 .followup-upload-left h1,
+html[data-design="proposal1"] body .local-login-shell.design-proposal-1 h1,
+html[data-design="proposal2"] body .local-login-shell.design-proposal-2 h1,
+html[data-design="proposal3"] body .local-login-shell.design-proposal-3 h1 {
+  color: var(--design-text) !important;
+}
+
+html[data-design="proposal1"] body .upload-shell.design-proposal-1 .followup-lead,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2 .followup-lead,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3 .followup-lead,
+html[data-design="proposal1"] body .local-login-shell.design-proposal-1 p,
+html[data-design="proposal2"] body .local-login-shell.design-proposal-2 p,
+html[data-design="proposal3"] body .local-login-shell.design-proposal-3 p {
+  color: var(--design-muted) !important;
+}
+
+html[data-design="proposal1"] body .upload-shell.design-proposal-1 .followup-action-button,
+html[data-design="proposal1"] body .upload-shell.design-proposal-1 .followup-mini-card,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2 .followup-action-button,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2 .followup-mini-card,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3 .followup-action-button,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3 .followup-mini-card,
+html[data-design="proposal1"] body .local-login-shell.design-proposal-1 button,
+html[data-design="proposal2"] body .local-login-shell.design-proposal-2 button,
+html[data-design="proposal3"] body .local-login-shell.design-proposal-3 button {
+  background: var(--design-card-2) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+}
+
+html[data-design="proposal1"] body .upload-shell.design-proposal-1 .followup-primary-upload,
+html[data-design="proposal1"] body .upload-shell.design-proposal-1 .followup-confirm-upload,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2 .followup-primary-upload,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2 .followup-confirm-upload,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3 .followup-primary-upload,
+html[data-design="proposal3"] body .upload-shell.design-proposal-3 .followup-confirm-upload,
+html[data-design="proposal1"] body .local-login-shell.design-proposal-1 .cdr-action-primary,
+html[data-design="proposal2"] body .local-login-shell.design-proposal-2 .cdr-action-primary,
+html[data-design="proposal3"] body .local-login-shell.design-proposal-3 .cdr-action-primary {
+  background: var(--design-button-bg) !important;
+  border-color: transparent !important;
+  color: var(--design-button-text) !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .chart-card,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .chart-card,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .chart-card,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .reports-panel,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .reports-panel,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .reports-panel,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .filtered-register,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filtered-register,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .filtered-register {
+  background: var(--design-card) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+}
+
+/* ========================================================================
+   FINAL FIXED-COLOR PURGE PATCH
+   Purpose: remove remaining hard-coded legacy navy/blue/purple colors after
+   selecting a proposal. Every visible surface now reads from design tokens.
+   ======================================================================== */
+html[data-design="proposal1"],
+html[data-design="proposal2"],
+html[data-design="proposal3"],
+html[data-design="proposal1"] body,
+html[data-design="proposal2"] body,
+html[data-design="proposal3"] body,
+.app-shell[class*="design-proposal"],
+.upload-shell[class*="design-proposal"],
+.local-login-shell[class*="design-proposal"] {
+  --bg: var(--design-bg) !important;
+  --bg-2: var(--design-bg-soft) !important;
+  --panel: var(--design-card) !important;
+  --panel-strong: var(--design-card-2) !important;
+  --card: var(--design-card) !important;
+  --text: var(--design-text) !important;
+  --muted: var(--design-muted) !important;
+  --line: var(--design-border) !important;
+  --blue: var(--design-accent) !important;
+  --blue-soft: var(--design-accent-2) !important;
+  --cyan: var(--design-accent-2) !important;
+  --amber: var(--design-warning) !important;
+  --green: var(--design-success) !important;
+  --red: var(--design-danger) !important;
+  --shadow: var(--design-shadow) !important;
+  --cdr-page-bg: var(--design-bg) !important;
+  --cdr-shell-bg: var(--design-bg-radial) !important;
+  --cdr-header-bg: var(--design-header-bg) !important;
+  --cdr-tabs-bg: var(--design-nav-bg) !important;
+  --cdr-filter-bg: var(--design-nav-bg) !important;
+  --cdr-panel-bg: var(--design-card) !important;
+  --cdr-card-bg: var(--design-card) !important;
+  --cdr-card-border: var(--design-border) !important;
+  --cdr-filter-label-color: var(--design-muted) !important;
+  --cdr-filter-control-bg: var(--design-card-2) !important;
+  --cdr-filter-control-border: var(--design-border) !important;
+  --cdr-filter-control-color: var(--design-text) !important;
+  --cdr-table-head-bg: var(--design-table-head) !important;
+  --cdr-table-row-bg: var(--design-table-row) !important;
+  --cdr-table-row-alt-bg: var(--design-table-row-alt) !important;
+  --cdr-table-text: var(--design-text) !important;
+}
+
+html[data-design="proposal1"] body .app-shell[class*="design-proposal"],
+html[data-design="proposal2"] body .app-shell[class*="design-proposal"],
+html[data-design="proposal3"] body .app-shell[class*="design-proposal"],
+html[data-design="proposal1"] body .upload-shell[class*="design-proposal"],
+html[data-design="proposal2"] body .upload-shell[class*="design-proposal"],
+html[data-design="proposal3"] body .upload-shell[class*="design-proposal"],
+html[data-design="proposal1"] body .local-login-shell[class*="design-proposal"],
+html[data-design="proposal2"] body .local-login-shell[class*="design-proposal"],
+html[data-design="proposal3"] body .local-login-shell[class*="design-proposal"] {
+  background: var(--design-bg-radial) !important;
+  color: var(--design-text) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-command-shell,
+html[data-design] body .app-shell[class*="design-proposal"] .topbar,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-navy-banner,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-banner-control-bar,
+html[data-design] body .app-shell[class*="design-proposal"] .dashboard-tabs-row,
+html[data-design] body .app-shell[class*="design-proposal"] .dashboard-tabs,
+html[data-design] body .app-shell[class*="design-proposal"] .filters-panel,
+html[data-design] body .app-shell[class*="design-proposal"] .filters-panel-arranged,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-card,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-left,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-visual,
+html[data-design] body .local-login-shell[class*="design-proposal"] .local-login-card,
+html[data-design] body .local-login-shell[class*="design-proposal"] .local-login-brand,
+html[data-design] body .local-settings-panel {
+  background: var(--design-card) !important;
+  background-color: var(--design-card) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: var(--design-shadow) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .topbar,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-navy-banner {
+  background: var(--design-header-bg) !important;
+  background-color: transparent !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-banner-control-bar,
+html[data-design] body .app-shell[class*="design-proposal"] .dashboard-tabs-row,
+html[data-design] body .app-shell[class*="design-proposal"] .dashboard-tabs,
+html[data-design] body .app-shell[class*="design-proposal"] .filters-panel,
+html[data-design] body .app-shell[class*="design-proposal"] .filters-panel-arranged {
+  background: var(--design-nav-bg) !important;
+  background-color: var(--design-nav-bg) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .dashboard-tab,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-action-pill,
+html[data-design] body .app-shell[class*="design-proposal"] .button,
+html[data-design] body .app-shell[class*="design-proposal"] .export-button,
+html[data-design] body .app-shell[class*="design-proposal"] .section-title-arrow,
+html[data-design] body .upload-shell[class*="design-proposal"] button,
+html[data-design] body .local-login-shell[class*="design-proposal"] button,
+html[data-design] body .local-settings-panel button {
+  background: var(--design-card-2) !important;
+  background-color: var(--design-card-2) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: none !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .dashboard-tab.active,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-action-primary,
+html[data-design] body .app-shell[class*="design-proposal"] .button.primary,
+html[data-design] body .app-shell[class*="design-proposal"] .export-button.primary,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-primary-upload,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-confirm-upload,
+html[data-design] body .local-login-shell[class*="design-proposal"] .cdr-action-primary,
+html[data-design] body .local-settings-panel .cdr-action-primary {
+  background: var(--design-active-bg) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--design-button-text) !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .dashboard-tab:hover,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-action-pill:hover,
+html[data-design] body .app-shell[class*="design-proposal"] .button:hover,
+html[data-design] body .upload-shell[class*="design-proposal"] button:hover,
+html[data-design] body .local-login-shell[class*="design-proposal"] button:hover,
+html[data-design] body .local-settings-panel button:hover {
+  background: var(--design-hover) !important;
+  border-color: var(--design-border-strong) !important;
+  color: var(--design-text) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .modern-profile-main,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-profile-card,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-profile-record-card,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-profile-source-card,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-panel,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-panel-head,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-stat-tile,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-kpi-card,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-quality-tile,
+html[data-design] body .app-shell[class*="design-proposal"] .quality-score-card,
+html[data-design] body .app-shell[class*="design-proposal"] .quality-issue,
+html[data-design] body .app-shell[class*="design-proposal"] .data-quality-panel,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-card,
+html[data-design] body .app-shell[class*="design-proposal"] .metric-card,
+html[data-design] body .app-shell[class*="design-proposal"] .chart-card,
+html[data-design] body .app-shell[class*="design-proposal"] .table-card,
+html[data-design] body .app-shell[class*="design-proposal"] .records-card,
+html[data-design] body .app-shell[class*="design-proposal"] .report-card,
+html[data-design] body .app-shell[class*="design-proposal"] .report-suite,
+html[data-design] body .app-shell[class*="design-proposal"] .wide-table-card,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-status-footer,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-saas-footer,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-quality-strip,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-quality-footer-strip {
+  background: var(--design-card) !important;
+  background-color: var(--design-card) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: var(--design-shadow) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .modern-panel-head,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-status-footer,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-saas-footer {
+  background: var(--design-card-2) !important;
+  background-color: var(--design-card-2) !important;
+  box-shadow: none !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .modern-stat-icon,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-kpi-icon,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-summary-icon,
+html[data-design] body .app-shell[class*="design-proposal"] .kpi-icon,
+html[data-design] body .app-shell[class*="design-proposal"] .metric-icon,
+html[data-design] body .app-shell[class*="design-proposal"] .quality-icon {
+  background: var(--design-active-bg) !important;
+  background-color: transparent !important;
+  color: var(--design-button-text) !important;
+  border-color: transparent !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] svg,
+html[data-design] body .upload-shell[class*="design-proposal"] svg,
+html[data-design] body .local-login-shell[class*="design-proposal"] svg,
+html[data-design] body .local-settings-panel svg {
+  color: var(--design-accent-2) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .modern-profile-main img,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-profile-record-card img,
+html[data-design] body .app-shell[class*="design-proposal"] .workbook-card img {
+  background: var(--design-card-2) !important;
+  border: 1px solid var(--design-border) !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] h1,
+html[data-design] body .app-shell[class*="design-proposal"] h2,
+html[data-design] body .app-shell[class*="design-proposal"] h3,
+html[data-design] body .app-shell[class*="design-proposal"] h4,
+html[data-design] body .app-shell[class*="design-proposal"] strong,
+html[data-design] body .upload-shell[class*="design-proposal"] h1,
+html[data-design] body .upload-shell[class*="design-proposal"] h2,
+html[data-design] body .upload-shell[class*="design-proposal"] h3,
+html[data-design] body .upload-shell[class*="design-proposal"] strong,
+html[data-design] body .local-login-shell[class*="design-proposal"] h1,
+html[data-design] body .local-login-shell[class*="design-proposal"] h2,
+html[data-design] body .local-login-shell[class*="design-proposal"] h3,
+html[data-design] body .local-login-shell[class*="design-proposal"] strong {
+  color: var(--design-text) !important;
+  text-shadow: none !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] p,
+html[data-design] body .app-shell[class*="design-proposal"] span,
+html[data-design] body .app-shell[class*="design-proposal"] small,
+html[data-design] body .app-shell[class*="design-proposal"] label,
+html[data-design] body .upload-shell[class*="design-proposal"] p,
+html[data-design] body .upload-shell[class*="design-proposal"] span,
+html[data-design] body .upload-shell[class*="design-proposal"] small,
+html[data-design] body .upload-shell[class*="design-proposal"] label,
+html[data-design] body .local-login-shell[class*="design-proposal"] p,
+html[data-design] body .local-login-shell[class*="design-proposal"] span,
+html[data-design] body .local-login-shell[class*="design-proposal"] small,
+html[data-design] body .local-login-shell[class*="design-proposal"] label {
+  color: var(--design-muted) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .eyebrow,
+html[data-design] body .app-shell[class*="design-proposal"] .followup-eyebrow,
+html[data-design] body .app-shell[class*="design-proposal"] .section-title p,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-profile-main span,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-profile-card span,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-profile-source-chips em,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-source-chips em,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-eyebrow,
+html[data-design] body .upload-shell[class*="design-proposal"] .eyebrow {
+  color: var(--design-accent-2) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] input,
+html[data-design] body .app-shell[class*="design-proposal"] select,
+html[data-design] body .app-shell[class*="design-proposal"] textarea,
+html[data-design] body .app-shell[class*="design-proposal"] .multi-select-trigger,
+html[data-design] body .app-shell[class*="design-proposal"] .filter-count,
+html[data-design] body .app-shell[class*="design-proposal"] .reset-filter-button,
+html[data-design] body .upload-shell[class*="design-proposal"] input,
+html[data-design] body .upload-shell[class*="design-proposal"] select,
+html[data-design] body .upload-shell[class*="design-proposal"] textarea,
+html[data-design] body .local-login-shell[class*="design-proposal"] input,
+html[data-design] body .local-login-shell[class*="design-proposal"] select,
+html[data-design] body .local-login-shell[class*="design-proposal"] textarea,
+html[data-design] body .local-settings-panel input,
+html[data-design] body .local-settings-panel select,
+html[data-design] body .local-settings-panel textarea {
+  background: var(--design-card-2) !important;
+  background-color: var(--design-card-2) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+  box-shadow: none !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] input::placeholder,
+html[data-design] body .upload-shell[class*="design-proposal"] input::placeholder,
+html[data-design] body .local-login-shell[class*="design-proposal"] input::placeholder {
+  color: var(--design-faint) !important;
+  opacity: 1 !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .multi-select-dropdown,
+html[data-design] body .app-shell[class*="design-proposal"] .multi-select-menu,
+html[data-design] body .app-shell[class*="design-proposal"] .dropdown-menu,
+html[data-design] body .app-shell[class*="design-proposal"] option,
+html[data-design] body .local-settings-panel option {
+  background: var(--design-card) !important;
+  color: var(--design-text) !important;
+  border-color: var(--design-border) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .multi-select-option:hover,
+html[data-design] body .app-shell[class*="design-proposal"] .multi-select-option.is-selected,
+html[data-design] body .app-shell[class*="design-proposal"] .multi-select-option.selected {
+  background: var(--design-selected) !important;
+  color: var(--design-text) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] table,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-table,
+html[data-design] body .app-shell[class*="design-proposal"] .records-table,
+html[data-design] body .app-shell[class*="design-proposal"] .filtered-register-table,
+html[data-design] body .app-shell[class*="design-proposal"] .busy-heatmap-table {
+  background: var(--design-card) !important;
+  color: var(--design-text) !important;
+  border-color: var(--design-border) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] thead,
+html[data-design] body .app-shell[class*="design-proposal"] tr,
+html[data-design] body .app-shell[class*="design-proposal"] th,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-table th,
+html[data-design] body .app-shell[class*="design-proposal"] .records-table th,
+html[data-design] body .app-shell[class*="design-proposal"] .filtered-register-table th,
+html[data-design] body .app-shell[class*="design-proposal"] .busy-heatmap-table th {
+  background: var(--design-table-head) !important;
+  background-color: var(--design-table-head) !important;
+  color: var(--design-text) !important;
+  border-color: var(--design-border) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] tbody tr,
+html[data-design] body .app-shell[class*="design-proposal"] td,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-table td,
+html[data-design] body .app-shell[class*="design-proposal"] .records-table td,
+html[data-design] body .app-shell[class*="design-proposal"] .filtered-register-table td,
+html[data-design] body .app-shell[class*="design-proposal"] .busy-heatmap-table td {
+  background: var(--design-table-row) !important;
+  background-color: var(--design-table-row) !important;
+  color: var(--design-text) !important;
+  border-color: var(--design-border) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] tbody tr:nth-child(even) td,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-table tbody tr:nth-child(even) td,
+html[data-design] body .app-shell[class*="design-proposal"] .records-table tbody tr:nth-child(even) td,
+html[data-design] body .app-shell[class*="design-proposal"] .filtered-register-table tbody tr:nth-child(even) td {
+  background: var(--design-table-row-alt) !important;
+  background-color: var(--design-table-row-alt) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] tbody tr:hover td {
+  background: var(--design-hover) !important;
+  background-color: var(--design-hover) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .badge,
+html[data-design] body .app-shell[class*="design-proposal"] .status-badge,
+html[data-design] body .app-shell[class*="design-proposal"] .pill,
+html[data-design] body .app-shell[class*="design-proposal"] .chip,
+html[data-design] body .app-shell[class*="design-proposal"] [class*="badge"],
+html[data-design] body .app-shell[class*="design-proposal"] [class*="chip"] {
+  background: var(--design-selected) !important;
+  background-color: var(--design-selected) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .chart-legend,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-chart-legend,
+html[data-design] body .app-shell[class*="design-proposal"] .legend,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-panel-menu {
+  color: var(--design-muted) !important;
+  border-color: var(--design-border) !important;
+  background: transparent !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .modern-panel-menu:hover {
+  color: var(--design-accent-2) !important;
+  background: var(--design-hover) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .recharts-cartesian-grid line {
+  stroke: var(--chart-grid) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .recharts-cartesian-axis-line,
+html[data-design] body .app-shell[class*="design-proposal"] .recharts-cartesian-axis-tick-line {
+  stroke: var(--chart-grid) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .recharts-text,
+html[data-design] body .app-shell[class*="design-proposal"] .recharts-cartesian-axis-tick-value,
+html[data-design] body .app-shell[class*="design-proposal"] .recharts-label,
+html[data-design] body .app-shell[class*="design-proposal"] .recharts-legend-item-text,
+html[data-design] body .app-shell[class*="design-proposal"] svg text,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-pie-center-value,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-pie-center-label {
+  fill: var(--chart-label) !important;
+  color: var(--chart-label) !important;
+}
+
+html[data-design] body .app-shell[class*="design-proposal"] .recharts-default-tooltip,
+html[data-design] body .app-shell[class*="design-proposal"] .modern-calltype-tooltip,
+html[data-design] body .app-shell[class*="design-proposal"] .custom-tooltip {
+  background: var(--chart-tooltip-bg) !important;
+  background-color: var(--chart-tooltip-bg) !important;
+  border-color: var(--chart-tooltip-border) !important;
+  color: var(--chart-tooltip-text) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-header-logo img,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .followup-header-badge img {
+  filter: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .modern-stat-icon,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .modern-kpi-icon,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .visual-summary-icon,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .kpi-icon,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .metric-icon,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .quality-icon {
+  color: #ffffff !important;
+}
+
+
+/* ========================================================================
+   CDR PROPOSAL 2 READABILITY + CONTROL/CARD COVERAGE PATCH
+   Fixes remaining light-design issues: button/action box, KPI cards, filter
+   label/input colors, dropdown values, and toolbar backgrounds.
+   ======================================================================== */
+html[data-design="proposal2"] body .app-shell.design-proposal-2,
+html[data-design="proposal2"] body .upload-shell.design-proposal-2,
+html[data-design="proposal2"] body .local-login-shell.design-proposal-2 {
+  --cdr-filter-panel-bg: #ffffff !important;
+  --cdr-filter-panel-border: rgba(37, 99, 235, 0.22) !important;
+  --cdr-filter-label-color: #284866 !important;
+  --cdr-filter-control-bg: #f7fbff !important;
+  --cdr-filter-control-color: #0c1f35 !important;
+  --cdr-filter-control-border: rgba(37, 99, 235, 0.24) !important;
+  --cdr-kpi-card-bg: #ffffff !important;
+  --cdr-kpi-card-border: rgba(37, 99, 235, 0.22) !important;
+  --cdr-kpi-label-color: #365a78 !important;
+  --cdr-kpi-value-color: #0c1f35 !important;
+  --cdr-kpi-subtitle-color: #536e88 !important;
+  --cdr-kpi-icon-bg: linear-gradient(135deg, #2563eb, #0ea5e9) !important;
+  --cdr-chart-panel-bg: #ffffff !important;
+  --cdr-chart-panel-border: rgba(37, 99, 235, 0.18) !important;
+  --cdr-chart-title-color: #0c1f35 !important;
+  --cdr-chart-subtitle-color: #4b647d !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .dashboard-tabs-row,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .dashboard-tabs-actions,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .dashboard-tabs-actions .cdr-header-actions,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .dashboard-tabs,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel.filters-panel-arranged {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border-color: rgba(37, 99, 235, 0.18) !important;
+  color: #0c1f35 !important;
+  box-shadow: 0 12px 32px rgba(15, 38, 70, 0.08) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .dashboard-tabs-row {
+  border: 1px solid rgba(37, 99, 235, 0.14) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .dashboard-tab,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-action-pill,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 label.cdr-action-pill,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .button.small.cdr-action-pill {
+  background: #f8fbff !important;
+  background-color: #f8fbff !important;
+  border-color: rgba(37, 99, 235, 0.28) !important;
+  color: #0c1f35 !important;
+  box-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .dashboard-tab:hover,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-action-pill:hover,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 label.cdr-action-pill:hover,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .button.small.cdr-action-pill:hover {
+  background: #eaf2ff !important;
+  background-color: #eaf2ff !important;
+  border-color: rgba(37, 99, 235, 0.42) !important;
+  color: #123f70 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .dashboard-tab.active,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .dashboard-tab[aria-current="page"] {
+  background: var(--design-active-bg) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-design-selector,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-theme-selector {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border-color: rgba(37, 99, 235, 0.26) !important;
+  color: #0c1f35 !important;
+  box-shadow: 0 10px 26px rgba(15, 38, 70, 0.10) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-design-selector-label,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-theme-selector-label {
+  color: #365a78 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-design-selector select,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-theme-selector select {
+  background: #f3f8ff !important;
+  background-color: #f3f8ff !important;
+  color: #0c1f35 !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .cdr-filter-search > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-filter > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .filter-field > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged label,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filter-field-label {
+  color: #284866 !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .cdr-filter-search input,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .search-box input,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-trigger,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .filter-count,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .reset-filter-button {
+  background: #f7fbff !important;
+  background-color: #f7fbff !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+  color: #0c1f35 !important;
+  box-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .reset-filter-button {
+  background: #eaf2ff !important;
+  color: #123f70 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .reset-filter-button:hover {
+  background: #dbeafe !important;
+  color: #0c1f35 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .cdr-filter-search input::placeholder,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .search-box input::placeholder {
+  color: #5d7892 !important;
+  opacity: 1 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-value,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-trigger span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .filter-count span {
+  color: #0c1f35 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .search-box svg,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-trigger svg,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-action-pill svg,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-design-selector svg,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-theme-selector svg {
+  color: #2563eb !important;
+  stroke: #2563eb !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .multi-select-dropdown,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .multi-select-menu,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .multi-select-option,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 option {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #0c1f35 !important;
+  border-color: rgba(37, 99, 235, 0.20) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .multi-select-option:hover,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .multi-select-option.is-selected,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .multi-select-option.selected {
+  background: #eaf2ff !important;
+  background-color: #eaf2ff !important;
+  color: #0c1f35 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .cdr-kpi-strip-30::before {
+  color: #284866 !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .modern-stat-deck.cdr-kpi-strip-30,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .modern-stat-tile,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .modern-stat-tile,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 .modern-stat-tile {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+  color: #0c1f35 !important;
+  box-shadow: 0 8px 22px rgba(15, 38, 70, 0.08) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .modern-stat-tile span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .modern-stat-tile span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile span {
+  color: #365a78 !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .modern-stat-tile strong,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .modern-stat-tile strong,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong {
+  color: #0c1f35 !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .modern-stat-icon,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9) !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .modern-stat-icon svg,
+html[data-design="proposal2"] body .app-shell.design-proposal-2.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Keep dark proposals consistent with their own tokens after the light fix. */
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .filters-panel-arranged .cdr-filter-search > span,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .filters-panel-arranged .multi-select-filter > span,
+html[data-design="proposal1"] body .app-shell.design-proposal-1 .filters-panel-arranged .filter-field > span,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .filters-panel-arranged .cdr-filter-search > span,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .filters-panel-arranged .multi-select-filter > span,
+html[data-design="proposal3"] body .app-shell.design-proposal-3 .filters-panel-arranged .filter-field > span {
+  color: var(--design-muted) !important;
+}
+
+html[data-design="proposal1"] body .app-shell.design-proposal-1.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile,
+html[data-design="proposal3"] body .app-shell.design-proposal-3.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile {
+  background: var(--design-card) !important;
+  background-color: var(--design-card) !important;
+  border-color: var(--design-border) !important;
+}
+
+/* ========================================================================
+   FINAL LIGHT EXECUTIVE DIRECT CLASS OVERRIDE
+   ------------------------------------------------------------------------
+   This block intentionally does not depend on html[data-design]. It targets
+   the live app class directly so Proposal 2 is fully light even if a stale
+   root attribute or legacy CSS remains in the browser cache.
+   ======================================================================== */
+body .app-shell.design-proposal-2,
+body .app-shell.design-proposal-2 .cdr-command-shell {
+  background: linear-gradient(135deg, #f8fbff 0%, #eef4fb 55%, #ffffff 100%) !important;
+  background-color: #f4f7fb !important;
+  color: #0c1f35 !important;
+}
+
+body .app-shell.design-proposal-2 .cdr-command-shell > .cdr-banner-control-bar,
+body .app-shell.design-proposal-2 .cdr-command-shell .cdr-banner-control-bar,
+body .app-shell.design-proposal-2 .dashboard-tabs-actions,
+body .app-shell.design-proposal-2 .dashboard-tabs-actions .cdr-control-actions,
+body .app-shell.design-proposal-2 .dashboard-tabs-actions .cdr-header-actions,
+body .app-shell.design-proposal-2 .top-controls,
+body .app-shell.design-proposal-2 .control-bar,
+body .app-shell.design-proposal-2 .header-actions {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(37, 99, 235, 0.18) !important;
+  box-shadow: 0 10px 26px rgba(15, 38, 70, 0.10) !important;
+  color: #0c1f35 !important;
+}
+
+body .app-shell.design-proposal-2 .cdr-design-selector,
+body .app-shell.design-proposal-2 .cdr-theme-selector,
+body .app-shell.design-proposal-2 .cdr-action-pill,
+body .app-shell.design-proposal-2 .button,
+body .app-shell.design-proposal-2 label.cdr-action-pill,
+body .app-shell.design-proposal-2 button.cdr-action-pill,
+body .app-shell.design-proposal-2 .dashboard-tabs-actions .cdr-action-pill,
+body .app-shell.design-proposal-2 .dashboard-tabs-actions .theme-toggle.cdr-action-pill,
+body .app-shell.design-proposal-2 .dashboard-tabs-actions label.cdr-action-pill {
+  background: #f8fbff !important;
+  background-color: #f8fbff !important;
+  background-image: none !important;
+  border: 1px solid rgba(37, 99, 235, 0.28) !important;
+  color: #0c1f35 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .cdr-design-selector select,
+body .app-shell.design-proposal-2 .cdr-theme-selector select,
+body .app-shell.design-proposal-2 select {
+  background: #f3f8ff !important;
+  background-color: #f3f8ff !important;
+  background-image: none !important;
+  border: 1px solid rgba(37, 99, 235, 0.24) !important;
+  color: #0c1f35 !important;
+  text-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .cdr-design-selector-label,
+body .app-shell.design-proposal-2 .cdr-theme-selector-label,
+body .app-shell.design-proposal-2 .cdr-design-selector span,
+body .app-shell.design-proposal-2 .cdr-theme-selector span,
+body .app-shell.design-proposal-2 .cdr-action-pill span,
+body .app-shell.design-proposal-2 .button span {
+  color: #365a78 !important;
+  fill: #365a78 !important;
+  text-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .cdr-action-pill svg,
+body .app-shell.design-proposal-2 .button svg,
+body .app-shell.design-proposal-2 .cdr-design-selector svg,
+body .app-shell.design-proposal-2 .cdr-theme-selector svg {
+  color: #2563eb !important;
+  stroke: #2563eb !important;
+}
+
+body .app-shell.design-proposal-2 .dashboard-tabs-row,
+body .app-shell.design-proposal-2 .dashboard-tabs {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-color: rgba(37, 99, 235, 0.14) !important;
+  box-shadow: 0 8px 22px rgba(15, 38, 70, 0.06) !important;
+}
+
+body .app-shell.design-proposal-2 .dashboard-tab {
+  background: #f8fbff !important;
+  background-color: #f8fbff !important;
+  background-image: none !important;
+  border: 1px solid rgba(37, 99, 235, 0.25) !important;
+  color: #0c1f35 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .dashboard-tab.active,
+body .app-shell.design-proposal-2 .dashboard-tab[aria-current="page"],
+body .app-shell.design-proposal-2 .cdr-action-primary,
+body .app-shell.design-proposal-2 .export-button {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9) !important;
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24) !important;
+}
+
+body .app-shell.design-proposal-2 .filters-panel,
+body .app-shell.design-proposal-2 .filters-panel-arranged,
+body .app-shell.design-proposal-2 .filter-panel {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(37, 99, 235, 0.16) !important;
+  box-shadow: 0 12px 30px rgba(15, 38, 70, 0.08) !important;
+  color: #0c1f35 !important;
+}
+
+body .app-shell.design-proposal-2 .filters-panel-arranged .search-box,
+body .app-shell.design-proposal-2 .filters-panel-arranged .filter-field,
+body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-filter,
+body .app-shell.design-proposal-2 .filters-panel-arranged .filter-action-cell {
+  background: transparent !important;
+  color: #0c1f35 !important;
+}
+
+body .app-shell.design-proposal-2 .filters-panel-arranged .search-box > span,
+body .app-shell.design-proposal-2 .filters-panel-arranged .filter-field > span,
+body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-filter > span,
+body .app-shell.design-proposal-2 .filters-panel-arranged .filter-action-label,
+body .app-shell.design-proposal-2 .filters-panel-arranged label,
+body .app-shell.design-proposal-2 .filter-field-label {
+  color: #284866 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .filters-panel-arranged .search-box input,
+body .app-shell.design-proposal-2 .filters-panel-arranged input,
+body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-trigger,
+body .app-shell.design-proposal-2 .filters-panel-arranged .reset-filter-button,
+body .app-shell.design-proposal-2 .filters-panel-arranged .filter-count {
+  background: #f7fbff !important;
+  background-color: #f7fbff !important;
+  background-image: none !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+  color: #0c1f35 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .filters-panel-arranged .search-box input::placeholder,
+body .app-shell.design-proposal-2 .filters-panel-arranged input::placeholder {
+  color: #5d7892 !important;
+  opacity: 1 !important;
+}
+
+body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-value,
+body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-trigger span,
+body .app-shell.design-proposal-2 .filters-panel-arranged .filter-count,
+body .app-shell.design-proposal-2 .filters-panel-arranged .filter-count span,
+body .app-shell.design-proposal-2 .filters-panel-arranged .reset-filter-button {
+  color: #0c1f35 !important;
+  fill: #0c1f35 !important;
+  text-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .filters-panel-arranged .search-box svg,
+body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-trigger svg,
+body .app-shell.design-proposal-2 .filters-panel-arranged .reset-filter-button svg {
+  color: #2563eb !important;
+  stroke: #2563eb !important;
+}
+
+body .app-shell.design-proposal-2 .modern-stat-deck,
+body .app-shell.design-proposal-2 .modern-stat-deck.cdr-kpi-strip-30,
+body .app-shell.design-proposal-2.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .modern-stat-tile,
+body .app-shell.design-proposal-2.active-tab-overview .modern-stat-tile,
+body .app-shell.design-proposal-2 .cdr-kpi-strip-30 .modern-stat-tile,
+body .app-shell.design-proposal-2.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile,
+body .app-shell.design-proposal-2.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 .modern-stat-tile,
+body .app-shell.design-proposal-2 article.modern-stat-tile,
+body .app-shell.design-proposal-2 .visual-summary-card,
+body .app-shell.design-proposal-2 .metric-card,
+body .app-shell.design-proposal-2 .summary-card {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+  color: #0c1f35 !important;
+  box-shadow: 0 8px 22px rgba(15, 38, 70, 0.08) !important;
+  text-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .modern-stat-tile *,
+body .app-shell.design-proposal-2.active-tab-overview .modern-stat-tile *,
+body .app-shell.design-proposal-2 .cdr-kpi-strip-30 .modern-stat-tile *,
+body .app-shell.design-proposal-2 article.modern-stat-tile * {
+  text-shadow: none !important;
+}
+
+body .app-shell.design-proposal-2 .modern-stat-tile span,
+body .app-shell.design-proposal-2 .modern-stat-tile small,
+body .app-shell.design-proposal-2.active-tab-overview .modern-stat-tile span,
+body .app-shell.design-proposal-2 .cdr-kpi-strip-30 .modern-stat-tile span {
+  color: #365a78 !important;
+  fill: #365a78 !important;
+}
+
+body .app-shell.design-proposal-2 .modern-stat-tile strong,
+body .app-shell.design-proposal-2 .modern-stat-tile b,
+body .app-shell.design-proposal-2.active-tab-overview .modern-stat-tile strong,
+body .app-shell.design-proposal-2 .cdr-kpi-strip-30 .modern-stat-tile strong {
+  color: #0c1f35 !important;
+  fill: #0c1f35 !important;
+}
+
+body .app-shell.design-proposal-2 .modern-stat-icon,
+body .app-shell.design-proposal-2 .modern-kpi-icon,
+body .app-shell.design-proposal-2 .visual-summary-icon,
+body .app-shell.design-proposal-2 .kpi-icon,
+body .app-shell.design-proposal-2 .metric-icon,
+body .app-shell.design-proposal-2 .quality-icon,
+body .app-shell.design-proposal-2.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9) !important;
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+}
+
+body .app-shell.design-proposal-2 .modern-stat-icon svg,
+body .app-shell.design-proposal-2 .modern-kpi-icon svg,
+body .app-shell.design-proposal-2 .visual-summary-icon svg,
+body .app-shell.design-proposal-2 .kpi-icon svg,
+body .app-shell.design-proposal-2 .metric-icon svg,
+body .app-shell.design-proposal-2 .quality-icon svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+/* ========================================================================
+   Final professional cleanup layer: shorter design names, preview cards,
+   user management, selected-filter chips, sticky tables and stronger
+   token coverage across legacy dashboard sections.
+   ======================================================================== */
+html[data-design] {
+  --control-height: 48px;
+  scrollbar-color: var(--design-accent) var(--design-bg-soft);
+}
+html[data-design] * {
+  scrollbar-width: thin;
+}
+html[data-design] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html[data-design] ::-webkit-scrollbar-track {
+  background: var(--design-bg-soft);
+}
+html[data-design] ::-webkit-scrollbar-thumb {
+  background: var(--design-accent);
+  border-radius: 999px;
+  border: 2px solid var(--design-bg-soft);
+}
+
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .cdr-command-shell,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .dashboard-tabs-row,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .filters-panel,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .section-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .chart-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .modern-chart-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .report-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .table-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .summary-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .quality-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .kpi-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .stat-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .metric-card,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] [class*="card"] {
+  background: var(--design-card) !important;
+  color: var(--design-text) !important;
+  border-color: var(--design-border) !important;
+  box-shadow: var(--design-shadow) !important;
+}
+
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .kpi-card *,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .stat-card *,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .metric-card *,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .filters-panel *,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .chart-card *,
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] .modern-chart-card * {
+  color: var(--design-text) !important;
+}
+
+.app-shell[class*="design-proposal"] .filters-panel label,
+.app-shell[class*="design-proposal"] .filter-label,
+.app-shell[class*="design-proposal"] .multi-select-label,
+.app-shell[class*="design-proposal"] .search-box > span,
+.app-shell[class*="design-proposal"] .filter-action-label {
+  color: var(--design-text) !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+  letter-spacing: .02em;
+}
+.app-shell[class*="design-proposal"] input,
+.app-shell[class*="design-proposal"] select,
+.app-shell[class*="design-proposal"] textarea,
+.local-login-shell[class*="design-proposal"] input,
+.local-login-shell[class*="design-proposal"] select,
+.local-settings-panel input,
+.local-settings-panel select,
+.local-settings-panel textarea {
+  background: var(--design-card-2) !important;
+  border: 1px solid var(--design-border) !important;
+  color: var(--design-text) !important;
+  caret-color: var(--design-accent) !important;
+  box-shadow: none !important;
+}
+.app-shell[class*="design-proposal"] input::placeholder,
+.local-login-shell[class*="design-proposal"] input::placeholder,
+.local-settings-panel input::placeholder {
+  color: var(--design-muted) !important;
+  opacity: .95 !important;
+}
+.app-shell[class*="design-proposal"] select option,
+.local-settings-panel select option,
+.local-login-shell[class*="design-proposal"] select option {
+  color: var(--design-text) !important;
+  background: var(--design-card) !important;
+}
+html[data-design="proposal2"] .app-shell[class*="design-proposal"] select option,
+html[data-design="proposal2"] .local-settings-panel select option,
+html[data-design="proposal2"] .local-login-shell[class*="design-proposal"] select option {
+  color: #0c1f35 !important;
+  background: #ffffff !important;
+}
+
+.app-shell[class*="design-proposal"] .dashboard-tab,
+.app-shell[class*="design-proposal"] .button,
+.upload-shell[class*="design-proposal"] .button,
+.local-login-shell[class*="design-proposal"] .button,
+.local-settings-panel .button,
+.app-shell[class*="design-proposal"] .cdr-action-pill {
+  min-height: 38px;
+  background: var(--design-card-2) !important;
+  color: var(--design-text) !important;
+  border: 1px solid var(--design-border-strong) !important;
+  box-shadow: none !important;
+}
+.app-shell[class*="design-proposal"] .dashboard-tab:hover,
+.app-shell[class*="design-proposal"] .button:hover,
+.upload-shell[class*="design-proposal"] .button:hover,
+.local-login-shell[class*="design-proposal"] .button:hover,
+.local-settings-panel .button:hover {
+  background: var(--design-hover) !important;
+  border-color: var(--design-accent) !important;
+}
+.app-shell[class*="design-proposal"] .dashboard-tab.active,
+.app-shell[class*="design-proposal"] .button.primary,
+.app-shell[class*="design-proposal"] .cdr-action-primary,
+.upload-shell[class*="design-proposal"] .cdr-action-primary,
+.local-login-shell[class*="design-proposal"] .cdr-action-primary,
+.local-settings-panel .cdr-action-primary {
+  background: var(--design-active-bg) !important;
+  color: var(--design-button-text) !important;
+  border-color: transparent !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+.app-shell[class*="design-proposal"] .kpi-card,
+.app-shell[class*="design-proposal"] .stat-card,
+.app-shell[class*="design-proposal"] .metric-card,
+.app-shell[class*="design-proposal"] .overview-stat-card,
+.app-shell[class*="design-proposal"] .pulse-card,
+.app-shell[class*="design-proposal"] .quality-card,
+.app-shell[class*="design-proposal"] .summary-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--design-card), var(--design-card-2)) !important;
+  border-color: var(--design-border) !important;
+  color: var(--design-text) !important;
+}
+.app-shell[class*="design-proposal"] .kpi-card::before,
+.app-shell[class*="design-proposal"] .stat-card::before,
+.app-shell[class*="design-proposal"] .metric-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--design-selected), transparent);
+  opacity: .20;
+  pointer-events: none;
+}
+.app-shell[class*="design-proposal"] .kpi-card svg,
+.app-shell[class*="design-proposal"] .stat-card svg,
+.app-shell[class*="design-proposal"] .metric-card svg,
+.app-shell[class*="design-proposal"] .metric-icon,
+.app-shell[class*="design-proposal"] .kpi-icon {
+  color: var(--design-accent) !important;
+  fill: none !important;
+}
+
+.app-shell[class*="design-proposal"] table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  color: var(--design-text) !important;
+}
+.app-shell[class*="design-proposal"] thead th,
+.app-shell[class*="design-proposal"] table th,
+.local-settings-panel table th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--design-table-head) !important;
+  color: var(--design-text) !important;
+  border-bottom: 1px solid var(--design-border-strong) !important;
+}
+.app-shell[class*="design-proposal"] tbody tr,
+.local-settings-panel tbody tr {
+  background: var(--design-table-row) !important;
+}
+.app-shell[class*="design-proposal"] tbody tr:nth-child(even),
+.local-settings-panel tbody tr:nth-child(even) {
+  background: var(--design-table-row-alt) !important;
+}
+.app-shell[class*="design-proposal"] tbody tr:hover,
+.local-settings-panel tbody tr:hover {
+  background: var(--design-hover) !important;
+}
+.app-shell[class*="design-proposal"] td,
+.app-shell[class*="design-proposal"] th,
+.local-settings-panel td,
+.local-settings-panel th {
+  color: var(--design-text) !important;
+}
+
+.selected-filter-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px 0;
+  color: var(--design-text);
+}
+.selected-filter-summary strong {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--design-muted);
+}
+.selected-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--design-border) !important;
+  color: var(--design-text) !important;
+  background: var(--design-selected) !important;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.local-design-preview-grid,
+.local-branding-grid,
+.local-credential-grid,
+.local-user-create-row {
+  display: grid;
+  gap: 12px;
+}
+.local-design-preview-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+.local-design-preview-card {
+  text-align: left;
+  border-radius: 18px;
+  border: 1px solid var(--design-border) !important;
+  background: var(--design-card-2) !important;
+  color: var(--design-text) !important;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+  cursor: pointer;
+}
+.local-design-preview-card span {
+  color: var(--design-accent) !important;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.local-design-preview-card strong {
+  color: var(--design-text) !important;
+  font-size: 15px;
+}
+.local-design-preview-card small {
+  color: var(--design-muted) !important;
+  line-height: 1.4;
+}
+.local-design-preview-card.active {
+  outline: 2px solid var(--design-accent);
+  box-shadow: var(--design-glow) !important;
+}
+
+.local-admin-management {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--design-border);
+}
+.local-admin-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0;
+}
+.local-admin-section-head span {
+  color: var(--design-accent);
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.local-admin-section-head h3 {
+  margin: 2px 0 0;
+  color: var(--design-text);
+}
+.local-admin-section-head small {
+  color: var(--design-muted);
+  font-weight: 800;
+}
+.local-user-create-row {
+  grid-template-columns: minmax(140px, .9fr) minmax(180px, 1.2fr) minmax(180px, 1.2fr) auto;
+  align-items: end;
+  margin-bottom: 14px;
+}
+.local-users-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--design-border);
+  border-radius: 16px;
+  background: var(--design-card);
+  max-height: 360px;
+}
+.local-users-table {
+  width: 100%;
+  min-width: 880px;
+}
+.local-users-table th,
+.local-users-table td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--design-border);
+}
+.local-users-table td strong,
+.local-users-table td small {
+  display: block;
+}
+.local-users-table td small {
+  color: var(--design-muted);
+  margin-top: 3px;
+}
+.local-users-table input,
+.local-users-table select {
+  width: 100%;
+  min-height: 34px;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+.local-users-actions {
+  white-space: nowrap;
+}
+.local-users-actions .button {
+  margin-right: 6px;
+}
+.local-audit-list {
+  display: grid;
+  gap: 8px;
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid var(--design-border);
+  border-radius: 16px;
+  padding: 10px;
+  background: var(--design-card);
+}
+.local-audit-row {
+  display: grid;
+  grid-template-columns: minmax(140px, .7fr) minmax(140px, .8fr) minmax(140px, .7fr) minmax(220px, 1.4fr);
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--design-card-2);
+  border: 1px solid var(--design-border);
+}
+.local-audit-row strong { color: var(--design-accent); }
+.local-audit-row span,
+.local-audit-row small,
+.local-audit-row p {
+  margin: 0;
+  color: var(--design-muted);
+}
+.status-pill.good { color: var(--design-success) !important; }
+.status-pill.bad { color: var(--design-danger) !important; }
+
+@media (max-width: 900px) {
+  .local-design-preview-grid,
+  .local-user-create-row,
+  .local-audit-row {
+    grid-template-columns: 1fr;
+  }
+}
+.local-settings-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0;
+}
+
+/* ========================================================================
+   Final header actions container design-token fix
+   ------------------------------------------------------------------------
+   The top actions box around Design/Home/Admin Settings/Logout/Add Region/
+   New Workbook was still keeping a legacy fixed navy panel. This layer makes
+   that container and its direct controls read from the selected design tokens.
+   ======================================================================== */
+.app-shell[class*="design-proposal"] .cdr-command-shell .cdr-header-actions,
+.app-shell[class*="design-proposal"].active-tab-overview .cdr-command-shell .cdr-header-actions,
+.app-shell[class*="design-proposal"] .dashboard-tabs-actions .cdr-header-actions,
+.app-shell[class*="design-proposal"] .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+.upload-shell[class*="design-proposal"] .upload-toolbar,
+.upload-shell[class*="design-proposal"] .upload-actions,
+.upload-shell[class*="design-proposal"] .upload-hero-toolbar {
+  background: linear-gradient(135deg, var(--design-nav-bg), var(--design-card-soft)) !important;
+  border: 1px solid var(--design-border-strong) !important;
+  box-shadow: var(--design-shadow) !important;
+  color: var(--design-text) !important;
+}
+
+.app-shell.design-proposal-1 .cdr-command-shell .cdr-header-actions,
+.app-shell.design-proposal-1.active-tab-overview .cdr-command-shell .cdr-header-actions,
+.app-shell.design-proposal-1 .dashboard-tabs-actions .cdr-header-actions {
+  background: linear-gradient(135deg, rgba(7, 25, 44, 0.96), rgba(10, 42, 74, 0.88)) !important;
+}
+
+.app-shell.design-proposal-2 .cdr-command-shell .cdr-header-actions,
+.app-shell.design-proposal-2.active-tab-overview .cdr-command-shell .cdr-header-actions,
+.app-shell.design-proposal-2 .dashboard-tabs-actions .cdr-header-actions {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(238, 245, 255, 0.96)) !important;
+}
+
+.app-shell.design-proposal-3 .cdr-command-shell .cdr-header-actions,
+.app-shell.design-proposal-3.active-tab-overview .cdr-command-shell .cdr-header-actions,
+.app-shell.design-proposal-3 .dashboard-tabs-actions .cdr-header-actions {
+  background: linear-gradient(135deg, rgba(5, 42, 35, 0.98), rgba(8, 78, 64, 0.90)) !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-command-shell .cdr-header-actions > *,
+.app-shell[class*="design-proposal"] .dashboard-tabs-actions .cdr-header-actions > *,
+.app-shell[class*="design-proposal"] .cdr-design-selector,
+.app-shell[class*="design-proposal"] .cdr-design-selector select,
+.app-shell[class*="design-proposal"] .cdr-design-selector-label,
+.app-shell[class*="design-proposal"] .cdr-action-pill,
+.app-shell[class*="design-proposal"] label.cdr-action-pill,
+.upload-shell[class*="design-proposal"] .cdr-design-selector,
+.upload-shell[class*="design-proposal"] .cdr-design-selector select,
+.upload-shell[class*="design-proposal"] .followup-theme-button {
+  color: var(--design-text) !important;
+  border-color: var(--design-border-strong) !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-command-shell .cdr-header-actions .button,
+.app-shell[class*="design-proposal"].active-tab-overview .cdr-command-shell .cdr-header-actions .button,
+.app-shell[class*="design-proposal"] .cdr-command-shell .cdr-header-actions label.button,
+.app-shell[class*="design-proposal"] .dashboard-tabs-actions .cdr-header-actions .button,
+.app-shell[class*="design-proposal"] .dashboard-tabs-actions .cdr-header-actions label.button,
+.upload-shell[class*="design-proposal"] .followup-theme-button {
+  background: var(--design-card-2) !important;
+  color: var(--design-text) !important;
+  border: 1px solid var(--design-border-strong) !important;
+  box-shadow: none !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-command-shell .cdr-header-actions .button:hover,
+.app-shell[class*="design-proposal"] .cdr-command-shell .cdr-header-actions label.button:hover,
+.app-shell[class*="design-proposal"] .dashboard-tabs-actions .cdr-header-actions .button:hover,
+.app-shell[class*="design-proposal"] .dashboard-tabs-actions .cdr-header-actions label.button:hover,
+.upload-shell[class*="design-proposal"] .followup-theme-button:hover {
+  background: var(--design-hover) !important;
+  color: var(--design-text) !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-design-selector {
+  background: var(--design-selected) !important;
+  border: 1px solid var(--design-border-strong) !important;
+  box-shadow: var(--design-glow) !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-design-selector select,
+.upload-shell[class*="design-proposal"] .cdr-design-selector select,
+.local-login-shell[class*="design-proposal"] .cdr-design-selector select {
+  background: var(--design-card) !important;
+  color: var(--design-text) !important;
+  border: 1px solid var(--design-border) !important;
+  box-shadow: none !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-design-selector select option,
+.upload-shell[class*="design-proposal"] .cdr-design-selector select option,
+.local-login-shell[class*="design-proposal"] .cdr-design-selector select option {
+  background: var(--design-card) !important;
+  color: var(--design-text) !important;
+}
+
+.app-shell[class*="design-proposal"] .cdr-header-actions svg,
+.app-shell[class*="design-proposal"] .cdr-design-selector svg,
+.upload-shell[class*="design-proposal"] .upload-actions svg {
+  color: var(--design-accent-2) !important;
+  stroke: var(--design-accent-2) !important;
+}
+
+/* ============================================================
+   Ticket Portal matrix row layout
+   Region Performance Matrix + TG Efficiency Matrix share one row.
+   Tables are compact and use the full card width without inner horizontal scroll.
+   ============================================================ */
+.app-shell.active-tab-company .company-matrix-pair {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: clamp(10px, 0.72vw, 14px) !important;
+  width: 100% !important;
+  align-items: stretch !important;
+  margin: 0 0 clamp(10px, 0.72vw, 14px) !important;
+}
+
+.app-shell.active-tab-company .company-matrix-pair > .company-matrix-section {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+/* Fallback for the prebuilt dist where the two sections are still direct siblings. */
+.app-shell.active-tab-company > #regionPerformance-content,
+.app-shell.active-tab-company > #talkgroupEfficiency-content {
+  display: inline-block !important;
+  width: calc(50% - 7px) !important;
+  min-width: 0 !important;
+  margin: 0 0 clamp(10px, 0.72vw, 14px) !important;
+  vertical-align: top !important;
+}
+
+.app-shell.active-tab-company > #regionPerformance-content {
+  margin-right: clamp(10px, 0.72vw, 14px) !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card {
+  height: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card .company-matrix-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+  scrollbar-gutter: auto !important;
+}
+
+.app-shell.active-tab-company .region-matrix-card table,
+.app-shell.active-tab-company .tg-efficiency-card table,
+.app-shell.active-tab-company .company-matrix-pair .company-matrix-card table {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.app-shell.active-tab-company .region-matrix-card th,
+.app-shell.active-tab-company .region-matrix-card td,
+.app-shell.active-tab-company .tg-efficiency-card th,
+.app-shell.active-tab-company .tg-efficiency-card td {
+  padding: 5px 5px !important;
+  font-size: clamp(8.5px, 0.48vw, 10.5px) !important;
+  line-height: 1.08 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Content-aware compact widths so every matrix column remains visible in half-row mode. */
+.app-shell.active-tab-company .region-matrix-card th:nth-child(1),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(1) { width: 9% !important; text-align: left !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(2),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(2) { width: 7% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(3),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(3) { width: 12% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(4),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(4) { width: 7% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(5),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(5) { width: 11% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(6),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(6) { width: 6% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(7),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(7) { width: 9% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(8),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(8) { width: 5% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(9),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(9) { width: 11% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(10),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(10) { width: 8% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(11),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(11) { width: 15% !important; text-align: left !important; }
+
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(1),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(1) { width: 13% !important; text-align: left !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(2),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(2) { width: 7% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(3),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(3) { width: 11% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(4),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(4) { width: 7% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(5),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(5) { width: 11% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(6),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(6) { width: 11% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(7),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(7) { width: 12% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(8),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(8) { width: 8% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(9),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(9) { width: 10% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(10),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(10) { width: 10% !important; text-align: left !important; }
+
+@media (max-width: 1450px) {
+  .app-shell.active-tab-company .company-matrix-pair,
+  .app-shell.active-tab-company > #regionPerformance-content,
+  .app-shell.active-tab-company > #talkgroupEfficiency-content {
+    display: block !important;
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+
+  .app-shell.active-tab-company .company-matrix-card .company-matrix-scroll {
+    overflow-x: auto !important;
+  }
+}
+
+
+/* Radio showcase picture setting - added for Admin Settings */
+.local-branding-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.local-branding-preview.radio-preview {
+  height: 150px;
+  padding: 10px;
+}
+.local-branding-preview.radio-preview img {
+  object-fit: contain;
+}
+
+/* ========================================================================
+   KPI CARD DENSITY + READABILITY FIX
+   ------------------------------------------------------------------------
+   Tightens card internal spacing so long KPI values have more usable width,
+   while increasing small KPI labels for better readability.
+   ======================================================================== */
+body .app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-deck.cdr-kpi-strip-30,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 {
+  gap: clamp(4px, 0.34vw, 7px) !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-tile,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-tile,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: clamp(64px, 4.15vw, 76px) !important;
+  padding: clamp(4px, 0.26vw, 6px) clamp(3px, 0.22vw, 5px) !important;
+  gap: 1px !important;
+  align-items: center !important;
+  justify-items: center !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-icon,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-icon,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon {
+  width: clamp(21px, 1.25vw, 26px) !important;
+  height: clamp(21px, 1.25vw, 26px) !important;
+  min-width: clamp(21px, 1.25vw, 26px) !important;
+  margin: 0 auto 1px !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-icon svg,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon svg,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-icon svg,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon svg {
+  width: clamp(12px, 0.72vw, 15px) !important;
+  height: clamp(12px, 0.72vw, 15px) !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-tile span,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile span,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-tile span,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile span {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 1px !important;
+  font-size: clamp(9.6px, 0.58vw, 11.6px) !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.01em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-tile strong,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-tile strong,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 1px !important;
+  font-size: clamp(15px, 0.98vw, 20px) !important;
+  line-height: 1.02 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.045em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 1500px) {
+  body .app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30,
+  body .app-shell.active-tab-overview .cdr-kpi-strip-30,
+  html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-deck.cdr-kpi-strip-30,
+  html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 {
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)) !important;
+  }
+}
+
+
+/* ========================================================================
+   KPI LONG VALUE WRAP FINAL FIX
+   ------------------------------------------------------------------------
+   Do not truncate KPI values with ellipsis. Long values such as radio alias,
+   user name, base station, talkgroup, and week values must wrap to another
+   compact row and shrink slightly so the full value remains visible.
+   ======================================================================== */
+body .app-shell .visual-kpi-cards.summary-cards-10-layout,
+body .app-shell .summary-cards-10-layout.visual-kpi-cards {
+  gap: clamp(3px, 0.24vw, 6px) !important;
+}
+
+body .app-shell .visual-kpi-cards .summary-card-row,
+body .app-shell .summary-cards-10-layout .summary-card-row {
+  gap: clamp(3px, 0.24vw, 6px) !important;
+}
+
+body .app-shell .visual-kpi-cards .visual-summary-card,
+body .app-shell .summary-cards-10-layout .summary-card,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .visual-summary-card,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: clamp(72px, 4.75vw, 92px) !important;
+  height: auto !important;
+  padding-left: clamp(2px, 0.12vw, 4px) !important;
+  padding-right: clamp(2px, 0.12vw, 4px) !important;
+  padding-top: clamp(5px, 0.28vw, 7px) !important;
+  padding-bottom: clamp(5px, 0.28vw, 8px) !important;
+  gap: 1px !important;
+  overflow: hidden !important;
+}
+
+body .app-shell .visual-kpi-cards .summary-card-head,
+body .app-shell .summary-cards-10-layout .summary-card-head,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .summary-card-head,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card-head {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1px !important;
+}
+
+body .app-shell .visual-kpi-cards .summary-card-head span,
+body .app-shell .summary-cards-10-layout .summary-card-head span,
+body .app-shell .summary-cards-10-layout .summary-card span,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .summary-card-head span,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card-head span,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card span {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: clamp(9px, 0.5vw, 10.5px) !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  hyphens: none !important;
+  text-align: center !important;
+}
+
+body .app-shell .visual-kpi-cards .visual-summary-card strong,
+body .app-shell .summary-cards-10-layout .summary-card strong,
+body .app-shell .summary-cards-manual-rows .summary-card strong,
+body .app-shell .summary-cards .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .visual-summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-manual-rows .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards .summary-card strong {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  font-size: clamp(11.6px, 0.72vw, 15.5px) !important;
+  line-height: 1.04 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.055em !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  hyphens: none !important;
+  text-align: center !important;
+  max-height: none !important;
+}
+
+body .app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card strong,
+body .app-shell .summary-cards-10-layout .summary-card-row-7 .summary-card strong,
+body .app-shell .visual-kpi-cards .summary-card-row-8 .visual-summary-card strong,
+body .app-shell .visual-kpi-cards .summary-card-row-7 .visual-summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card-row-8 .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card-row-7 .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .summary-card-row-8 .visual-summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .summary-card-row-7 .visual-summary-card strong {
+  font-size: clamp(10.8px, 0.66vw, 14.5px) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.065em !important;
+}
+
+body .app-shell .visual-kpi-cards .summary-card-icon,
+body .app-shell .summary-cards-10-layout .summary-card-icon {
+  width: clamp(17px, 1.05vw, 22px) !important;
+  height: clamp(17px, 1.05vw, 22px) !important;
+  margin: 0 auto !important;
+}
+
+/* Final guard: KPI values must wrap in all design proposals. */
+html[data-design] body .app-shell .cdr-kpi-strip-30 .modern-stat-tile,
+html[data-design] body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile {
+  height: auto !important;
+  min-height: 66px !important;
+  overflow: visible !important;
+  padding-left: 3px !important;
+  padding-right: 3px !important;
+}
+
+html[data-design] body .app-shell .cdr-kpi-strip-30 .modern-stat-tile strong,
+html[data-design] body .app-shell .cdr-kpi-strip-30 .modern-stat-tile .modern-stat-value,
+html[data-design] body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong,
+html[data-design] body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile .modern-stat-value {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  font-size: clamp(11px, 0.78vw, 16px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.035em !important;
+}
+
+html[data-design] body .app-shell .cdr-kpi-strip-30 .modern-stat-tile.modern-stat-tile-long-value strong,
+html[data-design] body .app-shell .cdr-kpi-strip-30 .modern-stat-tile.modern-stat-tile-long-value .modern-stat-value {
+  font-size: clamp(9px, 0.64vw, 13px) !important;
+}

@@ -1,0 +1,1831 @@
+﻿/*
+  CDR header clean layer
+  Imported after styles.css. This file owns only the top command shell:
+  banner, logos, title, action bar, tabs, and filters.
+*/
+
+.app-shell .cdr-command-shell,
+.app-shell.dark-background-theme .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell {
+  position: relative !important;
+  isolation: isolate !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 0 2px !important;
+  padding: 18px 18px 2px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--cdr-page-bg, #020914) !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell {
+  background: #eef5f9 !important;
+}
+
+.app-shell .cdr-command-shell::before,
+.app-shell .cdr-command-shell::after,
+.app-shell .cdr-command-shell > .topbar::before,
+.app-shell .cdr-command-shell > .topbar::after,
+.app-shell .cdr-command-shell .followup-header-badge::before,
+.app-shell .cdr-command-shell .followup-header-badge::after,
+.app-shell .cdr-command-shell .followup-header-badge-left::before,
+.app-shell .cdr-command-shell .followup-header-badge-left::after,
+.app-shell .cdr-command-shell .followup-header-badge-right::before,
+.app-shell .cdr-command-shell .followup-header-badge-right::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  opacity: 0 !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 120px minmax(0, 1fr) 120px !important;
+  grid-template-rows: 172px !important;
+  align-items: center !important;
+  gap: 18px !important;
+  width: 100% !important;
+  min-height: 172px !important;
+  height: 172px !important;
+  margin: 0 !important;
+  padding: 20px 28px !important;
+  overflow: hidden !important;
+  border-radius: 28px 28px 0 0 !important;
+  border: 1px solid rgba(54, 184, 230, 0.32) !important;
+  border-bottom: 0 !important;
+  background: #041426 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 42px rgba(0,0,0,0.22) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  background: #05213c !important;
+  border-color: rgba(0, 132, 202, 0.28) !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art .cdr-banner-svg {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > :not(.cdr-banner-art) {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge,
+.app-shell .cdr-command-shell .followup-header-badge-left,
+.app-shell .cdr-command-shell .followup-header-badge-right,
+.app-shell.light-background-theme .cdr-command-shell .followup-header-badge,
+.app-shell.light-background-theme .cdr-command-shell .followup-header-badge-left,
+.app-shell.light-background-theme .cdr-command-shell .followup-header-badge-right {
+  position: relative !important;
+  inset: auto !important;
+  width: 96px !important;
+  height: 96px !important;
+  min-width: 96px !important;
+  min-height: 96px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  justify-self: start !important;
+  align-self: start !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-right {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  justify-self: end !important;
+  align-self: start !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge img,
+.app-shell .cdr-command-shell .followup-header-badge-left img,
+.app-shell .cdr-command-shell .followup-header-badge-right img {
+  display: block !important;
+  width: 96px !important;
+  height: 96px !important;
+  max-width: 96px !important;
+  max-height: 96px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.24)) !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: center !important;
+  align-self: center !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: center !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #f8fbff !important;
+  font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+  font-size: clamp(34px, 4.6vw, 76px) !important;
+  line-height: 0.95 !important;
+  font-weight: 950 !important;
+  font-style: italic !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  letter-spacing: 0.06em !important;
+  text-shadow: 0 5px 0 rgba(0, 20, 42, 0.58), 0 14px 26px rgba(0,0,0,0.38) !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title p,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title p,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title p {
+  display: block !important;
+  margin: 12px 0 0 !important;
+  color: rgba(207, 236, 250, 0.88) !important;
+  font-size: clamp(11px, 1.05vw, 15px) !important;
+  line-height: 1.2 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.36em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.36) !important;
+}
+
+.app-shell .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.light-background-theme .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .cdr-banner-control-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 84px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 18px 24px !important;
+  border: 1px solid rgba(54, 184, 230, 0.28) !important;
+  border-top: 0 !important;
+  border-radius: 0 0 28px 28px !important;
+  background: rgba(4, 20, 36, 0.96) !important;
+  box-shadow: 0 18px 42px rgba(0,0,0,0.18) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .cdr-banner-control-bar {
+  background: rgba(255,255,255,0.96) !important;
+  border-color: rgba(0, 132, 202, 0.18) !important;
+}
+
+.app-shell .cdr-command-shell .cdr-control-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  width: 100% !important;
+  transform: none !important;
+}
+
+.app-shell .cdr-command-shell .cdr-action-pill,
+.app-shell .cdr-command-shell .theme-toggle.cdr-action-pill,
+.app-shell .cdr-command-shell label.cdr-action-pill {
+  min-width: 0 !important;
+  width: auto !important;
+  min-height: 46px !important;
+  height: 46px !important;
+  padding: 0 20px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(94, 199, 238, 0.34) !important;
+  background: rgba(7, 28, 45, 0.92) !important;
+  color: #f4fbff !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  white-space: nowrap !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .cdr-action-pill,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-action-pill {
+  background: #ffffff !important;
+  color: #082033 !important;
+  border-color: rgba(0, 119, 190, 0.22) !important;
+  box-shadow: 0 10px 24px rgba(15, 78, 120, 0.12) !important;
+}
+
+.app-shell .cdr-command-shell .cdr-action-primary,
+.app-shell .cdr-command-shell .dashboard-tab.active {
+  background: linear-gradient(135deg, #22d3ee 0%, #58a6ff 100%) !important;
+  color: #03131f !important;
+  border-color: rgba(125, 211, 252, 0.78) !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 14px 0 0 !important;
+  padding: 12px 14px !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(54, 184, 230, 0.24) !important;
+  background: rgba(4, 20, 36, 0.86) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs {
+  background: rgba(255,255,255,0.92) !important;
+  border-color: rgba(0, 132, 202, 0.18) !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tab {
+  height: 42px !important;
+  min-width: 0 !important;
+  padding: 0 17px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(94, 199, 238, 0.28) !important;
+  background: rgba(7, 28, 45, 0.82) !important;
+  color: #c8dcea !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tab,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tab {
+  background: #ffffff !important;
+  color: #35576b !important;
+  border-color: rgba(0, 119, 190, 0.18) !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell.light-background-theme .cdr-command-shell .filters-panel,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+  display: grid !important;
+  grid-template-columns:
+    minmax(180px, 230px)
+    minmax(92px, 116px)
+    minmax(92px, 116px)
+    minmax(105px, 130px)
+    minmax(165px, 210px)
+    minmax(190px, 240px)
+    minmax(165px, 210px)
+    minmax(132px, 158px)
+    minmax(240px, 1fr) !important;
+  align-items: end !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 12px 0 0 !important;
+  padding: 12px !important;
+  overflow: hidden !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(54, 184, 230, 0.24) !important;
+  background: rgba(4, 20, 36, 0.86) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .filters-panel,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+  background: rgba(255,255,255,0.94) !important;
+  border-color: rgba(0, 132, 202, 0.18) !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > .search-box.search-compact,
+.app-shell .cdr-command-shell .reset-filter-button,
+.app-shell .cdr-command-shell .filter-count {
+  max-width: none !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > .search-box.search-compact input {
+  min-width: 0 !important;
+  width: 100% !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .cdr-command-shell .reset-filter-button {
+  max-width: 158px !important;
+  justify-self: stretch !important;
+  padding-inline: 10px !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .filter-count {
+  justify-self: stretch !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 40px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 1300px) {
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.light-background-theme .cdr-command-shell .filters-panel,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell .cdr-command-shell .filter-count {
+    grid-column: span 2 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell .cdr-command-shell,
+  .app-shell.dark-background-theme .cdr-command-shell,
+  .app-shell.light-background-theme .cdr-command-shell,
+  .app-shell.se-theme .cdr-command-shell {
+    padding: 10px 10px 2px !important;
+  }
+
+  .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+    grid-template-columns: 76px minmax(0, 1fr) 76px !important;
+    grid-template-rows: 132px !important;
+    min-height: 132px !important;
+    height: 132px !important;
+    padding: 14px !important;
+  }
+
+  .app-shell .cdr-command-shell .followup-header-badge,
+  .app-shell .cdr-command-shell .followup-header-badge-left,
+  .app-shell .cdr-command-shell .followup-header-badge-right,
+  .app-shell .cdr-command-shell .followup-header-badge img,
+  .app-shell .cdr-command-shell .followup-header-badge-left img,
+  .app-shell .cdr-command-shell .followup-header-badge-right img {
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 68px !important;
+    min-height: 68px !important;
+  }
+
+  .app-shell .cdr-command-shell .followup-dashboard-title h1 {
+    white-space: normal !important;
+    font-size: clamp(24px, 6.2vw, 46px) !important;
+  }
+
+  .app-shell .cdr-command-shell .followup-dashboard-title p {
+    letter-spacing: 0.18em !important;
+  }
+
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.light-background-theme .cdr-command-shell .filters-panel,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .app-shell .cdr-command-shell .followup-header-badge-left,
+  .app-shell .cdr-command-shell .followup-header-badge-right,
+  .app-shell .cdr-command-shell .followup-dashboard-title {
+    grid-column: 1 !important;
+    justify-self: center !important;
+  }
+
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.light-background-theme .cdr-command-shell .filters-panel,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* V6 reference layout: compact full-width command header like the portfolio mockup. */
+.app-shell .cdr-command-shell,
+.app-shell.dark-background-theme .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  display: grid !important;
+  grid-template-columns: 220px minmax(0, 1fr) 220px !important;
+  grid-template-rows: 58px !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 58px !important;
+  height: 58px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: linear-gradient(180deg, #06111a 0%, #081822 100%) !important;
+  box-shadow: 0 1px 0 rgba(125, 211, 252, 0.12) !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art {
+  opacity: 0.18 !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge,
+.app-shell .cdr-command-shell .followup-header-badge-left,
+.app-shell .cdr-command-shell .followup-header-badge-right,
+.app-shell.light-background-theme .cdr-command-shell .followup-header-badge,
+.app-shell.light-background-theme .cdr-command-shell .followup-header-badge-left,
+.app-shell.light-background-theme .cdr-command-shell .followup-header-badge-right {
+  width: auto !important;
+  height: 58px !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left {
+  justify-content: flex-start !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-right {
+  justify-content: flex-end !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge img,
+.app-shell .cdr-command-shell .followup-header-badge-left img,
+.app-shell .cdr-command-shell .followup-header-badge-right img {
+  width: auto !important;
+  height: 44px !important;
+  max-width: 190px !important;
+  min-width: 0 !important;
+  object-fit: contain !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .followup-header-badge-left img {
+  height: 48px !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title {
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  align-self: center !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title h1 {
+  font-size: clamp(20px, 1.5vw, 28px) !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  font-style: normal !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title p {
+  display: none !important;
+}
+
+.app-shell .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.light-background-theme .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .cdr-banner-control-bar {
+  position: absolute !important;
+  top: 64px !important;
+  right: 10px !important;
+  z-index: 5 !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .cdr-control-actions {
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-action-pill,
+.app-shell .cdr-command-shell .theme-toggle.cdr-action-pill,
+.app-shell .cdr-command-shell label.cdr-action-pill {
+  min-height: 31px !important;
+  height: 31px !important;
+  padding: 0 12px !important;
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs {
+  width: 100% !important;
+  min-height: 42px !important;
+  height: 42px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 0 !important;
+  border-width: 1px 0 !important;
+  background: rgba(10, 25, 36, 0.96) !important;
+  gap: 8px !important;
+  padding-right: 545px !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tab {
+  height: 32px !important;
+  padding: 0 10px !important;
+  border-radius: 0 !important;
+  border-width: 0 0 2px !important;
+  background: transparent !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tab.active {
+  color: #22d3ee !important;
+  background: transparent !important;
+  border-color: #22d3ee !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell.light-background-theme .cdr-command-shell .filters-panel,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+  width: calc(100% - 20px) !important;
+  margin: 8px 10px 0 !important;
+  padding: 10px !important;
+  border-radius: 7px !important;
+  grid-template-columns:
+    minmax(180px, 1.2fr)
+    minmax(110px, 0.7fr)
+    minmax(82px, 0.45fr)
+    minmax(100px, 0.55fr)
+    minmax(160px, 1fr)
+    minmax(170px, 1fr)
+    minmax(150px, 0.9fr)
+    minmax(120px, 0.65fr)
+    minmax(160px, 0.75fr) !important;
+  gap: 8px !important;
+  background: rgba(9, 24, 35, 0.96) !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel label > span,
+.app-shell .cdr-command-shell .filters-panel .filter-label {
+  font-size: 10px !important;
+  line-height: 1 !important;
+  margin-bottom: 5px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel input,
+.app-shell .cdr-command-shell .filters-panel select,
+.app-shell .cdr-command-shell .filters-panel button,
+.app-shell .cdr-command-shell .filter-count {
+  min-height: 32px !important;
+  height: 32px !important;
+  font-size: 11px !important;
+}
+
+.app-shell .cdr-command-shell .reset-filter-button {
+  max-width: none !important;
+}
+
+.app-shell .cdr-command-shell .filter-count {
+  border-radius: 7px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+@media (max-width: 1300px) {
+  .app-shell .cdr-command-shell > .cdr-banner-control-bar {
+    position: static !important;
+    justify-content: center !important;
+    padding: 8px 10px 0 !important;
+  }
+
+  .app-shell .cdr-command-shell .dashboard-tabs {
+    padding-right: 14px !important;
+  }
+
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.light-background-theme .cdr-command-shell .filters-panel,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Final V6 command shell fit: keep buttons, tabs, and filters in normal flow with compact widths. */
+.app-shell .cdr-command-shell,
+.app-shell.dark-background-theme .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 4px !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.light-background-theme .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .cdr-banner-control-bar {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding: 3px 8px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .cdr-control-actions {
+  width: auto !important;
+  max-width: 100% !important;
+  justify-content: flex-end !important;
+  gap: 7px !important;
+  flex-wrap: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-action-pill,
+.app-shell .cdr-command-shell .theme-toggle.cdr-action-pill,
+.app-shell .cdr-command-shell label.cdr-action-pill {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  font-size: 10.5px !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs {
+  position: relative !important;
+  z-index: 1 !important;
+  min-height: 40px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 4px 10px !important;
+  padding-right: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tab {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 9px !important;
+  font-size: 10.5px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell.light-background-theme .cdr-command-shell .filters-panel,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 8px !important;
+  display: grid !important;
+  grid-template-columns:
+    minmax(118px, 0.82fr)
+    minmax(74px, 0.42fr)
+    minmax(64px, 0.34fr)
+    minmax(82px, 0.42fr)
+    minmax(118px, 0.8fr)
+    minmax(140px, 0.95fr)
+    minmax(126px, 0.86fr)
+    minmax(100px, 0.54fr)
+    minmax(146px, 0.64fr) !important;
+  gap: 7px !important;
+  align-items: end !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > .search-box.search-compact {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > .search-box.search-compact input {
+  min-width: 0 !important;
+  width: 100% !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .cdr-command-shell .filter-field,
+.app-shell .cdr-command-shell .multi-select-filter,
+.app-shell .cdr-command-shell .multi-select-trigger,
+.app-shell .cdr-command-shell .reset-filter-button,
+.app-shell .cdr-command-shell .filter-count {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell .cdr-command-shell .multi-select-trigger {
+  padding: 0 8px !important;
+}
+
+.app-shell .cdr-command-shell .multi-select-value {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .reset-filter-button {
+  padding: 0 9px !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .filter-count {
+  padding: 0 10px !important;
+  justify-content: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 11px !important;
+}
+
+@media (max-width: 1500px) {
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.light-background-theme .cdr-command-shell .filters-panel,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    overflow: visible !important;
+  }
+}
+
+/* Final V6 header actions: keep the five quick buttons inside the header at the top-right. */
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-control-bar,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-control-bar,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-control-bar {
+  position: absolute !important;
+  top: 10px !important;
+  right: 14px !important;
+  z-index: 8 !important;
+  width: auto !important;
+  max-width: calc(100% - 28px) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner .cdr-control-actions {
+  width: auto !important;
+  max-width: 100% !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 7px !important;
+  flex-wrap: nowrap !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner .cdr-action-pill,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner .theme-toggle.cdr-action-pill,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner label.cdr-action-pill {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  font-size: 10.5px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 1500px) {
+  .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-control-bar,
+  .app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-control-bar,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-control-bar {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+    margin-top: 8px !important;
+  }
+
+  .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner .cdr-control-actions {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+/* Final V6 logo reserve: align the header content toward the right while keeping room for the future right logo. */
+.app-shell {
+  --cdr-future-header-logo-slot: clamp(118px, 8vw, 168px);
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  padding-right: calc(var(--cdr-future-header-logo-slot) + 16px) !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title {
+  justify-self: end !important;
+  text-align: right !important;
+  padding-right: 0 !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-control-bar,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-control-bar,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-control-bar {
+  right: calc(var(--cdr-future-header-logo-slot) + 14px) !important;
+}
+
+@media (max-width: 1500px) {
+  .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+    padding-right: 14px !important;
+  }
+
+  .app-shell .cdr-command-shell .followup-dashboard-title,
+  .app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title {
+    justify-self: center !important;
+    text-align: center !important;
+  }
+}
+
+/* Final V6 title placement: title and detail are left aligned, with space kept for the future right logo. */
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  padding-left: clamp(24px, 3vw, 54px) !important;
+  padding-right: calc(var(--cdr-future-header-logo-slot) + 16px) !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title {
+  grid-column: 1 / -1 !important;
+  justify-self: start !important;
+  align-self: center !important;
+  width: min(100%, calc(100% - var(--cdr-future-header-logo-slot) - 560px)) !important;
+  max-width: 900px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title h1 {
+  text-align: left !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title p,
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title p,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title p {
+  display: block !important;
+  margin: 8px 0 0 !important;
+  text-align: left !important;
+}
+
+@media (max-width: 1500px) {
+  .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .app-shell .cdr-command-shell .followup-dashboard-title,
+  .app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title {
+    justify-self: start !important;
+    width: 100% !important;
+    max-width: none !important;
+    text-align: left !important;
+  }
+}
+
+/* Final V6 tabs/actions theme layer: actions live on the right side of the tabs row. */
+.app-shell .cdr-command-shell .dashboard-tabs-row,
+.app-shell.dark-background-theme .cdr-command-shell .dashboard-tabs-row {
+  position: relative !important;
+  z-index: 3 !important;
+  width: 100% !important;
+  min-height: 46px !important;
+  margin: 0 !important;
+  padding: 6px 10px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 12px !important;
+  align-items: center !important;
+  border: 1px solid rgba(54, 184, 230, 0.28) !important;
+  border-top: 0 !important;
+  background: rgba(6, 22, 33, 0.98) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-row,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-row {
+  border-color: rgba(0, 111, 164, 0.24) !important;
+  background: rgba(246, 251, 255, 0.98) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 1px 0 rgba(11, 72, 104, 0.08) !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: 34px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions {
+  min-width: 0 !important;
+  justify-self: end !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-banner-control-bar,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-actions .cdr-banner-control-bar,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-actions .cdr-banner-control-bar {
+  position: static !important;
+  inset: auto !important;
+  width: auto !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-control-actions {
+  width: auto !important;
+  max-width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tab,
+.app-shell.dark-background-theme .cdr-command-shell .dashboard-tab {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 12px !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(93, 190, 234, 0.24) !important;
+  background: rgba(13, 34, 49, 0.92) !important;
+  color: #d9edf8 !important;
+  font-weight: 850 !important;
+  text-shadow: none !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tab,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tab {
+  border-color: rgba(0, 102, 153, 0.22) !important;
+  background: #ffffff !important;
+  color: #18384c !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tab.active,
+.app-shell.dark-background-theme .cdr-command-shell .dashboard-tab.active,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tab.active,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tab.active {
+  border-color: #22c7f7 !important;
+  background: linear-gradient(135deg, #21d4fd 0%, #36a9f5 100%) !important;
+  color: #031321 !important;
+  box-shadow: 0 10px 24px rgba(28, 180, 240, 0.20) !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-action-pill,
+.app-shell .cdr-command-shell .dashboard-tabs-actions .theme-toggle.cdr-action-pill,
+.app-shell .cdr-command-shell .dashboard-tabs-actions label.cdr-action-pill {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 11px !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(93, 190, 234, 0.26) !important;
+  background: rgba(13, 34, 49, 0.96) !important;
+  color: #f2fbff !important;
+  font-size: 10.5px !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  text-shadow: none !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-actions .cdr-action-pill,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-actions .theme-toggle.cdr-action-pill,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-actions label.cdr-action-pill,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-actions .cdr-action-pill,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-actions .theme-toggle.cdr-action-pill,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-actions label.cdr-action-pill {
+  border-color: rgba(0, 102, 153, 0.22) !important;
+  background: #ffffff !important;
+  color: #082033 !important;
+  box-shadow: 0 6px 14px rgba(12, 70, 110, 0.08) !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-action-primary,
+.app-shell .cdr-command-shell .dashboard-tabs-actions .theme-toggle.cdr-action-primary,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-actions .cdr-action-primary,
+.app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-actions .theme-toggle.cdr-action-primary,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-actions .cdr-action-primary,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-actions .theme-toggle.cdr-action-primary {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, #2fd6ff 0%, #5aa8ff 100%) !important;
+  color: #031321 !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-action-pill svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell {
+  background: #eaf4fa !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  border-color: rgba(0, 102, 153, 0.20) !important;
+  background: linear-gradient(135deg, #f7fcff 0%, #e6f4fb 56%, #dff1fa 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 12px 28px rgba(34, 93, 130, 0.10) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art {
+  opacity: 0.52 !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title h1 {
+  color: #062033 !important;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.72), 0 10px 22px rgba(55, 112, 146, 0.18) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title p,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title p {
+  color: #126083 !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .filters-panel,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel {
+  border-color: rgba(0, 102, 153, 0.20) !important;
+  background: rgba(255,255,255,0.98) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.92), 0 8px 18px rgba(12, 70, 110, 0.07) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .filters-panel label > span,
+.app-shell.light-background-theme .cdr-command-shell .filters-panel .filter-label,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel label > span,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel .filter-label {
+  color: #18384c !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .filters-panel input,
+.app-shell.light-background-theme .cdr-command-shell .filters-panel select,
+.app-shell.light-background-theme .cdr-command-shell .multi-select-trigger,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel input,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel select,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .multi-select-trigger {
+  border-color: rgba(0, 102, 153, 0.24) !important;
+  background: #ffffff !important;
+  color: #082033 !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .filters-panel input::placeholder,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel input::placeholder {
+  color: #60798a !important;
+  opacity: 1 !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .reset-filter-button,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .reset-filter-button {
+  border-color: rgba(0, 102, 153, 0.24) !important;
+  background: #ffffff !important;
+  color: #082033 !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .filter-count,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .filter-count {
+  border-color: rgba(0, 102, 153, 0.20) !important;
+  background: #edf8ff !important;
+  color: #0b405b !important;
+}
+
+@media (max-width: 1500px) {
+  .app-shell .cdr-command-shell .dashboard-tabs-row,
+  .app-shell.dark-background-theme .cdr-command-shell .dashboard-tabs-row,
+  .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-row,
+  .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-row {
+    grid-template-columns: 1fr !important;
+    gap: 7px !important;
+  }
+
+  .app-shell .cdr-command-shell .dashboard-tabs,
+  .app-shell .cdr-command-shell .dashboard-tabs-actions,
+  .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-banner-control-bar,
+  .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-control-actions {
+    justify-content: center !important;
+  }
+
+  .app-shell .cdr-command-shell .dashboard-tabs,
+  .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-control-actions {
+    flex-wrap: wrap !important;
+    overflow: visible !important;
+  }
+}
+
+/* CDR patch: workbook profile/info card directly below the main header */
+.app-shell .cdr-command-shell,
+.app-shell.dark-background-theme .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell,
+.app-shell.active-tab-overview .cdr-command-shell {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-areas:
+    "cdrHeader"
+    "cdrProfile"
+    "cdrTabs"
+    "cdrFilters" !important;
+  gap: 0 !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  grid-area: cdrHeader !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band {
+  grid-area: cdrProfile !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 4px 4px 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(340px, 0.65fr) minmax(520px, 1fr) !important;
+  gap: 8px !important;
+  background: #020914 !important;
+  border-left: 1px solid rgba(54, 184, 230, 0.28) !important;
+  border-right: 1px solid rgba(54, 184, 230, 0.28) !important;
+  border-radius: 0 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card {
+  min-height: 76px !important;
+  height: 76px !important;
+  margin: 0 !important;
+  padding: 10px 18px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(65, 165, 225, 0.48) !important;
+  background: rgba(8, 32, 55, 0.98) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main {
+  display: grid !important;
+  grid-template-columns: 64px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main img,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main img {
+  width: 58px !important;
+  height: 58px !important;
+  object-fit: contain !important;
+  background: #ffffff !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main span,
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card span {
+  display: block !important;
+  margin: 0 0 2px !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.26em !important;
+  color: #b8f2ff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main strong,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main strong {
+  display: block !important;
+  margin: 0 !important;
+  font-size: clamp(40px, 4.6vw, 60px) !important;
+  line-height: 0.86 !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.045em !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main p,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main p {
+  margin: -1px 0 0 !important;
+  font-size: clamp(20px, 2vw, 28px) !important;
+  line-height: 0.9 !important;
+  font-weight: 950 !important;
+  color: #b8eaff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card {
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card svg,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card svg {
+  width: 24px !important;
+  height: 24px !important;
+  color: #d7f4ff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card strong,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card strong {
+  display: block !important;
+  margin: 0 !important;
+  font-size: 15px !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card p,
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card small,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card p,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card small {
+  margin: 2px 0 0 !important;
+  font-size: 11px !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  color: #b8eaff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-source-chips,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-source-chips {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 5px !important;
+  margin: 4px 0 0 !important;
+  overflow: hidden !important;
+  max-height: 22px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-source-chips em,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-source-chips em {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 18px !important;
+  padding: 2px 9px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(107, 205, 255, 0.55) !important;
+  background: rgba(26, 92, 133, 0.58) !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-style: normal !important;
+  font-weight: 950 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell > .dashboard-tabs-row,
+.app-shell.active-tab-overview .cdr-command-shell > .dashboard-tabs-row {
+  grid-area: cdrTabs !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  padding: 8px 18px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  background: rgba(5, 22, 37, 0.98) !important;
+  border: 1px solid rgba(62, 168, 220, 0.30) !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell > .filters-panel,
+.app-shell.active-tab-overview .cdr-command-shell > .filters-panel {
+  grid-area: cdrFilters !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .cdr-header-profile-band,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-header-profile-band {
+  background: #eaf4fa !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+.app-shell.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-card,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 102, 153, 0.24) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-main strong,
+.app-shell.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-main p,
+.app-shell.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-card strong,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-main strong,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-main p,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-header-profile-band .modern-profile-card strong {
+  color: #082033 !important;
+}
+
+@media (max-width: 1050px) {
+  .app-shell .cdr-command-shell .cdr-header-profile-band,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band {
+    grid-template-columns: 1fr !important;
+  }
+  .app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+  .app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card {
+    height: auto !important;
+    min-height: 72px !important;
+  }
+}
+
+/* CDR profile cards: match requested large two-card layout below header */
+.app-shell .cdr-command-shell .cdr-header-profile-band,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 6px 0 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(420px, 1fr) minmax(680px, 2fr) !important;
+  gap: 14px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card {
+  min-height: 176px !important;
+  height: 176px !important;
+  margin: 0 !important;
+  padding: 22px 32px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(64, 154, 218, 0.55) !important;
+  background: rgba(15, 25, 42, 0.98) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+  overflow: hidden !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main {
+  display: grid !important;
+  grid-template-columns: 110px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 28px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main img,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main img {
+  width: 98px !important;
+  height: 98px !important;
+  object-fit: contain !important;
+  background: #ffffff !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main span,
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card span {
+  display: block !important;
+  margin: 0 0 8px !important;
+  font-size: 15px !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.28em !important;
+  color: #b9efff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main strong,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main strong {
+  display: block !important;
+  margin: 0 !important;
+  font-size: clamp(82px, 6.4vw, 116px) !important;
+  line-height: 0.78 !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.07em !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main p,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main p {
+  margin: 3px 0 0 !important;
+  font-size: clamp(34px, 2.7vw, 46px) !important;
+  line-height: 0.92 !important;
+  font-weight: 950 !important;
+  color: #b8eaff !important;
+  white-space: nowrap !important;
+  letter-spacing: -0.035em !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card {
+  display: grid !important;
+  grid-template-columns: 52px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 26px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card svg,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card svg {
+  width: 34px !important;
+  height: 34px !important;
+  color: #d7f4ff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card strong,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card strong {
+  display: block !important;
+  margin: 0 0 3px !important;
+  font-size: 24px !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card p,
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card small,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card p,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card small {
+  margin: 5px 0 0 !important;
+  font-size: 16px !important;
+  line-height: 1.14 !important;
+  font-weight: 850 !important;
+  color: #b8eaff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-source-chips,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-source-chips {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin: 10px 0 0 !important;
+  overflow: hidden !important;
+  max-height: 30px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-source-chips em,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-source-chips em {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 24px !important;
+  padding: 4px 12px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(107, 205, 255, 0.58) !important;
+  background: rgba(26, 92, 133, 0.58) !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  font-style: normal !important;
+  font-weight: 950 !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 1250px) {
+  .app-shell .cdr-command-shell .cdr-header-profile-band,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* CDR profile cards compact side-by-side layout: record count left, source files right */
+.app-shell .cdr-command-shell .cdr-header-profile-band,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 6px 0 0 !important;
+  display: grid !important;
+  grid-template-columns: fit-content(560px) minmax(0, 1fr) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main {
+  width: fit-content !important;
+  min-width: 520px !important;
+  max-width: 560px !important;
+  min-height: 96px !important;
+  height: auto !important;
+  padding: 16px 28px 14px !important;
+  display: grid !important;
+  grid-template-columns: 84px max-content !important;
+  align-items: center !important;
+  gap: 22px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(64, 154, 218, 0.55) !important;
+  background: rgba(15, 25, 42, 0.98) !important;
+  overflow: hidden !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main img,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main img {
+  width: 76px !important;
+  height: 76px !important;
+  object-fit: contain !important;
+  background: #ffffff !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main span {
+  margin: 0 0 2px !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.28em !important;
+  white-space: nowrap !important;
+  color: #b9efff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main strong,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main strong {
+  display: block !important;
+  margin: 0 !important;
+  font-size: 72px !important;
+  line-height: 0.78 !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.07em !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main p,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main p {
+  margin: 1px 0 0 !important;
+  font-size: 31px !important;
+  line-height: 0.92 !important;
+  font-weight: 950 !important;
+  color: #b8eaff !important;
+  white-space: nowrap !important;
+  letter-spacing: -0.035em !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 96px !important;
+  height: auto !important;
+  padding: 16px 28px 14px !important;
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, max-content) !important;
+  justify-content: start !important;
+  align-items: center !important;
+  gap: 22px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(64, 154, 218, 0.55) !important;
+  background: rgba(15, 25, 42, 0.98) !important;
+  overflow: hidden !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card > div,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card > div {
+  width: fit-content !important;
+  max-width: 100% !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card svg,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card svg {
+  width: 30px !important;
+  height: 30px !important;
+  color: #d7f4ff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card span {
+  margin: 0 0 3px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.28em !important;
+  white-space: nowrap !important;
+  color: #b9efff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card strong,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card strong {
+  display: block !important;
+  margin: 0 0 2px !important;
+  font-size: 19px !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card p,
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-card small,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card p,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-card small {
+  margin: 3px 0 0 !important;
+  font-size: 14px !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  color: #b8eaff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-source-chips,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-source-chips {
+  width: fit-content !important;
+  max-width: 100% !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin: 7px 0 0 !important;
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-profile-band .modern-source-chips em,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-source-chips em {
+  min-height: 22px !important;
+  padding: 4px 11px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell .cdr-command-shell .cdr-header-profile-band,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band {
+    grid-template-columns: 1fr !important;
+  }
+  .app-shell .cdr-command-shell .cdr-header-profile-band .modern-profile-main,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-profile-band .modern-profile-main {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    grid-template-columns: 76px minmax(0, max-content) !important;
+  }
+}

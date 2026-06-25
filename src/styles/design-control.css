@@ -1,0 +1,3525 @@
+/* ============================================================================
+   CDR DASHBOARD MASTER DESIGN CONTROL SYSTEM
+   ---------------------------------------------------------------------------
+   Task of this file:
+   - This file is imported LAST in src/main.tsx.
+   - Change the variables in SECTION 01 to control fonts, colors, alignment,
+     heights, widths, padding, borders, and shadows across all dashboard tabs.
+   - The sections below map those variables to the real project classes.
+   - Keep this file after styles.css, header-clean.css, and upload-clean.css.
+   ============================================================================ */
+
+/* ============================================================================
+   SECTION 01 - MASTER PARAMETERS
+   Edit this section first. Most visual changes can be done here only.
+   ============================================================================ */
+body .app-shell,
+body .upload-shell {
+  /* ---------- Global font family ---------- */
+  --cdr-font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* ---------- Global page colors ---------- */
+  --cdr-page-dark-bg: #0A0F1A;
+  --cdr-page-light-bg: #F7FBFF;
+  --cdr-text-main-dark: #FFFFFF;
+  --cdr-text-sub-dark: #9CA3AF;
+  --cdr-text-main-light: #092033;
+  --cdr-text-sub-light: #3F6174;
+
+  /* ---------- Shared panel/box design ---------- */
+  --cdr-box-bg-dark: #111827;
+  --cdr-box-bg-dark-2: #0F172A;
+  --cdr-box-bg-light: #FFFFFF;
+  --cdr-box-bg-light-2: #F4F9FD;
+  --cdr-box-border-dark: #1F2937;
+  --cdr-box-border-light: rgba(0, 100, 150, 0.22);
+  --cdr-box-radius: 14px;
+  --cdr-box-radius-small: 10px;
+  --cdr-box-shadow-dark: 0 18px 46px rgba(0, 0, 0, 0.32);
+  --cdr-box-shadow-light: 0 18px 42px rgba(17, 86, 128, 0.14);
+  --cdr-box-padding: 16px;
+  --cdr-box-gap: 14px;
+
+  /* ---------- Primary colors ---------- */
+  --cdr-primary: #2563EB;
+  --cdr-secondary: #06B6D4;
+  --cdr-accent-purple: #7C3AED;
+  --cdr-accent-yellow: #FACC15;
+  --cdr-accent-green: #22C55E;
+  --cdr-accent-red: #EF4444;
+  --cdr-muted: #9CA3AF;
+
+  /* ---------- Header / top navigation ---------- */
+  --cdr-header-height: 90px;
+  --cdr-header-bg: #0A0F1A;
+  --cdr-header-border: #1F2937;
+  --cdr-header-radius: 16px;
+  --cdr-header-padding-y: 14px;
+  --cdr-header-padding-x: 18px;
+  --cdr-header-gap: 16px;
+  --cdr-header-title-size: 26px;
+  --cdr-header-title-weight: 900;
+  --cdr-header-title-color: #FFFFFF;
+  --cdr-header-title-align: left;
+  --cdr-header-subtitle-size: 12px;
+  --cdr-header-subtitle-weight: 750;
+  --cdr-header-subtitle-color: #9CA3AF;
+  --cdr-header-logo-width: 64px;
+  --cdr-header-logo-height: 42px;
+
+  /* ---------- Dashboard tab buttons ---------- */
+  --cdr-tab-height: 40px;
+  --cdr-tab-padding-x: 16px;
+  --cdr-tab-font-size: 12px;
+  --cdr-tab-font-weight: 850;
+  --cdr-tab-color: #9CA3AF;
+  --cdr-tab-active-color: #FFFFFF;
+  --cdr-tab-bg: transparent;
+  --cdr-tab-active-bg: #2563EB;
+  --cdr-tab-border: #1F2937;
+  --cdr-tab-radius: 999px;
+  --cdr-tab-horizontal-align: center;
+  --cdr-tab-vertical-align: center;
+
+  /* ---------- Section headers / titles ---------- */
+  --cdr-section-title-size: 24px;
+  --cdr-section-title-weight: 900;
+  --cdr-section-title-color: #FFFFFF;
+  --cdr-section-title-align: left;
+  --cdr-section-subtitle-size: 12px;
+  --cdr-section-subtitle-weight: 700;
+  --cdr-section-subtitle-color: #9CA3AF;
+  --cdr-section-header-height: auto;
+  --cdr-section-header-padding: 4px 2px;
+  --cdr-section-header-gap: 12px;
+
+  /* ---------- All normal buttons / export buttons / upload buttons ---------- */
+  --cdr-button-height: 40px;
+  --cdr-button-min-width: 92px;
+  --cdr-button-padding-x: 14px;
+  --cdr-button-font-size: 12px;
+  --cdr-button-font-weight: 850;
+  --cdr-button-color: #FFFFFF;
+  --cdr-button-bg: #092536;
+  --cdr-button-border: rgba(116, 181, 214, 0.38);
+  --cdr-button-radius: 12px;
+  --cdr-button-horizontal-align: center;
+  --cdr-button-vertical-align: center;
+  --cdr-button-gap: 8px;
+  --cdr-button-hover-bg: #0D3550;
+  --cdr-button-hover-color: #FFFFFF;
+  --cdr-button-hover-border: rgba(110, 201, 255, 0.62);
+
+  /* ---------- Filter bar layout: Row 1 = 6 controls; Row 2 = 5 controls + Reset + Info ---------- */
+  --cdr-filter-row-gap: 12px;
+  --cdr-filter-column-gap: 14px;
+  --cdr-filter-panel-padding: 12px;
+  --cdr-filter-panel-radius: 16px;
+  --cdr-filter-panel-bg: #111827;
+  --cdr-filter-panel-border: #1F2937;
+
+  --cdr-filter-search-width: 300px;
+  --cdr-filter-region-width: 150px;
+  --cdr-filter-year-width: 120px;
+  --cdr-filter-month-width: 145px;
+  --cdr-filter-company-width: 230px;
+  --cdr-filter-base-station-width: 260px;
+  --cdr-filter-talkgroup-width: 260px;
+  --cdr-filter-call-type-width: 220px;
+  --cdr-filter-radio-type-width: 200px;
+  --cdr-filter-encryption-width: 190px;
+  --cdr-filter-duplex-width: 190px;
+  --cdr-filter-reset-width: 110px;
+  --cdr-filter-info-width: 245px;
+
+  --cdr-filter-label-height: 18px;
+  --cdr-filter-label-size: 11px;
+  --cdr-filter-label-weight: 900;
+  --cdr-filter-label-color: #9CA3AF;
+  --cdr-filter-label-align: left;
+  --cdr-filter-control-height: 44px;
+  --cdr-filter-control-font-size: 13px;
+  --cdr-filter-control-font-weight: 800;
+  --cdr-filter-control-color: #FFFFFF;
+  --cdr-filter-control-bg: #0F172A;
+  --cdr-filter-control-border: #1F2937;
+  --cdr-filter-control-radius: 12px;
+  --cdr-filter-control-padding-x: 12px;
+  --cdr-filter-control-text-align: left;
+  --cdr-filter-control-horizontal-align: flex-start;
+  --cdr-filter-control-vertical-align: center;
+
+  /* ---------- Hero / workbook profile ---------- */
+  --cdr-hero-bg: #111827;
+  --cdr-hero-border: #1F2937;
+  --cdr-hero-radius: 18px;
+  --cdr-hero-padding: 16px;
+  --cdr-hero-gap: 16px;
+  --cdr-hero-title-size: 76px;
+  --cdr-hero-title-weight: 950;
+  --cdr-hero-title-color: #FFFFFF;
+  --cdr-hero-title-align: center;
+  --cdr-hero-subtitle-size: 22px;
+  --cdr-hero-subtitle-weight: 850;
+  --cdr-hero-subtitle-color: #9CA3AF;
+  --cdr-workbook-card-width: 680px;
+  --cdr-workbook-title-size: 15px;
+  --cdr-workbook-title-weight: 900;
+  --cdr-workbook-meta-size: 11px;
+  --cdr-workbook-meta-weight: 700;
+
+  /* ---------- KPI cards and data quality cards ---------- */
+  --cdr-kpi-card-bg: #111827;
+  --cdr-kpi-card-border: #1F2937;
+  --cdr-kpi-card-radius: 14px;
+  --cdr-kpi-card-height: 56px;
+  --cdr-kpi-card-padding: 6px;
+  --cdr-kpi-card-gap: 6px;
+  --cdr-kpi-label-size: 8px;
+  --cdr-kpi-label-weight: 900;
+  --cdr-kpi-label-color: #FFFFFF;
+  --cdr-kpi-label-align: center;
+  --cdr-kpi-value-size: 13px;
+  --cdr-kpi-value-weight: 900;
+  --cdr-kpi-value-color: #FFFFFF;
+  --cdr-kpi-value-align: center;
+  --cdr-kpi-subtitle-size: 8px;
+  --cdr-kpi-subtitle-weight: 750;
+  --cdr-kpi-subtitle-color: #9CA3AF;
+  --cdr-kpi-subtitle-align: center;
+  --cdr-kpi-icon-size: 28px;
+  --cdr-kpi-icon-bg: linear-gradient(135deg, #2563EB, #06B6D4);
+
+  /* ---------- Chart panels / modern panels ---------- */
+  --cdr-chart-panel-bg: #111827;
+  --cdr-chart-panel-border: #1F2937;
+  --cdr-chart-panel-radius: 16px;
+  --cdr-chart-panel-padding: 16px;
+  --cdr-chart-panel-min-height: 360px;
+  --cdr-chart-title-size: 16px;
+  --cdr-chart-title-weight: 900;
+  --cdr-chart-title-color: #FFFFFF;
+  --cdr-chart-title-align: left;
+  --cdr-chart-subtitle-size: 12px;
+  --cdr-chart-subtitle-weight: 700;
+  --cdr-chart-subtitle-color: #9CA3AF;
+  --cdr-chart-legend-size: 11px;
+  --cdr-chart-legend-weight: 750;
+  --cdr-chart-legend-color: #9CA3AF;
+  --cdr-chart-label-size: 11px;
+  --cdr-chart-label-weight: 800;
+  --cdr-chart-label-color: #9CA3AF;
+
+  /* ---------- Tables ---------- */
+  --cdr-table-bg: #0F172A;
+  --cdr-table-border: #1F2937;
+  --cdr-table-radius: 12px;
+  --cdr-table-header-bg: #1E293B;
+  --cdr-table-header-color: #FFFFFF;
+  --cdr-table-header-size: 11px;
+  --cdr-table-header-weight: 900;
+  --cdr-table-header-align: center;
+  --cdr-table-row-color: #E5E7EB;
+  --cdr-table-row-size: 11px;
+  --cdr-table-row-weight: 700;
+  --cdr-table-row-align: center;
+  --cdr-table-row-height: 36px;
+  --cdr-table-cell-padding-y: 7px;
+  --cdr-table-cell-padding-x: 8px;
+  --cdr-table-hover-bg: #1E293B;
+
+  /* ---------- Reports tab ---------- */
+  --cdr-report-panel-bg: #111827;
+  --cdr-report-card-bg: #0F172A;
+  --cdr-report-title-size: 18px;
+  --cdr-report-title-weight: 900;
+  --cdr-report-text-size: 12px;
+  --cdr-report-text-weight: 700;
+
+  /* ---------- Upload page ---------- */
+  --cdr-upload-card-bg: #111827;
+  --cdr-upload-card-border: #1F2937;
+  --cdr-upload-card-radius: 22px;
+  --cdr-upload-title-size: 54px;
+  --cdr-upload-title-weight: 950;
+  --cdr-upload-card-title-size: 22px;
+  --cdr-upload-card-title-weight: 900;
+  --cdr-upload-card-text-size: 13px;
+  --cdr-upload-card-text-weight: 700;
+
+  /* ---------- Footer/status strip ---------- */
+  --cdr-footer-height: 40px;
+  --cdr-footer-bg: #0A0F1A;
+  --cdr-footer-border: #1F2937;
+  --cdr-footer-color: #6B7280;
+  --cdr-footer-font-size: 11px;
+  --cdr-footer-font-weight: 750;
+  --cdr-footer-align: center;
+}
+
+/* Light theme overrides: change these if you want a different light visual style. */
+body .app-shell.light-background-theme,
+body .upload-shell.light-background-theme,
+body .app-shell.se-theme.light-background-theme {
+  --cdr-header-bg: #FFFFFF;
+  --cdr-header-title-color: #092033;
+  --cdr-header-subtitle-color: #3F6174;
+  --cdr-box-bg-dark: #FFFFFF;
+  --cdr-box-bg-dark-2: #F4F9FD;
+  --cdr-box-border-dark: rgba(0, 100, 150, 0.20);
+  --cdr-filter-panel-bg: #FFFFFF;
+  --cdr-filter-panel-border: rgba(0, 100, 150, 0.20);
+  --cdr-filter-label-color: #3F6174;
+  --cdr-filter-control-bg: #FFFFFF;
+  --cdr-filter-control-color: #092033;
+  --cdr-filter-control-border: rgba(0, 100, 150, 0.26);
+  --cdr-chart-panel-bg: #FFFFFF;
+  --cdr-chart-panel-border: rgba(0, 100, 150, 0.20);
+  --cdr-chart-title-color: #092033;
+  --cdr-chart-subtitle-color: #3F6174;
+  --cdr-kpi-card-bg: #FFFFFF;
+  --cdr-kpi-card-border: rgba(0, 100, 150, 0.20);
+  --cdr-kpi-label-color: #FFFFFF;
+  --cdr-kpi-value-color: #092033;
+  --cdr-kpi-subtitle-color: #3F6174;
+  --cdr-table-bg: #FFFFFF;
+  --cdr-table-border: rgba(0, 100, 150, 0.18);
+  --cdr-table-header-bg: #EEF7FC;
+  --cdr-table-header-color: #005F93;
+  --cdr-table-row-color: #18394D;
+  --cdr-table-hover-bg: #EEF7FC;
+  --cdr-button-bg: #FFFFFF;
+  --cdr-button-color: #083047;
+  --cdr-button-border: rgba(0, 100, 150, 0.26);
+  --cdr-button-hover-bg: #EAF6FF;
+  --cdr-button-hover-color: #06324C;
+}
+
+/* ============================================================================
+   SECTION 02 - GLOBAL TEXT AND COMMON SURFACES
+   Controls general font inheritance, panel defaults, and text colors.
+   ============================================================================ */
+body .app-shell,
+body .upload-shell {
+  font-family: var(--cdr-font-family) !important;
+}
+
+body .app-shell .topbar,
+body .app-shell .section-nav,
+body .app-shell .dashboard-tabs,
+body .app-shell .hero-panel,
+body .app-shell .workbook-card,
+body .app-shell .filters-panel,
+body .app-shell .summary-card,
+body .app-shell .chart-card,
+body .app-shell .table-card,
+body .app-shell .records-card,
+body .app-shell .modern-panel,
+body .app-shell .modern-record-card,
+body .app-shell .data-quality-panel,
+body .app-shell .quality-score-card,
+body .app-shell .quality-issue,
+body .app-shell .reports-tab-panel .table-card,
+body .upload-shell .upload-copy,
+body .upload-shell .workbook-choice-panel,
+body .upload-shell .workbook-choice-card,
+body .upload-shell .choice-card {
+  border-radius: var(--cdr-box-radius) !important;
+  border-color: var(--cdr-box-border-dark) !important;
+  box-shadow: var(--cdr-box-shadow-dark) !important;
+  background-color: var(--cdr-box-bg-dark) !important;
+  background-image: none !important;
+}
+
+body .app-shell.light-background-theme .topbar,
+body .app-shell.light-background-theme .section-nav,
+body .app-shell.light-background-theme .dashboard-tabs,
+body .app-shell.light-background-theme .hero-panel,
+body .app-shell.light-background-theme .workbook-card,
+body .app-shell.light-background-theme .filters-panel,
+body .app-shell.light-background-theme .summary-card,
+body .app-shell.light-background-theme .chart-card,
+body .app-shell.light-background-theme .table-card,
+body .app-shell.light-background-theme .records-card,
+body .app-shell.light-background-theme .modern-panel,
+body .app-shell.light-background-theme .modern-record-card,
+body .app-shell.light-background-theme .data-quality-panel,
+body .app-shell.light-background-theme .quality-score-card,
+body .app-shell.light-background-theme .quality-issue,
+body .upload-shell.light-background-theme .upload-copy,
+body .upload-shell.light-background-theme .workbook-choice-panel,
+body .upload-shell.light-background-theme .workbook-choice-card,
+body .upload-shell.light-background-theme .choice-card {
+  border-color: var(--cdr-box-border-light) !important;
+  box-shadow: var(--cdr-box-shadow-light) !important;
+  background-color: var(--cdr-box-bg-light) !important;
+}
+
+/* ============================================================================
+   SECTION 03 - TOP HEADER / LOGOS / TITLE
+   Controls the dark navy header bar, title, subtitle, logos, and header buttons.
+   ============================================================================ */
+body .app-shell .topbar {
+  min-height: var(--cdr-header-height) !important;
+  padding: var(--cdr-header-padding-y) var(--cdr-header-padding-x) !important;
+  gap: var(--cdr-header-gap) !important;
+  align-items: center !important;
+  background: var(--cdr-header-bg) !important;
+  border-color: var(--cdr-header-border) !important;
+  border-radius: var(--cdr-header-radius) !important;
+}
+
+body .app-shell .brand-block h1 {
+  font-size: var(--cdr-header-title-size) !important;
+  font-weight: var(--cdr-header-title-weight) !important;
+  color: var(--cdr-header-title-color) !important;
+  text-align: var(--cdr-header-title-align) !important;
+  line-height: 1.05 !important;
+}
+
+body .app-shell .brand-block p {
+  font-size: var(--cdr-header-subtitle-size) !important;
+  font-weight: var(--cdr-header-subtitle-weight) !important;
+  color: var(--cdr-header-subtitle-color) !important;
+  text-align: var(--cdr-header-title-align) !important;
+}
+
+body .app-shell .brand-logo,
+body .app-shell .brand-block img {
+  max-width: var(--cdr-header-logo-width) !important;
+  max-height: var(--cdr-header-logo-height) !important;
+  object-fit: contain !important;
+}
+
+/* ============================================================================
+   SECTION 04 - DASHBOARD TABS AND SECTION NAVIGATION
+   Controls all tab buttons and navigation toolbar styling.
+   ============================================================================ */
+body .app-shell .dashboard-tabs,
+body .app-shell .section-nav {
+  gap: 8px !important;
+  padding: 8px !important;
+  align-items: center !important;
+}
+
+body .app-shell .dashboard-tab,
+body .app-shell .section-nav-button,
+body .app-shell .section-nav button {
+  min-height: var(--cdr-tab-height) !important;
+  padding: 0 var(--cdr-tab-padding-x) !important;
+  font-size: var(--cdr-tab-font-size) !important;
+  font-weight: var(--cdr-tab-font-weight) !important;
+  color: var(--cdr-tab-color) !important;
+  background: var(--cdr-tab-bg) !important;
+  border-color: var(--cdr-tab-border) !important;
+  border-radius: var(--cdr-tab-radius) !important;
+  justify-content: var(--cdr-tab-horizontal-align) !important;
+  align-items: var(--cdr-tab-vertical-align) !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+body .app-shell .dashboard-tab.active,
+body .app-shell .section-nav-button.active {
+  color: var(--cdr-tab-active-color) !important;
+  background: var(--cdr-tab-active-bg) !important;
+  border-color: var(--cdr-tab-active-bg) !important;
+}
+
+/* ============================================================================
+   SECTION 05 - BUTTONS: NORMAL / EXPORT / UPLOAD / RESET / REPORT
+   Controls all clickable button boxes across the full project.
+   ============================================================================ */
+body .app-shell button,
+body .upload-shell button,
+body .app-shell .button,
+body .upload-shell .button,
+body .app-shell label.button,
+body .upload-shell label.button,
+body .app-shell .export-button,
+body .app-shell .quick-card-export,
+body .app-shell .generate-report-tile,
+body .app-shell .multi-select-clear,
+body .app-shell .modern-panel-menu {
+  min-height: var(--cdr-button-height) !important;
+  min-width: var(--cdr-button-min-width) !important;
+  padding-left: var(--cdr-button-padding-x) !important;
+  padding-right: var(--cdr-button-padding-x) !important;
+  font-size: var(--cdr-button-font-size) !important;
+  font-weight: var(--cdr-button-font-weight) !important;
+  color: var(--cdr-button-color) !important;
+  background: var(--cdr-button-bg) !important;
+  border-color: var(--cdr-button-border) !important;
+  border-radius: var(--cdr-button-radius) !important;
+  display: inline-flex !important;
+  align-items: var(--cdr-button-vertical-align) !important;
+  justify-content: var(--cdr-button-horizontal-align) !important;
+  gap: var(--cdr-button-gap) !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+body .app-shell button:hover:not(:disabled),
+body .upload-shell button:hover:not(:disabled),
+body .app-shell .button:hover,
+body .upload-shell .button:hover,
+body .app-shell .generate-report-tile:hover {
+  color: var(--cdr-button-hover-color) !important;
+  background: var(--cdr-button-hover-bg) !important;
+  border-color: var(--cdr-button-hover-border) !important;
+}
+
+body .app-shell .reset-filter-button {
+  min-width: var(--cdr-filter-reset-width) !important;
+  width: var(--cdr-filter-reset-width) !important;
+  max-width: var(--cdr-filter-reset-width) !important;
+}
+
+/* ============================================================================
+   SECTION 06 - FILTER BAR: LABELS, DROPDOWNS, SEARCH, RESET, INFO
+   Controls all filter boxes and their horizontal/vertical alignment.
+   ============================================================================ */
+body .app-shell .filters-panel.filters-panel-arranged {
+  padding: var(--cdr-filter-panel-padding) !important;
+  border-radius: var(--cdr-filter-panel-radius) !important;
+  background: var(--cdr-filter-panel-bg) !important;
+  border-color: var(--cdr-filter-panel-border) !important;
+  display: block !important;
+}
+
+body .app-shell .filters-panel-arranged .filters-fields-grid {
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  row-gap: var(--cdr-filter-row-gap) !important;
+}
+
+body .app-shell .filters-panel-arranged .filters-row {
+  display: grid !important;
+  gap: var(--cdr-filter-column-gap) !important;
+  align-items: end !important;
+}
+
+body .app-shell .filters-panel-arranged .filters-row-primary {
+  grid-template-columns:
+    var(--cdr-filter-search-width)
+    var(--cdr-filter-region-width)
+    var(--cdr-filter-year-width)
+    var(--cdr-filter-month-width)
+    var(--cdr-filter-company-width)
+    var(--cdr-filter-base-station-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .filters-row-secondary {
+  grid-template-columns:
+    var(--cdr-filter-talkgroup-width)
+    var(--cdr-filter-call-type-width)
+    var(--cdr-filter-radio-type-width)
+    var(--cdr-filter-encryption-width)
+    var(--cdr-filter-duplex-width)
+    var(--cdr-filter-reset-width)
+    var(--cdr-filter-info-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .search-box,
+body .app-shell .filters-panel-arranged .filter-field,
+body .app-shell .filters-panel-arranged .multi-select-filter,
+body .app-shell .filters-panel-arranged .filter-action-cell {
+  display: grid !important;
+  grid-template-rows: var(--cdr-filter-label-height) var(--cdr-filter-control-height) !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+  align-items: end !important;
+}
+
+body .app-shell .filters-panel-arranged .search-box > span,
+body .app-shell .filters-panel-arranged .filter-field > span,
+body .app-shell .filters-panel-arranged .multi-select-filter > span,
+body .app-shell .filters-panel-arranged .filter-action-label {
+  height: var(--cdr-filter-label-height) !important;
+  line-height: var(--cdr-filter-label-height) !important;
+  font-size: var(--cdr-filter-label-size) !important;
+  font-weight: var(--cdr-filter-label-weight) !important;
+  color: var(--cdr-filter-label-color) !important;
+  text-align: var(--cdr-filter-label-align) !important;
+  white-space: nowrap !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  overflow: visible !important;
+}
+
+body .app-shell .filters-panel-arranged .search-box input,
+body .app-shell .filters-panel-arranged .multi-select-trigger,
+body .app-shell .filters-panel-arranged .filter-count {
+  height: var(--cdr-filter-control-height) !important;
+  min-height: var(--cdr-filter-control-height) !important;
+  max-height: var(--cdr-filter-control-height) !important;
+  padding-left: var(--cdr-filter-control-padding-x) !important;
+  padding-right: var(--cdr-filter-control-padding-x) !important;
+  font-size: var(--cdr-filter-control-font-size) !important;
+  font-weight: var(--cdr-filter-control-font-weight) !important;
+  color: var(--cdr-filter-control-color) !important;
+  background: var(--cdr-filter-control-bg) !important;
+  border-color: var(--cdr-filter-control-border) !important;
+  border-radius: var(--cdr-filter-control-radius) !important;
+  display: flex !important;
+  align-items: var(--cdr-filter-control-vertical-align) !important;
+  justify-content: var(--cdr-filter-control-horizontal-align) !important;
+  text-align: var(--cdr-filter-control-text-align) !important;
+  line-height: normal !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+body .app-shell .filters-panel-arranged .search-box input {
+  padding-left: 38px !important;
+}
+
+body .app-shell .filters-panel-arranged .search-box svg {
+  left: 12px !important;
+  bottom: calc((var(--cdr-filter-control-height) - 16px) / 2) !important;
+  top: auto !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+body .app-shell .filters-panel-arranged .multi-select-value {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: var(--cdr-filter-control-horizontal-align) !important;
+  font-size: var(--cdr-filter-control-font-size) !important;
+  font-weight: var(--cdr-filter-control-font-weight) !important;
+  color: var(--cdr-filter-control-color) !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body .app-shell .multi-select-dropdown {
+  font-size: var(--cdr-filter-control-font-size) !important;
+  font-weight: var(--cdr-filter-control-font-weight) !important;
+  background: var(--cdr-filter-control-bg) !important;
+  color: var(--cdr-filter-control-color) !important;
+  border-color: var(--cdr-filter-control-border) !important;
+}
+
+body .app-shell .multi-select-option {
+  min-height: 34px !important;
+  align-items: center !important;
+}
+
+/* ============================================================================
+   SECTION 07 - HERO / WORKBOOK PROFILE BOX
+   Controls the large loaded workbook profile and right-side source box.
+   ============================================================================ */
+body .app-shell .hero-panel {
+  padding: var(--cdr-hero-padding) !important;
+  gap: var(--cdr-hero-gap) !important;
+  border-radius: var(--cdr-hero-radius) !important;
+  background: var(--cdr-hero-bg) !important;
+  border-color: var(--cdr-hero-border) !important;
+}
+
+body .app-shell .hero-main h2,
+body .app-shell .hero-call-text h2,
+body .app-shell .hero-profile-copy h2 {
+  font-size: var(--cdr-hero-title-size) !important;
+  font-weight: var(--cdr-hero-title-weight) !important;
+  color: var(--cdr-hero-title-color) !important;
+  text-align: var(--cdr-hero-title-align) !important;
+}
+
+body .app-shell .hero-subtitle {
+  font-size: var(--cdr-hero-subtitle-size) !important;
+  font-weight: var(--cdr-hero-subtitle-weight) !important;
+  color: var(--cdr-hero-subtitle-color) !important;
+  text-align: var(--cdr-hero-title-align) !important;
+}
+
+body .app-shell .workbook-card {
+  max-width: var(--cdr-workbook-card-width) !important;
+  background: var(--cdr-chart-panel-bg) !important;
+  border-color: var(--cdr-chart-panel-border) !important;
+}
+
+body .app-shell .workbook-card > strong {
+  font-size: var(--cdr-workbook-title-size) !important;
+  font-weight: var(--cdr-workbook-title-weight) !important;
+}
+
+body .app-shell .workbook-card > p,
+body .app-shell .workbook-card .cdr-sources-list li,
+body .app-shell .workbook-card .fleetmap-status {
+  font-size: var(--cdr-workbook-meta-size) !important;
+  font-weight: var(--cdr-workbook-meta-weight) !important;
+}
+
+/* ============================================================================
+   SECTION 08 - SECTION HEADERS / COLLAPSE ARROWS
+   Controls title rows above tables/charts and arrow buttons.
+   ============================================================================ */
+body .app-shell .section-title {
+  min-height: var(--cdr-section-header-height) !important;
+  padding: var(--cdr-section-header-padding) !important;
+  gap: var(--cdr-section-header-gap) !important;
+  align-items: center !important;
+}
+
+body .app-shell .section-title h2 {
+  font-size: var(--cdr-section-title-size) !important;
+  font-weight: var(--cdr-section-title-weight) !important;
+  color: var(--cdr-section-title-color) !important;
+  text-align: var(--cdr-section-title-align) !important;
+}
+
+body .app-shell .section-title span,
+body .app-shell .section-title p {
+  font-size: var(--cdr-section-subtitle-size) !important;
+  font-weight: var(--cdr-section-subtitle-weight) !important;
+  color: var(--cdr-section-subtitle-color) !important;
+}
+
+body .app-shell .section-title-arrow {
+  width: var(--cdr-button-height) !important;
+  height: var(--cdr-button-height) !important;
+  min-width: var(--cdr-button-height) !important;
+  border-radius: var(--cdr-button-radius) !important;
+}
+
+/* ============================================================================
+   SECTION 09 - KPI CARDS / DATA QUALITY CARDS
+   Controls all 30 KPI cards and quality cards.
+   ============================================================================ */
+body .app-shell .summary-card,
+body .app-shell .visual-summary-card,
+body .app-shell .quality-score-card,
+body .app-shell .quality-issue,
+body .app-shell .modern-quality-tile {
+  min-height: var(--cdr-kpi-card-height) !important;
+  padding: var(--cdr-kpi-card-padding) !important;
+  gap: var(--cdr-kpi-card-gap) !important;
+  border-radius: var(--cdr-kpi-card-radius) !important;
+  background: var(--cdr-kpi-card-bg) !important;
+  border-color: var(--cdr-kpi-card-border) !important;
+  text-align: var(--cdr-kpi-label-align) !important;
+}
+
+body .app-shell .summary-card span,
+body .app-shell .summary-card-head span,
+body .app-shell .quality-score-card span,
+body .app-shell .quality-issue span,
+body .app-shell .modern-quality-tile span,
+body .app-shell .modern-stat-tile span {
+  font-size: var(--cdr-kpi-label-size) !important;
+  font-weight: var(--cdr-kpi-label-weight) !important;
+  color: var(--cdr-kpi-label-color) !important;
+  text-align: var(--cdr-kpi-label-align) !important;
+}
+
+body .app-shell .summary-card strong,
+body .app-shell .quality-score-card strong,
+body .app-shell .quality-issue strong,
+body .app-shell .modern-quality-tile strong,
+body .app-shell .modern-stat-tile strong {
+  font-size: var(--cdr-kpi-value-size) !important;
+  font-weight: var(--cdr-kpi-value-weight) !important;
+  color: var(--cdr-kpi-value-color) !important;
+  text-align: var(--cdr-kpi-value-align) !important;
+}
+
+body .app-shell .summary-card small,
+body .app-shell .quality-score-card small,
+body .app-shell .quality-issue small,
+body .app-shell .modern-quality-tile small {
+  font-size: var(--cdr-kpi-subtitle-size) !important;
+  font-weight: var(--cdr-kpi-subtitle-weight) !important;
+  color: var(--cdr-kpi-subtitle-color) !important;
+  text-align: var(--cdr-kpi-subtitle-align) !important;
+}
+
+body .app-shell .summary-card-icon,
+body .app-shell .modern-stat-icon {
+  width: var(--cdr-kpi-icon-size) !important;
+  height: var(--cdr-kpi-icon-size) !important;
+  border-radius: 999px !important;
+  background: var(--cdr-kpi-icon-bg) !important;
+}
+
+/* ============================================================================
+   SECTION 10 - CHART PANELS / MODERN OVERVIEW PANELS / LEGENDS
+   Controls all chart boxes in Overview, Charts, KPI, Company, and Performance tabs.
+   ============================================================================ */
+body .app-shell .chart-card,
+body .app-shell .modern-panel,
+body .app-shell .modern-record-card,
+body .app-shell .table-card.report-management-card {
+  min-height: var(--cdr-chart-panel-min-height) !important;
+  padding: var(--cdr-chart-panel-padding) !important;
+  border-radius: var(--cdr-chart-panel-radius) !important;
+  background: var(--cdr-chart-panel-bg) !important;
+  border-color: var(--cdr-chart-panel-border) !important;
+}
+
+body .app-shell .chart-card h3,
+body .app-shell .modern-panel-head h3,
+body .app-shell .table-card h3,
+body .app-shell .records-card h3,
+body .app-shell .report-management-header h3,
+body .app-shell .generated-reports-title h3 {
+  font-size: var(--cdr-chart-title-size) !important;
+  font-weight: var(--cdr-chart-title-weight) !important;
+  color: var(--cdr-chart-title-color) !important;
+  text-align: var(--cdr-chart-title-align) !important;
+}
+
+body .app-shell .chart-card p,
+body .app-shell .modern-panel p,
+body .app-shell .table-card p,
+body .app-shell .reports-tab-panel p {
+  font-size: var(--cdr-chart-subtitle-size) !important;
+  font-weight: var(--cdr-chart-subtitle-weight) !important;
+  color: var(--cdr-chart-subtitle-color) !important;
+}
+
+body .app-shell .chart-legend,
+body .app-shell .company-color-legend,
+body .app-shell .cdr-chart-legend,
+body .app-shell .recharts-legend-item-text {
+  font-size: var(--cdr-chart-legend-size) !important;
+  font-weight: var(--cdr-chart-legend-weight) !important;
+  color: var(--cdr-chart-legend-color) !important;
+}
+
+body .app-shell .recharts-text,
+body .app-shell .recharts-cartesian-axis-tick-value,
+body .app-shell .modern-pie-center-label,
+body .app-shell .modern-pie-center-value {
+  font-size: var(--cdr-chart-label-size) !important;
+  font-weight: var(--cdr-chart-label-weight) !important;
+  fill: var(--cdr-chart-label-color) !important;
+}
+
+/* ============================================================================
+   SECTION 11 - TABLES: HEADERS / ROWS / CELLS / HOVER / ALIGNMENT
+   Controls all normal tables, behavior tables, ranking tables, and registers.
+   ============================================================================ */
+body .app-shell .table-wrap,
+body .app-shell .records-scroll,
+body .app-shell .modern-table-wrap,
+body .app-shell .generated-reports-table-wrap,
+body .app-shell .unmatched-fleetmap-table-wrap {
+  background: var(--cdr-table-bg) !important;
+  border-color: var(--cdr-table-border) !important;
+  border-radius: var(--cdr-table-radius) !important;
+}
+
+body .app-shell table {
+  background: var(--cdr-table-bg) !important;
+  border-color: var(--cdr-table-border) !important;
+}
+
+body .app-shell table th,
+body .app-shell .modern-table th,
+body .app-shell .generated-reports-table th,
+body .app-shell .filtered-register-table th {
+  height: var(--cdr-table-row-height) !important;
+  padding: var(--cdr-table-cell-padding-y) var(--cdr-table-cell-padding-x) !important;
+  background: var(--cdr-table-header-bg) !important;
+  color: var(--cdr-table-header-color) !important;
+  font-size: var(--cdr-table-header-size) !important;
+  font-weight: var(--cdr-table-header-weight) !important;
+  text-align: var(--cdr-table-header-align) !important;
+  vertical-align: middle !important;
+}
+
+body .app-shell table td,
+body .app-shell .modern-table td,
+body .app-shell .generated-reports-table td,
+body .app-shell .filtered-register-table td {
+  height: var(--cdr-table-row-height) !important;
+  padding: var(--cdr-table-cell-padding-y) var(--cdr-table-cell-padding-x) !important;
+  color: var(--cdr-table-row-color) !important;
+  font-size: var(--cdr-table-row-size) !important;
+  font-weight: var(--cdr-table-row-weight) !important;
+  text-align: var(--cdr-table-row-align) !important;
+  vertical-align: middle !important;
+}
+
+body .app-shell table tr:hover td,
+body .app-shell .modern-table tr:hover td,
+body .app-shell .generated-reports-table tr:hover td {
+  background: var(--cdr-table-hover-bg) !important;
+}
+
+/* ============================================================================
+   SECTION 12 - REPORTS TAB
+   Controls report builder cards, report buttons, search, and generated reports table.
+   ============================================================================ */
+body .app-shell .reports-tab-panel,
+body .app-shell .report-management-card,
+body .app-shell .report-generator-panel,
+body .app-shell .generated-reports-panel,
+body .app-shell .export-center-card {
+  background: var(--cdr-report-panel-bg) !important;
+  border-color: var(--cdr-box-border-dark) !important;
+}
+
+body .app-shell .report-management-header h3,
+body .app-shell .export-center-card h3,
+body .app-shell .generated-reports-title h3 {
+  font-size: var(--cdr-report-title-size) !important;
+  font-weight: var(--cdr-report-title-weight) !important;
+}
+
+body .app-shell .report-search-box input,
+body .app-shell .report-generation-form input,
+body .app-shell .report-generation-form select {
+  height: var(--cdr-filter-control-height) !important;
+  font-size: var(--cdr-filter-control-font-size) !important;
+  font-weight: var(--cdr-filter-control-font-weight) !important;
+  color: var(--cdr-filter-control-color) !important;
+  background: var(--cdr-filter-control-bg) !important;
+  border-color: var(--cdr-filter-control-border) !important;
+  border-radius: var(--cdr-filter-control-radius) !important;
+}
+
+/* ============================================================================
+   SECTION 13 - UPLOAD HOME PAGE
+   Controls upload screen title, workbook cards, upload cards, and upload buttons.
+   ============================================================================ */
+body .upload-shell .upload-copy h1 {
+  font-size: var(--cdr-upload-title-size) !important;
+  font-weight: var(--cdr-upload-title-weight) !important;
+}
+
+body .upload-shell .workbook-choice-card,
+body .upload-shell .choice-card {
+  background: var(--cdr-upload-card-bg) !important;
+  border-color: var(--cdr-upload-card-border) !important;
+  border-radius: var(--cdr-upload-card-radius) !important;
+}
+
+body .upload-shell .workbook-choice-card strong,
+body .upload-shell .choice-card strong {
+  font-size: var(--cdr-upload-card-title-size) !important;
+  font-weight: var(--cdr-upload-card-title-weight) !important;
+}
+
+body .upload-shell .workbook-choice-card p,
+body .upload-shell .choice-card p,
+body .upload-shell .lead {
+  font-size: var(--cdr-upload-card-text-size) !important;
+  font-weight: var(--cdr-upload-card-text-weight) !important;
+}
+
+/* ============================================================================
+   SECTION 14 - FOOTER / STATUS / DATA QUALITY STRIPS
+   Controls footer/status bars and overview record status tiles.
+   ============================================================================ */
+body .app-shell .modern-status-footer,
+body .app-shell .cdr-saas-footer {
+  min-height: var(--cdr-footer-height) !important;
+  background: var(--cdr-footer-bg) !important;
+  border-color: var(--cdr-footer-border) !important;
+  color: var(--cdr-footer-color) !important;
+  font-size: var(--cdr-footer-font-size) !important;
+  font-weight: var(--cdr-footer-font-weight) !important;
+  align-items: var(--cdr-footer-align) !important;
+}
+
+/* ============================================================================
+   SECTION 15 - RESPONSIVE CONTROL
+   Keeps the filter rows usable on smaller screens while preserving parameter use.
+   ============================================================================ */
+@media (max-width: 1500px) {
+  body .app-shell .filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(3, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body .app-shell .filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: 1fr !important;
+  }
+
+  body .app-shell .topbar {
+    min-height: auto !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+/* ============================================================================
+   SECTION 16 - QUICK PER-ELEMENT WIDTH OVERRIDES
+   Change these individual classes if one filter/control needs a special width.
+   ============================================================================ */
+body .app-shell .cdr-filter-search { width: var(--cdr-filter-search-width) !important; }
+body .app-shell .cdr-filter-region { width: var(--cdr-filter-region-width) !important; }
+body .app-shell .cdr-filter-year { width: var(--cdr-filter-year-width) !important; }
+body .app-shell .cdr-filter-month { width: var(--cdr-filter-month-width) !important; }
+body .app-shell .cdr-filter-company { width: var(--cdr-filter-company-width) !important; }
+body .app-shell .cdr-filter-base-station { width: var(--cdr-filter-base-station-width) !important; }
+body .app-shell .cdr-filter-talkgroup { width: var(--cdr-filter-talkgroup-width) !important; }
+body .app-shell .cdr-filter-call-type { width: var(--cdr-filter-call-type-width) !important; }
+body .app-shell .cdr-filter-radio-type { width: var(--cdr-filter-radio-type-width) !important; }
+body .app-shell .cdr-filter-encryption { width: var(--cdr-filter-encryption-width) !important; }
+body .app-shell .cdr-filter-duplex { width: var(--cdr-filter-duplex-width) !important; }
+body .app-shell .cdr-filter-info-cell,
+body .app-shell .cdr-filter-info-cell .filter-count { width: var(--cdr-filter-info-width) !important; }
+
+/* End of CDR Dashboard Master Design Control System. */
+
+/* ============================================================================
+   SECTION 17 - FILTER BAR READABILITY + DISTRIBUTION HOTFIX
+   Task of this section:
+   - Reduce the filter label/value font sizes after the master control layer.
+   - Make row 1 stay as 6 controls and row 2 stay as 5 filters + Reset + Info.
+   - Distribute filters across the available width without overflowing.
+   - Keep the info/count label inside its own box using ellipsis if space is tight.
+   - This section is intentionally placed at the very bottom so it wins over
+     older filter/grid/width patches.
+   ============================================================================ */
+body .app-shell,
+body .upload-shell {
+  /* Filter panel spacing */
+  --cdr-filter-row-gap: 10px;
+  --cdr-filter-column-gap: 12px;
+  --cdr-filter-panel-padding: 10px 12px;
+
+  /* Filter label typography: Search Radio/User, Region, Year, etc. */
+  --cdr-filter-label-height: 15px;
+  --cdr-filter-label-size: 10px;
+  --cdr-filter-label-weight: 850;
+  --cdr-filter-label-color: #B9E9FF;
+
+  /* Filter box typography and height: dropdown/search values */
+  --cdr-filter-control-height: 36px;
+  --cdr-filter-control-font-size: 11px;
+  --cdr-filter-control-font-weight: 750;
+  --cdr-filter-control-padding-x: 10px;
+
+  /* Minimum widths. The grid below distributes remaining space by fraction. */
+  --cdr-filter-search-width: 260px;
+  --cdr-filter-region-width: 120px;
+  --cdr-filter-year-width: 100px;
+  --cdr-filter-month-width: 115px;
+  --cdr-filter-company-width: 180px;
+  --cdr-filter-base-station-width: 220px;
+
+  --cdr-filter-talkgroup-width: 220px;
+  --cdr-filter-call-type-width: 180px;
+  --cdr-filter-radio-type-width: 170px;
+  --cdr-filter-encryption-width: 165px;
+  --cdr-filter-duplex-width: 165px;
+  --cdr-filter-reset-width: 82px;
+  --cdr-filter-info-width: 260px;
+}
+
+/* The whole filter panel must clip nothing except the text inside individual boxes. */
+body .app-shell .filters-panel.filters-panel-arranged {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  padding: var(--cdr-filter-panel-padding) !important;
+}
+
+body .app-shell .filters-panel-arranged .filters-fields-grid {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  row-gap: var(--cdr-filter-row-gap) !important;
+}
+
+body .app-shell .filters-panel-arranged .filters-row {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: grid !important;
+  gap: var(--cdr-filter-column-gap) !important;
+  align-items: end !important;
+  min-width: 0 !important;
+}
+
+/* Row 1: 6 controls, distributed cleanly across the filter panel. */
+body .app-shell .filters-panel-arranged .filters-row-primary {
+  grid-template-columns:
+    minmax(var(--cdr-filter-search-width), 1.55fr)
+    minmax(var(--cdr-filter-region-width), 0.72fr)
+    minmax(var(--cdr-filter-year-width), 0.58fr)
+    minmax(var(--cdr-filter-month-width), 0.68fr)
+    minmax(var(--cdr-filter-company-width), 1fr)
+    minmax(var(--cdr-filter-base-station-width), 1.25fr) !important;
+}
+
+/* Row 2: 5 filters + Reset + Info, distributed inside the same panel width. */
+body .app-shell .filters-panel-arranged .filters-row-secondary {
+  grid-template-columns:
+    minmax(var(--cdr-filter-talkgroup-width), 1.25fr)
+    minmax(var(--cdr-filter-call-type-width), 1fr)
+    minmax(var(--cdr-filter-radio-type-width), 0.95fr)
+    minmax(var(--cdr-filter-encryption-width), 0.9fr)
+    minmax(var(--cdr-filter-duplex-width), 0.9fr)
+    var(--cdr-filter-reset-width)
+    minmax(var(--cdr-filter-info-width), 1.15fr) !important;
+}
+
+/* Let grid columns control width. This prevents old fixed-width blocks from breaking the layout. */
+body .app-shell .filters-panel-arranged .cdr-filter-search,
+body .app-shell .filters-panel-arranged .cdr-filter-region,
+body .app-shell .filters-panel-arranged .cdr-filter-year,
+body .app-shell .filters-panel-arranged .cdr-filter-month,
+body .app-shell .filters-panel-arranged .cdr-filter-company,
+body .app-shell .filters-panel-arranged .cdr-filter-base-station,
+body .app-shell .filters-panel-arranged .cdr-filter-talkgroup,
+body .app-shell .filters-panel-arranged .cdr-filter-call-type,
+body .app-shell .filters-panel-arranged .cdr-filter-radio-type,
+body .app-shell .filters-panel-arranged .cdr-filter-encryption,
+body .app-shell .filters-panel-arranged .cdr-filter-duplex,
+body .app-shell .filters-panel-arranged .cdr-filter-reset-cell,
+body .app-shell .filters-panel-arranged .cdr-filter-info-cell {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Keep labels compact, one-line, and aligned across all filters. */
+body .app-shell .filters-panel-arranged .search-box,
+body .app-shell .filters-panel-arranged .filter-field,
+body .app-shell .filters-panel-arranged .multi-select-filter,
+body .app-shell .filters-panel-arranged .filter-action-cell {
+  display: grid !important;
+  grid-template-rows: var(--cdr-filter-label-height) var(--cdr-filter-control-height) !important;
+  row-gap: 5px !important;
+  align-items: end !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+body .app-shell .filters-panel-arranged .search-box > span,
+body .app-shell .filters-panel-arranged .filter-field > span,
+body .app-shell .filters-panel-arranged .multi-select-filter > span,
+body .app-shell .filters-panel-arranged .filter-action-label {
+  height: var(--cdr-filter-label-height) !important;
+  min-height: var(--cdr-filter-label-height) !important;
+  max-height: var(--cdr-filter-label-height) !important;
+  line-height: var(--cdr-filter-label-height) !important;
+  font-size: var(--cdr-filter-label-size) !important;
+  font-weight: var(--cdr-filter-label-weight) !important;
+  color: var(--cdr-filter-label-color) !important;
+  letter-spacing: 0.045em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  margin: 0 !important;
+}
+
+/* Make search input and dropdowns the same height, size, and vertical alignment. */
+body .app-shell .filters-panel-arranged .search-box input,
+body .app-shell .filters-panel-arranged .multi-select-trigger,
+body .app-shell .filters-panel-arranged .reset-filter-button,
+body .app-shell .filters-panel-arranged .filter-count {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: var(--cdr-filter-control-height) !important;
+  min-height: var(--cdr-filter-control-height) !important;
+  max-height: var(--cdr-filter-control-height) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: var(--cdr-filter-control-padding-x) !important;
+  padding-right: var(--cdr-filter-control-padding-x) !important;
+  font-size: var(--cdr-filter-control-font-size) !important;
+  font-weight: var(--cdr-filter-control-font-weight) !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+}
+
+/* Search icon and placeholder alignment. */
+body .app-shell .filters-panel-arranged .search-box {
+  position: relative !important;
+}
+
+body .app-shell .filters-panel-arranged .search-box input {
+  padding-left: 34px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body .app-shell .filters-panel-arranged .search-box svg {
+  position: absolute !important;
+  left: 12px !important;
+  bottom: calc((var(--cdr-filter-control-height) - 16px) / 2) !important;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  pointer-events: none !important;
+}
+
+body .app-shell .filters-panel-arranged .multi-select-value {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-size: var(--cdr-filter-control-font-size) !important;
+  font-weight: var(--cdr-filter-control-font-weight) !important;
+  line-height: 1 !important;
+}
+
+/* Reset is compact; info stays inside its own box. */
+body .app-shell .filters-panel-arranged .reset-filter-button {
+  justify-content: center !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  font-size: 10.5px !important;
+  font-weight: 850 !important;
+}
+
+body .app-shell .filters-panel-arranged .filter-count {
+  justify-content: center !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 10.5px !important;
+  font-weight: 850 !important;
+  letter-spacing: -0.015em !important;
+}
+
+/* Responsive only below laptop width. Desktop keeps the requested 6 / 5+actions layout. */
+@media (max-width: 1350px) {
+  body .app-shell .filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(3, minmax(180px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body .app-shell .filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================================
+   SECTION 18 - REPORTS HISTORY CLEAR BUTTON
+   Task: Adds the compact Clear History control beside the recent-count label.
+   Scope: Only controls the generated reports history header area. It does not
+   affect uploaded CDR files, fleetmap cache, Continue Previous data, filters,
+   export logic, tabs, charts, or KPI cards.
+   ============================================================================ */
+body .app-shell .generated-reports-title {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  margin-bottom: 10px !important;
+}
+
+body .app-shell .generated-reports-title-copy {
+  display: grid !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+}
+
+body .app-shell .generated-reports-title-copy h4 {
+  margin: 0 !important;
+  color: var(--cdr-card-title-color, var(--theme-text, #edf8ff)) !important;
+  font-size: var(--cdr-report-title-size, clamp(13px, 0.82vw, 16px)) !important;
+  font-weight: var(--cdr-report-title-weight, 950) !important;
+  line-height: 1.15 !important;
+}
+
+body .app-shell .generated-reports-note {
+  margin: 0 !important;
+  color: var(--cdr-card-subtitle-color, var(--theme-muted, #a7c1d2)) !important;
+  font-size: var(--cdr-report-note-size, 11px) !important;
+  font-weight: var(--cdr-report-note-weight, 700) !important;
+  line-height: 1.35 !important;
+}
+
+body .app-shell .generated-reports-title-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+body .app-shell .generated-reports-title-actions > span {
+  color: var(--cdr-card-subtitle-color, var(--theme-muted, #a7c1d2)) !important;
+  font-size: var(--cdr-report-history-count-size, 12px) !important;
+  font-weight: var(--cdr-report-history-count-weight, 850) !important;
+  line-height: 1 !important;
+}
+
+body .app-shell .clear-history-button {
+  min-width: 0 !important;
+  min-height: 30px !important;
+  height: 30px !important;
+  padding: 0 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(217, 95, 95, 0.42) !important;
+  background: rgba(217, 95, 95, 0.10) !important;
+  color: var(--cdr-report-clear-color, #ffb4b4) !important;
+  font-size: var(--cdr-report-clear-size, 11px) !important;
+  font-weight: var(--cdr-report-clear-weight, 900) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+
+body .app-shell .clear-history-button svg {
+  width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+}
+
+body .app-shell .clear-history-button:hover:not(:disabled) {
+  background: rgba(217, 95, 95, 0.18) !important;
+  border-color: rgba(217, 95, 95, 0.72) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+body .app-shell .clear-history-button:disabled {
+  opacity: 0.42 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+body .app-shell.light-background-theme .generated-reports-note,
+body .app-shell.se-theme.light-background-theme .generated-reports-note {
+  color: #3f6174 !important;
+}
+
+body .app-shell.light-background-theme .clear-history-button,
+body .app-shell.se-theme.light-background-theme .clear-history-button {
+  background: rgba(217, 95, 95, 0.08) !important;
+  border-color: rgba(217, 95, 95, 0.34) !important;
+  color: #b33b3b !important;
+}
+
+body .app-shell.light-background-theme .clear-history-button:hover:not(:disabled),
+body .app-shell.se-theme.light-background-theme .clear-history-button:hover:not(:disabled) {
+  background: rgba(217, 95, 95, 0.14) !important;
+  border-color: rgba(217, 95, 95, 0.58) !important;
+  color: #8d2424 !important;
+}
+
+@media (max-width: 720px) {
+  body .app-shell .generated-reports-title {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  body .app-shell .generated-reports-title-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  body .app-shell .clear-history-button {
+    height: 32px !important;
+    padding: 0 10px !important;
+  }
+}
+
+/* ============================================================================
+   SECTION 19 - GENERATED REPORTS SAVED LOCATION COLUMN
+   Task: Adds a browser-safe Downloads / file-name column to the generated
+   reports history table. The link opens the retained in-session Blob URL when
+   available. Browsers do not expose the real local Downloads path for security,
+   so this displays the expected browser Downloads location and file name.
+   ============================================================================ */
+body .app-shell .generated-reports-table {
+  table-layout: fixed !important;
+  min-width: 980px !important;
+}
+
+body .app-shell .generated-reports-table th:nth-child(1),
+body .app-shell .generated-reports-table td:nth-child(1) {
+  width: 24% !important;
+}
+
+body .app-shell .generated-reports-table th:nth-child(2),
+body .app-shell .generated-reports-table td:nth-child(2) {
+  width: 17% !important;
+}
+
+body .app-shell .generated-reports-table th:nth-child(3),
+body .app-shell .generated-reports-table td:nth-child(3) {
+  width: 9% !important;
+}
+
+body .app-shell .generated-reports-table th:nth-child(4),
+body .app-shell .generated-reports-table td:nth-child(4) {
+  width: 34% !important;
+  text-align: left !important;
+}
+
+body .app-shell .generated-reports-table th:nth-child(5),
+body .app-shell .generated-reports-table td:nth-child(5) {
+  width: 16% !important;
+}
+
+body .app-shell .generated-report-path-link {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 28px !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(77, 178, 232, 0.28) !important;
+  background: rgba(0, 120, 212, 0.10) !important;
+  color: var(--cdr-link-color, #8fd7ff) !important;
+  font-size: var(--cdr-report-path-size, 11px) !important;
+  font-weight: var(--cdr-report-path-weight, 850) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  cursor: pointer !important;
+}
+
+body .app-shell .generated-report-path-link span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body .app-shell .generated-report-path-link svg {
+  flex: 0 0 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+
+body .app-shell .generated-report-path-link:hover:not(:disabled) {
+  background: rgba(0, 120, 212, 0.18) !important;
+  border-color: rgba(77, 178, 232, 0.52) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+body .app-shell .generated-report-path-link:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+body .app-shell .generated-report-path,
+body .app-shell .generated-report-path-muted {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 28px !important;
+  max-width: 100% !important;
+  color: var(--cdr-card-subtitle-color, var(--theme-muted, #a7c1d2)) !important;
+  font-size: var(--cdr-report-path-size, 11px) !important;
+  font-weight: var(--cdr-report-path-weight, 850) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body .app-shell.light-background-theme .generated-report-path-link,
+body .app-shell.se-theme.light-background-theme .generated-report-path-link {
+  background: rgba(0, 120, 212, 0.07) !important;
+  border-color: rgba(0, 100, 150, 0.22) !important;
+  color: #005f93 !important;
+}
+
+body .app-shell.light-background-theme .generated-report-path-link:hover:not(:disabled),
+body .app-shell.se-theme.light-background-theme .generated-report-path-link:hover:not(:disabled) {
+  background: rgba(0, 120, 212, 0.12) !important;
+  border-color: rgba(0, 100, 150, 0.36) !important;
+  color: #06324c !important;
+}
+
+@media (max-width: 920px) {
+  body .app-shell .generated-reports-table {
+    min-width: 900px !important;
+  }
+
+  body .app-shell .generated-reports-table th:nth-child(4),
+  body .app-shell .generated-reports-table td:nth-child(4) {
+    width: 30% !important;
+  }
+}
+
+/* ============================================================
+   SECTION 20 - GENERATED REPORTS DOWNLOAD LOCATION AS TEXT ONLY
+   Task: The Downloaded Folder / File column must display the
+   browser download location text without acting as a link/button.
+   This prevents Excel/PPT files from downloading again when the
+   user clicks the path. Use the Actions column for View/Download.
+   ============================================================ */
+body .app-shell .generated-reports-table td:nth-child(4) .generated-report-path {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 28px !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0 !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(77, 178, 232, 0.18) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: var(--cdr-card-subtitle-color, var(--theme-muted, #a7c1d2)) !important;
+  font-size: var(--cdr-report-path-size, 11px) !important;
+  font-weight: var(--cdr-report-path-weight, 850) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  cursor: default !important;
+  text-decoration: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+body .app-shell.light-background-theme .generated-reports-table td:nth-child(4) .generated-report-path,
+body .app-shell.se-theme.light-background-theme .generated-reports-table td:nth-child(4) .generated-report-path {
+  background: rgba(0, 100, 150, 0.045) !important;
+  border-color: rgba(0, 100, 150, 0.16) !important;
+  color: #3f6174 !important;
+}
+
+/* ============================================================================
+   PATCH - Return action buttons into original top header
+   Keeps the CDR page header at the very top and places the main action buttons
+   inside the same header bar instead of a separate toolbar row.
+   ============================================================================ */
+body .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+body .app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+body .app-shell .cdr-command-shell .topbar.followup-style-topbar.cdr-navy-banner,
+body .app-shell.active-tab-overview .cdr-command-shell .topbar.followup-style-topbar.cdr-navy-banner {
+  display: grid !important;
+  grid-template-columns: 150px minmax(560px, 1fr) 150px !important;
+  grid-template-rows: 50px 44px !important;
+  align-items: center !important;
+  gap: 4px 14px !important;
+  min-height: 104px !important;
+  height: 104px !important;
+  margin: 0 !important;
+  padding: 6px 14px !important;
+  border-radius: 0 !important;
+  background: #06182c !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(73, 137, 190, 0.30) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-left,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-left {
+  grid-column: 1 !important;
+  grid-row: 1 / 3 !important;
+  justify-self: start !important;
+  align-self: center !important;
+  height: 86px !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-right,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-right {
+  grid-column: 3 !important;
+  grid-row: 1 / 3 !important;
+  justify-self: end !important;
+  align-self: center !important;
+  height: 86px !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo img,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo img {
+  max-width: 136px !important;
+  max-height: 54px !important;
+  object-fit: contain !important;
+}
+
+body .app-shell .cdr-command-shell .followup-dashboard-title,
+body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: center !important;
+  align-self: end !important;
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: center !important;
+}
+
+body .app-shell .cdr-command-shell .followup-dashboard-title h1,
+body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title h1 {
+  font-size: clamp(22px, 2.1vw, 34px) !important;
+  line-height: 1 !important;
+  letter-spacing: 0.04em !important;
+  margin: 0 !important;
+  text-transform: uppercase !important;
+  color: #f8fbff !important;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.35) !important;
+}
+
+body .app-shell .cdr-command-shell .followup-dashboard-title p,
+body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title p {
+  display: block !important;
+  margin: 6px 0 0 !important;
+  font-size: clamp(9px, 0.78vw, 12px) !important;
+  line-height: 1 !important;
+  letter-spacing: 0.32em !important;
+  color: rgba(207, 236, 250, 0.86) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-actions,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  justify-self: center !important;
+  align-self: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-actions .cdr-action-pill,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions .cdr-action-pill,
+body .app-shell .cdr-command-shell .cdr-header-actions label.cdr-action-pill,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions label.cdr-action-pill {
+  min-height: 36px !important;
+  height: 36px !important;
+  padding: 0 16px !important;
+  border-radius: 7px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+  flex: 0 1 auto !important;
+  background: #09243a !important;
+  color: #f4fbff !important;
+  border: 1px solid rgba(94, 199, 238, 0.38) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08) !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-actions .cdr-action-primary,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions .cdr-action-primary {
+  background: linear-gradient(135deg, #22d3ee 0%, #58a6ff 100%) !important;
+  color: #03131f !important;
+  border-color: rgba(125, 211, 252, 0.78) !important;
+}
+
+body .app-shell .dashboard-tabs-row:empty,
+body .app-shell .dashboard-tabs-row {
+  display: none !important;
+}
+
+body .app-shell .cdr-command-shell > .cdr-banner-control-bar,
+body .app-shell .cdr-command-shell .cdr-banner-control-bar {
+  display: none !important;
+}
+
+@media (max-width: 1200px) {
+  body .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  body .app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+    grid-template-columns: 120px minmax(0, 1fr) 120px !important;
+    height: auto !important;
+    min-height: 128px !important;
+  }
+
+  body .app-shell .cdr-command-shell .cdr-header-actions,
+  body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  body .app-shell .cdr-command-shell .cdr-header-actions .cdr-action-pill,
+  body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions .cdr-action-pill,
+  body .app-shell .cdr-command-shell .cdr-header-actions label.cdr-action-pill,
+  body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions label.cdr-action-pill {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 10px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* CDR patch: header / tabs / actions / filters alignment like reference image. */
+body .app-shell .cdr-command-shell,
+body .app-shell.active-tab-overview .cdr-command-shell {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+body .app-shell.dark-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+body .app-shell.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+body .app-shell.se-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  width: 100% !important;
+  max-width: none !important;
+  height: 78px !important;
+  min-height: 78px !important;
+  margin: 0 !important;
+  padding: 10px 124px 10px 124px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(45, 171, 222, 0.28) !important;
+  border-bottom: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo {
+  display: flex !important;
+  position: absolute !important;
+  top: 13px !important;
+  z-index: 8 !important;
+  width: 66px !important;
+  height: 52px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body .app-shell .cdr-command-shell .cdr-header-logo-left { left: 20px !important; }
+body .app-shell .cdr-command-shell .cdr-header-logo-right { right: 20px !important; }
+body .app-shell .cdr-command-shell .cdr-header-logo img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+body .app-shell .cdr-command-shell .followup-dashboard-title,
+body .app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  display: block !important;
+  text-align: center !important;
+  justify-self: center !important;
+}
+body .app-shell .cdr-command-shell .followup-dashboard-title h1,
+body .app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title h1,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .followup-dashboard-title h1 {
+  margin: 0 !important;
+  text-align: center !important;
+  font-size: clamp(28px, 2.15vw, 42px) !important;
+  line-height: 1 !important;
+  letter-spacing: 0.3px !important;
+  white-space: nowrap !important;
+}
+body .app-shell .cdr-command-shell .followup-dashboard-title p,
+body .app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title p,
+body .app-shell.se-theme.light-background-theme .followup-dashboard-title p {
+  margin: 13px 0 0 !important;
+  text-align: center !important;
+  font-size: clamp(10px, 0.72vw, 13px) !important;
+  letter-spacing: 3.6px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-portal-sidebar,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar {
+  display: none !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.dark-background-theme .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-row {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 54px !important;
+  margin: 0 !important;
+  padding: 10px 18px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 14px !important;
+  border: 1px solid rgba(45, 171, 222, 0.28) !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+  background: rgba(6, 21, 32, 0.98) !important;
+  box-sizing: border-box !important;
+}
+body .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-row {
+  background: rgba(238, 248, 253, 0.98) !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs,
+body .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs {
+  width: auto !important;
+  max-width: 100% !important;
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body .app-shell .cdr-command-shell .dashboard-tab,
+body .app-shell.dark-background-theme .cdr-command-shell .dashboard-tab {
+  height: 34px !important;
+  min-height: 34px !important;
+  min-width: max-content !important;
+  padding: 0 16px !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+}
+body .app-shell .cdr-command-shell .dashboard-tabs-actions,
+body .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+body .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-control-actions {
+  min-width: max-content !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+}
+body .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-action-pill,
+body .app-shell .cdr-command-shell .dashboard-tabs-actions .theme-toggle.cdr-action-pill,
+body .app-shell .cdr-command-shell .dashboard-tabs-actions label.cdr-action-pill {
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 16px !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged,
+body .app-shell.light-background-theme .cdr-command-shell .filters-panel.filters-panel-arranged,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .filters-panel.filters-panel-arranged {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 4px 0 8px !important;
+  padding: 12px 18px !important;
+  display: block !important;
+  border-radius: 14px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-fields-grid {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+}
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row {
+  width: 100% !important;
+  display: grid !important;
+  gap: 18px !important;
+  align-items: end !important;
+}
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary {
+  grid-template-columns: 1.35fr 0.9fr 0.76fr 0.85fr 1.15fr 1.55fr !important;
+}
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+  grid-template-columns: 1.35fr 1.1fr 1.1fr 1.1fr 1.1fr 0.7fr 1fr !important;
+}
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > *,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filter-action-cell {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filter-action-label,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .search-box > span,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .multi-select-filter > span {
+  height: 18px !important;
+  margin-bottom: 7px !important;
+  display: block !important;
+  font-size: 11px !important;
+  line-height: 18px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.45px !important;
+  text-transform: uppercase !important;
+}
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .search-box.search-compact,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .multi-select-filter,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filter-action-cell {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+}
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .search-box.search-compact input,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .multi-select-trigger,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .reset-filter-button,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filter-count {
+  width: 100% !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+  box-sizing: border-box !important;
+}
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .reset-filter-button,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filter-count {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body .app-shell.active-tab-overview .modern-overview,
+body .app-shell .modern-overview {
+  margin-top: 0 !important;
+}
+body .app-shell.active-tab-overview .modern-overview .workbook-profile-row,
+body .app-shell .modern-overview .workbook-profile-row {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 1450px) {
+  body .app-shell .cdr-command-shell .dashboard-tabs-row {
+    grid-template-columns: 1fr !important;
+  }
+  body .app-shell .cdr-command-shell .dashboard-tabs,
+  body .app-shell .cdr-command-shell .dashboard-tabs-actions,
+  body .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    min-width: 0 !important;
+  }
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 800px) {
+  body .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+    height: auto !important;
+    min-height: 82px !important;
+    padding: 12px 16px !important;
+  }
+  body .app-shell .cdr-command-shell .cdr-header-logo {
+    display: none !important;
+  }
+  body .app-shell .cdr-command-shell .followup-dashboard-title h1,
+  body .app-shell .cdr-command-shell .followup-dashboard-title p {
+    white-space: normal !important;
+  }
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: 1fr !important;
+  }
+}
+body .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions {
+  position: static !important;
+  inset: auto !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* CDR fix: header profile cards must stay side-by-side and size to content */
+.app-shell .cdr-command-shell > .cdr-header-profile-band.cdr-profile-inline-row,
+.app-shell.active-tab-overview .cdr-command-shell > .cdr-header-profile-band.cdr-profile-inline-row {
+  grid-area: cdrProfile !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 6px 8px !important;
+  display: grid !important;
+  grid-template-columns: max-content 1fr !important;
+  gap: 8px !important;
+  align-items: start !important;
+  justify-items: stretch !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-record-card,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-record-card,
+.app-shell .cdr-command-shell .cdr-profile-source-card,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-card {
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  border: 1px solid rgba(64, 154, 218, 0.58) !important;
+  border-radius: 12px !important;
+  background: rgba(15, 25, 42, 0.98) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-record-card,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-record-card {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 16px 24px 14px 20px !important;
+  display: grid !important;
+  grid-template-columns: 84px max-content !important;
+  gap: 18px !important;
+  align-items: center !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-record-icon,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-record-icon {
+  width: 76px !important;
+  height: 76px !important;
+  object-fit: contain !important;
+  display: block !important;
+  background: #ffffff !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-record-copy,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-record-copy {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-record-copy span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-record-copy span,
+.app-shell .cdr-command-shell .cdr-profile-source-copy span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-copy span {
+  display: block !important;
+  margin: 0 0 3px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.30em !important;
+  text-transform: none !important;
+  color: #b9efff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-record-copy strong,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-record-copy strong {
+  display: block !important;
+  margin: 0 !important;
+  font-size: 72px !important;
+  line-height: 0.78 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.07em !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-record-copy p,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-record-copy p {
+  margin: 3px 0 0 !important;
+  font-size: 31px !important;
+  line-height: 0.92 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+  color: #b8eaff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-source-card,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 16px 24px 14px 20px !important;
+  display: grid !important;
+  grid-template-columns: 38px max-content !important;
+  justify-content: start !important;
+  align-items: center !important;
+  gap: 18px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-source-icon,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-icon {
+  width: 30px !important;
+  height: 30px !important;
+  color: #d7f4ff !important;
+  flex: 0 0 auto !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-source-copy,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-copy {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: calc(100vw - 620px) !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-source-copy strong,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-copy strong {
+  display: block !important;
+  margin: 0 0 2px !important;
+  font-size: 19px !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-source-copy p,
+.app-shell .cdr-command-shell .cdr-profile-source-copy small,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-copy p,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-copy small {
+  display: block !important;
+  margin: 3px 0 0 !important;
+  font-size: 14px !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  color: #b8eaff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-source-chips,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-chips {
+  width: max-content !important;
+  max-width: 100% !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin: 7px 0 0 !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell .cdr-profile-source-chips em,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-chips em {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 22px !important;
+  padding: 4px 11px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(107, 205, 255, 0.58) !important;
+  background: rgba(26, 92, 133, 0.58) !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-style: normal !important;
+  font-weight: 950 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .cdr-profile-record-card,
+.app-shell.light-background-theme .cdr-command-shell .cdr-profile-source-card,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-profile-record-card,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-profile-source-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 102, 153, 0.24) !important;
+}
+
+.app-shell.light-background-theme .cdr-command-shell .cdr-profile-record-copy strong,
+.app-shell.light-background-theme .cdr-command-shell .cdr-profile-record-copy p,
+.app-shell.light-background-theme .cdr-command-shell .cdr-profile-source-copy strong,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-profile-record-copy strong,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-profile-record-copy p,
+.app-shell.se-theme.light-background-theme .cdr-command-shell .cdr-profile-source-copy strong {
+  color: #082033 !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .cdr-command-shell > .cdr-header-profile-band.cdr-profile-inline-row,
+  .app-shell.active-tab-overview .cdr-command-shell > .cdr-header-profile-band.cdr-profile-inline-row {
+    grid-template-columns: 1fr !important;
+  }
+  .app-shell .cdr-command-shell .cdr-profile-record-card,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-profile-record-card,
+  .app-shell .cdr-command-shell .cdr-profile-source-card,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-card {
+    width: 100% !important;
+    grid-template-columns: 76px minmax(0, max-content) !important;
+  }
+  .app-shell .cdr-command-shell .cdr-profile-source-copy,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-profile-source-copy {
+    max-width: 100% !important;
+  }
+}
+
+/* ============================================================
+   CDR NAVIGATION + UPLOAD CLEANUP PATCH
+   Purpose:
+   - Stop action controls from mixing with dashboard tabs.
+   - Row 1 = non-tab controls (Theme, Layout, Home, Admin Settings, Logout, Upload).
+   - Row 2 = dashboard tab selector buttons only.
+   - Fix futuristic layout so it does not create an unwanted side/overlap rail.
+   - Make upload landing page clean: no oversized background/visual image, no toolbar overlap.
+   - Keep all controls visible in every proposed theme.
+   ============================================================ */
+
+/* Main dashboard: two clear rows */
+.app-shell .cdr-command-shell .dashboard-tabs-row,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-row,
+.app-shell.layout-command-center .cdr-command-shell .dashboard-tabs-row,
+.app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tabs-row,
+.app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tabs-row {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 10px 0 0 !important;
+  overflow: visible !important;
+}
+
+/* Row 1: non-tab controls only */
+.app-shell .cdr-command-shell .dashboard-tabs-actions,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions,
+.app-shell.layout-command-center .cdr-command-shell .dashboard-tabs-actions,
+.app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tabs-actions,
+.app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tabs-actions {
+  order: 1 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 48px !important;
+  display: block !important;
+  padding: 8px !important;
+  overflow: visible !important;
+  border-radius: 16px !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+.app-shell.layout-command-center .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+.app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+.app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  overflow: visible !important;
+}
+
+/* Row 2: tabs only */
+.app-shell .cdr-command-shell .dashboard-tabs,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs,
+.app-shell.layout-command-center .cdr-command-shell .dashboard-tabs,
+.app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tabs,
+.app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tabs {
+  order: 2 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 54px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  overflow: visible !important;
+  border-radius: 16px !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tab,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tab,
+.app-shell.layout-command-center .cdr-command-shell .dashboard-tab,
+.app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tab,
+.app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tab {
+  flex: 0 1 auto !important;
+  min-width: 132px !important;
+  width: auto !important;
+  max-width: none !important;
+  min-height: 40px !important;
+  padding: 9px 13px !important;
+  justify-content: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.1 !important;
+}
+
+/* Header controls must not stretch into a broken full-width selector */
+.app-shell .cdr-command-shell .cdr-header-actions > *,
+.app-shell.layout-futuristic-ops .cdr-command-shell .cdr-header-actions > *,
+.app-shell .cdr-command-shell .cdr-theme-selector,
+.app-shell .cdr-command-shell .cdr-layout-selector,
+.app-shell .cdr-command-shell .cdr-action-pill,
+.app-shell.layout-futuristic-ops .cdr-command-shell .cdr-theme-selector,
+.app-shell.layout-futuristic-ops .cdr-command-shell .cdr-layout-selector,
+.app-shell.layout-futuristic-ops .cdr-command-shell .cdr-action-pill {
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: 100% !important;
+  min-height: 38px !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell .cdr-theme-selector,
+.app-shell .cdr-command-shell .cdr-layout-selector {
+  min-width: 300px !important;
+  flex: 0 1 350px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-theme-selector select,
+.app-shell .cdr-command-shell .cdr-layout-selector select {
+  min-width: 190px !important;
+  max-width: 230px !important;
+  color: var(--theme-text, #f8fafc) !important;
+}
+
+.theme-light-modern .cdr-command-shell .cdr-theme-selector select,
+.theme-light-modern .cdr-command-shell .cdr-layout-selector select {
+  color: #0f172a !important;
+}
+
+/* Futuristic Ops should remain futuristic but must not force an unwanted left sidebar. */
+.app-shell.layout-futuristic-ops .cdr-command-shell {
+  display: block !important;
+  grid-template-columns: none !important;
+  grid-template-areas: none !important;
+}
+
+.app-shell.layout-futuristic-ops .cdr-command-shell > .topbar,
+.app-shell.layout-futuristic-ops .cdr-command-shell > .cdr-header-profile-band,
+.app-shell.layout-futuristic-ops .dashboard-tabs-row,
+.app-shell.layout-futuristic-ops .filters-panel {
+  grid-area: auto !important;
+}
+
+.app-shell.layout-futuristic-ops .filters-panel {
+  margin-top: 10px !important;
+}
+
+/* Upload/workbook page: place toolbar in normal flow and remove the oversized visual image. */
+.upload-shell .followup-upload-card,
+.upload-shell.layout-command-center .followup-upload-card,
+.upload-shell.layout-executive-analytics .followup-upload-card,
+.upload-shell.layout-futuristic-ops .followup-upload-card {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 18px !important;
+  width: min(1720px, calc(100vw - 56px)) !important;
+  max-width: 1720px !important;
+  min-height: auto !important;
+  padding-top: 22px !important;
+  overflow: visible !important;
+}
+
+.upload-shell .upload-portal-toolbar,
+.upload-shell.layout-command-center .upload-portal-toolbar,
+.upload-shell.layout-executive-analytics .upload-portal-toolbar,
+.upload-shell.layout-futuristic-ops .upload-portal-toolbar {
+  position: static !important;
+  inset: auto !important;
+  z-index: 3 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  grid-column: 1 / -1 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  margin: 0 0 6px !important;
+  padding: 8px !important;
+  overflow: visible !important;
+  border-radius: 18px !important;
+  background: color-mix(in srgb, var(--theme-card-2, #111827) 84%, transparent) !important;
+  border: 1px solid var(--theme-border, rgba(31, 41, 55, 0.75)) !important;
+}
+
+.upload-shell .followup-upload-left,
+.upload-shell.layout-command-center .followup-upload-left,
+.upload-shell.layout-executive-analytics .followup-upload-left,
+.upload-shell.layout-futuristic-ops .followup-upload-left {
+  grid-column: 1 / -1 !important;
+  max-width: 1180px !important;
+  width: 100% !important;
+}
+
+.upload-shell .followup-upload-visual,
+.upload-shell .followup-upload-visual img,
+.upload-shell .followup-upload-visual::before,
+.upload-shell .followup-upload-visual::after,
+.upload-shell.layout-command-center .followup-upload-visual,
+.upload-shell.layout-executive-analytics .followup-upload-visual,
+.upload-shell.layout-futuristic-ops .followup-upload-visual {
+  display: none !important;
+  content: none !important;
+  visibility: hidden !important;
+}
+
+.upload-shell .upload-portal-toolbar > *,
+.upload-shell.layout-futuristic-ops .upload-portal-toolbar > *,
+.upload-shell .followup-theme-button,
+.upload-shell .upload-portal-toolbar .cdr-theme-selector,
+.upload-shell .upload-portal-toolbar .cdr-layout-selector {
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: 100% !important;
+  min-height: 40px !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+}
+
+.upload-shell .upload-portal-toolbar .cdr-theme-selector,
+.upload-shell .upload-portal-toolbar .cdr-layout-selector {
+  min-width: 300px !important;
+  flex: 0 1 350px !important;
+}
+
+.upload-shell .followup-primary-actions,
+.upload-shell .followup-mini-grid,
+.upload-shell.layout-futuristic-ops .followup-mini-grid,
+.upload-shell.layout-executive-analytics .followup-mini-grid {
+  grid-template-columns: repeat(2, minmax(260px, 1fr)) !important;
+}
+
+/* Upload buttons: explicit contrast for every proposed theme. */
+.upload-shell.theme-dark-command .followup-action-button,
+.upload-shell.theme-dark-command .followup-mini-card,
+.upload-shell.theme-dark-command .followup-staged-upload {
+  background: #0b1628 !important;
+  color: #f8fafc !important;
+  border-color: rgba(6, 182, 212, 0.35) !important;
+}
+
+.upload-shell.theme-light-modern .followup-action-button,
+.upload-shell.theme-light-modern .followup-mini-card,
+.upload-shell.theme-light-modern .followup-staged-upload {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.upload-shell.theme-neon-futuristic .followup-action-button,
+.upload-shell.theme-neon-futuristic .followup-mini-card,
+.upload-shell.theme-neon-futuristic .followup-staged-upload {
+  background: linear-gradient(135deg, rgba(5, 11, 26, 0.96), rgba(16, 8, 33, 0.92)) !important;
+  color: #e0f2fe !important;
+  border-color: rgba(34, 211, 238, 0.50) !important;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.16), 0 0 26px rgba(236, 72, 153, 0.10) !important;
+}
+
+.upload-shell .followup-action-button span,
+.upload-shell .followup-mini-card strong,
+.upload-shell .followup-mini-card span,
+.upload-shell .followup-staged-upload strong,
+.upload-shell .followup-staged-upload span,
+.upload-shell .followup-theme-button,
+.upload-shell .cdr-theme-selector,
+.upload-shell .cdr-layout-selector {
+  color: inherit !important;
+}
+
+.upload-shell .followup-action-button:disabled,
+.upload-shell .followup-confirm-upload:disabled,
+.upload-shell .followup-clear-upload:disabled {
+  opacity: 0.62 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.15) !important;
+}
+
+/* Responsive: keep two rows but allow wrapping, not clipping. */
+@media (max-width: 1100px) {
+  .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+  .app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+  .upload-shell .upload-portal-toolbar {
+    justify-content: flex-start !important;
+  }
+
+  .app-shell .cdr-command-shell .cdr-theme-selector,
+  .app-shell .cdr-command-shell .cdr-layout-selector,
+  .upload-shell .upload-portal-toolbar .cdr-theme-selector,
+  .upload-shell .upload-portal-toolbar .cdr-layout-selector {
+    flex: 1 1 280px !important;
+    min-width: min(100%, 280px) !important;
+  }
+
+  .app-shell .cdr-command-shell .dashboard-tab {
+    min-width: 150px !important;
+    flex: 1 1 150px !important;
+  }
+
+  .upload-shell .followup-primary-actions,
+  .upload-shell .followup-mini-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .upload-shell .followup-upload-card {
+    width: min(100%, calc(100vw - 24px)) !important;
+  }
+
+  .app-shell .cdr-command-shell .dashboard-tabs,
+  .app-shell .cdr-command-shell .dashboard-tabs-actions,
+  .upload-shell .upload-portal-toolbar {
+    border-radius: 14px !important;
+  }
+
+  .app-shell .cdr-command-shell .cdr-theme-selector,
+  .app-shell .cdr-command-shell .cdr-layout-selector,
+  .app-shell .cdr-command-shell .cdr-action-pill,
+  .app-shell .cdr-command-shell .dashboard-tab,
+  .upload-shell .upload-portal-toolbar > * {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+}
+
+/* ============================================================
+   CDR FINAL LAYOUT STABILITY PATCH - NO OVERLAP / NO CLIPPING
+   Purpose:
+   - Layout selector must never break the dashboard or push boxes over each other.
+   - Keep two rows: controls row first, dashboard tabs row second.
+   - Remove all previous unsafe layout experiments: side rail, fixed grid areas,
+     wide child max-widths, and large fixed dashboard grids.
+   - Layouts remain visually different only through safe density, width, radius,
+     alignment, and spacing changes.
+   ============================================================ */
+
+html,
+body,
+#root {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+body .app-shell,
+body .upload-shell,
+body .local-login-shell,
+body .app-shell *,
+body .upload-shell *,
+body .local-login-shell * {
+  box-sizing: border-box !important;
+}
+
+/* Safe page frame for all 3 layouts. */
+body .app-shell.layout-command-center,
+body .app-shell.layout-executive-analytics,
+body .app-shell.layout-futuristic-ops {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: block !important;
+  padding: 14px !important;
+  overflow-x: hidden !important;
+}
+
+/* Reset unsafe structural layout rules from older layout-selector attempts. */
+body .app-shell.layout-command-center > :not(.toast):not(.modal-backdrop),
+body .app-shell.layout-executive-analytics > :not(.toast):not(.modal-backdrop),
+body .app-shell.layout-futuristic-ops > :not(.toast):not(.modal-backdrop) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+body .app-shell.layout-command-center .cdr-command-shell,
+body .app-shell.layout-executive-analytics .cdr-command-shell,
+body .app-shell.layout-futuristic-ops .cdr-command-shell {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: block !important;
+  grid-template-columns: none !important;
+  grid-template-areas: none !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+body .app-shell.layout-command-center .cdr-command-shell > *,
+body .app-shell.layout-executive-analytics .cdr-command-shell > *,
+body .app-shell.layout-futuristic-ops .cdr-command-shell > * {
+  grid-area: auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Row 1 = non-tab controls. Row 2 = dashboard tabs. */
+body .app-shell .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.layout-command-center .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tabs-row {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: 10px !important;
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs-actions,
+body .app-shell.layout-command-center .cdr-command-shell .dashboard-tabs-actions,
+body .app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tabs-actions,
+body .app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tabs-actions {
+  order: 1 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: block !important;
+  padding: 8px !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+  background: color-mix(in srgb, var(--theme-card-2, #0b1628) 88%, transparent) !important;
+  border: 1px solid var(--theme-border, rgba(31, 41, 55, 0.75)) !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+body .app-shell.layout-command-center .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+body .app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+body .app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  grid-template-columns: none !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs,
+body .app-shell.layout-command-center .cdr-command-shell .dashboard-tabs,
+body .app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tabs,
+body .app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tabs {
+  order: 2 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 54px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+  background: color-mix(in srgb, var(--theme-card-2, #0b1628) 90%, transparent) !important;
+  border: 1px solid var(--theme-border, rgba(31, 41, 55, 0.75)) !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tab,
+body .app-shell.layout-command-center .cdr-command-shell .dashboard-tab,
+body .app-shell.layout-executive-analytics .cdr-command-shell .dashboard-tab,
+body .app-shell.layout-futuristic-ops .cdr-command-shell .dashboard-tab {
+  flex: 0 1 auto !important;
+  width: auto !important;
+  min-width: 122px !important;
+  max-width: none !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 14px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.1 !important;
+}
+
+/* Selectors and header actions: readable, visible, never stretched over the page. */
+body .app-shell .cdr-command-shell .cdr-theme-selector,
+body .app-shell .cdr-command-shell .cdr-layout-selector,
+body .app-shell .cdr-command-shell .cdr-action-pill,
+body .app-shell.layout-futuristic-ops .cdr-command-shell .cdr-theme-selector,
+body .app-shell.layout-futuristic-ops .cdr-command-shell .cdr-layout-selector,
+body .app-shell.layout-futuristic-ops .cdr-command-shell .cdr-action-pill {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  flex: 0 1 auto !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-theme-selector,
+body .app-shell .cdr-command-shell .cdr-layout-selector {
+  flex: 0 1 330px !important;
+  min-width: 260px !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-theme-selector select,
+body .app-shell .cdr-command-shell .cdr-layout-selector select,
+body .upload-shell .cdr-theme-selector select,
+body .upload-shell .cdr-layout-selector select {
+  width: 210px !important;
+  min-width: 210px !important;
+  max-width: 210px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: var(--theme-text, #f8fafc) !important;
+}
+
+/* Keep filter area inside screen. */
+body .app-shell .filters-panel,
+body .app-shell .filters-panel.filters-panel-arranged,
+body .app-shell.layout-command-center .filters-panel,
+body .app-shell.layout-executive-analytics .filters-panel,
+body .app-shell.layout-futuristic-ops .filters-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 10px 0 0 !important;
+  padding: 10px 12px !important;
+  overflow: hidden !important;
+  grid-area: auto !important;
+}
+
+body .app-shell .filters-panel-arranged .filters-fields-grid,
+body .app-shell.layout-command-center .filters-panel-arranged .filters-fields-grid,
+body .app-shell.layout-executive-analytics .filters-panel-arranged .filters-fields-grid,
+body .app-shell.layout-futuristic-ops .filters-panel-arranged .filters-fields-grid {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: none !important;
+  grid-template-rows: auto auto !important;
+  gap: 10px !important;
+}
+
+body .app-shell .filters-panel-arranged .filters-row-primary,
+body .app-shell.layout-command-center .filters-panel-arranged .filters-row-primary,
+body .app-shell.layout-executive-analytics .filters-panel-arranged .filters-row-primary,
+body .app-shell.layout-futuristic-ops .filters-panel-arranged .filters-row-primary {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns:
+    minmax(210px, 1.4fr)
+    minmax(115px, .72fr)
+    minmax(100px, .62fr)
+    minmax(115px, .68fr)
+    minmax(170px, 1fr)
+    minmax(200px, 1.15fr) !important;
+  gap: 12px !important;
+}
+
+body .app-shell .filters-panel-arranged .filters-row-secondary,
+body .app-shell.layout-command-center .filters-panel-arranged .filters-row-secondary,
+body .app-shell.layout-executive-analytics .filters-panel-arranged .filters-row-secondary,
+body .app-shell.layout-futuristic-ops .filters-panel-arranged .filters-row-secondary {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns:
+    minmax(190px, 1.15fr)
+    minmax(155px, .92fr)
+    minmax(150px, .88fr)
+    minmax(145px, .84fr)
+    minmax(145px, .84fr)
+    110px
+    minmax(190px, 1fr) !important;
+  gap: 12px !important;
+}
+
+/* KPI rows: never force fixed 8/10/12 column structures that overflow. */
+body .app-shell .summary-cards,
+body .app-shell .summary-cards-manual-rows,
+body .app-shell .modern-stat-deck,
+body .app-shell .cdr-kpi-strip-30 {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+
+body .app-shell .summary-cards-manual-rows .summary-card-row,
+body .app-shell.layout-command-center .summary-cards-manual-rows .summary-card-row,
+body .app-shell.layout-executive-analytics .summary-cards-manual-rows .summary-card-row,
+body .app-shell.layout-futuristic-ops .summary-cards-manual-rows .summary-card-row,
+body .app-shell .modern-stat-deck,
+body .app-shell .cdr-kpi-strip-30,
+body .app-shell.layout-command-center .modern-stat-deck,
+body .app-shell.layout-command-center .cdr-kpi-strip-30,
+body .app-shell.layout-executive-analytics .modern-stat-deck,
+body .app-shell.layout-executive-analytics .cdr-kpi-strip-30,
+body .app-shell.layout-futuristic-ops .modern-stat-deck,
+body .app-shell.layout-futuristic-ops .cdr-kpi-strip-30 {
+  display: grid !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)) !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+}
+
+body .app-shell .summary-card,
+body .app-shell .visual-summary-card,
+body .app-shell .modern-kpi-card,
+body .app-shell .modern-stat-tile {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+body .app-shell .summary-card strong,
+body .app-shell .visual-summary-card strong,
+body .app-shell .modern-kpi-card strong,
+body .app-shell .modern-stat-tile strong {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Chart/content grids: safe responsive grid, no panel overlay. */
+body .app-shell .modern-overview-shell,
+body .app-shell .modern-dashboard-grid,
+body .app-shell .chart-grid,
+body .app-shell .behavior-grid,
+body .app-shell .quality-grid,
+body .app-shell .cdr-saas-overview-grid,
+body .app-shell .cdr-deep-dive-grid,
+body .app-shell .cdr-top-entities-grid {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+
+body .app-shell .modern-dashboard-grid,
+body .app-shell .chart-grid,
+body .app-shell .behavior-grid,
+body .app-shell .quality-grid,
+body .app-shell.layout-command-center .modern-dashboard-grid,
+body .app-shell.layout-command-center .chart-grid,
+body .app-shell.layout-executive-analytics .modern-dashboard-grid,
+body .app-shell.layout-executive-analytics .chart-grid,
+body .app-shell.layout-futuristic-ops .modern-dashboard-grid,
+body .app-shell.layout-futuristic-ops .chart-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+body .app-shell .cdr-saas-overview-grid,
+body .app-shell.layout-command-center .cdr-saas-overview-grid,
+body .app-shell.layout-executive-analytics .cdr-saas-overview-grid,
+body .app-shell.layout-futuristic-ops .cdr-saas-overview-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+body .app-shell .modern-panel,
+body .app-shell .chart-card,
+body .app-shell .table-card,
+body .app-shell .records-card,
+body .app-shell .modern-record-card,
+body .app-shell .modern-panel-wide,
+body .app-shell .modern-panel-table-wide,
+body .app-shell.layout-executive-analytics .modern-panel-wide,
+body .app-shell.layout-executive-analytics .modern-panel-table-wide,
+body .app-shell.layout-futuristic-ops .modern-panel-wide,
+body .app-shell.layout-futuristic-ops .modern-panel-table-wide {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  grid-column: auto !important;
+  overflow: hidden !important;
+}
+
+body .app-shell .modern-panel-wide.cdr-overview-volume,
+body .app-shell.layout-command-center .modern-panel-wide.cdr-overview-volume,
+body .app-shell.layout-executive-analytics .modern-panel-wide.cdr-overview-volume,
+body .app-shell.layout-futuristic-ops .modern-panel-wide.cdr-overview-volume {
+  grid-column: auto !important;
+}
+
+body .app-shell .recharts-responsive-container,
+body .app-shell .recharts-wrapper,
+body .app-shell svg.recharts-surface {
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+/* Three safe layout personalities - visible without breaking structure. */
+body .app-shell.layout-command-center {
+  --cdr-box-radius: 14px;
+  --cdr-kpi-card-height: 58px;
+  --cdr-chart-panel-min-height: 360px;
+}
+
+body .app-shell.layout-command-center .dashboard-tabs {
+  justify-content: flex-start !important;
+}
+
+body .app-shell.layout-executive-analytics {
+  --cdr-box-radius: 18px;
+  --cdr-kpi-card-height: 66px;
+  --cdr-chart-panel-min-height: 390px;
+  padding: 20px !important;
+}
+
+body .app-shell.layout-executive-analytics .dashboard-tabs,
+body .app-shell.layout-executive-analytics .dashboard-tabs-actions .cdr-header-actions {
+  justify-content: center !important;
+}
+
+body .app-shell.layout-executive-analytics .summary-cards-manual-rows .summary-card-row,
+body .app-shell.layout-executive-analytics .modern-stat-deck,
+body .app-shell.layout-executive-analytics .cdr-kpi-strip-30 {
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)) !important;
+  gap: 12px !important;
+}
+
+body .app-shell.layout-futuristic-ops {
+  --cdr-box-radius: 12px;
+  --cdr-kpi-card-height: 52px;
+  --cdr-chart-panel-min-height: 330px;
+  padding: 10px !important;
+}
+
+body .app-shell.layout-futuristic-ops .dashboard-tabs,
+body .app-shell.layout-futuristic-ops .dashboard-tabs-actions .cdr-header-actions {
+  justify-content: flex-start !important;
+}
+
+body .app-shell.layout-futuristic-ops .summary-cards-manual-rows .summary-card-row,
+body .app-shell.layout-futuristic-ops .modern-stat-deck,
+body .app-shell.layout-futuristic-ops .cdr-kpi-strip-30 {
+  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)) !important;
+  gap: 6px !important;
+}
+
+body .app-shell.layout-futuristic-ops .summary-card,
+body .app-shell.layout-futuristic-ops .visual-summary-card,
+body .app-shell.layout-futuristic-ops .modern-stat-tile {
+  padding: 6px !important;
+}
+
+@media (max-width: 1350px) {
+  body .app-shell .filters-panel-arranged .filters-row-primary,
+  body .app-shell.layout-command-center .filters-panel-arranged .filters-row-primary,
+  body .app-shell.layout-executive-analytics .filters-panel-arranged .filters-row-primary,
+  body .app-shell.layout-futuristic-ops .filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel-arranged .filters-row-secondary,
+  body .app-shell.layout-command-center .filters-panel-arranged .filters-row-secondary,
+  body .app-shell.layout-executive-analytics .filters-panel-arranged .filters-row-secondary,
+  body .app-shell.layout-futuristic-ops .filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(3, minmax(180px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1050px) {
+  body .app-shell .modern-dashboard-grid,
+  body .app-shell .chart-grid,
+  body .app-shell .cdr-saas-overview-grid,
+  body .app-shell.layout-command-center .modern-dashboard-grid,
+  body .app-shell.layout-command-center .chart-grid,
+  body .app-shell.layout-command-center .cdr-saas-overview-grid,
+  body .app-shell.layout-executive-analytics .modern-dashboard-grid,
+  body .app-shell.layout-executive-analytics .chart-grid,
+  body .app-shell.layout-executive-analytics .cdr-saas-overview-grid,
+  body .app-shell.layout-futuristic-ops .modern-dashboard-grid,
+  body .app-shell.layout-futuristic-ops .chart-grid,
+  body .app-shell.layout-futuristic-ops .cdr-saas-overview-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body .app-shell.layout-command-center,
+  body .app-shell.layout-executive-analytics,
+  body .app-shell.layout-futuristic-ops {
+    padding: 10px !important;
+  }
+
+  body .app-shell .filters-panel-arranged .filters-row-primary,
+  body .app-shell.layout-command-center .filters-panel-arranged .filters-row-primary,
+  body .app-shell.layout-executive-analytics .filters-panel-arranged .filters-row-primary,
+  body .app-shell.layout-futuristic-ops .filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel-arranged .filters-row-secondary,
+  body .app-shell.layout-command-center .filters-panel-arranged .filters-row-secondary,
+  body .app-shell.layout-executive-analytics .filters-panel-arranged .filters-row-secondary,
+  body .app-shell.layout-futuristic-ops .filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: 1fr !important;
+  }
+
+  body .app-shell .cdr-command-shell .cdr-theme-selector,
+  body .app-shell .cdr-command-shell .cdr-layout-selector,
+  body .app-shell .cdr-command-shell .cdr-action-pill,
+  body .app-shell .cdr-command-shell .dashboard-tab {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  body .app-shell .cdr-command-shell .cdr-theme-selector select,
+  body .app-shell .cdr-command-shell .cdr-layout-selector select {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+
+/* Layout selector removed: keep one fixed original dashboard layout. */
+.cdr-layout-selector {
+  display: none !important;
+}
+
+.local-login-shell.layout-command-center,
+.local-login-shell.layout-executive-analytics,
+.local-login-shell.layout-futuristic-ops,
+.upload-shell.layout-command-center,
+.upload-shell.layout-executive-analytics,
+.upload-shell.layout-futuristic-ops,
+.app-shell.layout-command-center,
+.app-shell.layout-executive-analytics,
+.app-shell.layout-futuristic-ops {
+  padding: inherit;
+}
+
+body .app-shell.layout-executive-analytics,
+body .app-shell.layout-futuristic-ops,
+body .app-shell.layout-command-center {
+  --cdr-box-radius: 14px !important;
+  --cdr-kpi-card-height: 58px !important;
+  --cdr-chart-panel-min-height: 360px !important;
+  padding: 0 !important;
+}
+
+body .app-shell.layout-executive-analytics .dashboard-tabs,
+body .app-shell.layout-futuristic-ops .dashboard-tabs,
+body .app-shell.layout-command-center .dashboard-tabs,
+body .app-shell.layout-executive-analytics .dashboard-tabs-actions .cdr-header-actions,
+body .app-shell.layout-futuristic-ops .dashboard-tabs-actions .cdr-header-actions,
+body .app-shell.layout-command-center .dashboard-tabs-actions .cdr-header-actions {
+  justify-content: flex-start !important;
+}
+
+body .app-shell.layout-executive-analytics .summary-cards-manual-rows .summary-card-row,
+body .app-shell.layout-futuristic-ops .summary-cards-manual-rows .summary-card-row,
+body .app-shell.layout-command-center .summary-cards-manual-rows .summary-card-row,
+body .app-shell.layout-executive-analytics .modern-stat-deck,
+body .app-shell.layout-futuristic-ops .modern-stat-deck,
+body .app-shell.layout-command-center .modern-stat-deck,
+body .app-shell.layout-executive-analytics .cdr-kpi-strip-30,
+body .app-shell.layout-futuristic-ops .cdr-kpi-strip-30,
+body .app-shell.layout-command-center .cdr-kpi-strip-30 {
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+  gap: 8px !important;
+}
+
+body .app-shell.layout-executive-analytics .summary-card,
+body .app-shell.layout-futuristic-ops .summary-card,
+body .app-shell.layout-command-center .summary-card,
+body .app-shell.layout-executive-analytics .visual-summary-card,
+body .app-shell.layout-futuristic-ops .visual-summary-card,
+body .app-shell.layout-command-center .visual-summary-card,
+body .app-shell.layout-executive-analytics .modern-stat-tile,
+body .app-shell.layout-futuristic-ops .modern-stat-tile,
+body .app-shell.layout-command-center .modern-stat-tile {
+  padding: 8px !important;
+}
+
+/* ============================================================
+   CDR RESTORE UPLOAD HERO PICTURE PATCH
+   Purpose:
+   - Restore the right-side CDR/Hytera visual image on the upload/customer start page.
+   - Keep the fixed original layout: no layout selector, no side rail, no overlap.
+   - Keep controls in the normal toolbar and prevent the logout/local buttons from floating.
+   ============================================================ */
+.upload-shell .followup-upload-card,
+.upload-shell.theme-dark-command .followup-upload-card,
+.upload-shell.theme-light-modern .followup-upload-card,
+.upload-shell.theme-neon-futuristic .followup-upload-card,
+.upload-shell.light-background-theme .followup-upload-card,
+.upload-shell.dark-background-theme .followup-upload-card {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.02fr) minmax(420px, 0.82fr) !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  gap: clamp(20px, 2.5vw, 42px) !important;
+  align-items: stretch !important;
+  width: min(100%, 1720px) !important;
+  max-width: calc(100vw - 48px) !important;
+  min-height: min(840px, calc(100vh - 48px)) !important;
+  padding: clamp(24px, 3vw, 48px) !important;
+  overflow: hidden !important;
+}
+
+.upload-shell .upload-portal-toolbar,
+.upload-shell.theme-dark-command .upload-portal-toolbar,
+.upload-shell.theme-light-modern .upload-portal-toolbar,
+.upload-shell.theme-neon-futuristic .upload-portal-toolbar {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 8px !important;
+  border-radius: 18px !important;
+  background: color-mix(in srgb, var(--theme-card-2, #111827) 84%, transparent) !important;
+  border: 1px solid var(--theme-border, rgba(31, 41, 55, 0.75)) !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.upload-shell .upload-portal-toolbar .followup-theme-button,
+.upload-shell .upload-portal-toolbar .cdr-theme-selector {
+  position: static !important;
+  inset: auto !important;
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0 14px !important;
+  color: var(--theme-text, #f8fafc) !important;
+  background: color-mix(in srgb, var(--theme-card, #0b1628) 92%, transparent) !important;
+  border: 1px solid var(--theme-border, rgba(31, 41, 55, 0.75)) !important;
+  border-radius: 14px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  box-shadow: none !important;
+  white-space: nowrap !important;
+}
+
+.upload-shell .followup-upload-left,
+.upload-shell.theme-dark-command .followup-upload-left,
+.upload-shell.theme-light-modern .followup-upload-left,
+.upload-shell.theme-neon-futuristic .followup-upload-left,
+.upload-shell.layout-command-center .followup-upload-left,
+.upload-shell.layout-executive-analytics .followup-upload-left,
+.upload-shell.layout-futuristic-ops .followup-upload-left {
+  grid-column: 1 / 2 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  align-self: center !important;
+}
+
+.upload-shell .followup-upload-visual,
+.upload-shell.theme-dark-command .followup-upload-visual,
+.upload-shell.theme-light-modern .followup-upload-visual,
+.upload-shell.theme-neon-futuristic .followup-upload-visual,
+.upload-shell.light-background-theme .followup-upload-visual,
+.upload-shell.dark-background-theme .followup-upload-visual,
+.upload-shell.layout-command-center .followup-upload-visual,
+.upload-shell.layout-executive-analytics .followup-upload-visual,
+.upload-shell.layout-futuristic-ops .followup-upload-visual {
+  grid-column: 2 / 3 !important;
+  grid-row: 2 !important;
+  position: relative !important;
+  z-index: 1 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 560px !important;
+  height: 100% !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 24px !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent, #06b6d4) 46%, transparent) !important;
+  background: color-mix(in srgb, var(--theme-card-2, #0b1628) 90%, #000 10%) !important;
+  box-shadow: 0 26px 68px rgba(0, 0, 0, 0.28) !important;
+}
+
+.upload-shell .followup-upload-visual::before,
+.upload-shell .followup-upload-visual::after {
+  content: none !important;
+  display: none !important;
+}
+
+.upload-shell .followup-upload-visual img,
+.upload-shell.theme-dark-command .followup-upload-visual img,
+.upload-shell.theme-light-modern .followup-upload-visual img,
+.upload-shell.theme-neon-futuristic .followup-upload-visual img,
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  content: normal !important;
+  position: static !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  transform: none !important;
+  filter: saturate(1.05) contrast(1.05) !important;
+}
+
+.upload-shell.theme-light-modern .followup-upload-visual img {
+  filter: saturate(1.02) contrast(1.02) brightness(1.02) !important;
+}
+
+.upload-shell.theme-neon-futuristic .followup-upload-visual {
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.22), 0 0 44px rgba(236, 72, 153, 0.12) !important;
+}
+
+.upload-shell.theme-neon-futuristic .followup-upload-visual img {
+  filter: saturate(1.2) contrast(1.1) brightness(0.95) !important;
+}
+
+@media (max-width: 1180px) {
+  .upload-shell .followup-upload-card,
+  .upload-shell.theme-dark-command .followup-upload-card,
+  .upload-shell.theme-light-modern .followup-upload-card,
+  .upload-shell.theme-neon-futuristic .followup-upload-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+    min-height: auto !important;
+    max-width: calc(100vw - 28px) !important;
+    overflow: visible !important;
+  }
+
+  .upload-shell .followup-upload-left,
+  .upload-shell.theme-dark-command .followup-upload-left,
+  .upload-shell.theme-light-modern .followup-upload-left,
+  .upload-shell.theme-neon-futuristic .followup-upload-left {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+  }
+
+  .upload-shell .followup-upload-visual,
+  .upload-shell.theme-dark-command .followup-upload-visual,
+  .upload-shell.theme-light-modern .followup-upload-visual,
+  .upload-shell.theme-neon-futuristic .followup-upload-visual {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    min-height: 320px !important;
+    max-height: 460px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .upload-shell .followup-upload-visual,
+  .upload-shell.theme-dark-command .followup-upload-visual,
+  .upload-shell.theme-light-modern .followup-upload-visual,
+  .upload-shell.theme-neon-futuristic .followup-upload-visual {
+    min-height: 240px !important;
+    border-radius: 18px !important;
+  }
+}
+
+/* ============================================================
+   CDR MANAGED BRANDING PATCH
+   - Header logos fill the header height while preserving aspect ratio.
+   - Header title/description are vertically centered.
+   - Branding upload cards are visible in Admin Settings.
+   ============================================================ */
+:root {
+  --cdr-managed-header-height: 96px;
+}
+
+body .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+body .app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: minmax(148px, 230px) minmax(0, 1fr) minmax(148px, 230px) !important;
+  grid-template-rows: 1fr !important;
+  align-items: center !important;
+  min-height: var(--cdr-managed-header-height) !important;
+  height: var(--cdr-managed-header-height) !important;
+  padding: 8px 18px !important;
+  overflow: hidden !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-banner-art,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-banner-art {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: calc(var(--cdr-managed-header-height) - 18px) !important;
+  min-height: 64px !important;
+  max-height: 84px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-left,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-left {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  justify-self: stretch !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-right,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-right {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  justify-self: stretch !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo img,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+body .app-shell .cdr-command-shell .followup-dashboard-title,
+body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title {
+  position: relative !important;
+  z-index: 2 !important;
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  align-self: stretch !important;
+  justify-self: stretch !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 18px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body .app-shell .cdr-command-shell .followup-dashboard-title h1,
+body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title h1 {
+  margin: 0 !important;
+  max-width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: clamp(26px, 3.2vw, 52px) !important;
+  line-height: 1 !important;
+}
+
+body .app-shell .cdr-command-shell .followup-dashboard-title p,
+body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title p {
+  margin: 8px 0 0 !important;
+  max-width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.15 !important;
+}
+
+.local-branding-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 14px 0 16px;
+}
+
+.local-branding-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.local-branding-card > span {
+  color: #93c5fd;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.local-branding-card > strong {
+  color: #f8fafc;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.local-branding-preview {
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 1px dashed rgba(125, 211, 252, 0.36);
+  background: rgba(2, 6, 23, 0.44);
+  overflow: hidden;
+}
+
+.local-branding-preview.hero-preview {
+  height: 130px;
+}
+
+.local-branding-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.local-branding-preview.hero-preview img {
+  object-fit: cover;
+}
+
+.local-file-picker {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.42);
+  background: rgba(8, 47, 73, 0.62);
+  color: #e0f2fe !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.local-file-picker input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.local-settings-guidance {
+  background: rgba(14, 165, 233, 0.14) !important;
+  border-color: rgba(56, 189, 248, 0.30) !important;
+  color: #bae6fd !important;
+}
+
+@media (max-width: 900px) {
+  body .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  body .app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+    grid-template-columns: 92px minmax(0, 1fr) 92px !important;
+    --cdr-managed-header-height: 82px;
+    padding: 8px 10px !important;
+  }
+  .local-branding-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Radio showcase picture setting - added for Admin Settings */
+.local-branding-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.local-branding-preview.radio-preview {
+  height: 150px;
+  padding: 10px;
+}
+.local-branding-preview.radio-preview img {
+  object-fit: contain;
+}
