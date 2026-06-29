@@ -1,0 +1,439 @@
+﻿/* Overview final table arrangement and legends. Source split from src/styles.css lines 16193-16630. */
+/* FINAL CDR OVERVIEW LAYOUT FIX
+   Keep all 30 KPI cards, but remove the squeezed right-side column layout. */
+.app-shell.active-tab-overview .cdr-saas-overview {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  gap: 14px !important;
+  overflow: visible !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-overview > * {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-profile-band {
+  display: grid !important;
+  grid-template-columns: minmax(300px, 0.78fr) minmax(0, 1.55fr) !important;
+  gap: 14px !important;
+  width: 100% !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-main,
+.app-shell.active-tab-overview .modern-profile-card {
+  height: auto !important;
+  min-height: 150px !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30,
+.app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 {
+  display: grid !important;
+  grid-template-columns: repeat(10, minmax(96px, 1fr)) !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  align-items: stretch !important;
+  grid-column: 1 / -1 !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile,
+.app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 .modern-stat-tile {
+  min-width: 0 !important;
+  min-height: 82px !important;
+  height: 82px !important;
+  padding: 8px 7px !important;
+  border-radius: 14px !important;
+  justify-items: center !important;
+  align-content: center !important;
+  gap: 4px !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #2563EB, #06B6D4) !important;
+  color: #fff !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile span {
+  font-size: 10px !important;
+  color: #9CA3AF !important;
+  max-width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong {
+  font-size: clamp(14px, 0.9vw, 19px) !important;
+  max-width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-overview-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.65fr) minmax(380px, 0.85fr) !important;
+  grid-template-areas: "volume distribution" !important;
+  gap: 14px !important;
+  width: 100% !important;
+}
+
+.app-shell.active-tab-overview .cdr-overview-volume {
+  grid-area: volume !important;
+  min-height: 340px !important;
+  height: auto !important;
+}
+
+.app-shell.active-tab-overview .cdr-overview-distribution {
+  grid-area: distribution !important;
+  min-height: 340px !important;
+  height: auto !important;
+}
+
+.app-shell.active-tab-overview .cdr-performance-matrix-panel {
+  width: 100% !important;
+  min-height: auto !important;
+  height: auto !important;
+}
+
+.app-shell.active-tab-overview .cdr-deep-dive-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-areas: none !important;
+  gap: 14px !important;
+  width: 100% !important;
+}
+
+.app-shell.active-tab-overview .cdr-deep-dive-grid .modern-panel,
+.app-shell.active-tab-overview .cdr-deep-dive-grid .modern-panel-call-type,
+.app-shell.active-tab-overview .cdr-deep-dive-grid .modern-panel-radio-type,
+.app-shell.active-tab-overview .cdr-deep-dive-grid .modern-panel-encryption,
+.app-shell.active-tab-overview .cdr-deep-dive-grid .modern-panel-duplex {
+  display: block !important;
+  min-height: 340px !important;
+  height: 340px !important;
+  padding: 14px !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-areas: none !important;
+  gap: 14px !important;
+  width: 100% !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel,
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-top-bs,
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-talkgroups,
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-users {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  min-height: 350px !important;
+  height: auto !important;
+  padding: 14px !important;
+}
+
+.app-shell.active-tab-overview .cdr-behavior-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  width: 100% !important;
+}
+
+.app-shell.active-tab-overview .cdr-behavior-panel {
+  min-height: 300px !important;
+  height: auto !important;
+  padding: 14px !important;
+}
+
+.app-shell.active-tab-overview .cdr-quality-footer-strip,
+.app-shell.active-tab-overview .modern-quality-strip.cdr-quality-footer-strip {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)) !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
+.app-shell.active-tab-overview .cdr-quality-footer-strip .modern-quality-tile,
+.app-shell.active-tab-overview .cdr-quality-footer-strip .modern-record-card {
+  min-height: 72px !important;
+  height: 72px !important;
+  padding: 9px 10px !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-footer {
+  display: flex !important;
+  width: 100% !important;
+  min-height: 40px !important;
+  height: auto !important;
+  flex-wrap: wrap !important;
+  row-gap: 6px !important;
+}
+
+@media (max-width: 1600px) {
+  .app-shell.active-tab-overview .cdr-kpi-strip-30,
+  .app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 {
+    grid-template-columns: repeat(6, minmax(110px, 1fr)) !important;
+  }
+  .app-shell.active-tab-overview .cdr-deep-dive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .app-shell.active-tab-overview .cdr-saas-profile-band,
+  .app-shell.active-tab-overview .cdr-saas-overview-grid,
+  .app-shell.active-tab-overview .cdr-top-entities-grid,
+  .app-shell.active-tab-overview .cdr-behavior-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: none !important;
+  }
+  .app-shell.active-tab-overview .cdr-kpi-strip-30,
+  .app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 {
+    grid-template-columns: repeat(3, minmax(120px, 1fr)) !important;
+  }
+  .app-shell.active-tab-overview .cdr-deep-dive-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* FINAL TABLE ARRANGEMENT FIX â€” CDR Overview
+   Reset old named grid-area rules so Top Entities and Behavior tables stay aligned. */
+.app-shell.active-tab-overview .cdr-top-entities-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-areas: none !important;
+  grid-auto-flow: row !important;
+  grid-auto-columns: unset !important;
+  grid-auto-rows: auto !important;
+  align-items: stretch !important;
+  gap: 14px !important;
+  width: 100% !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel,
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-top-bs,
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-talkgroups,
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-users {
+  grid-area: auto !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: 260px !important;
+  height: auto !important;
+  padding: 12px !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  align-content: start !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-top-bs { order: 1 !important; }
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-talkgroups { order: 2 !important; }
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-users { order: 3 !important; }
+
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel-head,
+.app-shell.active-tab-overview .cdr-behavior-grid .modern-panel-head {
+  margin-bottom: 8px !important;
+}
+
+.app-shell.active-tab-overview .modern-ranking-table-wrap,
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table-wrap,
+.app-shell.active-tab-overview .cdr-behavior-grid .modern-table-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table,
+.app-shell.active-tab-overview .cdr-behavior-grid .modern-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table th,
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table td,
+.app-shell.active-tab-overview .cdr-behavior-grid .modern-table th,
+.app-shell.active-tab-overview .cdr-behavior-grid .modern-table td {
+  height: 24px !important;
+  padding: 5px 7px !important;
+  font-size: clamp(10px, 0.54vw, 12px) !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  vertical-align: middle !important;
+}
+
+/* Ranking tables: rank small, name wide, numbers compact */
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table th:nth-child(1),
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table td:nth-child(1) {
+  width: 38px !important;
+  text-align: center !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table th:nth-child(2),
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table td:nth-child(2) {
+  width: auto !important;
+  text-align: left !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table th:nth-child(3),
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table td:nth-child(3),
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table th:nth-child(4),
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-table td:nth-child(4) {
+  width: 92px !important;
+  text-align: center !important;
+}
+
+/* Behavior tables: two clean equal panels, no floating or compressed side tables. */
+.app-shell.active-tab-overview .cdr-behavior-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-areas: none !important;
+  gap: 14px !important;
+  width: 100% !important;
+  align-items: stretch !important;
+}
+
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel {
+  grid-area: auto !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: 265px !important;
+  height: auto !important;
+  padding: 12px !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+}
+
+.app-shell.active-tab-overview .cdr-behavior-table th:nth-child(1),
+.app-shell.active-tab-overview .cdr-behavior-table td:nth-child(1) { width: 13% !important; text-align: center !important; }
+.app-shell.active-tab-overview .cdr-behavior-table th:nth-child(2),
+.app-shell.active-tab-overview .cdr-behavior-table td:nth-child(2) { width: 19% !important; text-align: left !important; }
+.app-shell.active-tab-overview .cdr-behavior-table th:nth-child(3),
+.app-shell.active-tab-overview .cdr-behavior-table td:nth-child(3) { width: 15% !important; text-align: left !important; }
+.app-shell.active-tab-overview .cdr-behavior-table th:nth-child(4),
+.app-shell.active-tab-overview .cdr-behavior-table td:nth-child(4) { width: 9% !important; text-align: center !important; }
+.app-shell.active-tab-overview .cdr-behavior-table th:nth-child(5),
+.app-shell.active-tab-overview .cdr-behavior-table td:nth-child(5) { width: 14% !important; text-align: center !important; }
+.app-shell.active-tab-overview .cdr-behavior-table th:nth-child(6),
+.app-shell.active-tab-overview .cdr-behavior-table td:nth-child(6) { width: 14% !important; text-align: center !important; }
+.app-shell.active-tab-overview .cdr-behavior-table th:nth-child(7),
+.app-shell.active-tab-overview .cdr-behavior-table td:nth-child(7),
+.app-shell.active-tab-overview .cdr-behavior-table th:nth-child(8),
+.app-shell.active-tab-overview .cdr-behavior-table td:nth-child(8) { width: 8% !important; text-align: center !important; }
+
+/* User Behavior has 7 columns, so override width distribution inside second panel. */
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table th:nth-child(1),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table td:nth-child(1) { width: 22% !important; text-align: left !important; }
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table th:nth-child(2),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table td:nth-child(2) { width: 10% !important; text-align: center !important; }
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table th:nth-child(3),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table td:nth-child(3),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table th:nth-child(4),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table td:nth-child(4) { width: 17% !important; text-align: center !important; }
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table th:nth-child(5),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table td:nth-child(5),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table th:nth-child(6),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table td:nth-child(6),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table th:nth-child(7),
+.app-shell.active-tab-overview .cdr-behavior-grid .cdr-behavior-panel:nth-child(2) .cdr-behavior-table td:nth-child(7) { width: 9% !important; text-align: center !important; }
+
+.app-shell.active-tab-overview .cdr-quality-footer-strip {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 1300px) {
+  .app-shell.active-tab-overview .cdr-top-entities-grid,
+  .app-shell.active-tab-overview .cdr-behavior-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.modern-pie-center-value {
+  fill: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  paint-order: stroke;
+  stroke: rgba(2, 6, 23, 0.88);
+  stroke-width: 3px;
+}
+
+.modern-pie-center-label {
+  fill: #9ca3af;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  paint-order: stroke;
+  stroke: rgba(2, 6, 23, 0.88);
+  stroke-width: 2px;
+}
+
+/* CDR overview chart legends */
+.app-shell.active-tab-overview .cdr-chart-legend {
+  margin-top: 6px !important;
+  gap: 5px 8px !important;
+  font-size: clamp(9px, 0.52vw, 11px) !important;
+  line-height: 1.15 !important;
+  color: #C7D2FE !important;
+}
+
+.app-shell.active-tab-overview .cdr-chart-legend span {
+  max-width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-weight: 800 !important;
+}
+
+.app-shell.active-tab-overview .cdr-chart-legend i {
+  width: 8px !important;
+  height: 8px !important;
+  min-width: 8px !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.22) !important;
+}
+
+.app-shell.active-tab-overview .cdr-pie-legend,
+.app-shell.active-tab-overview .cdr-trend-legend {
+  justify-content: center !important;
+  align-items: center !important;
+  max-height: 44px !important;
+  overflow: hidden !important;
+}
+
+.app-shell.active-tab-overview .cdr-trend-chart-block {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+
+.app-shell.active-tab-overview .cdr-volume-legend {
+  justify-content: center !important;
+  margin-top: -2px !important;
+}
+
+.app-shell.active-tab-overview .modern-donut-chart {
+  min-width: 0 !important;
+}
+
+@media (max-width: 1500px) {
+  .app-shell.active-tab-overview .cdr-deep-dive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell.active-tab-overview .cdr-split-chart {
+    grid-template-columns: minmax(150px, 0.85fr) minmax(220px, 1fr) !important;
+  }
+}
+

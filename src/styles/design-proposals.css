@@ -1439,6 +1439,19 @@ html[data-design="proposal2"] body .app-shell.design-proposal-2 .quality-icon {
   color: #ffffff !important;
 }
 
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-header-logo-right img {
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(16%)
+    sepia(44%)
+    saturate(1093%)
+    hue-rotate(169deg)
+    brightness(88%)
+    contrast(94%)
+    drop-shadow(0 2px 3px rgba(255, 255, 255, 0.68)) !important;
+}
+
 
 /* ========================================================================
    CDR PROPOSAL 2 READABILITY + CONTROL/CARD COVERAGE PATCH
@@ -2794,4 +2807,438 @@ html[data-design] body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-
 html[data-design] body .app-shell .cdr-kpi-strip-30 .modern-stat-tile.modern-stat-tile-long-value strong,
 html[data-design] body .app-shell .cdr-kpi-strip-30 .modern-stat-tile.modern-stat-tile-long-value .modern-stat-value {
   font-size: clamp(9px, 0.64vw, 13px) !important;
+}
+
+/* Final upload shell layout: keep the command column and visual image separated. */
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-shell {
+  min-height: 100vh !important;
+  padding: clamp(18px, 2vw, 28px) !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-card {
+  width: min(96vw, 1450px) !important;
+  max-width: min(96vw, 1450px) !important;
+  min-height: auto !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 760px) minmax(360px, 520px) !important;
+  grid-template-rows: auto minmax(0, auto) !important;
+  column-gap: clamp(18px, 2.2vw, 34px) !important;
+  row-gap: clamp(16px, 1.4vw, 24px) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: clamp(18px, 2vw, 28px) !important;
+  overflow: hidden !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .upload-portal-toolbar {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+  margin: 0 !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-left {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  max-width: 760px !important;
+  min-width: 0 !important;
+  align-self: center !important;
+  justify-self: stretch !important;
+  padding: 0 !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-eyebrow {
+  margin: 0 0 10px !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-left h1 {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  white-space: normal !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  font-size: clamp(42px, 4vw, 74px) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.035em !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-lead {
+  max-width: 100% !important;
+  margin: clamp(12px, 1vw, 16px) 0 clamp(14px, 1.2vw, 20px) !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-control-stack {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: clamp(16px, 1.4vw, 22px) !important;
+  margin: 0 !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-primary-actions,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-mini-grid,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-staged-upload {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-primary-actions,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-mini-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(12px, 1vw, 16px) !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-primary-actions .followup-action-button,
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-mini-card {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-staged-upload {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(92px, 0.5fr) !important;
+  gap: clamp(10px, 0.9vw, 14px) !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-staged-upload > div:first-child {
+  grid-column: 1 / -1 !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-staged-actions {
+  grid-column: 3 / 5 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(92px, 0.5fr) !important;
+  gap: clamp(10px, 0.9vw, 14px) !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-visual {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  max-width: 520px !important;
+  height: clamp(430px, 42vw, 610px) !important;
+  min-height: 0 !important;
+  align-self: center !important;
+  justify-self: start !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
+@media (max-width: 1180px) {
+  html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-left,
+  html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-visual {
+    grid-column: 1 !important;
+  }
+
+  html[data-design] body .upload-shell[class*="design-proposal"] .followup-upload-visual {
+    grid-row: 3 !important;
+    justify-self: center !important;
+    width: min(100%, 720px) !important;
+    max-width: 720px !important;
+    height: min(46vw, 430px) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  html[data-design] body .upload-shell[class*="design-proposal"] .followup-primary-actions,
+  html[data-design] body .upload-shell[class*="design-proposal"] .followup-mini-grid,
+  html[data-design] body .upload-shell[class*="design-proposal"] .followup-staged-upload,
+  html[data-design] body .upload-shell[class*="design-proposal"] .followup-staged-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  html[data-design] body .upload-shell[class*="design-proposal"] .followup-staged-actions {
+    grid-column: auto !important;
+  }
+}
+
+/* Final light-theme contrast guard for reports, filters, and export controls. */
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .cdr-filter-search > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .search-box > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-filter > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .filter-field > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .filter-action-label,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged label,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filter-field-label {
+  color: #17334d !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .cdr-filter-search input,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .search-box input,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-trigger,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .filter-count,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .reset-filter-button {
+  background: #f7fbff !important;
+  border-color: rgba(37, 99, 235, 0.28) !important;
+  color: #0c1f35 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-value,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-trigger span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .filter-count,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .filter-count span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .reset-filter-button,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged input::placeholder {
+  color: #0c1f35 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .search-box svg,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .multi-select-trigger svg,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel-arranged .reset-filter-button svg {
+  color: #123f70 !important;
+  stroke: #123f70 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .reports-panel,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .report-management-center,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .report-generator-panel,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .report-generation-form,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .report-download-directory,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-panel,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-table-wrap {
+  background: #ffffff !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+  color: #0c1f35 !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .reports-panel h3,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .reports-panel h4,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .reports-panel p,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .report-generation-form label > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .report-download-directory label > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .report-directory-status,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-title h4,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-note,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-table th,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-table td {
+  color: #0c1f35 !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-table th {
+  background: #eaf2ff !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-table td {
+  background: #ffffff !important;
+  border-color: rgba(37, 99, 235, 0.16) !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generate-report-tile {
+  background: #eef6ff !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
+  color: #0c1f35 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generate-report-tile span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generate-report-tile svg {
+  color: #0c1f35 !important;
+  stroke: #0c1f35 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-table button {
+  background: #eaf2ff !important;
+  border-color: rgba(37, 99, 235, 0.28) !important;
+  color: #123f70 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .report-directory-button,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-table button {
+  background: #eaf2ff !important;
+  border-color: rgba(37, 99, 235, 0.28) !important;
+  color: #123f70 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .report-directory-button svg,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .generated-reports-table button svg {
+  color: #123f70 !important;
+  stroke: #123f70 !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .filter-action-label,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > span,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .filter-action-label {
+  color: #17334d !important;
+  text-shadow: none !important;
+}
+
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > .multi-select-trigger,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input,
+html[data-design="proposal2"] body .app-shell.design-proposal-2 .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > .multi-select-trigger {
+  background: #f7fbff !important;
+  border-color: rgba(37, 99, 235, 0.28) !important;
+  color: #0c1f35 !important;
+  text-shadow: none !important;
+}
+
+/* Final CDR control strip order/alignment patch.
+   Keeps the quick actions above the workbook info cards and prevents the
+   Design selector from stretching wider than its label/value need. */
+body .app-shell .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.dark-background-theme .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-row,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .dashboard-tabs-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .dashboard-tabs {
+  flex: 0 0 auto !important;
+  justify-content: flex-start !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs-actions,
+body .app-shell.dark-background-theme .cdr-command-shell .dashboard-tabs-actions,
+body .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-actions,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-actions,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .dashboard-tabs-actions {
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  margin: 0 !important;
+  justify-self: start !important;
+  justify-content: flex-start !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-actions,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .cdr-header-actions {
+  width: auto !important;
+  max-width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-actions > *,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .cdr-header-actions > * {
+  flex: 0 0 auto !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-design-selector,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .cdr-design-selector {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+  flex: 0 0 auto !important;
+  grid-template-columns: auto auto !important;
+  gap: 8px !important;
+  padding-inline: 10px !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-design-selector select,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .cdr-design-selector select {
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-design-selector-label,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .cdr-design-selector-label {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+/* Final left-lock for the command buttons strip. Some older header layouts put
+   the tab group first and center the actions, so this explicitly makes actions
+   the first left-aligned item inside the strip. */
+body .app-shell .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.dark-background-theme .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-row,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-row,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .dashboard-tabs-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  text-align: left !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions,
+body .app-shell.dark-background-theme .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions,
+body .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions {
+  order: 1 !important;
+  flex: 0 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 8px) !important;
+  margin: 0 auto 0 0 !important;
+  padding: 0 !important;
+  justify-self: start !important;
+  align-self: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs,
+body .app-shell.dark-background-theme .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs,
+body .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs {
+  order: 2 !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+  margin: 0 !important;
+  justify-content: flex-start !important;
+}
+
+body .app-shell .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions > .cdr-header-actions,
+body .app-shell.dark-background-theme .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions > .cdr-header-actions,
+body .app-shell.light-background-theme .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions > .cdr-header-actions,
+body .app-shell.se-theme.light-background-theme .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions > .cdr-header-actions,
+body .app-shell[class*="design-proposal"] .cdr-command-shell .dashboard-tabs-row > .dashboard-tabs-actions > .cdr-header-actions {
+  flex: 0 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: calc(100vw - 48px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  justify-content: flex-start !important;
+  align-content: flex-start !important;
+  text-align: left !important;
 }

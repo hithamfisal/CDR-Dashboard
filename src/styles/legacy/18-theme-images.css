@@ -1,0 +1,785 @@
+﻿/* Theme background image geometry and upload visuals. Source split from src/styles.css lines 6070-6853. */
+/* ============================================================
+   Theme-based hero visual image
+   ============================================================ */
+
+.followup-upload-visual img {
+  transition: opacity 0.25s ease, filter 0.25s ease !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  opacity: 0.84 !important;
+  filter: saturate(1.02) contrast(1.04) brightness(0.96) !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual img {
+  opacity: 0.8 !important;
+  filter: saturate(1.08) contrast(1.01) brightness(1.02) !important;
+}
+
+
+/* ============================================================
+   FINAL FIX: dark.png fit behavior for home + dashboard
+   Prevents dark.png from appearing zoomed/cropped compared with light.png.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* Dashboard dark background: show the full dark.png clearly */
+html:has(.app-shell.dark-background-theme),
+body:has(.app-shell.dark-background-theme) {
+  background-color: #06131e !important;
+  background-image: url("/assets/dark.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* Upload/home dark background: same full-screen fit */
+html:has(.upload-shell.dark-background-theme),
+body:has(.upload-shell.dark-background-theme) {
+  background-color: #06131e !important;
+  background-image: url("/assets/dark.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* Shells should not zoom or override the image with another large background */
+.app-shell.dark-background-theme,
+.upload-shell.dark-background-theme {
+  background-color: transparent !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+}
+
+/* Right-side home visual: dark image should fit inside the card, not crop/zoom */
+.upload-shell.dark-background-theme .followup-upload-visual {
+  background:
+    linear-gradient(160deg, rgba(2, 13, 28, 0.92), rgba(8, 27, 43, 0.86)),
+    #06131e !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  opacity: 0.96 !important;
+  filter: saturate(1.02) contrast(1.03) brightness(0.98) !important;
+  background-color: #06131e !important;
+}
+
+/* Light image can remain cover because it already looks correct */
+.upload-shell.light-background-theme .followup-upload-visual img {
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+/* Keep dark overlay softer so dark.png stays visible and not muddy */
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  opacity: 0.35 !important;
+  mix-blend-mode: screen !important;
+}
+
+/* Mobile: avoid fixed-background rendering issues */
+@media (max-width: 900px) {
+  html:has(.app-shell.dark-background-theme),
+  body:has(.app-shell.dark-background-theme),
+  html:has(.upload-shell.dark-background-theme),
+  body:has(.upload-shell.dark-background-theme) {
+    background-attachment: scroll !important;
+    background-size: 100% 100% !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL FIX: light.png and dark.png same behavior
+   Both themes use full-screen 100% 100% image fitting.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* Dashboard light background: same behavior as dark */
+html:has(.app-shell.light-background-theme),
+body:has(.app-shell.light-background-theme) {
+  background-color: #f5f9fc !important;
+  background-image: url("/assets/light.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* Home/upload light background: same behavior as dark */
+html:has(.upload-shell.light-background-theme),
+body:has(.upload-shell.light-background-theme) {
+  background-color: #f5f9fc !important;
+  background-image: url("/assets/light.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* Shells should not override the page-level background image */
+.app-shell.light-background-theme,
+.upload-shell.light-background-theme {
+  background-color: transparent !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+}
+
+/* Home right-side visual: light image also uses contain, same as dark */
+.upload-shell.light-background-theme .followup-upload-visual {
+  background:
+    linear-gradient(160deg, rgba(248, 252, 255, 0.72), rgba(229, 244, 255, 0.66)),
+    #f5f9fc !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  opacity: 0.96 !important;
+  filter: saturate(1.02) contrast(1.02) brightness(1.01) !important;
+  background-color: #f5f9fc !important;
+}
+
+/* Keep light overlay soft so light.png stays clear */
+.upload-shell.light-background-theme .followup-upload-visual::after {
+  opacity: 0.35 !important;
+  mix-blend-mode: multiply !important;
+}
+
+/* Mobile: avoid fixed-background rendering issues for both themes */
+@media (max-width: 900px) {
+  html:has(.app-shell.light-background-theme),
+  body:has(.app-shell.light-background-theme),
+  html:has(.upload-shell.light-background-theme),
+  body:has(.upload-shell.light-background-theme) {
+    background-attachment: scroll !important;
+    background-size: 100% 100% !important;
+  }
+}
+
+
+/* ============================================================
+   Home upload screen refinement:
+   - Title justified into 2 lines
+   - CDR / Raw / Continue buttons kept in one row
+   - Charts & Reports mini card removed in TSX
+   ============================================================ */
+
+.followup-upload-left h1 {
+  display: grid !important;
+  gap: 0 !important;
+  max-width: 620px !important;
+  text-align: left !important;
+}
+
+.followup-upload-left h1 span {
+  display: block !important;
+  width: 100% !important;
+}
+
+.followup-primary-actions {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+  max-width: 720px !important;
+  width: 100% !important;
+}
+
+.followup-action-button {
+  width: 100% !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.followup-action-button span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* With Charts & Reports removed, keep only Master + Fixed in a clean 2-card row. */
+.followup-mini-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  max-width: 520px !important;
+}
+
+/* Laptop compression */
+@media (max-width: 1180px) {
+  .followup-primary-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Tablet/mobile can stack if there is not enough width */
+@media (max-width: 760px) {
+  .followup-upload-left h1 {
+    text-align: center !important;
+    max-width: 100% !important;
+  }
+
+  .followup-primary-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .followup-mini-grid {
+    grid-template-columns: 1fr !important;
+    max-width: 100% !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL OVERRIDE: Light and Dark themes use the SAME full-screen image fit
+   Put this at the VERY END of styles.css
+   ============================================================ */
+
+/* ---------- Dashboard + Home page-level background images ---------- */
+html:has(.app-shell.light-background-theme),
+body:has(.app-shell.light-background-theme),
+html:has(.upload-shell.light-background-theme),
+body:has(.upload-shell.light-background-theme) {
+  background-color: #f5f9fc !important;
+  background-image: url("/assets/light.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+html:has(.app-shell.dark-background-theme),
+body:has(.app-shell.dark-background-theme),
+html:has(.upload-shell.dark-background-theme),
+body:has(.upload-shell.dark-background-theme) {
+  background-color: #06131e !important;
+  background-image: url("/assets/dark.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* ---------- Shells should not add their own conflicting large backgrounds ---------- */
+.app-shell.light-background-theme,
+.upload-shell.light-background-theme,
+.app-shell.dark-background-theme,
+.upload-shell.dark-background-theme {
+  background: transparent !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100% 100% !important;
+  min-height: 100vh !important;
+}
+
+/* ---------- Home right-side hero visual: both themes behave exactly the same ---------- */
+.upload-shell.light-background-theme .followup-upload-visual,
+.upload-shell.dark-background-theme .followup-upload-visual {
+  background: transparent !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block !important;
+  opacity: 0.96 !important;
+}
+
+/* Theme-specific gentle image tuning only, same geometry */
+.upload-shell.light-background-theme .followup-upload-visual img {
+  filter: saturate(1.02) contrast(1.01) brightness(1.01) !important;
+  background-color: #f5f9fc !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  filter: saturate(1.02) contrast(1.03) brightness(0.98) !important;
+  background-color: #06131e !important;
+}
+
+/* Keep overlays equally soft so neither theme looks cropped or muddy */
+.upload-shell.light-background-theme .followup-upload-visual::after,
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  opacity: 0.28 !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual::after {
+  mix-blend-mode: multiply !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  mix-blend-mode: screen !important;
+}
+
+/* ---------- Mobile fallback to avoid browser fixed-background issues ---------- */
+@media (max-width: 900px) {
+  html:has(.app-shell.light-background-theme),
+  body:has(.app-shell.light-background-theme),
+  html:has(.upload-shell.light-background-theme),
+  body:has(.upload-shell.light-background-theme),
+  html:has(.app-shell.dark-background-theme),
+  body:has(.app-shell.dark-background-theme),
+  html:has(.upload-shell.dark-background-theme),
+  body:has(.upload-shell.dark-background-theme) {
+    background-attachment: scroll !important;
+    background-size: 100% 100% !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL BACKGROUND FIX
+   Light and dark images now use the same fixed viewport layer.
+   This prevents light.png from stretching differently when the
+   page has a scrollbar or different document height.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* Stop body/html from stretching the image by document height */
+html,
+body {
+  min-height: 100% !important;
+}
+
+body:has(.upload-shell.light-background-theme),
+body:has(.app-shell.light-background-theme),
+body:has(.upload-shell.dark-background-theme),
+body:has(.app-shell.dark-background-theme),
+html:has(.upload-shell.light-background-theme),
+html:has(.app-shell.light-background-theme),
+html:has(.upload-shell.dark-background-theme),
+html:has(.app-shell.dark-background-theme) {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+/* Both shells become transparent over the fixed viewport image */
+.upload-shell.light-background-theme,
+.upload-shell.dark-background-theme,
+.app-shell.light-background-theme,
+.app-shell.dark-background-theme {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 100dvh !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Fixed background image layer for both home and dashboard */
+.upload-shell.light-background-theme::before,
+.upload-shell.dark-background-theme::before,
+.app-shell.light-background-theme::before,
+.app-shell.dark-background-theme::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 100vw 100dvh !important;
+  pointer-events: none !important;
+  transform: translateZ(0) !important;
+}
+
+.upload-shell.light-background-theme::before,
+.app-shell.light-background-theme::before {
+  background-image: url("/assets/light.png") !important;
+  background-color: #f5f9fc !important;
+}
+
+.upload-shell.dark-background-theme::before,
+.app-shell.dark-background-theme::before {
+  background-image: url("/assets/dark.png") !important;
+  background-color: #06131e !important;
+}
+
+/* Optional gentle tint layer: same geometry, different color only */
+.upload-shell.light-background-theme::after,
+.app-shell.light-background-theme::after,
+.upload-shell.dark-background-theme::after,
+.app-shell.dark-background-theme::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  pointer-events: none !important;
+}
+
+.upload-shell.light-background-theme::after,
+.app-shell.light-background-theme::after {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.upload-shell.dark-background-theme::after,
+.app-shell.dark-background-theme::after {
+  background: rgba(0, 8, 18, 0.10) !important;
+}
+
+/* Home screen card should start at the same vertical position in both themes */
+.upload-shell .followup-upload-shell {
+  min-height: calc(100dvh - 44px) !important;
+  align-items: center !important;
+  justify-items: center !important;
+}
+
+/* Right-side visual uses the same exact image geometry in both themes */
+.upload-shell.light-background-theme .followup-upload-visual,
+.upload-shell.dark-background-theme .followup-upload-visual {
+  background: rgba(2, 13, 28, 0.12) !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block !important;
+  opacity: 0.96 !important;
+}
+
+/* Same overlay geometry for both; only blend differs */
+.upload-shell.light-background-theme .followup-upload-visual::after,
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  inset: 0 !important;
+  opacity: 0.26 !important;
+}
+
+/* Prevent old body background rules from reappearing through nested elements */
+body:has(.light-background-theme) .upload-shell,
+body:has(.dark-background-theme) .upload-shell,
+body:has(.light-background-theme) .app-shell,
+body:has(.dark-background-theme) .app-shell {
+  background-image: none !important;
+}
+
+/* Mobile: fixed layer still uses viewport height */
+@media (max-width: 900px) {
+  .upload-shell.light-background-theme::before,
+  .upload-shell.dark-background-theme::before,
+  .app-shell.light-background-theme::before,
+  .app-shell.dark-background-theme::before {
+    background-size: 100vw 100dvh !important;
+    background-position: center center !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL THEME BACKGROUND ALIGNMENT
+   Light and dark backgrounds use the same viewport geometry.
+   Light is corrected to match dark visual framing.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/* Remove all earlier body/html background image behavior */
+html,
+body,
+body:has(.light-background-theme),
+body:has(.dark-background-theme),
+html:has(.light-background-theme),
+html:has(.dark-background-theme) {
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  background-position: center top !important;
+  background-size: cover !important;
+}
+
+/* Both shells are transparent and use the same fixed pseudo-layer */
+.upload-shell.light-background-theme,
+.upload-shell.dark-background-theme,
+.app-shell.light-background-theme,
+.app-shell.dark-background-theme {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  background: transparent !important;
+  background-image: none !important;
+  overflow-x: hidden !important;
+}
+
+/* Common image layer: same position, same size, same viewport */
+.upload-shell.light-background-theme::before,
+.upload-shell.dark-background-theme::before,
+.app-shell.light-background-theme::before,
+.app-shell.dark-background-theme::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background-repeat: no-repeat !important;
+  background-position: center top !important;
+  background-size: cover !important;
+  pointer-events: none !important;
+  transform-origin: center top !important;
+}
+
+/* Dark reference framing */
+.upload-shell.dark-background-theme::before,
+.app-shell.dark-background-theme::before {
+  background-image: url("/assets/dark.png") !important;
+  background-color: #06131e !important;
+  transform: none !important;
+}
+
+/* Light corrected to use the same apparent framing as dark */
+.upload-shell.light-background-theme::before,
+.app-shell.light-background-theme::before {
+  background-image: url("/assets/light.png") !important;
+  background-color: #f5f9fc !important;
+  /*
+    Correction because light.png artwork sits visually lower/larger than dark.png.
+    This shifts the light artwork upward and scales it slightly so it frames like dark.png.
+  */
+  transform: translateY(-34px) scale(1.035) !important;
+}
+
+/* Tint layer only; does not affect geometry */
+.upload-shell.light-background-theme::after,
+.upload-shell.dark-background-theme::after,
+.app-shell.light-background-theme::after,
+.app-shell.dark-background-theme::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  pointer-events: none !important;
+}
+
+.upload-shell.light-background-theme::after,
+.app-shell.light-background-theme::after {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.upload-shell.dark-background-theme::after,
+.app-shell.dark-background-theme::after {
+  background: rgba(0, 8, 18, 0.08) !important;
+}
+
+/* Keep the home right-side image using same geometry for both */
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+  display: block !important;
+}
+
+/* Light visual image correction mirrors the page background correction */
+.upload-shell.light-background-theme .followup-upload-visual img {
+  transform: translateY(-3%) scale(1.035) !important;
+  transform-origin: center top !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  transform: none !important;
+}
+
+/* If image appears too high/low later, adjust ONLY these two values:
+   translateY(-34px) for page background
+   translateY(-3%) for right-side visual image
+*/
+
+/* Smaller screens: remove correction so the image does not over-crop */
+@media (max-width: 900px) {
+  .upload-shell.light-background-theme::before,
+  .app-shell.light-background-theme::before {
+    transform: none !important;
+  }
+
+  .upload-shell.light-background-theme .followup-upload-visual img {
+    transform: none !important;
+  }
+}
+
+
+/* ============================================================
+   FINAL THEME RULE: same logos/shapes position, color changes only
+   Both light and dark themes use ONE shared background artwork.
+   This guarantees the logo and shapes stay in the exact same place.
+   Only the overlay/tint changes by theme.
+   Keep this block at the VERY END of styles.css.
+   ============================================================ */
+
+/*
+   IMPORTANT:
+   Use one shared image for both themes.
+   Recommended: use the image with the correct logo/shape placement.
+   If you prefer light.png as the master artwork, change both URLs below
+   from "/assets/dark.png" to "/assets/light.png".
+*/
+
+html,
+body,
+body:has(.light-background-theme),
+body:has(.dark-background-theme),
+html:has(.light-background-theme),
+html:has(.dark-background-theme) {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+.upload-shell.light-background-theme,
+.upload-shell.dark-background-theme,
+.app-shell.light-background-theme,
+.app-shell.dark-background-theme {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  background: transparent !important;
+  background-image: none !important;
+  overflow-x: hidden !important;
+}
+
+/* SAME artwork, SAME position, SAME dimensions for both themes */
+.upload-shell.light-background-theme::before,
+.upload-shell.dark-background-theme::before,
+.app-shell.light-background-theme::before,
+.app-shell.dark-background-theme::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background-image: url("/assets/dark.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center top !important;
+  background-size: cover !important;
+  pointer-events: none !important;
+  transform: none !important;
+  transform-origin: center top !important;
+}
+
+/* Only the color/tint changes */
+.upload-shell.light-background-theme::after,
+.app-shell.light-background-theme::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(245,250,255,0.66)),
+    rgba(255,255,255,0.48) !important;
+  mix-blend-mode: screen !important;
+}
+
+.upload-shell.dark-background-theme::after,
+.app-shell.dark-background-theme::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(180deg, rgba(0,8,18,0.10), rgba(0,8,18,0.24)),
+    rgba(0,8,18,0.10) !important;
+  mix-blend-mode: multiply !important;
+}
+
+/* Home right-side visual also uses same image placement in both themes */
+.upload-shell.light-background-theme .followup-upload-visual img,
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  content: url("/assets/dark.png") !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+  display: block !important;
+  transform: none !important;
+}
+
+/* Color treatment only for the right-side visual */
+.upload-shell.light-background-theme .followup-upload-visual img {
+  opacity: 0.72 !important;
+  filter: brightness(1.35) saturate(0.95) contrast(0.92) !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual img {
+  opacity: 0.92 !important;
+  filter: brightness(0.96) saturate(1.04) contrast(1.04) !important;
+}
+
+.upload-shell.light-background-theme .followup-upload-visual::after {
+  opacity: 0.18 !important;
+  mix-blend-mode: screen !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-visual::after {
+  opacity: 0.28 !important;
+  mix-blend-mode: screen !important;
+}
+
+/* Keep cards readable while background geometry remains identical */
+.upload-shell.light-background-theme .followup-upload-card,
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .summary-card,
+.app-shell.light-background-theme .chart-card,
+.app-shell.light-background-theme .table-card,
+.app-shell.light-background-theme .records-card {
+  background-color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.upload-shell.dark-background-theme .followup-upload-card,
+.app-shell.dark-background-theme .hero-panel,
+.app-shell.dark-background-theme .topbar,
+.app-shell.dark-background-theme .filters-panel,
+.app-shell.dark-background-theme .summary-card,
+.app-shell.dark-background-theme .chart-card,
+.app-shell.dark-background-theme .table-card,
+.app-shell.dark-background-theme .records-card {
+  background-color: rgba(2, 13, 28, 0.80) !important;
+}
+
+/* Mobile keeps the same artwork geometry */
+@media (max-width: 900px) {
+  .upload-shell.light-background-theme::before,
+  .upload-shell.dark-background-theme::before,
+  .app-shell.light-background-theme::before,
+  .app-shell.dark-background-theme::before {
+    background-position: center top !important;
+    background-size: cover !important;
+  }
+}
+
+

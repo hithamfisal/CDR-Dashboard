@@ -12,6 +12,19 @@ function notifyGeneratedFile(fileName: string, blob: Blob, mimeType = blob.type)
   window.dispatchEvent(new CustomEvent("cdr-report-generated-file", { detail: { fileName, blob, mimeType } }));
 }
 
+function shouldSuppressBrowserDownload() {
+  return Boolean((window as Window & { __cdrSuppressBrowserDownload?: boolean }).__cdrSuppressBrowserDownload);
+}
+
+function triggerBrowserDownload(fileName: string, url: string) {
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
 function dataUrlToBlob(dataUrl: string) {
   const [header = "", data = ""] = dataUrl.split(",");
   const mimeType = header.match(/^data:([^;]+)/)?.[1] ?? "application/octet-stream";
@@ -25,19 +38,17 @@ function dataUrlToBlob(dataUrl: string) {
 export function downloadText(fileName: string, text: string) {
   const blob = new Blob(["\ufeff", text], { type: "text/csv;charset=utf-8" });
   notifyGeneratedFile(fileName, blob);
+  if (shouldSuppressBrowserDownload()) return;
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url; link.download = fileName;
-  document.body.appendChild(link); link.click(); link.remove();
+  triggerBrowserDownload(fileName, url);
   window.setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 
 export function downloadBlob(fileName: string, blob: Blob) {
   notifyGeneratedFile(fileName, blob);
+  if (shouldSuppressBrowserDownload()) return;
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url; link.download = fileName;
-  document.body.appendChild(link); link.click(); link.remove();
+  triggerBrowserDownload(fileName, url);
   window.setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 
@@ -61,22 +72,36 @@ export function downloadDataUrl(fileName: string, dataUrl: string) {
   } catch {
     // Keep the browser download working even if a malformed data URL cannot be converted to a Blob for history tracking.
   }
-  const link = document.createElement("a");
-  link.href = dataUrl; link.download = fileName;
-  document.body.appendChild(link); link.click(); link.remove();
+  if (shouldSuppressBrowserDownload()) return;
+  triggerBrowserDownload(fileName, dataUrl);
+}
+
+async function createExcelWorkbook() {
+  const ExcelJSModule = await import("exceljs");
+  return new ExcelJSModule.default.Workbook();
+}
+
+function applyExportSheetColumns(worksheet: ExcelJS.Worksheet, headers: string[], rows: unknown[][]) {
+  worksheet.columns = headers.map((header, index) => {
+    const max = Math.max(`${header}`.length, ...rows.map((row) => `${row[index] ?? ""}`.length));
+    return { width: Math.min(42, Math.max(12, max + 2)) };
+  });
+}
+
+async function writeExcelWorkbook(workbook: ExcelJS.Workbook, fileName: string) {
+  const buffer = await workbook.xlsx.writeBuffer();
+  downloadBlob(fileName, new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
 }
 
 export async function downloadWorkbookData(fileName: string, sheetName: string, title: string, dataset: ChartExportDataset) {
-  const XLSX = await import("xlsx");
-  const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.aoa_to_sheet([[title], [], dataset.headers, ...dataset.rows]);
-  worksheet["!cols"] = dataset.headers.map((header, index) => {
-    const max = Math.max(`${header}`.length, ...dataset.rows.map((row) => `${row[index] ?? ""}`.length));
-    return { wch: Math.min(42, Math.max(12, max + 2)) };
-  });
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName.slice(0, 31) || "Chart Data");
-  const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  downloadBlob(fileName, new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+  const workbook = await createExcelWorkbook();
+  const worksheet = workbook.addWorksheet(sheetName.slice(0, 31) || "Chart Data");
+  worksheet.addRow([title]);
+  worksheet.addRow([]);
+  worksheet.addRow(dataset.headers);
+  dataset.rows.forEach((row) => worksheet.addRow(row));
+  applyExportSheetColumns(worksheet, dataset.headers, dataset.rows);
+  await writeExcelWorkbook(workbook, fileName);
 }
 
 function safeSheetName(value: string, usedNames: Set<string>) {
@@ -93,27 +118,28 @@ function safeSheetName(value: string, usedNames: Set<string>) {
 }
 
 export async function downloadWorkbookDatasets(fileName: string, title: string, datasets: Record<string, ChartExportDataset>) {
-  const XLSX = await import("xlsx");
-  const workbook = XLSX.utils.book_new();
+  const workbook = await createExcelWorkbook();
   const usedSheetNames = new Set<string>();
   const entries = Object.entries(datasets).filter(([, dataset]) => dataset.headers.length > 0);
 
   const indexRows = entries.map(([name], index) => [index + 1, name]);
-  const indexSheet = XLSX.utils.aoa_to_sheet([[title], [], ["SN", "Chart Data Sheet"], ...indexRows]);
-  indexSheet["!cols"] = [{ wch: 8 }, { wch: 42 }];
-  XLSX.utils.book_append_sheet(workbook, indexSheet, safeSheetName("Index", usedSheetNames));
+  const indexSheet = workbook.addWorksheet(safeSheetName("Index", usedSheetNames));
+  indexSheet.addRow([title]);
+  indexSheet.addRow([]);
+  indexSheet.addRow(["SN", "Chart Data Sheet"]);
+  indexRows.forEach((row) => indexSheet.addRow(row));
+  indexSheet.columns = [{ width: 8 }, { width: 42 }];
 
   entries.forEach(([name, dataset]) => {
-    const worksheet = XLSX.utils.aoa_to_sheet([[name], [], dataset.headers, ...dataset.rows]);
-    worksheet["!cols"] = dataset.headers.map((header, index) => {
-      const max = Math.max(`${header}`.length, ...dataset.rows.map((row) => `${row[index] ?? ""}`.length));
-      return { wch: Math.min(42, Math.max(12, max + 2)) };
-    });
-    XLSX.utils.book_append_sheet(workbook, worksheet, safeSheetName(name, usedSheetNames));
+    const worksheet = workbook.addWorksheet(safeSheetName(name, usedSheetNames));
+    worksheet.addRow([name]);
+    worksheet.addRow([]);
+    worksheet.addRow(dataset.headers);
+    dataset.rows.forEach((row) => worksheet.addRow(row));
+    applyExportSheetColumns(worksheet, dataset.headers, dataset.rows);
   });
 
-  const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  downloadBlob(fileName, new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+  await writeExcelWorkbook(workbook, fileName);
 }
 
 export function fileSlug(value: string) {

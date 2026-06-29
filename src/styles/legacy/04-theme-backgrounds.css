@@ -1,0 +1,362 @@
+﻿/* PNG theme background and foreground protection. Source split from src/styles.css lines 1006-1366. */
+/* ============================================================
+   PNG background theme + upload-home layout restoration
+   dark-background-theme  => /assets/h.png
+   light-background-theme => /assets/light.png
+   ============================================================ */
+
+.app-shell.dark-background-theme,
+.upload-shell.dark-background-theme {
+  color: #eaf7ff;
+}
+
+.app-shell.dark-background-theme {
+  min-height: 100vh;
+  padding: 18px clamp(14px, 3vw, 38px) 48px;
+  background:
+    linear-gradient(rgba(7,17,24,0.74), rgba(7,17,24,0.86)),
+    url("/assets/h.png") center top / cover fixed,
+    linear-gradient(120deg, rgba(55,166,217,0.16), transparent 32%),
+    radial-gradient(circle at 78% 0%, rgba(240,184,79,0.15), transparent 28%),
+    var(--bg);
+}
+
+.upload-shell.dark-background-theme {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 5vw, 64px);
+  background:
+    linear-gradient(rgba(7,17,24,0.68), rgba(7,17,24,0.86)),
+    url("/assets/h.png") center / cover,
+    linear-gradient(120deg, rgba(55,166,217,0.16), transparent 34%),
+    radial-gradient(circle at 72% 8%, rgba(240,184,79,0.16), transparent 30%),
+    var(--bg);
+}
+
+.app-shell.light-background-theme {
+  min-height: 100vh;
+  padding: 18px clamp(14px, 3vw, 38px) 48px;
+  color: #092033;
+  background:
+    linear-gradient(rgba(255,255,255,0.50), rgba(255,255,255,0.78)),
+    url("/assets/light.png") center top / cover fixed,
+    linear-gradient(120deg, rgba(0,120,255,0.08), transparent 32%),
+    radial-gradient(circle at 78% 0%, rgba(0,201,139,0.08), transparent 28%),
+    #f7fbff;
+}
+
+.upload-shell.light-background-theme {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 5vw, 64px);
+  color: #092033;
+  background:
+    linear-gradient(rgba(255,255,255,0.46), rgba(255,255,255,0.78)),
+    url("/assets/light.png") center / cover,
+    linear-gradient(120deg, rgba(0,120,255,0.08), transparent 34%),
+    radial-gradient(circle at 72% 8%, rgba(0,201,139,0.08), transparent 30%),
+    #f7fbff;
+}
+
+body:has(.dark-background-theme),
+body:has(.light-background-theme) {
+  background: #071118;
+}
+
+/* Keep the dashboard cards readable on both PNG backgrounds. */
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .section-nav,
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .workbook-card,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .summary-card,
+.app-shell.light-background-theme .chart-card,
+.app-shell.light-background-theme .table-card,
+.app-shell.light-background-theme .records-card,
+.app-shell.light-background-theme .warning-strip {
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(235,247,255,0.88));
+  border-color: rgba(0, 120, 180, 0.20);
+  box-shadow: 0 18px 42px rgba(24, 78, 119, 0.16);
+}
+
+.app-shell.light-background-theme .chart-card h3,
+.app-shell.light-background-theme .table-card h3,
+.app-shell.light-background-theme .hero-main h2,
+.app-shell.light-background-theme .brand-block h1,
+.app-shell.light-background-theme .workbook-card strong {
+  color: #092033;
+}
+
+.app-shell.light-background-theme td,
+.app-shell.light-background-theme .chart-card p,
+.app-shell.light-background-theme .filter-count,
+.app-shell.light-background-theme .brand-block p {
+  color: #315568;
+}
+
+.app-shell.light-background-theme th {
+  background: rgba(230, 244, 255, .98);
+  color: #006fae;
+}
+
+.app-shell.light-background-theme .button {
+  color: #083047;
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(0,120,180,0.25);
+}
+.app-shell.light-background-theme .button.primary { color: #fff; background: linear-gradient(135deg, #0078ff, #00a7d8); }
+.app-shell.light-background-theme .theme-toggle { color: #0078c8; border-color: rgba(0,120,200,0.34); }
+
+/* Upload screen layout requested by user:
+   1) theme button alone at top of the upload box
+   2) Master and Fixed Fleetmap in the same row
+   3) New Analysis and Continue Work in the same row */
+.workbook-choice-panel.three-tile {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "theme theme"
+    "master fixed"
+    "new previous";
+  align-items: stretch;
+  gap: 12px;
+  padding: 18px 22px 22px;
+  min-height: auto;
+}
+
+.workbook-choice-panel.three-tile .upload-theme-toggle {
+  grid-area: theme;
+  position: static;
+  justify-self: end;
+  width: auto;
+  min-height: 34px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.workbook-choice-panel.three-tile .fleetmap-choice-card:nth-of-type(1) { grid-area: master; }
+.workbook-choice-panel.three-tile .fleetmap-choice-card:nth-of-type(2) { grid-area: fixed; }
+.workbook-choice-panel.three-tile .cdr-choice-card { grid-area: new; grid-column: auto; }
+.workbook-choice-panel.three-tile .previous-choice-card { grid-area: previous; grid-column: auto; }
+
+.workbook-choice-panel.three-tile .workbook-choice-card {
+  min-height: 176px;
+}
+.workbook-choice-panel.three-tile .fleetmap-choice-card {
+  min-height: 150px;
+}
+
+.upload-shell.light-background-theme .upload-copy,
+.upload-shell.light-background-theme .workbook-choice-panel,
+.upload-shell.light-background-theme .workbook-choice-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(239,248,255,0.86));
+  color: #092033;
+  border-color: rgba(0,120,180,0.18);
+  box-shadow: 0 22px 60px rgba(24,78,119,0.16);
+}
+.upload-shell.light-background-theme .upload-copy h1,
+.upload-shell.light-background-theme .workbook-choice-card strong { color: #092033; }
+.upload-shell.light-background-theme .upload-copy .lead,
+.upload-shell.light-background-theme .workbook-choice-card p { color: #315568; }
+.upload-shell.light-background-theme .choice-eyebrow { color: #0078c8; }
+.upload-shell.light-background-theme .button { color: #083047; background: rgba(255,255,255,0.76); }
+
+@media (max-width: 1180px) {
+  .workbook-choice-panel.three-tile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "theme theme"
+      "master fixed"
+      "new previous";
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell.dark-background-theme,
+  .app-shell.light-background-theme {
+    padding: 14px 10px 36px;
+    background-attachment: scroll;
+  }
+  .workbook-choice-panel.three-tile {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "theme"
+      "master"
+      "fixed"
+      "new"
+      "previous";
+    padding: 14px;
+  }
+  .workbook-choice-panel.three-tile .upload-theme-toggle {
+    justify-self: stretch;
+    justify-content: center;
+  }
+}
+
+/* ============================================================
+   Foreground protection for BOTH PNG themes
+   Prevents h.png/light.png diagonal shapes from visually washing over
+   dashboard headers, filters, workbook panel, and summary stat cards.
+   ============================================================ */
+
+.app-shell.dark-background-theme,
+.app-shell.light-background-theme {
+  isolation: isolate;
+  background-blend-mode: normal, normal, normal, normal, normal;
+}
+
+.app-shell.dark-background-theme > *,
+.app-shell.light-background-theme > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Core top dashboard surfaces: make them real foreground panels. */
+.app-shell.dark-background-theme .topbar,
+.app-shell.dark-background-theme .section-nav,
+.app-shell.dark-background-theme .hero-panel,
+.app-shell.dark-background-theme .filters-panel,
+.app-shell.dark-background-theme .workbook-card,
+.app-shell.dark-background-theme .summary-card,
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .section-nav,
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .workbook-card,
+.app-shell.light-background-theme .summary-card {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+  background-clip: padding-box;
+}
+
+.app-shell.dark-background-theme .topbar,
+.app-shell.dark-background-theme .section-nav {
+  background: linear-gradient(180deg, rgba(5, 20, 31, 0.98), rgba(8, 30, 43, 0.96)) !important;
+  border: 1px solid rgba(109, 181, 214, 0.38) !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255,255,255,0.035) inset !important;
+}
+
+.app-shell.dark-background-theme .hero-panel,
+.app-shell.dark-background-theme .filters-panel,
+.app-shell.dark-background-theme .workbook-card {
+  background: linear-gradient(180deg, rgba(7, 26, 39, 0.97), rgba(4, 18, 28, 0.96)) !important;
+  border: 1px solid rgba(91, 155, 185, 0.40) !important;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.36), 0 0 0 1px rgba(255,255,255,0.03) inset !important;
+}
+
+.app-shell.dark-background-theme .summary-card {
+  background: linear-gradient(180deg, rgba(10, 34, 48, 0.99), rgba(4, 18, 28, 0.98)) !important;
+  border: 1px solid rgba(91, 155, 185, 0.42) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255,255,255,0.025) !important;
+}
+
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .section-nav {
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,249,255,0.96)) !important;
+  border: 1px solid rgba(0, 115, 176, 0.24) !important;
+  box-shadow: 0 18px 42px rgba(17, 86, 128, 0.18), inset 0 0 0 1px rgba(255,255,255,0.76) !important;
+}
+
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .workbook-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(237,248,255,0.94)) !important;
+  border: 1px solid rgba(0, 115, 176, 0.24) !important;
+  box-shadow: 0 20px 46px rgba(17, 86, 128, 0.16), inset 0 0 0 1px rgba(255,255,255,0.70) !important;
+}
+
+.app-shell.light-background-theme .summary-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(233,247,255,0.97)) !important;
+  border: 1px solid rgba(0, 115, 176, 0.24) !important;
+  box-shadow: 0 12px 28px rgba(17, 86, 128, 0.14), inset 0 0 0 1px rgba(255,255,255,0.72) !important;
+}
+
+/* Disable decorative card overlays specifically on the top stat cards;
+   this is the visible 'shadow over items' in the header/stat area. */
+.app-shell.dark-background-theme .summary-card::before,
+.app-shell.light-background-theme .summary-card::before,
+.app-shell.dark-background-theme .hero-panel::before,
+.app-shell.light-background-theme .hero-panel::before,
+.app-shell.dark-background-theme .workbook-card::before,
+.app-shell.light-background-theme .workbook-card::before {
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* Ensure text and controls sit above the panel surface. */
+.app-shell.dark-background-theme .topbar *,
+.app-shell.dark-background-theme .section-nav *,
+.app-shell.dark-background-theme .hero-panel *,
+.app-shell.dark-background-theme .filters-panel *,
+.app-shell.dark-background-theme .workbook-card *,
+.app-shell.dark-background-theme .summary-card *,
+.app-shell.light-background-theme .topbar *,
+.app-shell.light-background-theme .section-nav *,
+.app-shell.light-background-theme .hero-panel *,
+.app-shell.light-background-theme .filters-panel *,
+.app-shell.light-background-theme .workbook-card *,
+.app-shell.light-background-theme .summary-card * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Light theme contrast corrections for stat cards and filter controls. */
+.app-shell.light-background-theme .hero-main h2,
+.app-shell.light-background-theme .summary-card strong,
+.app-shell.light-background-theme .workbook-card strong,
+.app-shell.light-background-theme .brand-block h1 {
+  color: #062033 !important;
+  text-shadow: none !important;
+}
+
+.app-shell.light-background-theme .summary-card,
+.app-shell.light-background-theme .summary-card p,
+.app-shell.light-background-theme .summary-card small,
+.app-shell.light-background-theme .workbook-card p,
+.app-shell.light-background-theme .workbook-card span,
+.app-shell.light-background-theme .filter-count {
+  color: #294c5f !important;
+}
+
+.app-shell.light-background-theme .search-box input,
+.app-shell.light-background-theme .multi-select-trigger,
+.app-shell.light-background-theme .filter-field input,
+.app-shell.light-background-theme .filter-field select {
+  background: rgba(255,255,255,0.94) !important;
+  color: #092033 !important;
+  border-color: rgba(0, 115, 176, 0.28) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.app-shell.dark-background-theme .search-box input,
+.app-shell.dark-background-theme .multi-select-trigger,
+.app-shell.dark-background-theme .filter-field input,
+.app-shell.dark-background-theme .filter-field select {
+  background: rgba(2, 14, 23, 0.94) !important;
+  color: #f3fbff !important;
+  border-color: rgba(89, 139, 163, 0.54) !important;
+}
+
+/* Preserve colored summary headers but stop them from becoming transparent. */
+.app-shell.dark-background-theme .summary-card.yellow span,
+.app-shell.light-background-theme .summary-card.yellow span {
+  background: linear-gradient(180deg, #fff15d, #e5bb00) !important;
+  color: #10202a !important;
+}
+.app-shell.dark-background-theme .summary-card.green span,
+.app-shell.light-background-theme .summary-card.green span {
+  background: linear-gradient(180deg, #b9f06c, #42bd66) !important;
+  color: #10202a !important;
+}
+
+/* Keep sticky header/nav above the background and above hero content. */
+.app-shell.dark-background-theme .topbar,
+.app-shell.light-background-theme .topbar { z-index: 200 !important; }
+.app-shell.dark-background-theme .section-nav,
+.app-shell.light-background-theme .section-nav { z-index: 190 !important; }
+

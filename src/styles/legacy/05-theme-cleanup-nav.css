@@ -1,0 +1,633 @@
+﻿/* Final theme cleanup and section navigation separation. Source split from src/styles.css lines 1367-1998. */
+/* ============================================================
+   FINAL THEME CLEANUP PATCH
+   Purpose:
+   1) Remove all decorative ::before card overlays
+   2) Stop background image / gradient wash from bleeding into cards
+   3) Force clean light panels and deep navy dark panels
+   4) Fix inherited dark colors when light-background-theme is active
+   Place this block at the VERY END of styles.css
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. Global theme variables for app-shell and upload-shell
+   ------------------------------------------------------------ */
+.app-shell.dark-background-theme,
+.upload-shell.dark-background-theme {
+  --theme-page-bg: #071118;
+  --theme-panel-bg: #071c2a;
+  --theme-panel-bg-strong: #092536;
+  --theme-card-bg: #081f2f;
+  --theme-card-bg-soft: #0b2a3d;
+  --theme-text: #f4fbff;
+  --theme-muted: #a8c8d8;
+  --theme-border: rgba(116, 181, 214, 0.36);
+  --theme-border-strong: rgba(116, 181, 214, 0.52);
+  --theme-shadow: 0 22px 52px rgba(0, 0, 0, 0.42);
+}
+
+.app-shell.light-background-theme,
+.upload-shell.light-background-theme {
+  --theme-page-bg: #f5f9fc;
+  --theme-panel-bg: #ffffff;
+  --theme-panel-bg-strong: #f8fcff;
+  --theme-card-bg: #ffffff;
+  --theme-card-bg-soft: #f4f9fd;
+  --theme-text: #092033;
+  --theme-muted: #3f6174;
+  --theme-border: rgba(0, 100, 150, 0.20);
+  --theme-border-strong: rgba(0, 100, 150, 0.32);
+  --theme-shadow: 0 18px 42px rgba(17, 86, 128, 0.14);
+}
+
+/* ------------------------------------------------------------
+   2. Completely remove decorative overlays from dashboard cards
+   This is the main fix for the color wash.
+   ------------------------------------------------------------ */
+.app-shell .chart-card::before,
+.app-shell .table-card::before,
+.app-shell .records-card::before,
+.app-shell .summary-card::before,
+.app-shell .hero-panel::before,
+.app-shell .workbook-card::before,
+.app-shell .metric-card::before,
+.app-shell .filter-panel::before,
+.app-shell .filters-panel::before,
+.app-shell .warning-strip::before,
+.app-shell .topbar::before,
+.app-shell .section-nav::before,
+.upload-shell .upload-copy::before,
+.upload-shell .workbook-choice-panel::before,
+.upload-shell .workbook-choice-card::before,
+.upload-shell .choice-card::before {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  background: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+/* ------------------------------------------------------------
+   3. Keep background images behind everything only
+   ------------------------------------------------------------ */
+.app-shell.dark-background-theme,
+.app-shell.light-background-theme,
+.upload-shell.dark-background-theme,
+.upload-shell.light-background-theme {
+  isolation: isolate !important;
+  background-blend-mode: normal !important;
+}
+
+.app-shell.dark-background-theme > *,
+.app-shell.light-background-theme > *,
+.upload-shell.dark-background-theme > *,
+.upload-shell.light-background-theme > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------
+   4. Force clean opaque cards / panels in both themes
+   ------------------------------------------------------------ */
+.app-shell.dark-background-theme .topbar,
+.app-shell.dark-background-theme .section-nav,
+.app-shell.dark-background-theme .hero-panel,
+.app-shell.dark-background-theme .workbook-card,
+.app-shell.dark-background-theme .filters-panel,
+.app-shell.dark-background-theme .filter-panel,
+.app-shell.dark-background-theme .summary-card,
+.app-shell.dark-background-theme .metric-card,
+.app-shell.dark-background-theme .chart-card,
+.app-shell.dark-background-theme .table-card,
+.app-shell.dark-background-theme .records-card,
+.app-shell.dark-background-theme .warning-strip,
+.app-shell.dark-background-theme .multi-select-dropdown,
+.app-shell.dark-background-theme .modal-panel {
+  background: var(--theme-card-bg) !important;
+  background-image: none !important;
+  color: var(--theme-text) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-clip: padding-box !important;
+}
+
+.app-shell.light-background-theme .topbar,
+.app-shell.light-background-theme .section-nav,
+.app-shell.light-background-theme .hero-panel,
+.app-shell.light-background-theme .workbook-card,
+.app-shell.light-background-theme .filters-panel,
+.app-shell.light-background-theme .filter-panel,
+.app-shell.light-background-theme .summary-card,
+.app-shell.light-background-theme .metric-card,
+.app-shell.light-background-theme .chart-card,
+.app-shell.light-background-theme .table-card,
+.app-shell.light-background-theme .records-card,
+.app-shell.light-background-theme .warning-strip,
+.app-shell.light-background-theme .multi-select-dropdown,
+.app-shell.light-background-theme .modal-panel {
+  background: var(--theme-card-bg) !important;
+  background-image: none !important;
+  color: var(--theme-text) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-clip: padding-box !important;
+}
+
+/* ------------------------------------------------------------
+   5. Upload screen clean cards
+   ------------------------------------------------------------ */
+.upload-shell.dark-background-theme .upload-copy,
+.upload-shell.dark-background-theme .workbook-choice-panel,
+.upload-shell.dark-background-theme .workbook-choice-card,
+.upload-shell.dark-background-theme .choice-card {
+  background: var(--theme-card-bg) !important;
+  background-image: none !important;
+  color: var(--theme-text) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.upload-shell.light-background-theme .upload-copy,
+.upload-shell.light-background-theme .workbook-choice-panel,
+.upload-shell.light-background-theme .workbook-choice-card,
+.upload-shell.light-background-theme .choice-card {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #092033 !important;
+  border: 1px solid rgba(0, 100, 150, 0.20) !important;
+  box-shadow: 0 18px 42px rgba(17, 86, 128, 0.14) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ------------------------------------------------------------
+   6. Force text contrast in light theme
+   Prevents old dark-theme values from surviving.
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme,
+.app-shell.light-background-theme *,
+.upload-shell.light-background-theme,
+.upload-shell.light-background-theme * {
+  color-scheme: light !important;
+}
+
+.app-shell.light-background-theme h1,
+.app-shell.light-background-theme h2,
+.app-shell.light-background-theme h3,
+.app-shell.light-background-theme h4,
+.app-shell.light-background-theme strong,
+.app-shell.light-background-theme .brand-block h1,
+.app-shell.light-background-theme .hero-main h2,
+.app-shell.light-background-theme .summary-card strong,
+.app-shell.light-background-theme .workbook-card strong,
+.upload-shell.light-background-theme h1,
+.upload-shell.light-background-theme h2,
+.upload-shell.light-background-theme h3,
+.upload-shell.light-background-theme strong,
+.upload-shell.light-background-theme .workbook-choice-card strong {
+  color: #092033 !important;
+  text-shadow: none !important;
+}
+
+.app-shell.light-background-theme p,
+.app-shell.light-background-theme span,
+.app-shell.light-background-theme small,
+.app-shell.light-background-theme li,
+.app-shell.light-background-theme td,
+.app-shell.light-background-theme label,
+.app-shell.light-background-theme .brand-block p,
+.app-shell.light-background-theme .chart-card p,
+.app-shell.light-background-theme .workbook-card p,
+.app-shell.light-background-theme .filter-count,
+.app-shell.light-background-theme .section-title span,
+.upload-shell.light-background-theme p,
+.upload-shell.light-background-theme span,
+.upload-shell.light-background-theme small,
+.upload-shell.light-background-theme li,
+.upload-shell.light-background-theme .lead,
+.upload-shell.light-background-theme .workbook-choice-card p {
+  color: #3f6174 !important;
+}
+
+/* ------------------------------------------------------------
+   7. Force text contrast in dark theme
+   ------------------------------------------------------------ */
+.app-shell.dark-background-theme h1,
+.app-shell.dark-background-theme h2,
+.app-shell.dark-background-theme h3,
+.app-shell.dark-background-theme h4,
+.app-shell.dark-background-theme strong,
+.app-shell.dark-background-theme .brand-block h1,
+.app-shell.dark-background-theme .hero-main h2,
+.app-shell.dark-background-theme .summary-card strong,
+.app-shell.dark-background-theme .workbook-card strong,
+.upload-shell.dark-background-theme h1,
+.upload-shell.dark-background-theme h2,
+.upload-shell.dark-background-theme h3,
+.upload-shell.dark-background-theme strong,
+.upload-shell.dark-background-theme .workbook-choice-card strong {
+  color: #f4fbff !important;
+}
+
+.app-shell.dark-background-theme p,
+.app-shell.dark-background-theme span,
+.app-shell.dark-background-theme small,
+.app-shell.dark-background-theme li,
+.app-shell.dark-background-theme td,
+.app-shell.dark-background-theme label,
+.app-shell.dark-background-theme .brand-block p,
+.app-shell.dark-background-theme .chart-card p,
+.app-shell.dark-background-theme .workbook-card p,
+.app-shell.dark-background-theme .filter-count,
+.app-shell.dark-background-theme .section-title span,
+.upload-shell.dark-background-theme p,
+.upload-shell.dark-background-theme span,
+.upload-shell.dark-background-theme small,
+.upload-shell.dark-background-theme li,
+.upload-shell.dark-background-theme .lead,
+.upload-shell.dark-background-theme .workbook-choice-card p {
+  color: #a8c8d8 !important;
+}
+
+/* ------------------------------------------------------------
+   8. Inputs, selects, multi-selects, and buttons
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme input,
+.app-shell.light-background-theme select,
+.app-shell.light-background-theme textarea,
+.app-shell.light-background-theme .multi-select-trigger,
+.upload-shell.light-background-theme input,
+.upload-shell.light-background-theme select,
+.upload-shell.light-background-theme textarea,
+.upload-shell.light-background-theme .multi-select-trigger {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #092033 !important;
+  border: 1px solid rgba(0, 100, 150, 0.26) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.dark-background-theme input,
+.app-shell.dark-background-theme select,
+.app-shell.dark-background-theme textarea,
+.app-shell.dark-background-theme .multi-select-trigger,
+.upload-shell.dark-background-theme input,
+.upload-shell.dark-background-theme select,
+.upload-shell.dark-background-theme textarea,
+.upload-shell.dark-background-theme .multi-select-trigger {
+  background: #061824 !important;
+  background-image: none !important;
+  color: #f4fbff !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.light-background-theme .button,
+.upload-shell.light-background-theme .button {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #083047 !important;
+  border: 1px solid rgba(0, 100, 150, 0.26) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.dark-background-theme .button,
+.upload-shell.dark-background-theme .button {
+  background: #092536 !important;
+  background-image: none !important;
+  color: #f4fbff !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.light-background-theme .button.primary,
+.upload-shell.light-background-theme .button.primary,
+.app-shell.dark-background-theme .button.primary,
+.upload-shell.dark-background-theme .button.primary {
+  color: #ffffff !important;
+  background: #0078d4 !important;
+  background-image: none !important;
+  border-color: #0078d4 !important;
+}
+
+/* ------------------------------------------------------------
+   9. Tables
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme table,
+.app-shell.light-background-theme .table-wrap,
+.app-shell.light-background-theme .records-scroll {
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: rgba(0, 100, 150, 0.20) !important;
+}
+
+.app-shell.light-background-theme th {
+  background: #eef7fc !important;
+  background-image: none !important;
+  color: #005f93 !important;
+  border-color: rgba(0, 100, 150, 0.22) !important;
+}
+
+.app-shell.light-background-theme td {
+  background: #ffffff !important;
+  color: #18394d !important;
+  border-color: rgba(0, 100, 150, 0.16) !important;
+}
+
+.app-shell.light-background-theme tbody tr:nth-child(even) td {
+  background: #f7fbfe !important;
+}
+
+.app-shell.light-background-theme tbody tr:hover td {
+  background: #eef7fc !important;
+}
+
+.app-shell.dark-background-theme table,
+.app-shell.dark-background-theme .table-wrap,
+.app-shell.dark-background-theme .records-scroll {
+  background: #061824 !important;
+  background-image: none !important;
+  border-color: rgba(116, 181, 214, 0.30) !important;
+}
+
+.app-shell.dark-background-theme th {
+  background: #092536 !important;
+  background-image: none !important;
+  color: #dff8ff !important;
+  border-color: rgba(116, 181, 214, 0.34) !important;
+}
+
+.app-shell.dark-background-theme td {
+  background: #071c2a !important;
+  color: #d8edf5 !important;
+  border-color: rgba(116, 181, 214, 0.22) !important;
+}
+
+.app-shell.dark-background-theme tbody tr:nth-child(even) td {
+  background: #082131 !important;
+}
+
+.app-shell.dark-background-theme tbody tr:hover td {
+  background: #0b2a3d !important;
+}
+
+/* ------------------------------------------------------------
+   10. Summary-card colored headers stay readable
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme .summary-card.yellow span,
+.app-shell.dark-background-theme .summary-card.yellow span {
+  background: #f2cf21 !important;
+  background-image: none !important;
+  color: #10202a !important;
+}
+
+.app-shell.light-background-theme .summary-card.green span,
+.app-shell.dark-background-theme .summary-card.green span {
+  background: #7ed957 !important;
+  background-image: none !important;
+  color: #10202a !important;
+}
+
+/* ------------------------------------------------------------
+   11. Recharts / SVG label protection
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme .recharts-text,
+.app-shell.light-background-theme .recharts-cartesian-axis-tick-value,
+.app-shell.light-background-theme .recharts-legend-item-text {
+  fill: #3f6174 !important;
+  color: #3f6174 !important;
+}
+
+.app-shell.dark-background-theme .recharts-text,
+.app-shell.dark-background-theme .recharts-cartesian-axis-tick-value,
+.app-shell.dark-background-theme .recharts-legend-item-text {
+  fill: #a8c8d8 !important;
+  color: #a8c8d8 !important;
+}
+
+/* ------------------------------------------------------------
+   12. Tooltips
+   ------------------------------------------------------------ */
+.app-shell.light-background-theme .custom-tooltip {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #092033 !important;
+  border: 1px solid rgba(0, 100, 150, 0.24) !important;
+  box-shadow: 0 14px 32px rgba(17, 86, 128, 0.14) !important;
+}
+
+.app-shell.dark-background-theme .custom-tooltip {
+  background: #071c2a !important;
+  background-image: none !important;
+  color: #f4fbff !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42) !important;
+}
+
+/* ------------------------------------------------------------
+   13. Extra protection against old .se-theme dark override
+   Your file has .app-shell.se-theme rules that force dark colors.
+   This makes light-background-theme win when both classes exist.
+   ------------------------------------------------------------ */
+.app-shell.se-theme.light-background-theme {
+  color: #092033 !important;
+}
+
+.app-shell.se-theme.light-background-theme .topbar,
+.app-shell.se-theme.light-background-theme .section-nav,
+.app-shell.se-theme.light-background-theme .hero-panel,
+.app-shell.se-theme.light-background-theme .workbook-card,
+.app-shell.se-theme.light-background-theme .filters-panel,
+.app-shell.se-theme.light-background-theme .summary-card,
+.app-shell.se-theme.light-background-theme .chart-card,
+.app-shell.se-theme.light-background-theme .table-card,
+.app-shell.se-theme.light-background-theme .records-card,
+.app-shell.se-theme.light-background-theme .warning-strip {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #092033 !important;
+  border-color: rgba(0, 100, 150, 0.20) !important;
+  box-shadow: 0 18px 42px rgba(17, 86, 128, 0.14) !important;
+}
+
+/* ============================================================
+   FINAL SECTION NAV BUTTON STYLE PATCH
+   Makes section navigation buttons visually match the dashboard
+   action buttons while preserving the nav layout.
+   Place after all previous section-nav/button rules.
+   ============================================================ */
+
+.app-shell .section-nav {
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.app-shell .section-nav button,
+.app-shell .section-nav .section-nav-button {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: fit-content !important;
+  min-height: 28px !important;
+  padding: 7px 12px !important;
+  white-space: nowrap !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: transform .16s ease, border-color .16s ease, background-color .16s ease, color .16s ease, box-shadow .16s ease !important;
+}
+
+.app-shell.dark-background-theme .section-nav button,
+.app-shell.dark-background-theme .section-nav .section-nav-button {
+  color: #f4fbff !important;
+  background: #092536 !important;
+  background-image: none !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.dark-background-theme .section-nav button:hover,
+.app-shell.dark-background-theme .section-nav .section-nav-button:hover,
+.app-shell.dark-background-theme .section-nav button:focus-visible,
+.app-shell.dark-background-theme .section-nav .section-nav-button:focus-visible {
+  color: #ffffff !important;
+  background: #0b2f46 !important;
+  border-color: rgba(0, 198, 255, 0.68) !important;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24) !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
+}
+
+.app-shell.light-background-theme .section-nav button,
+.app-shell.light-background-theme .section-nav .section-nav-button {
+  color: #083047 !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(0, 100, 150, 0.26) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.light-background-theme .section-nav button:hover,
+.app-shell.light-background-theme .section-nav .section-nav-button:hover,
+.app-shell.light-background-theme .section-nav button:focus-visible,
+.app-shell.light-background-theme .section-nav .section-nav-button:focus-visible {
+  color: #005f93 !important;
+  background: #eef7fc !important;
+  border-color: rgba(0, 120, 200, 0.42) !important;
+  box-shadow: 0 8px 18px rgba(17, 86, 128, 0.12) !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
+}
+
+.app-shell .section-nav button:active,
+.app-shell .section-nav .section-nav-button:active {
+  transform: translateY(0) !important;
+}
+
+
+/* ============================================================
+   FINAL SECTION NAV SEPARATION PATCH
+   Keeps section navigation as a standalone toolbar above hero.
+   This prevents it from visually attaching to / washing into the
+   hero panel and gives it its own spacing, surface, and stacking.
+   Place at the very end of styles.css.
+   ============================================================ */
+
+.app-shell .section-nav {
+  position: sticky !important;
+  top: 78px !important;
+  z-index: 190 !important;
+
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+
+  width: 100% !important;
+  height: auto !important;
+  min-height: 52px !important;
+  padding: 10px 12px !important;
+
+  /* Important: creates real separation from topbar and hero */
+  margin: 14px 0 26px !important;
+
+  border-radius: 14px !important;
+  overflow: visible !important;
+  background-clip: padding-box !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Prevent the hero from sitting too close to the nav */
+.app-shell .section-nav + .hero-panel {
+  margin-top: 0 !important;
+  margin-bottom: 18px !important;
+}
+
+/* Dark theme standalone nav surface */
+.app-shell.dark-background-theme .section-nav {
+  background: #071c2a !important;
+  background-image: none !important;
+  border: 1px solid rgba(116, 181, 214, 0.38) !important;
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025) !important;
+}
+
+/* Light theme standalone nav surface */
+.app-shell.light-background-theme .section-nav,
+.app-shell.se-theme.light-background-theme .section-nav {
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(0, 100, 150, 0.20) !important;
+  box-shadow:
+    0 16px 36px rgba(17, 86, 128, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72) !important;
+}
+
+/* Make sure no decorative overlay can connect nav visually to hero */
+.app-shell .section-nav::before,
+.app-shell .section-nav::after,
+.app-shell .section-nav + .hero-panel::before,
+.app-shell .section-nav + .hero-panel::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  background: none !important;
+  background-image: none !important;
+  pointer-events: none !important;
+}
+
+/* Keep mobile spacing clean */
+@media (max-width: 720px) {
+  .app-shell .section-nav {
+    top: 8px !important;
+    margin: 12px 0 20px !important;
+    padding: 9px !important;
+    border-radius: 12px !important;
+  }
+
+  .app-shell .section-nav button,
+  .app-shell .section-nav .section-nav-button {
+    flex: 1 1 auto !important;
+    min-width: max-content !important;
+  }
+}
+
+

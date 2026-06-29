@@ -1,0 +1,1488 @@
+﻿/* Final theme, chart, matrix, and global overrides. Source split from src/styles.css lines 22648-24101. */
+/* ============================================================
+   CDR THEME BACKGROUND + CHART VISIBILITY FINAL PATCH
+   Purpose:
+   - Disable any remaining old dashboard background-image coloring.
+   - Use ONLY the 3 proposed CDR theme palettes.
+   - Keep fonts, tables, forms, and chart labels visible in every theme.
+   ============================================================ */
+
+/* Old theme classes are legacy only. If an old saved class appears, it must not control the dashboard background. */
+.app-shell.dark-background-theme,
+.app-shell.light-background-theme,
+.upload-shell.dark-background-theme,
+.upload-shell.light-background-theme,
+.local-login-shell.dark-background-theme,
+.local-login-shell.light-background-theme,
+.app-shell.se-theme,
+.upload-shell.se-theme,
+.local-login-shell.se-theme {
+  background-image: none !important;
+}
+
+.app-shell.dark-background-theme::before,
+.app-shell.dark-background-theme::after,
+.app-shell.light-background-theme::before,
+.app-shell.light-background-theme::after,
+.upload-shell.dark-background-theme::before,
+.upload-shell.dark-background-theme::after,
+.upload-shell.light-background-theme::before,
+.upload-shell.light-background-theme::after,
+.local-login-shell.dark-background-theme::before,
+.local-login-shell.dark-background-theme::after,
+.local-login-shell.light-background-theme::before,
+.local-login-shell.light-background-theme::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  background-image: none !important;
+}
+
+.theme-dark-command {
+  --theme-bg: #07111f;
+  --theme-bg-2: #0b1628;
+  --theme-header: #0a0f1a;
+  --theme-card: #111827;
+  --theme-card-2: #162033;
+  --theme-card-3: #0f1b2e;
+  --theme-border: rgba(59, 130, 246, 0.26);
+  --theme-border-strong: rgba(6, 182, 212, 0.44);
+  --theme-text: #f8fafc;
+  --theme-muted: #b6c7da;
+  --theme-accent: #2563eb;
+  --theme-accent-2: #06b6d4;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-danger: #ef4444;
+  --theme-font-family: Inter, "Segoe UI", Arial, sans-serif;
+  --chart-axis: #d8e6f8;
+  --chart-grid: rgba(148, 163, 184, 0.22);
+  --chart-label: #ffffff;
+  --chart-label-stroke: #07111f;
+  --chart-tooltip-bg: #0b1628;
+  --chart-tooltip-border: rgba(6, 182, 212, 0.52);
+  --chart-tooltip-text: #f8fafc;
+  --theme-shadow: 0 20px 58px rgba(0, 0, 0, 0.36);
+}
+
+.theme-light-modern {
+  --theme-bg: #f8fafc;
+  --theme-bg-2: #eef6ff;
+  --theme-header: #ffffff;
+  --theme-card: #ffffff;
+  --theme-card-2: #f1f7ff;
+  --theme-card-3: #ffffff;
+  --theme-border: rgba(37, 99, 235, 0.16);
+  --theme-border-strong: rgba(37, 99, 235, 0.34);
+  --theme-text: #0f172a;
+  --theme-muted: #475569;
+  --theme-accent: #2563eb;
+  --theme-accent-2: #0891b2;
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-danger: #dc2626;
+  --theme-font-family: Inter, "Segoe UI", Arial, sans-serif;
+  --chart-axis: #0f172a;
+  --chart-grid: rgba(15, 23, 42, 0.13);
+  --chart-label: #0f172a;
+  --chart-label-stroke: #ffffff;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: rgba(37, 99, 235, 0.28);
+  --chart-tooltip-text: #0f172a;
+  --theme-shadow: 0 18px 48px rgba(15, 23, 42, 0.10);
+}
+
+.theme-neon-futuristic {
+  --theme-bg: #020617;
+  --theme-bg-2: #090a24;
+  --theme-header: #030712;
+  --theme-card: #050b1a;
+  --theme-card-2: #0b1028;
+  --theme-card-3: #100821;
+  --theme-border: rgba(34, 211, 238, 0.48);
+  --theme-border-strong: rgba(236, 72, 153, 0.62);
+  --theme-text: #e0f2fe;
+  --theme-muted: #a5f3fc;
+  --theme-accent: #22d3ee;
+  --theme-accent-2: #ec4899;
+  --theme-success: #22c55e;
+  --theme-warning: #facc15;
+  --theme-danger: #fb7185;
+  --theme-font-family: "Roboto Condensed", Inter, "Segoe UI", Arial, sans-serif;
+  --chart-axis: #e0f2fe;
+  --chart-grid: rgba(34, 211, 238, 0.24);
+  --chart-label: #ffffff;
+  --chart-label-stroke: #020617;
+  --chart-tooltip-bg: #050b1a;
+  --chart-tooltip-border: rgba(236, 72, 153, 0.62);
+  --chart-tooltip-text: #e0f2fe;
+  --theme-shadow: 0 0 0 1px rgba(34, 211, 238, 0.18), 0 0 36px rgba(236, 72, 153, 0.16), 0 26px 70px rgba(0, 0, 0, 0.48);
+}
+
+html:has(.theme-dark-command),
+body:has(.theme-dark-command) {
+  background: #07111f !important;
+  color: #f8fafc !important;
+}
+
+html:has(.theme-light-modern),
+body:has(.theme-light-modern) {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html:has(.theme-neon-futuristic),
+body:has(.theme-neon-futuristic) {
+  background: #020617 !important;
+  color: #e0f2fe !important;
+}
+
+.app-shell.theme-dark-command,
+.upload-shell.theme-dark-command,
+.local-login-shell.theme-dark-command {
+  font-family: var(--theme-font-family) !important;
+  color: var(--theme-text) !important;
+  background:
+    radial-gradient(circle at 11% 4%, rgba(37, 99, 235, 0.26), transparent 30rem),
+    radial-gradient(circle at 92% 0%, rgba(6, 182, 212, 0.18), transparent 34rem),
+    linear-gradient(135deg, #07111f 0%, #0b1628 50%, #07111f 100%) !important;
+  background-image:
+    radial-gradient(circle at 11% 4%, rgba(37, 99, 235, 0.26), transparent 30rem),
+    radial-gradient(circle at 92% 0%, rgba(6, 182, 212, 0.18), transparent 34rem),
+    linear-gradient(135deg, #07111f 0%, #0b1628 50%, #07111f 100%) !important;
+}
+
+.app-shell.theme-light-modern,
+.upload-shell.theme-light-modern,
+.local-login-shell.theme-light-modern {
+  font-family: var(--theme-font-family) !important;
+  color: var(--theme-text) !important;
+  background:
+    radial-gradient(circle at 14% 3%, rgba(37, 99, 235, 0.11), transparent 30rem),
+    radial-gradient(circle at 88% 2%, rgba(6, 182, 212, 0.10), transparent 34rem),
+    linear-gradient(135deg, #f8fafc 0%, #eef6ff 52%, #ffffff 100%) !important;
+  background-image:
+    radial-gradient(circle at 14% 3%, rgba(37, 99, 235, 0.11), transparent 30rem),
+    radial-gradient(circle at 88% 2%, rgba(6, 182, 212, 0.10), transparent 34rem),
+    linear-gradient(135deg, #f8fafc 0%, #eef6ff 52%, #ffffff 100%) !important;
+}
+
+.app-shell.theme-neon-futuristic,
+.upload-shell.theme-neon-futuristic,
+.local-login-shell.theme-neon-futuristic {
+  font-family: var(--theme-font-family) !important;
+  color: var(--theme-text) !important;
+  background-color: #020617 !important;
+  background-image:
+    linear-gradient(90deg, rgba(34, 211, 238, 0.09) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(236, 72, 153, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 14% 8%, rgba(34, 211, 238, 0.34), transparent 26rem),
+    radial-gradient(circle at 88% 8%, rgba(236, 72, 153, 0.30), transparent 30rem),
+    linear-gradient(135deg, #020617 0%, #090a24 48%, #12051d 100%) !important;
+  background-size: 34px 34px, 34px 34px, auto, auto, auto !important;
+}
+
+.app-shell.theme-dark-command::before,
+.app-shell.theme-dark-command::after,
+.app-shell.theme-light-modern::before,
+.app-shell.theme-light-modern::after,
+.app-shell.theme-neon-futuristic::before,
+.app-shell.theme-neon-futuristic::after,
+.upload-shell.theme-dark-command::before,
+.upload-shell.theme-dark-command::after,
+.upload-shell.theme-light-modern::before,
+.upload-shell.theme-light-modern::after,
+.upload-shell.theme-neon-futuristic::before,
+.upload-shell.theme-neon-futuristic::after,
+.local-login-shell.theme-dark-command::before,
+.local-login-shell.theme-dark-command::after,
+.local-login-shell.theme-light-modern::before,
+.local-login-shell.theme-light-modern::after,
+.local-login-shell.theme-neon-futuristic::before,
+.local-login-shell.theme-neon-futuristic::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  background-image: none !important;
+}
+
+.theme-dark-command .cdr-command-shell,
+.theme-dark-command .topbar,
+.theme-dark-command .dashboard-tabs,
+.theme-dark-command .dashboard-tabs-actions,
+.theme-dark-command .section-nav,
+.theme-dark-command .filters-panel,
+.theme-dark-command .filter-panel,
+.theme-dark-command .workbook-card,
+.theme-dark-command .hero-panel,
+.theme-dark-command .summary-card,
+.theme-dark-command .metric-card,
+.theme-dark-command .chart-card,
+.theme-dark-command .table-card,
+.theme-dark-command .records-card,
+.theme-dark-command .modern-panel,
+.theme-dark-command .modern-record-card,
+.theme-dark-command .data-quality-panel,
+.theme-dark-command .quality-score-card,
+.theme-dark-command .quality-issue,
+.theme-dark-command .visual-summary-card,
+.theme-dark-command .visual-quality-card,
+.theme-dark-command .visual-quality-issue,
+.theme-dark-command .warning-strip,
+.theme-dark-command .modal-panel,
+.theme-dark-command .multi-select-dropdown,
+.theme-dark-command .cdr-page-intro,
+.theme-dark-command .followup-upload-card,
+.theme-dark-command .followup-mini-card,
+.theme-dark-command .followup-staged-upload,
+.theme-dark-command .followup-status-panel,
+.theme-dark-command .local-login-card,
+.theme-dark-command .local-login-note {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-card) 96%, transparent), color-mix(in srgb, var(--theme-card-2) 92%, transparent)) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.theme-light-modern .cdr-command-shell,
+.theme-light-modern .topbar,
+.theme-light-modern .dashboard-tabs,
+.theme-light-modern .dashboard-tabs-actions,
+.theme-light-modern .section-nav,
+.theme-light-modern .filters-panel,
+.theme-light-modern .filter-panel,
+.theme-light-modern .workbook-card,
+.theme-light-modern .hero-panel,
+.theme-light-modern .summary-card,
+.theme-light-modern .metric-card,
+.theme-light-modern .chart-card,
+.theme-light-modern .table-card,
+.theme-light-modern .records-card,
+.theme-light-modern .modern-panel,
+.theme-light-modern .modern-record-card,
+.theme-light-modern .data-quality-panel,
+.theme-light-modern .quality-score-card,
+.theme-light-modern .quality-issue,
+.theme-light-modern .visual-summary-card,
+.theme-light-modern .visual-quality-card,
+.theme-light-modern .visual-quality-issue,
+.theme-light-modern .warning-strip,
+.theme-light-modern .modal-panel,
+.theme-light-modern .multi-select-dropdown,
+.theme-light-modern .cdr-page-intro,
+.theme-light-modern .followup-upload-card,
+.theme-light-modern .followup-mini-card,
+.theme-light-modern .followup-staged-upload,
+.theme-light-modern .followup-status-panel,
+.theme-light-modern .local-login-card,
+.theme-light-modern .local-login-note {
+  background: linear-gradient(180deg, #ffffff, #f8fbff) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.theme-neon-futuristic .cdr-command-shell,
+.theme-neon-futuristic .topbar,
+.theme-neon-futuristic .dashboard-tabs,
+.theme-neon-futuristic .dashboard-tabs-actions,
+.theme-neon-futuristic .section-nav,
+.theme-neon-futuristic .filters-panel,
+.theme-neon-futuristic .filter-panel,
+.theme-neon-futuristic .workbook-card,
+.theme-neon-futuristic .hero-panel,
+.theme-neon-futuristic .summary-card,
+.theme-neon-futuristic .metric-card,
+.theme-neon-futuristic .chart-card,
+.theme-neon-futuristic .table-card,
+.theme-neon-futuristic .records-card,
+.theme-neon-futuristic .modern-panel,
+.theme-neon-futuristic .modern-record-card,
+.theme-neon-futuristic .data-quality-panel,
+.theme-neon-futuristic .quality-score-card,
+.theme-neon-futuristic .quality-issue,
+.theme-neon-futuristic .visual-summary-card,
+.theme-neon-futuristic .visual-quality-card,
+.theme-neon-futuristic .visual-quality-issue,
+.theme-neon-futuristic .warning-strip,
+.theme-neon-futuristic .modal-panel,
+.theme-neon-futuristic .multi-select-dropdown,
+.theme-neon-futuristic .cdr-page-intro,
+.theme-neon-futuristic .followup-upload-card,
+.theme-neon-futuristic .followup-mini-card,
+.theme-neon-futuristic .followup-staged-upload,
+.theme-neon-futuristic .followup-status-panel,
+.theme-neon-futuristic .local-login-card,
+.theme-neon-futuristic .local-login-note {
+  background: linear-gradient(135deg, rgba(5, 11, 26, 0.96), rgba(16, 8, 33, 0.92)) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.theme-dark-command :is(h1,h2,h3,h4,h5,h6,strong,label,dt,th),
+.theme-neon-futuristic :is(h1,h2,h3,h4,h5,h6,strong,label,dt,th) {
+  color: var(--theme-text) !important;
+}
+
+.theme-light-modern :is(h1,h2,h3,h4,h5,h6,strong,label,dt,th) {
+  color: #0f172a !important;
+}
+
+.theme-dark-command :is(p,small,span,dd,td,li,.filter-count,.chart-legend,.cdr-chart-legend),
+.theme-neon-futuristic :is(p,small,span,dd,td,li,.filter-count,.chart-legend,.cdr-chart-legend) {
+  color: inherit;
+}
+
+.theme-light-modern :is(p,small,span,dd,td,li,.filter-count,.chart-legend,.cdr-chart-legend) {
+  color: #475569;
+}
+
+.theme-dark-command input,
+.theme-dark-command select,
+.theme-dark-command textarea,
+.theme-dark-command .multi-select-trigger,
+.theme-dark-command .search-box input {
+  background: #0b1628 !important;
+  color: #f8fafc !important;
+  border-color: var(--theme-border) !important;
+}
+
+.theme-light-modern input,
+.theme-light-modern select,
+.theme-light-modern textarea,
+.theme-light-modern .multi-select-trigger,
+.theme-light-modern .search-box input {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #dbe7f5 !important;
+}
+
+.theme-neon-futuristic input,
+.theme-neon-futuristic select,
+.theme-neon-futuristic textarea,
+.theme-neon-futuristic .multi-select-trigger,
+.theme-neon-futuristic .search-box input {
+  background: #030712 !important;
+  color: #e0f2fe !important;
+  border-color: rgba(34, 211, 238, 0.46) !important;
+}
+
+.theme-dark-command .button:not(.primary):not(.cdr-action-primary),
+.theme-dark-command .cdr-action-pill:not(.cdr-action-primary),
+.theme-dark-command .dashboard-tab:not(.active) {
+  background: #0b1628 !important;
+  color: #f8fafc !important;
+  border-color: var(--theme-border) !important;
+}
+
+.theme-light-modern .button:not(.primary):not(.cdr-action-primary),
+.theme-light-modern .cdr-action-pill:not(.cdr-action-primary),
+.theme-light-modern .dashboard-tab:not(.active) {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #dbe7f5 !important;
+}
+
+.theme-neon-futuristic .button:not(.primary):not(.cdr-action-primary),
+.theme-neon-futuristic .cdr-action-pill:not(.cdr-action-primary),
+.theme-neon-futuristic .dashboard-tab:not(.active) {
+  background: #050b1a !important;
+  color: #e0f2fe !important;
+  border-color: rgba(34, 211, 238, 0.46) !important;
+}
+
+.theme-dark-command .button.primary,
+.theme-dark-command .cdr-action-primary,
+.theme-dark-command .dashboard-tab.active,
+.theme-light-modern .button.primary,
+.theme-light-modern .cdr-action-primary,
+.theme-light-modern .dashboard-tab.active,
+.theme-neon-futuristic .button.primary,
+.theme-neon-futuristic .cdr-action-primary,
+.theme-neon-futuristic .dashboard-tab.active {
+  background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-2)) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.theme-neon-futuristic .button.primary,
+.theme-neon-futuristic .cdr-action-primary,
+.theme-neon-futuristic .dashboard-tab.active {
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.32), inset 0 0 18px rgba(236, 72, 153, 0.14) !important;
+}
+
+.theme-dark-command th,
+.theme-neon-futuristic th {
+  background: color-mix(in srgb, var(--theme-header) 84%, var(--theme-accent) 16%) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.theme-light-modern th {
+  background: #eef6ff !important;
+  color: #0f172a !important;
+  border-color: #dbe7f5 !important;
+}
+
+.theme-dark-command td,
+.theme-neon-futuristic td {
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.theme-light-modern td {
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+.theme-dark-command tr:hover td {
+  background: rgba(37, 99, 235, 0.10) !important;
+}
+
+.theme-light-modern tr:hover td {
+  background: #eef6ff !important;
+}
+
+.theme-neon-futuristic tr:hover td {
+  background: rgba(34, 211, 238, 0.10) !important;
+}
+
+/* Recharts/readability: override hard-coded SVG text where possible so every theme remains visible. */
+.theme-dark-command .recharts-cartesian-axis-tick-value,
+.theme-dark-command .recharts-text,
+.theme-dark-command .recharts-label,
+.theme-dark-command .recharts-legend-item-text,
+.theme-dark-command .recharts-polar-angle-axis-tick-value,
+.theme-dark-command .recharts-polar-radius-axis-tick-value,
+.theme-dark-command .recharts-pie-label-text,
+.theme-dark-command svg text {
+  fill: var(--chart-axis) !important;
+  color: var(--chart-axis) !important;
+}
+
+.theme-light-modern .recharts-cartesian-axis-tick-value,
+.theme-light-modern .recharts-text,
+.theme-light-modern .recharts-label,
+.theme-light-modern .recharts-legend-item-text,
+.theme-light-modern .recharts-polar-angle-axis-tick-value,
+.theme-light-modern .recharts-polar-radius-axis-tick-value,
+.theme-light-modern .recharts-pie-label-text,
+.theme-light-modern svg text {
+  fill: var(--chart-axis) !important;
+  color: var(--chart-axis) !important;
+}
+
+.theme-neon-futuristic .recharts-cartesian-axis-tick-value,
+.theme-neon-futuristic .recharts-text,
+.theme-neon-futuristic .recharts-label,
+.theme-neon-futuristic .recharts-legend-item-text,
+.theme-neon-futuristic .recharts-polar-angle-axis-tick-value,
+.theme-neon-futuristic .recharts-polar-radius-axis-tick-value,
+.theme-neon-futuristic .recharts-pie-label-text,
+.theme-neon-futuristic svg text {
+  fill: var(--chart-axis) !important;
+  color: var(--chart-axis) !important;
+}
+
+.theme-dark-command .recharts-cartesian-grid line,
+.theme-light-modern .recharts-cartesian-grid line,
+.theme-neon-futuristic .recharts-cartesian-grid line {
+  stroke: var(--chart-grid) !important;
+}
+
+.theme-dark-command .recharts-cartesian-axis-line,
+.theme-dark-command .recharts-cartesian-axis-tick line,
+.theme-light-modern .recharts-cartesian-axis-line,
+.theme-light-modern .recharts-cartesian-axis-tick line,
+.theme-neon-futuristic .recharts-cartesian-axis-line,
+.theme-neon-futuristic .recharts-cartesian-axis-tick line {
+  stroke: var(--chart-grid) !important;
+}
+
+.theme-dark-command .custom-tooltip,
+.theme-dark-command .radar-tooltip,
+.theme-light-modern .custom-tooltip,
+.theme-light-modern .radar-tooltip,
+.theme-neon-futuristic .custom-tooltip,
+.theme-neon-futuristic .radar-tooltip {
+  background: var(--chart-tooltip-bg) !important;
+  color: var(--chart-tooltip-text) !important;
+  border-color: var(--chart-tooltip-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.theme-dark-command .custom-tooltip *,
+.theme-dark-command .radar-tooltip *,
+.theme-light-modern .custom-tooltip *,
+.theme-light-modern .radar-tooltip *,
+.theme-neon-futuristic .custom-tooltip *,
+.theme-neon-futuristic .radar-tooltip * {
+  color: var(--chart-tooltip-text) !important;
+}
+
+.theme-dark-command .chart-legend,
+.theme-dark-command .chart-legend *,
+.theme-dark-command .cdr-chart-legend,
+.theme-dark-command .cdr-chart-legend *,
+.theme-light-modern .chart-legend,
+.theme-light-modern .chart-legend *,
+.theme-light-modern .cdr-chart-legend,
+.theme-light-modern .cdr-chart-legend *,
+.theme-neon-futuristic .chart-legend,
+.theme-neon-futuristic .chart-legend *,
+.theme-neon-futuristic .cdr-chart-legend,
+.theme-neon-futuristic .cdr-chart-legend * {
+  color: var(--theme-muted) !important;
+}
+
+.theme-light-modern .status-badge,
+.theme-light-modern .badge,
+.theme-light-modern .pill {
+  color: #0f172a;
+}
+
+.theme-dark-command .status-badge,
+.theme-neon-futuristic .status-badge,
+.theme-dark-command .badge,
+.theme-neon-futuristic .badge,
+.theme-dark-command .pill,
+.theme-neon-futuristic .pill {
+  color: var(--theme-text);
+}
+
+/* Layout selector removed: one fixed dashboard layout remains active. */
+.cdr-layout-selector { display: none !important; }
+
+/* CDR managed branding patch mirrored from design-control.css */
+.local-branding-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:14px 0 16px}.local-branding-card{display:grid;gap:10px;padding:16px;border-radius:18px;border:1px solid rgba(96,165,250,.28);background:rgba(15,23,42,.72)}.local-branding-card>span{color:#93c5fd;font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.local-branding-card>strong{color:#f8fafc;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.local-branding-preview{height:92px;display:flex;align-items:center;justify-content:center;border-radius:16px;border:1px dashed rgba(125,211,252,.36);background:rgba(2,6,23,.44);overflow:hidden}.local-branding-preview.hero-preview{height:130px}.local-branding-preview img{width:100%;height:100%;object-fit:contain}.local-branding-preview.hero-preview img{object-fit:cover}.local-file-picker{position:relative;display:inline-flex!important;align-items:center;justify-content:center;min-height:38px;padding:0 14px;border-radius:12px;border:1px solid rgba(56,189,248,.42);background:rgba(8,47,73,.62);color:#e0f2fe!important;font-size:12px!important;font-weight:900!important;cursor:pointer;overflow:hidden}.local-file-picker input{position:absolute;inset:0;opacity:0;cursor:pointer}.local-settings-guidance{background:rgba(14,165,233,.14)!important;border-color:rgba(56,189,248,.30)!important;color:#bae6fd!important}@media(max-width:900px){.local-branding-grid{grid-template-columns:1fr}}
+
+/* ============================================================
+   Ticket Portal matrix row layout
+   Region Performance Matrix + TG Efficiency Matrix share one row.
+   Tables are compact and use the full card width without inner horizontal scroll.
+   ============================================================ */
+.app-shell.active-tab-company .company-matrix-pair {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: clamp(10px, 0.72vw, 14px) !important;
+  width: 100% !important;
+  align-items: stretch !important;
+  margin: 0 0 clamp(10px, 0.72vw, 14px) !important;
+}
+
+.app-shell.active-tab-company .company-matrix-pair > .company-matrix-section {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+/* Fallback for the prebuilt dist where the two sections are still direct siblings. */
+.app-shell.active-tab-company > #regionPerformance-content,
+.app-shell.active-tab-company > #talkgroupEfficiency-content {
+  display: inline-block !important;
+  width: calc(50% - 7px) !important;
+  min-width: 0 !important;
+  margin: 0 0 clamp(10px, 0.72vw, 14px) !important;
+  vertical-align: top !important;
+}
+
+.app-shell.active-tab-company > #regionPerformance-content {
+  margin-right: clamp(10px, 0.72vw, 14px) !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card {
+  height: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.app-shell.active-tab-company .company-matrix-card .company-matrix-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+  scrollbar-gutter: auto !important;
+}
+
+.app-shell.active-tab-company .region-matrix-card table,
+.app-shell.active-tab-company .tg-efficiency-card table,
+.app-shell.active-tab-company .company-matrix-pair .company-matrix-card table {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.app-shell.active-tab-company .region-matrix-card th,
+.app-shell.active-tab-company .region-matrix-card td,
+.app-shell.active-tab-company .tg-efficiency-card th,
+.app-shell.active-tab-company .tg-efficiency-card td {
+  padding: 5px 5px !important;
+  font-size: clamp(8.5px, 0.48vw, 10.5px) !important;
+  line-height: 1.08 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Content-aware compact widths so every matrix column remains visible in half-row mode. */
+.app-shell.active-tab-company .region-matrix-card th:nth-child(1),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(1) { width: 9% !important; text-align: left !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(2),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(2) { width: 7% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(3),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(3) { width: 12% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(4),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(4) { width: 7% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(5),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(5) { width: 11% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(6),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(6) { width: 6% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(7),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(7) { width: 9% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(8),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(8) { width: 5% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(9),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(9) { width: 11% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(10),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(10) { width: 8% !important; }
+.app-shell.active-tab-company .region-matrix-card th:nth-child(11),
+.app-shell.active-tab-company .region-matrix-card td:nth-child(11) { width: 15% !important; text-align: left !important; }
+
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(1),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(1) { width: 13% !important; text-align: left !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(2),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(2) { width: 7% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(3),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(3) { width: 11% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(4),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(4) { width: 7% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(5),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(5) { width: 11% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(6),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(6) { width: 11% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(7),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(7) { width: 12% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(8),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(8) { width: 8% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(9),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(9) { width: 10% !important; }
+.app-shell.active-tab-company .tg-efficiency-card th:nth-child(10),
+.app-shell.active-tab-company .tg-efficiency-card td:nth-child(10) { width: 10% !important; text-align: left !important; }
+
+@media (max-width: 1450px) {
+  .app-shell.active-tab-company .company-matrix-pair,
+  .app-shell.active-tab-company > #regionPerformance-content,
+  .app-shell.active-tab-company > #talkgroupEfficiency-content {
+    display: block !important;
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+
+  .app-shell.active-tab-company .company-matrix-card .company-matrix-scroll {
+    overflow-x: auto !important;
+  }
+}
+/* PATCH_APPENDED_KPI_ROW_LAYOUT */
+
+/* =========================================================
+   FINAL PATCH: KPI Measurements full row + KPI chart pair row
+   Request: KPI Measurements takes a dedicated full-width row.
+   Then KPI Average Duration per Company and KPI Calls and Duration
+   per Company share the next row evenly.
+   ========================================================= */
+.app-shell.active-tab-kpi .kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-areas:
+    "kpiTable kpiTable"
+    "kpiAvg kpiCalls"
+    "kpiMonthly kpiDonut" !important;
+  gap: clamp(10px, 0.85vw, 14px) !important;
+  align-items: stretch !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card {
+  grid-area: kpiTable !important;
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-height: auto !important;
+}
+
+.app-shell.active-tab-kpi .kpi-average-card {
+  grid-area: kpiAvg !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.app-shell.active-tab-kpi .kpi-calls-duration-card {
+  grid-area: kpiCalls !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.app-shell.active-tab-kpi .kpi-monthly-card {
+  grid-area: kpiMonthly !important;
+}
+
+.app-shell.active-tab-kpi .kpi-total-avg-card {
+  grid-area: kpiDonut !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card .records-scroll {
+  width: 100% !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card table,
+.app-shell.active-tab-kpi .kpi-measurements-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th,
+.app-shell.active-tab-kpi .kpi-measurements-table td {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  vertical-align: middle !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th:first-child,
+.app-shell.active-tab-kpi .kpi-measurements-table td:first-child {
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.app-shell.active-tab-kpi .kpi-average-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-calls-duration-card .recharts-responsive-container {
+  min-height: 330px !important;
+}
+
+@media (max-width: 900px) {
+  .app-shell.active-tab-kpi .kpi-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "kpiTable"
+      "kpiAvg"
+      "kpiCalls"
+      "kpiMonthly"
+      "kpiDonut" !important;
+  }
+
+  .app-shell.active-tab-kpi .kpi-measurements-table-card .records-scroll {
+    overflow-x: auto !important;
+  }
+
+  .app-shell.active-tab-kpi .kpi-measurements-table-card table,
+  .app-shell.active-tab-kpi .kpi-measurements-table {
+    min-width: 900px !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL FIX: KPI tab row flow - no overlap
+   This patch intentionally comes after all older KPI rules.
+   KPI Measurements is one full row. The two company KPI charts
+   are the next row. Monthly KPI and total average are the third row.
+   ========================================================= */
+.app-shell.active-tab-kpi #kpi-content.kpi-grid,
+.app-shell.active-tab-kpi .kpi-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  grid-template-areas:
+    "kpiTable kpiTable"
+    "kpiAvg kpiCalls"
+    "kpiMonthly kpiDonut" !important;
+  grid-auto-flow: row !important;
+  grid-auto-rows: auto !important;
+  gap: clamp(12px, 0.9vw, 16px) !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  margin-bottom: clamp(12px, 1vw, 18px) !important;
+}
+
+.app-shell.active-tab-kpi #kpi-content.kpi-grid > *,
+.app-shell.active-tab-kpi .kpi-grid > * {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  float: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+}
+
+.app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-measurements-table-card,
+.app-shell.active-tab-kpi .kpi-grid > .kpi-measurements-table-card {
+  grid-area: kpiTable !important;
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  min-height: auto !important;
+  align-self: start !important;
+  z-index: 1 !important;
+}
+
+.app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-average-card,
+.app-shell.active-tab-kpi .kpi-grid > .kpi-average-card {
+  grid-area: kpiAvg !important;
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  min-height: 420px !important;
+  z-index: 1 !important;
+}
+
+.app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-calls-duration-card,
+.app-shell.active-tab-kpi .kpi-grid > .kpi-calls-duration-card {
+  grid-area: kpiCalls !important;
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  min-height: 420px !important;
+  z-index: 1 !important;
+}
+
+.app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-monthly-card,
+.app-shell.active-tab-kpi .kpi-grid > .kpi-monthly-card {
+  grid-area: kpiMonthly !important;
+  grid-column: 1 !important;
+  grid-row: 3 !important;
+  min-height: 470px !important;
+  z-index: 1 !important;
+}
+
+.app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-total-avg-card,
+.app-shell.active-tab-kpi .kpi-grid > .kpi-total-avg-card {
+  grid-area: kpiDonut !important;
+  grid-column: 2 !important;
+  grid-row: 3 !important;
+  min-height: 470px !important;
+  z-index: 1 !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card .records-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card table,
+.app-shell.active-tab-kpi .kpi-measurements-table-card .kpi-measurements-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card th,
+.app-shell.active-tab-kpi .kpi-measurements-table-card td {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  vertical-align: middle !important;
+}
+
+.app-shell.active-tab-kpi .kpi-average-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-calls-duration-card .recharts-responsive-container {
+  min-height: 345px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-monthly-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-total-avg-card .recharts-responsive-container {
+  min-height: 390px !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell.active-tab-kpi #kpi-content.kpi-grid,
+  .app-shell.active-tab-kpi .kpi-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "kpiTable"
+      "kpiAvg"
+      "kpiCalls"
+      "kpiMonthly"
+      "kpiDonut" !important;
+  }
+
+  .app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-measurements-table-card,
+  .app-shell.active-tab-kpi .kpi-grid > .kpi-measurements-table-card,
+  .app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-average-card,
+  .app-shell.active-tab-kpi .kpi-grid > .kpi-average-card,
+  .app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-calls-duration-card,
+  .app-shell.active-tab-kpi .kpi-grid > .kpi-calls-duration-card,
+  .app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-monthly-card,
+  .app-shell.active-tab-kpi .kpi-grid > .kpi-monthly-card,
+  .app-shell.active-tab-kpi #kpi-content.kpi-grid > .kpi-total-avg-card,
+  .app-shell.active-tab-kpi .kpi-grid > .kpi-total-avg-card {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  .app-shell.active-tab-kpi .kpi-measurements-table-card .records-scroll {
+    overflow-x: auto !important;
+  }
+
+  .app-shell.active-tab-kpi .kpi-measurements-table-card table,
+  .app-shell.active-tab-kpi .kpi-measurements-table-card .kpi-measurements-table {
+    min-width: 900px !important;
+  }
+}
+
+
+/* Radio showcase picture setting - added for Admin Settings */
+.local-branding-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.local-branding-preview.radio-preview {
+  height: 150px;
+  padding: 10px;
+}
+.local-branding-preview.radio-preview img {
+  object-fit: contain;
+}
+
+/* Radio showcase picture setting - added for Admin Settings */
+.local-branding-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.local-branding-preview.radio-preview {
+  height: 150px;
+  padding: 10px;
+}
+.local-branding-preview.radio-preview img {
+  object-fit: contain;
+}
+
+/* ========================================================================
+   KPI CARD DENSITY + READABILITY FIX
+   ------------------------------------------------------------------------
+   Tightens card internal spacing so long KPI values have more usable width,
+   while increasing small KPI labels for better readability.
+   ======================================================================== */
+body .app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-deck.cdr-kpi-strip-30,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 {
+  gap: clamp(4px, 0.34vw, 7px) !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-tile,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-tile,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: clamp(64px, 4.15vw, 76px) !important;
+  padding: clamp(4px, 0.26vw, 6px) clamp(3px, 0.22vw, 5px) !important;
+  gap: 1px !important;
+  align-items: center !important;
+  justify-items: center !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-icon,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-icon,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon {
+  width: clamp(21px, 1.25vw, 26px) !important;
+  height: clamp(21px, 1.25vw, 26px) !important;
+  min-width: clamp(21px, 1.25vw, 26px) !important;
+  margin: 0 auto 1px !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-icon svg,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon svg,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-icon svg,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon svg {
+  width: clamp(12px, 0.72vw, 15px) !important;
+  height: clamp(12px, 0.72vw, 15px) !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-tile span,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile span,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-tile span,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile span {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 1px !important;
+  font-size: clamp(9.6px, 0.58vw, 11.6px) !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.01em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-tile strong,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-tile strong,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 1px !important;
+  font-size: clamp(15px, 0.98vw, 20px) !important;
+  line-height: 1.02 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.045em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 1500px) {
+  body .app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30,
+  body .app-shell.active-tab-overview .cdr-kpi-strip-30,
+  html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-deck.cdr-kpi-strip-30,
+  html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 {
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)) !important;
+  }
+}
+
+/* ========================================================================
+   KPI VALUE WRAP / NO CUT FIX
+   ------------------------------------------------------------------------
+   Long KPI values such as radio aliases can be wider than the card because
+   they contain more real text than the visible ellipsis. Allow KPI values to
+   use up to two compact lines instead of forcing one-line truncation.
+   ======================================================================== */
+body .app-shell.active-tab-overview .modern-stat-tile,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-tile,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile {
+  min-height: clamp(70px, 4.45vw, 84px) !important;
+  padding-left: clamp(2px, 0.14vw, 4px) !important;
+  padding-right: clamp(2px, 0.14vw, 4px) !important;
+}
+
+body .app-shell.active-tab-overview .modern-stat-tile strong,
+body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-tile strong,
+html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong {
+  font-size: clamp(13.6px, 0.84vw, 18px) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.065em !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  max-height: none !important;
+  min-height: 1.05em !important;
+}
+
+@media (min-width: 1700px) {
+  body .app-shell.active-tab-overview .modern-stat-tile strong,
+  body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong,
+  html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .modern-stat-tile strong,
+  html[data-design] body .app-shell[class*="design-proposal"].active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong {
+    font-size: clamp(14px, 0.78vw, 18.5px) !important;
+  }
+}
+
+
+/* ========================================================================
+   KPI LONG VALUE WRAP FINAL FIX
+   ------------------------------------------------------------------------
+   Do not truncate KPI values with ellipsis. Long values such as radio alias,
+   user name, base station, talkgroup, and week values must wrap to another
+   compact row and shrink slightly so the full value remains visible.
+   ======================================================================== */
+body .app-shell .visual-kpi-cards.summary-cards-10-layout,
+body .app-shell .summary-cards-10-layout.visual-kpi-cards {
+  gap: clamp(3px, 0.24vw, 6px) !important;
+}
+
+body .app-shell .visual-kpi-cards .summary-card-row,
+body .app-shell .summary-cards-10-layout .summary-card-row {
+  gap: clamp(3px, 0.24vw, 6px) !important;
+}
+
+body .app-shell .visual-kpi-cards .visual-summary-card,
+body .app-shell .summary-cards-10-layout .summary-card,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .visual-summary-card,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: clamp(72px, 4.75vw, 92px) !important;
+  height: auto !important;
+  padding-left: clamp(2px, 0.12vw, 4px) !important;
+  padding-right: clamp(2px, 0.12vw, 4px) !important;
+  padding-top: clamp(5px, 0.28vw, 7px) !important;
+  padding-bottom: clamp(5px, 0.28vw, 8px) !important;
+  gap: 1px !important;
+  overflow: hidden !important;
+}
+
+body .app-shell .visual-kpi-cards .summary-card-head,
+body .app-shell .summary-cards-10-layout .summary-card-head,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .summary-card-head,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card-head {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1px !important;
+}
+
+body .app-shell .visual-kpi-cards .summary-card-head span,
+body .app-shell .summary-cards-10-layout .summary-card-head span,
+body .app-shell .summary-cards-10-layout .summary-card span,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .summary-card-head span,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card-head span,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card span {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: clamp(9px, 0.5vw, 10.5px) !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  hyphens: none !important;
+  text-align: center !important;
+}
+
+body .app-shell .visual-kpi-cards .visual-summary-card strong,
+body .app-shell .summary-cards-10-layout .summary-card strong,
+body .app-shell .summary-cards-manual-rows .summary-card strong,
+body .app-shell .summary-cards .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .visual-summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-manual-rows .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards .summary-card strong {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  font-size: clamp(11.6px, 0.72vw, 15.5px) !important;
+  line-height: 1.04 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.055em !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  hyphens: none !important;
+  text-align: center !important;
+  max-height: none !important;
+}
+
+body .app-shell .summary-cards-10-layout .summary-card-row-8 .summary-card strong,
+body .app-shell .summary-cards-10-layout .summary-card-row-7 .summary-card strong,
+body .app-shell .visual-kpi-cards .summary-card-row-8 .visual-summary-card strong,
+body .app-shell .visual-kpi-cards .summary-card-row-7 .visual-summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card-row-8 .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .summary-cards-10-layout .summary-card-row-7 .summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .summary-card-row-8 .visual-summary-card strong,
+html[data-design] body .app-shell[class*="design-proposal"] .visual-kpi-cards .summary-card-row-7 .visual-summary-card strong {
+  font-size: clamp(10.8px, 0.66vw, 14.5px) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.065em !important;
+}
+
+body .app-shell .visual-kpi-cards .summary-card-icon,
+body .app-shell .summary-cards-10-layout .summary-card-icon {
+  width: clamp(17px, 1.05vw, 22px) !important;
+  height: clamp(17px, 1.05vw, 22px) !important;
+  margin: 0 auto !important;
+}
+
+/* --------------------------------------------------------------------------
+   FINAL KPI VALUE WRAP FIX
+   The overview Executive Pulse cards had old one-line ellipsis rules with
+   higher specificity. Keep all KPI values visible: wrap long values and reduce
+   font size instead of cutting text like "434862 - East...".
+-------------------------------------------------------------------------- */
+html body .app-shell .cdr-kpi-strip-30 .modern-stat-tile,
+html body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-kpi-strip-30 .modern-stat-tile {
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 66px !important;
+  overflow: visible !important;
+  padding-left: 3px !important;
+  padding-right: 3px !important;
+  align-content: center !important;
+}
+
+html body .app-shell .cdr-kpi-strip-30 .modern-stat-tile strong,
+html body .app-shell .cdr-kpi-strip-30 .modern-stat-tile .modern-stat-value,
+html body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong,
+html body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile .modern-stat-value,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-kpi-strip-30 .modern-stat-tile strong,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-kpi-strip-30 .modern-stat-tile .modern-stat-value {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+  line-height: 1.05 !important;
+  text-align: center !important;
+  font-size: clamp(11px, 0.78vw, 16px) !important;
+  letter-spacing: -0.035em !important;
+}
+
+html body .app-shell .cdr-kpi-strip-30 .modern-stat-tile.modern-stat-tile-long-value strong,
+html body .app-shell .cdr-kpi-strip-30 .modern-stat-tile.modern-stat-tile-long-value .modern-stat-value,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-kpi-strip-30 .modern-stat-tile.modern-stat-tile-long-value strong,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-kpi-strip-30 .modern-stat-tile.modern-stat-tile-long-value .modern-stat-value {
+  font-size: clamp(9px, 0.64vw, 13px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.04em !important;
+}
+
+html body .app-shell .cdr-kpi-strip-30 .modern-stat-tile span,
+html body .app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile span,
+html[data-design] body .app-shell[class*="design-proposal"] .cdr-kpi-strip-30 .modern-stat-tile span {
+  max-width: 100% !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* ========================================================================
+   FILTER BAR COMPACT TWO-ROW ALIGNMENT PATCH
+   ------------------------------------------------------------------------
+   Reduce filter label/value size to match the dashboard scale, move Talkgroup
+   to row 1, make row 2 start from the left, and let the record-count info box
+   expand dynamically to the remaining row width.
+   ======================================================================== */
+body .app-shell,
+body .upload-shell {
+  --cdr-filter-control-height: 40px;
+  --cdr-filter-row-gap: 9px;
+  --cdr-filter-column-gap: 10px;
+  --cdr-filter-label-size-compact: 11px;
+  --cdr-filter-value-size-compact: 13px;
+  --cdr-filter-radius-compact: 12px;
+}
+
+html body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged,
+html body .app-shell .filters-panel.filters-panel-arranged {
+  width: 100% !important;
+  padding: 12px 14px !important;
+  overflow: visible !important;
+}
+
+html body .app-shell .filters-panel-arranged .filters-fields-grid {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: var(--cdr-filter-row-gap) !important;
+}
+
+/* Row 1: Search + Region + Year + Month + Company + Base Station + Talkgroup */
+html body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+html body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns:
+    minmax(220px, 1.25fr)
+    minmax(126px, .7fr)
+    minmax(112px, .58fr)
+    minmax(132px, .68fr)
+    minmax(178px, 1fr)
+    minmax(190px, 1.1fr)
+    minmax(170px, .9fr) !important;
+  gap: var(--cdr-filter-column-gap) !important;
+  align-items: end !important;
+}
+
+/* Row 2: start from left, with info/count box filling the remaining width. */
+html body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+html body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns:
+    minmax(158px, .76fr)
+    minmax(158px, .76fr)
+    minmax(158px, .76fr)
+    minmax(166px, .82fr)
+    minmax(88px, 96px)
+    minmax(220px, 1fr) !important;
+  gap: var(--cdr-filter-column-gap) !important;
+  align-items: end !important;
+  justify-content: stretch !important;
+}
+
+html body .app-shell .filters-panel-arranged .cdr-filter-search,
+html body .app-shell .filters-panel-arranged .multi-select-filter,
+html body .app-shell .filters-panel-arranged .filter-action-cell {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 1 1 auto !important;
+}
+
+html body .app-shell .filters-panel-arranged .cdr-filter-reset-cell,
+html body .app-shell .filters-panel-arranged .cdr-filter-reset-cell > .reset-filter-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: 1 1 auto !important;
+}
+
+html body .app-shell .filters-panel-arranged .cdr-filter-info-cell,
+html body .app-shell .filters-panel-arranged .cdr-filter-info-cell > .filter-count {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 1 1 auto !important;
+}
+
+html body .app-shell .filters-panel-arranged .search-box > span,
+html body .app-shell .filters-panel-arranged .cdr-filter-search > span,
+html body .app-shell .filters-panel-arranged .multi-select-filter > span,
+html body .app-shell .filters-panel-arranged .filter-field > span,
+html body .app-shell .filters-panel-arranged .filter-action-label {
+  font-size: var(--cdr-filter-label-size-compact) !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  letter-spacing: .025em !important;
+  margin-bottom: 4px !important;
+}
+
+html body .app-shell .filters-panel-arranged .multi-select-trigger,
+html body .app-shell .filters-panel-arranged .cdr-filter-search > input,
+html body .app-shell .filters-panel-arranged .reset-filter-button,
+html body .app-shell .filters-panel-arranged .filter-count {
+  height: var(--cdr-filter-control-height) !important;
+  min-height: var(--cdr-filter-control-height) !important;
+  max-height: var(--cdr-filter-control-height) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  padding: 0 12px !important;
+  border-radius: var(--cdr-filter-radius-compact) !important;
+  box-sizing: border-box !important;
+  font-size: var(--cdr-filter-value-size-compact) !important;
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+html body .app-shell .filters-panel-arranged .cdr-filter-search > input,
+html body .app-shell .filters-panel-arranged .multi-select-trigger {
+  justify-content: space-between !important;
+}
+
+html body .app-shell .filters-panel-arranged .reset-filter-button {
+  justify-content: center !important;
+  gap: 6px !important;
+}
+
+html body .app-shell .filters-panel-arranged .filter-count {
+  justify-content: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+html body .app-shell .filters-panel-arranged .multi-select-value,
+html body .app-shell .filters-panel-arranged .cdr-filter-search > input::placeholder {
+  font-size: var(--cdr-filter-value-size-compact) !important;
+  font-weight: 800 !important;
+}
+
+html body .app-shell .filters-panel-arranged .cdr-filter-search > svg {
+  width: 15px !important;
+  height: 15px !important;
+  min-width: 15px !important;
+}
+
+html body .app-shell .filters-panel-arranged .multi-select-trigger svg,
+html body .app-shell .filters-panel-arranged .reset-filter-button svg {
+  width: 14px !important;
+  height: 14px !important;
+  min-width: 14px !important;
+}
+
+@media (max-width: 1350px) {
+  html body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  html body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  html body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  html body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(3, minmax(170px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  html body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  html body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  html body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  html body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.lazy-tab-fallback {
+  min-height: 180px;
+  width: 100%;
+  border: 1px solid var(--design-border);
+  border-radius: 18px;
+  background: var(--design-surface);
+  color: var(--design-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: var(--cdr-size-body);
+  box-shadow: var(--design-shadow);
+}
+
+.lazy-tab-fallback svg {
+  color: var(--accent-cyan);
+}
+
+/* Light theme logo contrast: keeps white custom/header artwork readable on pale banners. */
+html body .app-shell.theme-light-modern .cdr-command-shell .cdr-header-logo-right img {
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(16%)
+    sepia(44%)
+    saturate(1093%)
+    hue-rotate(169deg)
+    brightness(88%)
+    contrast(94%)
+    drop-shadow(0 2px 3px rgba(255, 255, 255, 0.68)) !important;
+}

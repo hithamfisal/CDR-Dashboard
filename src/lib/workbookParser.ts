@@ -1,17 +1,120 @@
-import type * as XLSXTypes from "xlsx";
+import type ExcelJS from "exceljs";
 import { FLEETMAP_HEADER_ALIASES, HEADER_ALIASES, MOBILE_TYPE_LABELS, RAW_SYSTEM_HEADER_ALIASES } from "./dashboardConstants";
 import { formatNumber } from "./formatters";
 import { cleanText, isKnownLabel, normalizeRadioKey, parseDate, parseNumber, weekLabelFromDate } from "./recordUtils";
 import type { CallRecord, DashboardData, FleetmapRecord, LookupRecord, RawRow } from "../types/dashboard";
 
-type WorkBook = XLSXTypes.WorkBook;
+type WorkBook = {
+  SheetNames: string[];
+  Sheets: Record<string, RawRow[]>;
+};
+const MAX_UPLOAD_FILE_BYTES = 80 * 1024 * 1024;
+const BLOCKED_ROW_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
-async function loadXlsx() {
-  return import("xlsx");
+async function loadExcelJS() {
+  return (await import("exceljs")).default;
 }
 
 function normalizeHeader(value: unknown) {
   return `${value ?? ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function assertUploadWithinLimit(file: File) {
+  if (file.size > MAX_UPLOAD_FILE_BYTES) {
+    throw new Error(`The selected file is too large. Maximum supported size is ${formatNumber(MAX_UPLOAD_FILE_BYTES)} bytes.`);
+  }
+}
+
+function sanitizeRawRow(row: RawRow) {
+  const clean: RawRow = {};
+  for (const [key, value] of Object.entries(row)) {
+    if (BLOCKED_ROW_KEYS.has(key) || BLOCKED_ROW_KEYS.has(normalizeHeader(key))) continue;
+    clean[key] = value;
+  }
+  return clean;
+}
+
+function cellToValue(value: ExcelJS.CellValue) {
+  if (value == null) return "";
+  if (value instanceof Date) return value;
+  if (typeof value !== "object") return value;
+  if ("result" in value && value.result !== undefined) return cellToValue(value.result as ExcelJS.CellValue);
+  if ("text" in value && value.text !== undefined) return value.text;
+  if ("richText" in value && Array.isArray(value.richText)) return value.richText.map((part) => part.text ?? "").join("");
+  if ("hyperlink" in value && "text" in value && value.text !== undefined) return value.text;
+  return `${value}`;
+}
+
+function parseCsvLine(line: string) {
+  const values: string[] = [];
+  let current = "";
+  let inQuotes = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    const next = line[index + 1];
+    if (char === '"' && inQuotes && next === '"') {
+      current += '"';
+      index += 1;
+    } else if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      values.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  values.push(current);
+  return values;
+}
+
+function rowsFromHeaderMatrix(matrix: unknown[][]) {
+  const headerIndex = matrix.findIndex((row) => row.some((value) => cleanText(value, "") !== ""));
+  if (headerIndex < 0) return [];
+  const headers = matrix[headerIndex].map((value, index) => cleanText(value, `Column ${index + 1}`));
+  return matrix.slice(headerIndex + 1).map((row) => {
+    const record: RawRow = {};
+    headers.forEach((header, index) => {
+      record[header || `Column ${index + 1}`] = row[index] ?? "";
+    });
+    return sanitizeRawRow(record);
+  });
+}
+
+function worksheetToRows(worksheet: ExcelJS.Worksheet) {
+  const matrix: unknown[][] = [];
+  worksheet.eachRow({ includeEmpty: false }, (row) => {
+    const values: unknown[] = [];
+    const rowValues = Array.isArray(row.values) ? row.values : [];
+    for (let index = 1; index < rowValues.length; index += 1) {
+      values.push(cellToValue(rowValues[index] as ExcelJS.CellValue));
+    }
+    matrix.push(values);
+  });
+  return rowsFromHeaderMatrix(matrix);
+}
+
+function csvTextToWorkbook(text: string, sheetName = "Raw_Data"): WorkBook {
+  const lines = normalizeRawSystemCsvText(text)
+    .split("\n")
+    .filter((line) => line.trim() !== "");
+  const matrix = lines.map(parseCsvLine);
+  return {
+    SheetNames: [sheetName],
+    Sheets: { [sheetName]: rowsFromHeaderMatrix(matrix) },
+  };
+}
+
+async function excelFileToWorkbook(file: File): Promise<WorkBook> {
+  if (/\.(xls|xlsb)$/i.test(file.name)) {
+    throw new Error("Legacy .xls and .xlsb workbooks are not supported by the hardened parser. Please save the file as .xlsx or upload CSV raw call logs.");
+  }
+  const ExcelJS = await loadExcelJS();
+  const excelWorkbook = new ExcelJS.Workbook();
+  await excelWorkbook.xlsx.load(await file.arrayBuffer());
+  const SheetNames = excelWorkbook.worksheets.map((worksheet) => worksheet.name);
+  const Sheets = Object.fromEntries(excelWorkbook.worksheets.map((worksheet) => [worksheet.name, worksheetToRows(worksheet)]));
+  return { SheetNames, Sheets };
 }
 
 function cleanRawSystemValue(value: unknown, fallback = "") {
@@ -59,13 +162,13 @@ function normalizeRawSystemCsvText(text: string) {
 }
 
 export async function readWorkbookFromUploadedFile(file: File) {
-  const XLSX = await loadXlsx();
+  assertUploadWithinLimit(file);
   const isCsv = /\.csv$/i.test(file.name) || /csv/i.test(file.type);
   if (isCsv) {
     const text = await file.text();
-    return XLSX.read(normalizeRawSystemCsvText(text), { type: "string", cellDates: false, raw: false });
+    return csvTextToWorkbook(text);
   }
-  return XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
+  return excelFileToWorkbook(file);
 }
 
 function findValue(row: RawRow, aliases: string[]) {
@@ -211,10 +314,9 @@ function baseStationOrRadioType(baseStation: string, mobileType: string) {
 }
 
 export async function parseFleetmap(workbook: WorkBook, source: "master" | "fixed"): Promise<FleetmapRecord[]> {
-  const XLSX = await loadXlsx();
   const preferred = workbook.SheetNames.find((n) => /fleet|master|fixed|lookup/i.test(n));
   const sheetName = preferred ?? workbook.SheetNames[0];
-  const rows = XLSX.utils.sheet_to_json<RawRow>(workbook.Sheets[sheetName], { defval: "", raw: true });
+  const rows = workbook.Sheets[sheetName] ?? [];
   return rows
     .map((row): FleetmapRecord => {
       const radioId = cleanText(findValue(row, FLEETMAP_HEADER_ALIASES.radioId), "");
@@ -242,16 +344,14 @@ export function unionFleetmaps(master: FleetmapRecord[], fixed: FleetmapRecord[]
 }
 
 async function parseWorkbook(workbook: WorkBook, fileName: string, fleetmap: FleetmapRecord[] = []): Promise<DashboardData> {
-  const XLSX = await loadXlsx();
   const sourceSheet = workbook.SheetNames.includes("Raw_Data") ? "Raw_Data" : workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sourceSheet];
-  const rows = XLSX.utils.sheet_to_json<RawRow>(worksheet, { defval: "", raw: true });
+  const rows = workbook.Sheets[sourceSheet] ?? [];
 
   const fleetIndex = new Map<string, FleetmapRecord>();
   fleetmap.forEach((rec) => fleetIndex.set(normalizeRadioKey(rec.radioId), rec));
 
   const lookupRows = workbook.SheetNames.includes("lookup")
-    ? XLSX.utils.sheet_to_json<RawRow>(workbook.Sheets.lookup, { defval: "", raw: true })
+    ? workbook.Sheets.lookup ?? []
     : [];
 
   const pickFleet = (cdrValue: string, fleetValue: string | undefined, fallback: string) =>
@@ -343,11 +443,9 @@ async function parseWorkbook(workbook: WorkBook, fileName: string, fleetmap: Fle
 }
 
 async function isRawSystemWorkbook(workbook: WorkBook) {
-  const XLSX = await loadXlsx();
   const sourceSheet = workbook.SheetNames[0];
   if (!sourceSheet) return false;
-  const worksheet = workbook.Sheets[sourceSheet];
-  const rows = XLSX.utils.sheet_to_json<RawRow>(worksheet, { defval: "", raw: true });
+  const rows = workbook.Sheets[sourceSheet] ?? [];
   if (rows.length === 0) return false;
   const sample = rows.slice(0, 5);
   return sample.some((row) => {
@@ -367,10 +465,8 @@ export async function parseUploadedTrafficWorkbook(workbook: WorkBook, fileName:
 }
 
 export async function parseRawSystemWorkbook(workbook: WorkBook, fileName: string, fleetmap: FleetmapRecord[] = []): Promise<DashboardData> {
-  const XLSX = await loadXlsx();
   const sourceSheet = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sourceSheet];
-  const rows = XLSX.utils.sheet_to_json<RawRow>(worksheet, { defval: "", raw: true });
+  const rows = workbook.Sheets[sourceSheet] ?? [];
 
   const fleetIndex = new Map<string, FleetmapRecord>();
   fleetmap.forEach((rec) => fleetIndex.set(normalizeRadioKey(rec.radioId), rec));

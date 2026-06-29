@@ -858,14 +858,12 @@ body .app-shell .generated-reports-table tr:hover td {
 body .app-shell .reports-tab-panel,
 body .app-shell .report-management-card,
 body .app-shell .report-generator-panel,
-body .app-shell .generated-reports-panel,
-body .app-shell .export-center-card {
+body .app-shell .generated-reports-panel {
   background: var(--cdr-report-panel-bg) !important;
   border-color: var(--cdr-box-border-dark) !important;
 }
 
 body .app-shell .report-management-header h3,
-body .app-shell .export-center-card h3,
 body .app-shell .generated-reports-title h3 {
   font-size: var(--cdr-report-title-size) !important;
   font-weight: var(--cdr-report-title-weight) !important;
@@ -881,6 +879,69 @@ body .app-shell .report-generation-form select {
   background: var(--cdr-filter-control-bg) !important;
   border-color: var(--cdr-filter-control-border) !important;
   border-radius: var(--cdr-filter-control-radius) !important;
+}
+
+body .app-shell .report-download-directory {
+  display: grid !important;
+  gap: 10px !important;
+  padding: 12px !important;
+  border: 1px solid var(--cdr-box-border-dark) !important;
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--cdr-report-panel-bg) 88%, transparent) !important;
+}
+
+body .app-shell .report-directory-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+body .app-shell .report-directory-actions {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+}
+
+body .app-shell .report-directory-button {
+  min-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--cdr-filter-control-border) !important;
+  border-radius: 12px !important;
+  background: var(--cdr-filter-control-bg) !important;
+  color: var(--cdr-filter-control-color) !important;
+  font-size: var(--cdr-filter-control-font-size) !important;
+  font-weight: 850 !important;
+}
+
+body .app-shell .report-directory-button:hover:not(:disabled) {
+  border-color: var(--cdr-accent-cyan, #35d5ff) !important;
+  color: var(--cdr-accent-cyan, #35d5ff) !important;
+}
+
+body .app-shell .report-directory-button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
+body .app-shell .report-directory-button svg {
+  flex: 0 0 auto !important;
+}
+
+body .app-shell .report-directory-status {
+  margin: 0 !important;
+  font-size: var(--cdr-size-small, 12px) !important;
+  line-height: 1.35 !important;
+  color: var(--cdr-chart-subtitle-color) !important;
+}
+
+body .app-shell .report-directory-status.is-configured {
+  color: var(--cdr-accent-green, #37d399) !important;
 }
 
 /* ============================================================================
@@ -1336,169 +1397,32 @@ body .app-shell.se-theme.light-background-theme .clear-history-button:hover:not(
 }
 
 /* ============================================================================
-   SECTION 19 - GENERATED REPORTS SAVED LOCATION COLUMN
-   Task: Adds a browser-safe Downloads / file-name column to the generated
-   reports history table. The link opens the retained in-session Blob URL when
-   available. Browsers do not expose the real local Downloads path for security,
-   so this displays the expected browser Downloads location and file name.
+   SECTION 19 - GENERATED REPORTS HISTORY TABLE
    ============================================================================ */
 body .app-shell .generated-reports-table {
   table-layout: fixed !important;
-  min-width: 980px !important;
+  min-width: 620px !important;
 }
 
 body .app-shell .generated-reports-table th:nth-child(1),
 body .app-shell .generated-reports-table td:nth-child(1) {
-  width: 24% !important;
+  width: 56% !important;
 }
 
 body .app-shell .generated-reports-table th:nth-child(2),
 body .app-shell .generated-reports-table td:nth-child(2) {
-  width: 17% !important;
+  width: 28% !important;
 }
 
 body .app-shell .generated-reports-table th:nth-child(3),
 body .app-shell .generated-reports-table td:nth-child(3) {
-  width: 9% !important;
-}
-
-body .app-shell .generated-reports-table th:nth-child(4),
-body .app-shell .generated-reports-table td:nth-child(4) {
-  width: 34% !important;
-  text-align: left !important;
-}
-
-body .app-shell .generated-reports-table th:nth-child(5),
-body .app-shell .generated-reports-table td:nth-child(5) {
   width: 16% !important;
-}
-
-body .app-shell .generated-report-path-link {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-height: 28px !important;
-  height: 28px !important;
-  padding: 0 10px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 7px !important;
-  border-radius: 999px !important;
-  border: 1px solid rgba(77, 178, 232, 0.28) !important;
-  background: rgba(0, 120, 212, 0.10) !important;
-  color: var(--cdr-link-color, #8fd7ff) !important;
-  font-size: var(--cdr-report-path-size, 11px) !important;
-  font-weight: var(--cdr-report-path-weight, 850) !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  cursor: pointer !important;
-}
-
-body .app-shell .generated-report-path-link span {
-  min-width: 0 !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-body .app-shell .generated-report-path-link svg {
-  flex: 0 0 14px !important;
-  width: 14px !important;
-  height: 14px !important;
-}
-
-body .app-shell .generated-report-path-link:hover:not(:disabled) {
-  background: rgba(0, 120, 212, 0.18) !important;
-  border-color: rgba(77, 178, 232, 0.52) !important;
-  color: #ffffff !important;
-  transform: translateY(-1px) !important;
-}
-
-body .app-shell .generated-report-path-link:disabled {
-  opacity: 0.55 !important;
-  cursor: not-allowed !important;
-  transform: none !important;
-}
-
-body .app-shell .generated-report-path,
-body .app-shell .generated-report-path-muted {
-  display: inline-flex !important;
-  align-items: center !important;
-  min-height: 28px !important;
-  max-width: 100% !important;
-  color: var(--cdr-card-subtitle-color, var(--theme-muted, #a7c1d2)) !important;
-  font-size: var(--cdr-report-path-size, 11px) !important;
-  font-weight: var(--cdr-report-path-weight, 850) !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-body .app-shell.light-background-theme .generated-report-path-link,
-body .app-shell.se-theme.light-background-theme .generated-report-path-link {
-  background: rgba(0, 120, 212, 0.07) !important;
-  border-color: rgba(0, 100, 150, 0.22) !important;
-  color: #005f93 !important;
-}
-
-body .app-shell.light-background-theme .generated-report-path-link:hover:not(:disabled),
-body .app-shell.se-theme.light-background-theme .generated-report-path-link:hover:not(:disabled) {
-  background: rgba(0, 120, 212, 0.12) !important;
-  border-color: rgba(0, 100, 150, 0.36) !important;
-  color: #06324c !important;
 }
 
 @media (max-width: 920px) {
   body .app-shell .generated-reports-table {
-    min-width: 900px !important;
+    min-width: 620px !important;
   }
-
-  body .app-shell .generated-reports-table th:nth-child(4),
-  body .app-shell .generated-reports-table td:nth-child(4) {
-    width: 30% !important;
-  }
-}
-
-/* ============================================================
-   SECTION 20 - GENERATED REPORTS DOWNLOAD LOCATION AS TEXT ONLY
-   Task: The Downloaded Folder / File column must display the
-   browser download location text without acting as a link/button.
-   This prevents Excel/PPT files from downloading again when the
-   user clicks the path. Use the Actions column for View/Download.
-   ============================================================ */
-body .app-shell .generated-reports-table td:nth-child(4) .generated-report-path {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-height: 28px !important;
-  height: 28px !important;
-  padding: 0 10px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 0 !important;
-  border-radius: 999px !important;
-  border: 1px solid rgba(77, 178, 232, 0.18) !important;
-  background: rgba(255, 255, 255, 0.035) !important;
-  color: var(--cdr-card-subtitle-color, var(--theme-muted, #a7c1d2)) !important;
-  font-size: var(--cdr-report-path-size, 11px) !important;
-  font-weight: var(--cdr-report-path-weight, 850) !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  cursor: default !important;
-  text-decoration: none !important;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-body .app-shell.light-background-theme .generated-reports-table td:nth-child(4) .generated-report-path,
-body .app-shell.se-theme.light-background-theme .generated-reports-table td:nth-child(4) .generated-report-path {
-  background: rgba(0, 100, 150, 0.045) !important;
-  border-color: rgba(0, 100, 150, 0.16) !important;
-  color: #3f6174 !important;
 }
 
 /* ============================================================================
@@ -3300,13 +3224,16 @@ body .app-shell.layout-command-center .modern-stat-tile {
    ============================================================ */
 :root {
   --cdr-managed-header-height: 96px;
+  --cdr-managed-header-logo-column: minmax(132px, 210px);
+  --cdr-managed-header-title-size: clamp(24px, 2.25vw, 42px);
+  --cdr-managed-header-title-spacing: 0.075em;
 }
 
 body .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
 body .app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
   position: relative !important;
   display: grid !important;
-  grid-template-columns: minmax(148px, 230px) minmax(0, 1fr) minmax(148px, 230px) !important;
+  grid-template-columns: var(--cdr-managed-header-logo-column) minmax(0, 1fr) var(--cdr-managed-header-logo-column) !important;
   grid-template-rows: 1fr !important;
   align-items: center !important;
   min-height: var(--cdr-managed-header-height) !important;
@@ -3398,8 +3325,9 @@ body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  font-size: clamp(26px, 3.2vw, 52px) !important;
+  font-size: var(--cdr-managed-header-title-size) !important;
   line-height: 1 !important;
+  letter-spacing: var(--cdr-managed-header-title-spacing) !important;
 }
 
 body .app-shell .cdr-command-shell .followup-dashboard-title p,
@@ -3410,6 +3338,14 @@ body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   line-height: 1.15 !important;
+}
+
+@media (max-width: 1500px) {
+  :root {
+    --cdr-managed-header-logo-column: minmax(108px, 168px);
+    --cdr-managed-header-title-size: clamp(22px, 2.05vw, 34px);
+    --cdr-managed-header-title-spacing: 0.055em;
+  }
 }
 
 .local-branding-grid {
@@ -3522,4 +3458,140 @@ body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title
 }
 .local-branding-preview.radio-preview img {
   object-fit: contain;
+}
+
+/* V8 polish: admin-controlled sizing, report presets, mobile layout, and compact mode. */
+body .app-shell .cdr-command-shell .cdr-header-logo,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo {
+  width: var(--cdr-admin-logo-size, 66px) !important;
+  height: calc(var(--cdr-admin-logo-size, 66px) * 0.78) !important;
+}
+
+body .app-shell .cdr-command-shell .followup-dashboard-title h1,
+body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title h1 {
+  font-size: clamp(
+    calc(28px * var(--cdr-admin-title-scale, 1)),
+    calc(2.15vw * var(--cdr-admin-title-scale, 1)),
+    calc(42px * var(--cdr-admin-title-scale, 1))
+  ) !important;
+}
+
+body .app-shell.compact-dashboard-layout .cdr-command-shell .filters-panel.filters-panel-arranged {
+  margin-bottom: 4px !important;
+  padding-block: 8px !important;
+}
+
+body .app-shell.compact-dashboard-layout .chart-card,
+body .app-shell.compact-dashboard-layout .table-card,
+body .app-shell.compact-dashboard-layout .modern-card,
+body .app-shell.compact-dashboard-layout .section-card {
+  margin-block: 6px !important;
+}
+
+body .app-shell.compact-dashboard-layout .chart-grid,
+body .app-shell.compact-dashboard-layout .overview-grid,
+body .app-shell.compact-dashboard-layout .performance-layout {
+  gap: 8px !important;
+}
+
+.local-settings-grid select,
+.local-settings-grid input,
+.local-settings-grid textarea {
+  width: 100%;
+}
+
+.local-settings-toggle {
+  display: flex !important;
+  min-height: 46px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(56, 189, 248, 0.24);
+  border-radius: 14px;
+  background: rgba(2, 21, 34, 0.46);
+}
+
+.local-settings-toggle input {
+  width: 18px !important;
+  height: 18px;
+  accent-color: var(--cdr-admin-primary-color, #22d3ee);
+}
+
+.local-settings-toggle span {
+  color: inherit;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.report-generation-form label small {
+  margin-top: 6px;
+  display: block;
+  color: var(--design-muted, #9fb1bc);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.report-generation-form select:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.generated-reports-table {
+  table-layout: fixed;
+}
+
+.generated-reports-table th,
+.generated-reports-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body .app-shell.light-background-theme .report-generation-form label small,
+body .app-shell.design-proposal-2 .report-generation-form label small,
+body .app-shell.theme-light-modern .report-generation-form label small {
+  color: #31536a;
+}
+
+@media (max-width: 1180px) {
+  body .app-shell .report-management-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  body .app-shell .report-generator-panel {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.4fr) minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  body .app-shell .generated-reports-panel {
+    min-height: auto !important;
+  }
+}
+
+@media (max-width: 720px) {
+  body .app-shell .report-generator-panel,
+  body .app-shell .report-management-header,
+  body .app-shell .generated-reports-title {
+    grid-template-columns: 1fr !important;
+    display: grid !important;
+  }
+
+  body .app-shell .report-search-box,
+  body .app-shell .report-directory-row,
+  body .app-shell .report-directory-actions {
+    width: 100%;
+  }
+
+  body .app-shell .generated-reports-table-wrap {
+    overflow-x: auto;
+  }
+
+  body .app-shell .generated-reports-table {
+    min-width: 640px;
+  }
+
+  body .app-shell .cdr-command-shell .dashboard-tabs-row {
+    padding: 8px !important;
+  }
 }

@@ -1,0 +1,144 @@
+﻿/* Tab visibility routing. Source split from src/styles.css lines 4093-4288. */
+/* Hide all tab-specific content by default once the tab system is active. */
+.app-shell[class*="active-tab-"] > #command,
+.app-shell[class*="active-tab-"] > .summary-cards-arranged,
+.app-shell[class*="active-tab-"] > .data-quality-panel,
+.app-shell[class*="active-tab-"] > #reportsTabPanel,
+.app-shell[class*="active-tab-"] > #networkUtilization,
+.app-shell[class*="active-tab-"] > #networkUtilization-content,
+.app-shell[class*="active-tab-"] > #unmatchedFleetmap,
+.app-shell[class*="active-tab-"] > #unmatchedFleetmap-content,
+.app-shell[class*="active-tab-"] > #regionPerformance,
+.app-shell[class*="active-tab-"] > #regionPerformance-content,
+.app-shell[class*="active-tab-"] > #trafficIntensity,
+.app-shell[class*="active-tab-"] > #trafficIntensity-content,
+.app-shell[class*="active-tab-"] > #talkgroupEfficiency,
+.app-shell[class*="active-tab-"] > #talkgroupEfficiency-content,
+.app-shell[class*="active-tab-"] > #kpi,
+.app-shell[class*="active-tab-"] > #kpi-content,
+.app-shell[class*="active-tab-"] > #Company,
+.app-shell[class*="active-tab-"] > #Company-content,
+.app-shell[class*="active-tab-"] > #Performance,
+.app-shell[class*="active-tab-"] > #Performance-content,
+.app-shell[class*="active-tab-"] > #General,
+.app-shell[class*="active-tab-"] > #General-content,
+.app-shell[class*="active-tab-"] > #Charts,
+.app-shell[class*="active-tab-"] > #Charts-content,
+.app-shell[class*="active-tab-"] > #users,
+.app-shell[class*="active-tab-"] > #users-content,
+.app-shell[class*="active-tab-"] > #records,
+.app-shell[class*="active-tab-"] > #records-content {
+  display: none !important;
+}
+
+/* Overview & Records tab */
+.app-shell.active-tab-overview > #command {
+  display: grid !important;
+}
+.app-shell.active-tab-overview > .summary-cards-arranged {
+  display: grid !important;
+}
+.app-shell.active-tab-overview > .data-quality-panel {
+  display: grid !important;
+}
+.app-shell.active-tab-overview > #records {
+  display: flex !important;
+}
+.app-shell.active-tab-overview > #records-content:not(.section-content-collapsed) {
+  display: block !important;
+}
+
+/* Fleet Activation tab */
+.app-shell.active-tab-fleet > #networkUtilization,
+.app-shell.active-tab-fleet > #unmatchedFleetmap {
+  display: flex !important;
+}
+.app-shell.active-tab-fleet > #networkUtilization-content:not(.section-content-collapsed),
+.app-shell.active-tab-fleet > #unmatchedFleetmap-content:not(.section-content-collapsed) {
+  display: block !important;
+}
+
+/* Charts tab */
+.app-shell.active-tab-charts > #Company,
+.app-shell.active-tab-charts > #General,
+.app-shell.active-tab-charts > #Charts {
+  display: flex !important;
+}
+.app-shell.active-tab-charts > #Company-content:not(.section-content-collapsed),
+.app-shell.active-tab-charts > #General-content:not(.section-content-collapsed),
+.app-shell.active-tab-charts > #Charts-content:not(.section-content-collapsed) {
+  display: grid !important;
+}
+
+/* Company, Talkgroup & Users tab */
+.app-shell.active-tab-company > #regionPerformance,
+.app-shell.active-tab-company > #talkgroupEfficiency,
+.app-shell.active-tab-company > #users {
+  display: flex !important;
+}
+.app-shell.active-tab-company > #regionPerformance-content:not(.section-content-collapsed),
+.app-shell.active-tab-company > #talkgroupEfficiency-content:not(.section-content-collapsed) {
+  display: block !important;
+}
+.app-shell.active-tab-company > #users-content:not(.section-content-collapsed) {
+  display: grid !important;
+}
+
+/* Performance KPI tab */
+.app-shell.active-tab-kpi > #kpi,
+.app-shell.active-tab-kpi > #Performance,
+.app-shell.active-tab-kpi > #General {
+  display: flex !important;
+}
+.app-shell.active-tab-kpi > #kpi-content:not(.section-content-collapsed),
+.app-shell.active-tab-kpi > #Performance-content:not(.section-content-collapsed),
+.app-shell.active-tab-kpi > #General-content:not(.section-content-collapsed) {
+  display: grid !important;
+}
+
+
+/* Reports tab */
+.app-shell.active-tab-reports > #reportsTabPanel {
+  display: block !important;
+}
+
+.reports-tab-panel {
+  margin: 14px 0 18px !important;
+}
+
+.app-shell .performance-chart-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Keep filters as the global control strip for all tabs. */
+.app-shell[class*="active-tab-"] > .filters-panel {
+  display: grid !important;
+}
+
+/* Smooth selected panel entrance. */
+.app-shell[class*="active-tab-"] > #command,
+.app-shell[class*="active-tab-"] > .summary-cards-arranged,
+.app-shell[class*="active-tab-"] > .data-quality-panel,
+.app-shell[class*="active-tab-"] > #reportsTabPanel,
+.app-shell[class*="active-tab-"] > [id$="-content"] {
+  animation: dashboardTabFadeIn .18s ease both;
+}
+
+@keyframes dashboardTabFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 920px) {
+  .dashboard-tabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+  }
+
+  .dashboard-tab {
+    flex: 0 0 auto !important;
+  }
+}
+

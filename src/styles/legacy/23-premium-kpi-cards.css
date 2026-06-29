@@ -1,0 +1,1596 @@
+﻿/* Premium KPI and quality card system. Source split from src/styles.css lines 11295-12889. */
+/* FINAL GLOSSY DASHBOARD KPI CARD VISUALIZATION STYLE */
+.app-shell .visual-kpi-cards.summary-cards-10-layout {
+  gap: 8px !important;
+  padding-top: 10px !important;
+  padding-bottom: 6px !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-row {
+  gap: 8px !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card,
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 58px !important;
+  height: 58px !important;
+  padding: 7px 10px 6px 10px !important;
+  border-radius: 9px !important;
+  overflow: hidden !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.36) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.42), inset 0 -16px 26px rgba(0,0,0,0.18), 0 8px 18px rgba(2, 8, 23, 0.22) !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 48%, #164e63 100%) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card::before,
+.app-shell .visual-quality-panel .visual-quality-card::before,
+.app-shell .visual-quality-panel .visual-quality-issue::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.06) 42%, rgba(0,0,0,0.12) 100%) !important;
+  pointer-events: none !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head,
+.app-shell .visual-quality-panel .summary-card-head {
+  display: grid !important;
+  grid-template-columns: 20px minmax(0, 1fr) 20px !important;
+  align-items: center !important;
+  gap: 3px !important;
+  min-width: 0 !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head span,
+.app-shell .visual-quality-panel .summary-card-head span {
+  grid-column: 2 !important;
+  font-size: clamp(7px, 0.58vw, 10px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.035em !important;
+  text-transform: uppercase !important;
+  font-weight: 900 !important;
+  color: rgba(255,255,255,0.95) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.34) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-icon,
+.app-shell .visual-quality-panel .summary-card-icon {
+  grid-column: 1 !important;
+  justify-self: start !important;
+  width: 17px !important;
+  height: 17px !important;
+  color: rgba(255,255,255,0.94) !important;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35)) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card strong,
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-issue strong {
+  display: block !important;
+  margin: 2px 0 0 !important;
+  font-size: clamp(14px, 1.08vw, 21px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.035em !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.38) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card small,
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-issue small {
+  display: block !important;
+  margin-top: 1px !important;
+  font-size: clamp(6.5px, 0.5vw, 8.5px) !important;
+  line-height: 1.05 !important;
+  font-weight: 800 !important;
+  color: rgba(255,255,255,0.86) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .visual-kpi-cards .visual-tone-cyan { background: linear-gradient(135deg, #0891b2 0%, #0e7490 48%, #164e63 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-green { background: linear-gradient(135deg, #16a34a 0%, #15803d 48%, #14532d 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-purple { background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 50%, #312e81 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-amber { background: linear-gradient(135deg, #d97706 0%, #b45309 48%, #78350f 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-red { background: linear-gradient(135deg, #b91c1c 0%, #991b1b 48%, #450a0a 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-blue { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 48%, #1e3a8a 100%) !important; }
+.app-shell .visual-kpi-cards .visual-tone-slate { background: linear-gradient(135deg, #64748b 0%, #475569 48%, #1e293b 100%) !important; }
+
+.app-shell .visual-quality-panel {
+  display: grid !important;
+  grid-template-columns: minmax(170px, 1.05fr) minmax(0, 4fr) !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card {
+  min-height: 68px !important;
+  height: 68px !important;
+  background: linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(226,232,240,0.92) 50%, rgba(148,163,184,0.86) 100%) !important;
+  color: #0f172a !important;
+  border-color: rgba(148,163,184,0.55) !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card .summary-card-head span,
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-card .summary-card-icon {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+.app-shell .visual-quality-panel .quality-issue-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(120px, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-issue {
+  min-height: 68px !important;
+  height: 68px !important;
+  background: linear-gradient(135deg, rgba(248,250,252,0.92) 0%, rgba(226,232,240,0.88) 50%, rgba(148,163,184,0.82) 100%) !important;
+  color: #0f172a !important;
+  border-color: rgba(148,163,184,0.5) !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-issue .summary-card-head span,
+.app-shell .visual-quality-panel .visual-quality-issue strong,
+.app-shell .visual-quality-panel .visual-quality-issue small,
+.app-shell .visual-quality-panel .visual-quality-issue .summary-card-icon {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell .visual-quality-panel {
+    grid-template-columns: 1fr !important;
+  }
+  .app-shell .visual-quality-panel .quality-issue-grid {
+    grid-template-columns: repeat(2, minmax(150px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell .visual-quality-panel .quality-issue-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   IMPROVED KPI CARD DESIGN
+   â€” Only CSS changes. App.tsx and structure untouched.
+   â€” Each tone gets a vivid color-coded gradient (matching original
+     color intent) with a glowing left-edge accent bar.
+   â€” Cards are taller, more breathable, values are larger.
+   â€” Data quality row stays light/white for visual contrast.
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+/* â”€â”€ Layout: grid container â”€â”€ */
+.app-shell .visual-kpi-cards.summary-cards-10-layout {
+  --cdr-kpi-gap: 10px;
+  --cdr-kpi-card-height: 92px;
+  --cdr-kpi-radius: 14px;
+  display: grid !important;
+  gap: var(--cdr-kpi-gap) !important;
+  margin: 18px 0 20px !important;
+  padding: 0 !important;
+}
+
+/* â”€â”€ Row grids: 10 / 8 / 7 all use 10 columns on large screens â”€â”€ */
+.app-shell .visual-kpi-cards .summary-card-row,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+  display: grid !important;
+  gap: var(--cdr-kpi-gap) !important;
+  align-items: stretch !important;
+  width: 100% !important;
+}
+
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10 {
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+}
+
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8 {
+  grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+}
+
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+/* â”€â”€ Card base: height grows with content, text wraps inside box â”€â”€ */
+.app-shell .visual-kpi-cards .visual-summary-card {
+  position: relative !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: var(--cdr-kpi-card-height) !important;
+  height: auto !important;
+  padding: 11px 13px 10px 17px !important;
+  border-radius: var(--cdr-kpi-radius) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: stretch !important;
+  text-align: center !important;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  background: linear-gradient(145deg, #0e2236 0%, #102a40 50%, #071522 100%) !important;
+  box-shadow:
+    0 6px 18px rgba(2, 6, 23, 0.32),
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -14px 28px rgba(0,0,0,0.16) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+/* Subtle glass sheen on top */
+.app-shell .visual-kpi-cards .visual-summary-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 52%) !important;
+  pointer-events: none !important;
+}
+
+/* Glowing left-edge accent bar â€” THE signature element */
+.app-shell .visual-kpi-cards .visual-summary-card::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 10px !important;
+  bottom: 10px !important;
+  width: 4px !important;
+  border-radius: 0 4px 4px 0 !important;
+  background: var(--cdr-kpi-accent, #38bdf8) !important;
+  box-shadow: 0 0 16px var(--cdr-kpi-accent-glow, rgba(56,189,248,0.55)) !important;
+}
+
+/* â”€â”€ z-index for content above pseudo-elements â”€â”€ */
+.app-shell .visual-kpi-cards .summary-card-head,
+.app-shell .visual-kpi-cards .visual-summary-card > strong,
+.app-shell .visual-kpi-cards .visual-summary-card > small {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* â”€â”€ Header row: icon + label centered â”€â”€ */
+.app-shell .visual-kpi-cards .summary-card-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+}
+
+/* Icon badge â€” LEFT side (order:1) */
+.app-shell .visual-kpi-cards .summary-card-icon {
+  order: 1 !important;
+  flex: 0 0 auto !important;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 5px !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.28) !important;
+  filter: none !important;
+}
+
+/* Label text â€” centered, wraps inside the card â”€â”€ */
+.app-shell .visual-kpi-cards .summary-card-head span {
+  order: 2 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-size: clamp(8px, 0.65vw, 11px) !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* â”€â”€ Main value â€” centered, wraps inside card â”€â”€ */
+.app-shell .visual-kpi-cards .visual-summary-card strong {
+  margin: 6px 0 0 !important;
+  display: block !important;
+  color: #ffffff !important;
+  font-size: clamp(14px, 1.2vw, 22px) !important;
+  line-height: 1.1 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.03em !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.32) !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* â”€â”€ Subtitle / detail â€” centered, wraps inside card â”€â”€ */
+.app-shell .visual-kpi-cards .visual-summary-card small {
+  display: block !important;
+  margin-top: 4px !important;
+  color: rgba(203, 213, 225, 0.68) !important;
+  font-size: clamp(7.5px, 0.56vw, 10px) !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  text-shadow: none !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* â”€â”€ Tone-specific gradient backgrounds + accent colors â”€â”€
+   Matching your original image's color intent per tile category:
+   cyan  â†’ teal-blue  (total calls, traffic)
+   green â†’ rich green (regions, talkgroups)
+   purpleâ†’ deep purple(companies, avg duration)
+   amber â†’ warm orange(radios, max duration, peak entries)
+   red   â†’ deep red   (base stations, all peaks)
+   blue  â†’ royal blue (total/min duration)
+   slate â†’ cool gray  (fallback)
+*/
+.app-shell .visual-kpi-cards .visual-tone-cyan {
+  --cdr-kpi-accent: #22d3ee;
+  --cdr-kpi-accent-glow: rgba(34,211,238,0.52);
+  background: linear-gradient(145deg, #0a3040 0%, #0d3d52 52%, #071e2e 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-green {
+  --cdr-kpi-accent: #4ade80;
+  --cdr-kpi-accent-glow: rgba(74,222,128,0.48);
+  background: linear-gradient(145deg, #0b2e1c 0%, #103d26 52%, #071a10 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-purple {
+  --cdr-kpi-accent: #a78bfa;
+  --cdr-kpi-accent-glow: rgba(167,139,250,0.5);
+  background: linear-gradient(145deg, #1e1245 0%, #261558 52%, #110c2c 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-amber {
+  --cdr-kpi-accent: #fbbf24;
+  --cdr-kpi-accent-glow: rgba(251,191,36,0.48);
+  background: linear-gradient(145deg, #3a2208 0%, #4d2c0a 52%, #221408 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-red {
+  --cdr-kpi-accent: #fb7185;
+  --cdr-kpi-accent-glow: rgba(251,113,133,0.48);
+  background: linear-gradient(145deg, #3d1018 0%, #521420 52%, #230a0d 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-blue {
+  --cdr-kpi-accent: #60a5fa;
+  --cdr-kpi-accent-glow: rgba(96,165,250,0.5);
+  background: linear-gradient(145deg, #0b1f45 0%, #0e2b60 52%, #07132e 100%) !important;
+}
+.app-shell .visual-kpi-cards .visual-tone-slate {
+  --cdr-kpi-accent: #94a3b8;
+  --cdr-kpi-accent-glow: rgba(148,163,184,0.36);
+  background: linear-gradient(145deg, #162033 0%, #1e2d43 52%, #0f172a 100%) !important;
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   DATA QUALITY PANEL
+   â€” Kept light/white as in the original for visual contrast
+   â€” Larger numbers, cleaner spacing
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+.app-shell .visual-quality-panel {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+  margin: 18px 0 24px !important;
+}
+
+.app-shell .visual-quality-panel .quality-issue-grid {
+  display: contents !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue {
+  min-height: 100px !important;
+  height: auto !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  padding: 14px 16px 12px !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: stretch !important;
+  text-align: center !important;
+  background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 55%, #e2e8f0 100%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  color: #0f172a !important;
+  box-shadow: 0 6px 18px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+  overflow: hidden !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head span {
+  order: 2 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  color: #334155 !important;
+  font-size: clamp(8px, 0.65vw, 10.5px) !important;
+  line-height: 1.3 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  text-shadow: none !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-icon {
+  order: 1 !important;
+  flex: 0 0 auto !important;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 5px !important;
+  border-radius: 8px !important;
+  color: #334155 !important;
+  background: rgba(15,23,42,0.09) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5) !important;
+  filter: none !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-issue strong {
+  color: #0f172a !important;
+  font-size: clamp(22px, 1.8vw, 32px) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.045em !important;
+  text-shadow: none !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-issue small {
+  color: #64748b !important;
+  font-size: clamp(8px, 0.6vw, 10px) !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+  text-align: center !important;
+}
+
+/* â”€â”€ Responsive breakpoints â”€â”€ */
+@media (max-width: 1450px) {
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10 {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+  .app-shell .visual-quality-panel {
+    grid-template-columns: repeat(3, minmax(160px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7,
+  .app-shell .visual-quality-panel {
+    grid-template-columns: repeat(2, minmax(150px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7,
+  .app-shell .visual-quality-panel {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* â”€â”€ Light theme override: preserve readability â”€â”€ */
+.app-shell.light-background-theme .visual-kpi-cards .visual-summary-card,
+.app-shell.se-theme .visual-kpi-cards .visual-summary-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.97) 0%, rgba(241,245,249,0.96) 55%, rgba(226,232,240,0.93) 100%) !important;
+  border-color: rgba(15,23,42,0.10) !important;
+  box-shadow: 0 6px 18px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-head span,
+.app-shell.se-theme .visual-kpi-cards .summary-card-head span {
+  color: #334155 !important;
+}
+.app-shell.light-background-theme .visual-kpi-cards .visual-summary-card strong,
+.app-shell.se-theme .visual-kpi-cards .visual-summary-card strong {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+.app-shell.light-background-theme .visual-kpi-cards .visual-summary-card small,
+.app-shell.se-theme .visual-kpi-cards .visual-summary-card small {
+  color: #64748b !important;
+}
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon {
+  color: #0f172a !important;
+  background: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 18%, #e2e8f0) !important;
+}
+/* FINAL KPI CARD 30-UP LAYOUT: 10 cards x 3 rows without clipped text */
+.app-shell .visual-kpi-cards.summary-cards-10-layout {
+  --cdr-kpi-gap: clamp(6px, 0.52vw, 10px) !important;
+  --cdr-kpi-card-height: clamp(88px, 5.35vw, 108px) !important;
+  width: 100% !important;
+  overflow: visible !important;
+}
+
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  overflow: visible !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card {
+  min-height: var(--cdr-kpi-card-height) !important;
+  height: auto !important;
+  padding: clamp(8px, 0.62vw, 12px) clamp(7px, 0.58vw, 12px) !important;
+  overflow: hidden !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head {
+  gap: 4px !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-icon {
+  width: clamp(18px, 1.25vw, 24px) !important;
+  height: clamp(18px, 1.25vw, 24px) !important;
+  padding: 4px !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head span {
+  font-size: clamp(7px, 0.53vw, 10px) !important;
+  line-height: 1.16 !important;
+  letter-spacing: 0.035em !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card strong {
+  font-size: clamp(12px, 0.96vw, 18px) !important;
+  line-height: 1.08 !important;
+  margin-top: 4px !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card small {
+  font-size: clamp(6.5px, 0.48vw, 8.5px) !important;
+  line-height: 1.14 !important;
+  margin-top: 3px !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+@media (max-width: 1100px) {
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: repeat(2, minmax(150px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+  .app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+
+/* PREMIUM GLASS KPI CARDS - final visual skin */
+.app-shell .visual-kpi-cards.summary-cards-10-layout {
+  --cdr-kpi-gap: clamp(8px, 0.56vw, 12px) !important;
+  --cdr-kpi-card-height: clamp(96px, 5.15vw, 112px) !important;
+  perspective: 1200px !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card {
+  isolation: isolate !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  padding: clamp(9px, 0.58vw, 12px) clamp(7px, 0.52vw, 11px) clamp(10px, 0.58vw, 12px) !important;
+  border-radius: 16px !important;
+  border: 1px solid color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 44%, rgba(255, 255, 255, 0.16)) !important;
+  background:
+    radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 22%, transparent) 0%, transparent 34%),
+    linear-gradient(155deg, rgba(21, 44, 64, 0.86) 0%, rgba(9, 23, 38, 0.72) 48%, rgba(2, 9, 18, 0.88) 100%) !important;
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.26),
+    0 0 24px color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -22px 34px rgba(0, 0, 0, 0.22) !important;
+  backdrop-filter: blur(18px) saturate(135%) !important;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 72%, white) !important;
+  box-shadow:
+    0 20px 38px rgba(0, 0, 0, 0.32),
+    0 0 34px color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 32%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  border-radius: inherit !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, transparent 34%),
+    radial-gradient(circle at 82% 78%, color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 18%, transparent) 0%, transparent 42%) !important;
+  pointer-events: none !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card::after {
+  content: "" !important;
+  position: absolute !important;
+  left: clamp(9px, 0.55vw, 12px) !important;
+  right: clamp(9px, 0.55vw, 12px) !important;
+  top: auto !important;
+  bottom: 8px !important;
+  width: auto !important;
+  height: 4px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, transparent 0%, var(--cdr-kpi-accent, #38bdf8) 18%, color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 70%, white) 52%, transparent 100%) !important;
+  box-shadow: 0 0 18px var(--cdr-kpi-accent-glow, rgba(56, 189, 248, 0.55)) !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head {
+  width: 100% !important;
+  min-height: 28px !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-icon {
+  order: 1 !important;
+  width: clamp(32px, 1.8vw, 36px) !important;
+  height: clamp(32px, 1.8vw, 36px) !important;
+  padding: 6px !important;
+  border-radius: 10px !important;
+  color: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 72%, white) !important;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 30%, rgba(255,255,255,0.16)), rgba(255,255,255,0.08)) !important;
+  border: 1px solid color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 38%, rgba(255,255,255,0.16)) !important;
+  box-shadow:
+    0 6px 14px color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head span {
+  order: 2 !important;
+  color: rgba(226, 242, 250, 0.84) !important;
+  font-size: clamp(7.5px, 0.55vw, 10.5px) !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.065em !important;
+  text-align: center !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.42) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card strong {
+  width: 100% !important;
+  margin: 1px 0 0 !important;
+  color: #ffffff !important;
+  font-size: clamp(14px, 0.98vw, 19px) !important;
+  line-height: 1.06 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+  text-align: center !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.42) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card small {
+  width: 100% !important;
+  margin-top: 2px !important;
+  padding-bottom: 6px !important;
+  color: rgba(183, 205, 218, 0.78) !important;
+  font-size: clamp(7px, 0.47vw, 8.8px) !important;
+  line-height: 1.15 !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+}
+
+.app-shell.light-background-theme .visual-kpi-cards .visual-summary-card,
+.app-shell.se-theme .visual-kpi-cards .visual-summary-card {
+  border-color: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 42%, rgba(15, 23, 42, 0.16)) !important;
+  background:
+    radial-gradient(circle at 18% 8%, color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 13%, transparent) 0%, transparent 34%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.94) 0%, rgba(241, 248, 252, 0.88) 52%, rgba(226, 238, 246, 0.92) 100%) !important;
+  box-shadow:
+    0 14px 30px rgba(15, 44, 67, 0.12),
+    0 0 22px color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 14%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-head span,
+.app-shell.se-theme .visual-kpi-cards .summary-card-head span {
+  color: #214154 !important;
+  text-shadow: none !important;
+}
+
+.app-shell.light-background-theme .visual-kpi-cards .visual-summary-card strong,
+.app-shell.se-theme .visual-kpi-cards .visual-summary-card strong {
+  color: #071927 !important;
+  text-shadow: none !important;
+}
+
+.app-shell.light-background-theme .visual-kpi-cards .visual-summary-card small,
+.app-shell.se-theme .visual-kpi-cards .visual-summary-card small {
+  color: #4f6b7d !important;
+}
+
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon {
+  color: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 64%, #071927) !important;
+  background: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 14%, #ffffff) !important;
+}
+
+/* Premium glass icon color binding: icon stroke follows each card accent */
+.app-shell .visual-kpi-cards .summary-card-icon,
+.app-shell .visual-kpi-cards .summary-card-icon svg,
+.app-shell .visual-kpi-cards .summary-card-icon path,
+.app-shell .visual-kpi-cards .summary-card-icon circle,
+.app-shell .visual-kpi-cards .summary-card-icon line,
+.app-shell .visual-kpi-cards .summary-card-icon polyline,
+.app-shell .visual-kpi-cards .summary-card-icon rect {
+  color: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 78%, #ffffff) !important;
+  stroke: currentColor !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-icon {
+  background:
+    radial-gradient(circle at 35% 25%, color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 36%, white) 0%, transparent 42%),
+    linear-gradient(145deg, color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 30%, rgba(255,255,255,0.16)), rgba(255,255,255,0.07)) !important;
+  border-color: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 58%, rgba(255,255,255,0.22)) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 18%, transparent),
+    0 8px 18px color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 24%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon,
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon svg,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon svg,
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon path,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon path,
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon circle,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon circle,
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon line,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon line,
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon polyline,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon polyline,
+.app-shell.light-background-theme .visual-kpi-cards .summary-card-icon rect,
+.app-shell.se-theme .visual-kpi-cards .summary-card-icon rect {
+  color: color-mix(in srgb, var(--cdr-kpi-accent, #38bdf8) 70%, #071927) !important;
+  stroke: currentColor !important;
+}
+
+
+
+/* ==========================================================
+   DASHBOARD TYPOGRAPHY CONTROL LAYER
+   All visible dashboard text should inherit configurable tokens
+   for font family, size, weight, style, line-height, letter spacing,
+   and theme-aware colors.
+   ========================================================== */
+:root {
+  --cdr-font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --cdr-font-style: normal;
+  --cdr-line-height-tight: 1.08;
+  --cdr-line-height-normal: 1.32;
+  --cdr-line-height-relaxed: 1.6;
+  --cdr-letter-tight: 0;
+  --cdr-letter-normal: 0;
+  --cdr-letter-wide: 0.055em;
+  --cdr-weight-regular: 500;
+  --cdr-weight-medium: 650;
+  --cdr-weight-bold: 800;
+  --cdr-weight-black: 950;
+
+  --cdr-text-primary: #f8fcff;
+  --cdr-text-secondary: #c5d9e8;
+  --cdr-text-muted: #91aabd;
+  --cdr-text-accent: #6ec9ff;
+  --cdr-text-warning: #ffd166;
+  --cdr-text-danger: #ff8a8a;
+  --cdr-text-on-accent: #04131f;
+
+  --cdr-size-page-title: clamp(40px, 4.4vw, 86px);
+  --cdr-size-header-title: clamp(34px, 4.2vw, 78px);
+  --cdr-size-section-title: clamp(18px, 1.45vw, 26px);
+  --cdr-size-card-label: clamp(12px, 0.55vw, 16px);
+  --cdr-size-card-value: clamp(16px, 0.98vw, 19px);
+  --cdr-size-card-detail: clamp(11px, 0.47vw, 22px);
+  --cdr-size-body: clamp(13px, 0.78vw, 15px);
+  --cdr-size-small: clamp(11px, 0.68vw, 13px);
+  --cdr-size-tiny: clamp(9px, 0.58vw, 11px);
+  --cdr-size-button: clamp(12px, 0.8vw, 15px);
+  --cdr-size-filter-label: clamp(10px, 0.7vw, 12px);
+  --cdr-size-filter-value: clamp(12px, 0.78vw, 14px);
+  --cdr-size-table-header: clamp(10px, 0.68vw, 12px);
+  --cdr-size-table-cell: clamp(10px, 0.66vw, 12px);
+  --cdr-size-chart-title: clamp(14px, 0.95vw, 18px);
+  --cdr-size-chart-note: clamp(10px, 0.68vw, 12px);
+}
+
+.app-shell.light-background-theme,
+.app-shell.se-theme,
+.upload-shell.light-background-theme,
+.upload-shell.se-theme {
+  --cdr-text-primary: #071927;
+  --cdr-text-secondary: #27465a;
+  --cdr-text-muted: #5d7384;
+  --cdr-text-accent: #0078d4;
+  --cdr-text-warning: #9a6700;
+  --cdr-text-danger: #b42318;
+  --cdr-text-on-accent: #ffffff;
+}
+
+body,
+.upload-shell,
+.app-shell,
+.upload-shell *,
+.app-shell * {
+  font-family: var(--cdr-font-family) !important;
+  font-style: var(--cdr-font-style) !important;
+  letter-spacing: var(--cdr-letter-normal);
+}
+
+.upload-shell,
+.app-shell {
+  color: var(--cdr-text-primary) !important;
+  font-size: var(--cdr-size-body) !important;
+  font-weight: var(--cdr-weight-regular) !important;
+  line-height: var(--cdr-line-height-normal) !important;
+}
+
+.app-shell h1,
+.app-shell .dashboard-title,
+.app-shell .command-title,
+.upload-shell h1 {
+  color: var(--cdr-text-primary) !important;
+  font-size: var(--cdr-size-header-title) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: var(--cdr-line-height-tight) !important;
+  letter-spacing: var(--cdr-letter-wide) !important;
+}
+
+.upload-shell h1 {
+  font-size: var(--cdr-size-page-title) !important;
+  letter-spacing: var(--cdr-letter-tight) !important;
+}
+
+.app-shell h2,
+.app-shell .section-title h2,
+.app-shell .section-heading h2,
+.app-shell .panel-title,
+.app-shell .modal-panel h2 {
+  color: var(--cdr-text-primary) !important;
+  font-size: var(--cdr-size-section-title) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: var(--cdr-line-height-tight) !important;
+  letter-spacing: var(--cdr-letter-normal) !important;
+}
+
+.app-shell h3,
+.app-shell .chart-card h3,
+.app-shell .table-card h3,
+.app-shell .section-title h3,
+.app-shell .export-menu h3 {
+  color: var(--cdr-text-primary) !important;
+  font-size: var(--cdr-size-chart-title) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: var(--cdr-line-height-tight) !important;
+  letter-spacing: var(--cdr-letter-normal) !important;
+}
+
+.app-shell p,
+.app-shell li,
+.app-shell small,
+.app-shell .chart-card p,
+.app-shell .table-card p,
+.app-shell .section-title span,
+.app-shell .section-title p,
+.upload-shell p,
+.upload-shell small {
+  color: var(--cdr-text-secondary) !important;
+  font-size: var(--cdr-size-small) !important;
+  font-weight: var(--cdr-weight-medium) !important;
+  line-height: var(--cdr-line-height-relaxed) !important;
+}
+
+.app-shell .eyebrow,
+.app-shell .choice-eyebrow,
+.app-shell .section-title p,
+.app-shell label,
+.app-shell .filter-label,
+.app-shell .field-label,
+.app-shell .multi-select-label,
+.upload-shell .eyebrow,
+.upload-shell .choice-eyebrow {
+  color: var(--cdr-text-accent) !important;
+  font-size: var(--cdr-size-filter-label) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: var(--cdr-line-height-normal) !important;
+  letter-spacing: var(--cdr-letter-wide) !important;
+  text-transform: uppercase !important;
+}
+
+.app-shell button,
+.app-shell .button,
+.app-shell .tab-button,
+.app-shell .section-nav button,
+.app-shell .export-button,
+.app-shell .quick-card-export,
+.upload-shell button,
+.upload-shell .button {
+  font-size: var(--cdr-size-button) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: var(--cdr-line-height-tight) !important;
+  letter-spacing: var(--cdr-letter-normal) !important;
+}
+
+.app-shell input,
+.app-shell select,
+.app-shell textarea,
+.app-shell .multi-select-trigger,
+.app-shell .filter-input,
+.upload-shell input,
+.upload-shell select,
+.upload-shell textarea {
+  color: var(--cdr-text-primary) !important;
+  font-size: var(--cdr-size-filter-value) !important;
+  font-weight: var(--cdr-weight-bold) !important;
+  line-height: var(--cdr-line-height-normal) !important;
+  letter-spacing: var(--cdr-letter-normal) !important;
+}
+
+.app-shell input::placeholder,
+.upload-shell input::placeholder,
+.app-shell textarea::placeholder,
+.upload-shell textarea::placeholder {
+  color: var(--cdr-text-muted) !important;
+  font-weight: var(--cdr-weight-medium) !important;
+}
+
+.app-shell table,
+.app-shell th,
+.app-shell td,
+.app-shell .records-table,
+.app-shell .kpi-measurements-table,
+.app-shell .modal-panel table {
+  font-family: var(--cdr-font-family) !important;
+  line-height: var(--cdr-line-height-normal) !important;
+  letter-spacing: var(--cdr-letter-normal) !important;
+}
+
+.app-shell th,
+.app-shell thead td {
+  color: var(--cdr-text-primary) !important;
+  font-size: var(--cdr-size-table-header) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  text-transform: uppercase !important;
+}
+
+.app-shell td,
+.app-shell tbody th {
+  color: var(--cdr-text-secondary) !important;
+  font-size: var(--cdr-size-table-cell) !important;
+  font-weight: var(--cdr-weight-medium) !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head span {
+  color: var(--cdr-text-secondary) !important;
+  font-size: var(--cdr-size-card-label) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: var(--cdr-line-height-tight) !important;
+  letter-spacing: var(--cdr-letter-wide) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card strong {
+  color: var(--cdr-text-primary) !important;
+  font-size: var(--cdr-size-card-value) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: var(--cdr-line-height-tight) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card small {
+  color: var(--cdr-text-muted) !important;
+  font-size: var(--cdr-size-card-detail) !important;
+  font-weight: var(--cdr-weight-bold) !important;
+  line-height: var(--cdr-line-height-normal) !important;
+  display: none !important;
+}
+
+.app-shell .recharts-text,
+.app-shell .recharts-cartesian-axis-tick-value,
+.app-shell .recharts-legend-item-text,
+.app-shell .recharts-label,
+.app-shell .recharts-label-list text {
+  fill: var(--cdr-text-secondary) !important;
+  color: var(--cdr-text-secondary) !important;
+  font-family: var(--cdr-font-family) !important;
+  font-size: var(--cdr-size-chart-note) !important;
+  font-weight: var(--cdr-weight-bold) !important;
+}
+
+.app-shell .recharts-tooltip-wrapper,
+.app-shell .recharts-default-tooltip,
+.app-shell .custom-tooltip {
+  color: var(--cdr-text-primary) !important;
+  font-family: var(--cdr-font-family) !important;
+  font-size: var(--cdr-size-small) !important;
+  font-weight: var(--cdr-weight-bold) !important;
+}
+/* KPI card vertical icon alignment */
+.app-shell .visual-kpi-cards .summary-card-head {
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 5px !important;
+  min-height: 24px !important;
+  text-align: center !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-icon {
+  order: 1 !important;
+  margin: 0 auto !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head span {
+  order: 2 !important;
+  flex: 0 1 auto !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card strong,
+.app-shell .visual-kpi-cards .visual-summary-card small {
+  text-align: center !important;
+}
+/* KPI card compact vertical spacing: label closer to value */
+.app-shell .visual-kpi-cards .summary-card-head {
+  gap: 2px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.app-shell .visual-kpi-cards .summary-card-head span {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.02 !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card strong {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card {
+  gap: 1px !important;
+  justify-content: flex-start !important;
+}
+
+/* Data quality cards: match KPI vertical icon style while keeping percentage/detail visible */
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue {
+  position: relative !important;
+  isolation: isolate !important;
+  min-height: 96px !important;
+  padding: 10px 12px 12px !important;
+  border-radius: 16px !important;
+  gap: 2px !important;
+  justify-content: flex-start !important;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(56, 189, 248, 0.12) 0%, transparent 34%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.94) 0%, rgba(241, 248, 252, 0.9) 52%, rgba(226, 238, 246, 0.94) 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.28) !important;
+  box-shadow:
+    0 14px 30px rgba(15, 44, 67, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card::after,
+.app-shell .visual-quality-panel .visual-quality-issue::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: 8px !important;
+  height: 4px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, transparent 0%, #38bdf8 18%, #7dd3fc 52%, transparent 100%) !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.38) !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head {
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 2px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-icon {
+  order: 1 !important;
+  width: clamp(20px, 1.25vw, 26px) !important;
+  height: clamp(20px, 1.25vw, 26px) !important;
+  padding: 4px !important;
+  margin: 0 auto !important;
+  color: #0891b2 !important;
+  stroke: currentColor !important;
+  border-radius: 9px !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(125, 211, 252, 0.5) 0%, transparent 42%),
+    linear-gradient(145deg, rgba(56, 189, 248, 0.18), rgba(255, 255, 255, 0.72)) !important;
+  border: 1px solid rgba(14, 165, 233, 0.3) !important;
+  box-shadow: 0 8px 18px rgba(14, 165, 233, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-icon svg,
+.app-shell .visual-quality-panel .summary-card-icon path,
+.app-shell .visual-quality-panel .summary-card-icon circle,
+.app-shell .visual-quality-panel .summary-card-icon line,
+.app-shell .visual-quality-panel .summary-card-icon polyline,
+.app-shell .visual-quality-panel .summary-card-icon rect {
+  color: inherit !important;
+  stroke: currentColor !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head span {
+  order: 2 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #214154 !important;
+  font-size: var(--cdr-size-card-label) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: 1.02 !important;
+  letter-spacing: var(--cdr-letter-wide) !important;
+  text-align: center !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-issue strong {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #071927 !important;
+  font-size: var(--cdr-size-card-value) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-issue small {
+  display: block !important;
+  margin: 1px 0 8px !important;
+  padding: 0 !important;
+  color: #4f6b7d !important;
+  font-size: var(--cdr-size-card-detail) !important;
+  font-weight: var(--cdr-weight-bold) !important;
+  line-height: 1.08 !important;
+  text-align: center !important;
+}
+
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-card,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-issue {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(56, 189, 248, 0.2) 0%, transparent 34%),
+    linear-gradient(155deg, rgba(21, 44, 64, 0.86) 0%, rgba(9, 23, 38, 0.76) 52%, rgba(2, 9, 18, 0.9) 100%) !important;
+  border-color: rgba(56, 189, 248, 0.34) !important;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+
+.app-shell.dark-background-theme .visual-quality-panel .summary-card-head span,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-card strong,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-issue strong {
+  color: #f8fcff !important;
+}
+
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-card small,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-issue small {
+  color: #91aabd !important;
+}
+
+/* Data quality readability fix: restore visible label, larger icon, value and detail */
+.app-shell .visual-quality-panel .summary-card-head {
+  min-height: 54px !important;
+  gap: 5px !important;
+  overflow: visible !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-icon {
+  width: clamp(30px, 1.9vw, 38px) !important;
+  height: clamp(30px, 1.9vw, 38px) !important;
+  padding: 6px !important;
+  flex: 0 0 auto !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head span {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 14px !important;
+  color: #214154 !important;
+  font-size: clamp(10px, 0.72vw, 13px) !important;
+  line-height: 1.12 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.055em !important;
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-issue strong {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #071927 !important;
+  font-size: clamp(18px, 1.35vw, 26px) !important;
+  line-height: 1.04 !important;
+  font-weight: 950 !important;
+  margin-top: 4px !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-issue small {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #4f6b7d !important;
+  font-size: clamp(9px, 0.68vw, 12px) !important;
+  line-height: 1.14 !important;
+  font-weight: 850 !important;
+  margin: 3px 0 10px !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue {
+  min-height: 128px !important;
+  padding: 12px 14px 14px !important;
+  gap: 4px !important;
+}
+
+.app-shell.dark-background-theme .visual-quality-panel .summary-card-head span,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-card strong,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-issue strong {
+  color: #f8fcff !important;
+}
+
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-card small,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-issue small {
+  color: #b7cdde !important;
+}
+
+/* Data quality dark-theme background correction */
+.app-shell:not(.light-background-theme):not(.se-theme) .visual-quality-panel .visual-quality-card,
+.app-shell:not(.light-background-theme):not(.se-theme) .visual-quality-panel .visual-quality-issue,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-card,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-issue {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(56, 189, 248, 0.2) 0%, transparent 34%),
+    linear-gradient(155deg, rgba(21, 44, 64, 0.88) 0%, rgba(9, 23, 38, 0.8) 52%, rgba(2, 9, 18, 0.92) 100%) !important;
+  border-color: rgba(56, 189, 248, 0.34) !important;
+  color: #f8fcff !important;
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.28),
+    0 0 24px rgba(56, 189, 248, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+
+.app-shell:not(.light-background-theme):not(.se-theme) .visual-quality-panel .summary-card-head span,
+.app-shell:not(.light-background-theme):not(.se-theme) .visual-quality-panel .visual-quality-card strong,
+.app-shell:not(.light-background-theme):not(.se-theme) .visual-quality-panel .visual-quality-issue strong,
+.app-shell.dark-background-theme .visual-quality-panel .summary-card-head span,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-card strong,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-issue strong {
+  color: #f8fcff !important;
+}
+
+.app-shell:not(.light-background-theme):not(.se-theme) .visual-quality-panel .visual-quality-card small,
+.app-shell:not(.light-background-theme):not(.se-theme) .visual-quality-panel .visual-quality-issue small,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-card small,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-issue small {
+  color: #b7cdde !important;
+}
+
+.app-shell:not(.light-background-theme):not(.se-theme) .visual-quality-panel .summary-card-icon,
+.app-shell.dark-background-theme .visual-quality-panel .summary-card-icon {
+  color: #7dd3fc !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(125, 211, 252, 0.34) 0%, transparent 42%),
+    linear-gradient(145deg, rgba(56, 189, 248, 0.18), rgba(255, 255, 255, 0.08)) !important;
+  border-color: rgba(125, 211, 252, 0.32) !important;
+}
+
+/* Final correction: quality cards use dark premium glass, not white */
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue,
+.app-shell.light-background-theme .visual-quality-panel .visual-quality-card,
+.app-shell.light-background-theme .visual-quality-panel .visual-quality-issue,
+.app-shell.se-theme .visual-quality-panel .visual-quality-card,
+.app-shell.se-theme .visual-quality-panel .visual-quality-issue,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-card,
+.app-shell.dark-background-theme .visual-quality-panel .visual-quality-issue {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(56, 189, 248, 0.2) 0%, transparent 34%),
+    linear-gradient(155deg, rgba(21, 44, 64, 0.9) 0%, rgba(9, 23, 38, 0.82) 52%, rgba(2, 9, 18, 0.94) 100%) !important;
+  border-color: rgba(56, 189, 248, 0.38) !important;
+  color: #f8fcff !important;
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.3),
+    0 0 24px rgba(56, 189, 248, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head span,
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-issue strong,
+.app-shell.light-background-theme .visual-quality-panel .summary-card-head span,
+.app-shell.light-background-theme .visual-quality-panel .visual-quality-card strong,
+.app-shell.light-background-theme .visual-quality-panel .visual-quality-issue strong,
+.app-shell.se-theme .visual-quality-panel .summary-card-head span,
+.app-shell.se-theme .visual-quality-panel .visual-quality-card strong,
+.app-shell.se-theme .visual-quality-panel .visual-quality-issue strong {
+  color: #f8fcff !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-issue small,
+.app-shell.light-background-theme .visual-quality-panel .visual-quality-card small,
+.app-shell.light-background-theme .visual-quality-panel .visual-quality-issue small,
+.app-shell.se-theme .visual-quality-panel .visual-quality-card small,
+.app-shell.se-theme .visual-quality-panel .visual-quality-issue small {
+  color: #b7cdde !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-icon,
+.app-shell.light-background-theme .visual-quality-panel .summary-card-icon,
+.app-shell.se-theme .visual-quality-panel .summary-card-icon {
+  width: clamp(32px, 2vw, 40px) !important;
+  height: clamp(32px, 2vw, 40px) !important;
+  color: #7dd3fc !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(125, 211, 252, 0.34) 0%, transparent 42%),
+    linear-gradient(145deg, rgba(56, 189, 248, 0.2), rgba(255, 255, 255, 0.08)) !important;
+  border-color: rgba(125, 211, 252, 0.36) !important;
+}
+
+/* Final correction: Peak TG and Peak BS values use normal KPI value size */
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8 .visual-summary-card:nth-child(6) strong,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8 .visual-summary-card:nth-child(7) strong {
+  font-size: var(--cdr-size-card-value) !important;
+  font-weight: var(--cdr-weight-black) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.025em !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  max-height: none !important;
+}
+
+/* Compact horizontal spacing for all KPI and quality cards */
+.app-shell .visual-kpi-cards.summary-cards-10-layout {
+  --cdr-kpi-gap: clamp(3px, 0.28vw, 6px) !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card {
+  padding-left: clamp(5px, 0.36vw, 8px) !important;
+  padding-right: clamp(5px, 0.36vw, 8px) !important;
+}
+
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+  gap: clamp(3px, 0.28vw, 6px) !important;
+}
+
+.app-shell .visual-quality-panel {
+  gap: clamp(4px, 0.32vw, 7px) !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue {
+  padding-left: clamp(7px, 0.44vw, 10px) !important;
+  padding-right: clamp(7px, 0.44vw, 10px) !important;
+}
+
+/* Final card spacing + quality label strip removal */
+.app-shell .summary-cards,
+.app-shell .summary-cards-arranged,
+.app-shell .visual-kpi-cards.summary-cards-10-layout,
+.app-shell .data-quality-panel,
+.app-shell .visual-quality-panel {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100% !important;
+}
+
+.app-shell .visual-kpi-cards.summary-cards-10-layout,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-10,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-8,
+.app-shell .visual-kpi-cards.summary-cards-10-layout .summary-card-row-7 {
+  gap: 4px !important;
+  column-gap: 4px !important;
+  row-gap: 6px !important;
+}
+
+.app-shell .visual-quality-panel,
+.app-shell .data-quality-panel,
+.app-shell .visual-quality-panel .quality-issue-grid {
+  gap: 4px !important;
+  column-gap: 4px !important;
+  row-gap: 6px !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card,
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue,
+.app-shell .quality-score-card,
+.app-shell .quality-issue {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.app-shell .visual-kpi-cards .visual-summary-card {
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue {
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head span,
+.app-shell .data-quality-panel .quality-score-card span,
+.app-shell .data-quality-panel .quality-issue span,
+.app-shell .quality-score-card span,
+.app-shell .quality-issue span {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  width: auto !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Preserve source/coded text casing across dashboard */
+.upload-shell *,
+.app-shell *,
+.app-shell .visual-kpi-cards .summary-card-head span,
+.app-shell .visual-quality-panel .summary-card-head span,
+.app-shell .eyebrow,
+.app-shell .choice-eyebrow,
+.app-shell .section-title p,
+.app-shell label,
+.app-shell .filter-label,
+.app-shell .field-label,
+.app-shell .multi-select-label,
+.upload-shell .eyebrow,
+.upload-shell .choice-eyebrow,
+.app-shell th,
+.app-shell thead td {
+  text-transform: none !important;
+}
+
+/* Compact space between tabs/filters and dashboard sections */
+.app-shell .dashboard-tabs {
+  margin-bottom: 8px !important;
+}
+
+.app-shell .filters-panel {
+  margin-top: 8px !important;
+  margin-bottom: 10px !important;
+}
+
+.app-shell .cdr-command-shell {
+  margin-bottom: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+.app-shell .hero-panel {
+  margin-top: 10px !important;
+}
+
+.app-shell .summary-cards,
+.app-shell .summary-cards-arranged,
+.app-shell .visual-kpi-cards.summary-cards-10-layout,
+.app-shell .data-quality-panel,
+.app-shell .visual-quality-panel,
+.app-shell .section-title,
+.app-shell .chart-grid,
+.app-shell .table-card,
+.app-shell .chart-card {
+  margin-top: 10px !important;
+}
+

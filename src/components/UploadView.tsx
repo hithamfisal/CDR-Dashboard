@@ -33,6 +33,7 @@ type UploadViewProps = {
     customerPortalDescription: string;
     uploadHeroImageName: string;
     uploadHeroImageDataUrl: string;
+    showSampleDataButton: boolean;
   };
   portalSession: { role: "admin" | "customerAdmin" | "customer"; username: string };
   onOpenSettings: () => void;
@@ -115,13 +116,13 @@ export function UploadView({
               {canUploadTraffic && (
                 <div className="followup-primary-actions">
                   <label className="followup-action-button followup-primary-upload">
-                    <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" multiple onChange={onUploadCdr} />
+                    <input type="file" accept=".xlsx,.xlsm" multiple onChange={onUploadCdr} />
                     <FileSpreadsheet size={18} />
                     <span>{stagedTrafficUpload?.mode === "cdr" ? `${stagedCount} CDR selected` : "Select CDR workbook"}</span>
                   </label>
 
                   <label className="followup-action-button">
-                    <input type="file" accept=".csv,.xlsx,.xls,.xlsm,.xlsb" multiple onChange={onUploadRawSystem} />
+                    <input type="file" accept=".csv,.xlsx,.xlsm" multiple onChange={onUploadRawSystem} />
                     <FileText size={18} />
                     <span>{stagedTrafficUpload?.mode === "raw" ? `${stagedCount} raw selected` : "Select raw call log"}</span>
                   </label>
@@ -131,7 +132,7 @@ export function UploadView({
               {canManageFleetmap && (
                 <div className="followup-mini-grid">
                   <label className={`followup-mini-card ${masterFleetmap.meta ? "loaded" : ""}`}>
-                    <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadMasterFleetmap} />
+                    <input type="file" accept=".xlsx,.xlsm" onChange={onUploadMasterFleetmap} />
                     <Users size={18} />
                     <div>
                       <strong>{masterFleetmap.isParsing ? "Reading..." : masterFleetmap.meta?.fileName ?? "Master Fleetmap"}</strong>
@@ -140,7 +141,7 @@ export function UploadView({
                   </label>
 
                   <label className={`followup-mini-card ${fixedFleetmap.meta ? "loaded" : ""}`}>
-                    <input type="file" accept=".xlsx,.xls,.xlsm,.xlsb" onChange={onUploadFixedFleetmap} />
+                    <input type="file" accept=".xlsx,.xlsm" onChange={onUploadFixedFleetmap} />
                     <Radio size={18} />
                     <div>
                       <strong>{fixedFleetmap.isParsing ? "Reading..." : fixedFleetmap.meta?.fileName ?? "Fixed Fleetmap"}</strong>
@@ -166,7 +167,7 @@ export function UploadView({
                   <span>{isLoadingSaved ? "Opening..." : "Continue previous workbook"}</span>
                 </button>
 
-                {canUploadTraffic && (
+                {canUploadTraffic && appSettings.showSampleDataButton && (
                   <button
                     className="followup-action-button followup-sample-button"
                     type="button"

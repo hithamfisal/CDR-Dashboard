@@ -1,0 +1,124 @@
+﻿/* Early upload/fleetmap input cards and workbook source list. Source split from src/styles.css lines 417-539. */
+/* Wider upload grid to fit 4 tiles */
+.upload-grid-wide {
+  grid-template-columns: 1fr 1.1fr;
+}
+.workbook-choice-panel.three-tile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 74px 22px 22px;
+  min-height: 540px;
+}
+.workbook-choice-panel.three-tile .cdr-choice-card {
+  grid-column: span 2;
+  border-color: rgba(240, 184, 79, 0.42);
+  background: linear-gradient(135deg, rgba(240, 184, 79, 0.16), rgba(20, 37, 51, 0.92));
+}
+.workbook-choice-panel.three-tile .previous-choice-card {
+  grid-column: span 2;
+}
+
+/* Fleetmap tiles: smaller, two-up at top of panel */
+.fleetmap-choice-card {
+  min-height: 138px;
+  padding: 16px;
+}
+.fleetmap-choice-card .choice-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+}
+.fleetmap-choice-card strong {
+  font-size: clamp(18px, 2vw, 22px);
+}
+.fleetmap-choice-card p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.fleetmap-choice-card.loaded {
+  border-color: rgba(101, 193, 140, 0.5);
+  background: linear-gradient(135deg, rgba(101, 193, 140, 0.14), rgba(20, 37, 51, 0.92));
+}
+.fleetmap-choice-card.loaded .choice-icon {
+  border-color: rgba(101, 193, 140, 0.55);
+  background: rgba(101, 193, 140, 0.16);
+  color: var(--green);
+}
+.fleetmap-choice-card.loaded .choice-eyebrow {
+  color: var(--green);
+}
+
+/* "Add Region" button in topbar */
+.add-region-button {
+  border-color: rgba(240, 184, 79, 0.46);
+  background: rgba(240, 184, 79, 0.12);
+  color: var(--amber);
+}
+.add-region-button:hover {
+  background: rgba(240, 184, 79, 0.22);
+  border-color: var(--amber);
+}
+
+/* Workbook card - list of merged CDR sources */
+.cdr-sources-list {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  max-height: 110px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+}
+.cdr-sources-list li {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.cdr-sources-list strong {
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text);
+}
+.fleetmap-status {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--green);
+  border: 1px solid rgba(101, 193, 140, 0.3);
+  border-radius: 6px;
+  background: rgba(101, 193, 140, 0.08);
+}
+
+/* Light theme adjustments */
+.se-theme .fleetmap-choice-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(239,248,255,0.92));
+}
+.se-theme .fleetmap-choice-card.loaded {
+  background: linear-gradient(135deg, rgba(0,201,139,0.12), rgba(255,255,255,0.96));
+  border-color: rgba(0,201,139,0.4);
+}
+.se-theme .cdr-sources-list {
+  background: rgba(0,120,255,0.04);
+  border-color: rgba(0,120,255,0.16);
+}
+.se-theme .add-region-button {
+  background: rgba(0,167,216,0.12);
+  border-color: rgba(0,167,216,0.36);
+  color: #0087c7;
+}
+
+/* Mobile fallback for the upload screen */
+@media (max-width: 1180px) {
+  .upload-grid-wide { grid-template-columns: 1fr; }
+  .workbook-choice-panel.three-tile { grid-template-columns: 1fr; }
+  .workbook-choice-panel.three-tile .cdr-choice-card,
+  .workbook-choice-panel.three-tile .previous-choice-card {
+    grid-column: span 1;
+  }
+}
+

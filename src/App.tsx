@@ -3,6 +3,8 @@ import {
   ChangeEvent,
   FormEvent,
   ReactNode,
+  Suspense,
+  lazy,
   useCallback,
   useDeferredValue,
   useEffect,
@@ -11,14 +13,11 @@ import {
   useState,
 } from "react";
 import {
-  ChartLegend,
   ExportButton,
-  SectionTitle,
 } from "./components/DashboardUi";
 import { DashboardFilters } from "./components/DashboardFilters";
 import { DashboardTabs } from "./components/DashboardTabs";
 import {
-  chartLabel,
   formatDecimal,
   formatNumber,
   formatPercent,
@@ -38,7 +37,6 @@ import {
   workbookMeta,
 } from "./lib/browserCache";
 import {
-  CHART_COLORS,
   COLORS,
   DASHBOARD_TABS,
   EMPTY_FILTERS,
@@ -51,7 +49,6 @@ import {
   SAVED_WORKBOOK_META_KEY,
   SAVED_WORKBOOK_STORE,
   SECTION_NAV_ITEMS,
-  TOOLTIP_STYLE,
 } from "./lib/dashboardConstants";
 import type {
   CallRecord,
@@ -60,7 +57,6 @@ import type {
   DashboardTab,
   Filters,
   FleetmapMeta,
-  FleetmapRecord,
   FleetmapState,
   NativeChartConfig,
   Ranking,
@@ -68,7 +64,6 @@ import type {
   StagedTrafficUpload,
   ThemeName,
 } from "./types/dashboard";
-import { ReportsPanel } from "./components/ReportsPanel";
 import {
   DEFAULT_LOCAL_SETTINGS,
   ensureLocalAppDatabase,
@@ -87,34 +82,26 @@ import {
 } from "./lib/localAppDatabase";
 import { UploadView } from "./components/UploadView";
 import { ThemeSelector } from "./components/ThemeSelector";
+import { DESIGN_PROPOSALS, normalizeDesignProposal } from "./theme/designProposals";
 import { WorkbookHero } from "./components/WorkbookHero";
-import { ModernOverview } from "./components/ModernOverview";
-import { ChartsTab } from "./components/ChartsTab";
-import { FilteredCallsRegister } from "./components/FilteredCallsRegister";
 import {
-  CallsDurationPerformanceChart,
-  CompanyPerformanceTooltip,
-  KpiBarLabel,
-  KpiLineLabel,
-  MobileTypeOverlayBarShape,
-  MobileTypeTooltip,
-  OverlayBarShape,
-  PieOuterDecimalLabel,
-  PointValueLabel,
-  RadioTooltip,
-  RightValueLabel,
-  TalkgroupTooltip,
-  TopValueLabel,
+  CALL_TYPE_SERIES,
+  COMPANY_TREEMAP_COLORS,
+  CallTypeMixTooltip,
+  CompanyTreemapTile,
+  MONTH_BUCKETS,
+  REGION_RADAR_COLORS,
+  REGION_RADAR_ORDER,
+  StackedPercentLabel,
+  callTypeMixKey,
+  callTypeMonthIndex,
 } from "./components/ChartParts";
 import { filterCallRecords } from "./lib/filterRecords";
 import { calculateMetrics, calculateRankings, modeBy } from "./lib/analytics";
 import { monthSortValue, weekSortValue } from "./lib/dateSort";
 import { buildFilterOptions, uniqueOptions } from "./lib/filterOptions";
 import {
-  companyColor,
-  companyMetricColor,
   dataKey,
-  mobileTypeColor,
   mobileTypeKey,
   shortMonthLabel,
   truncateLabel,
@@ -147,7 +134,18 @@ import {
   pdfText,
   pptTextOptions,
 } from "./lib/exportUtils";
+import { unionFleetmapRecords } from "./lib/fleetmapUtils";
+import {
+  loadChartWorkbookExport,
+  loadExcelJS,
+  loadJsPdf,
+  loadPptxgen,
+  loadTablePdfExport,
+  loadWorkbookParser,
+} from "./lib/lazyModules";
 import { usePagedItems } from "./hooks/usePagination";
+import { useKpiAnalytics } from "./hooks/useKpiAnalytics";
+import { useFleetActivation } from "./hooks/useFleetActivation";
 import type ExcelJS from "exceljs";
 import {
   Activity,
@@ -166,267 +164,33 @@ import {
   ShieldCheck,
   UploadCloud,
 } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ComposedChart,
-  LabelList,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  PolarAngleAxis,
-  PolarGrid,
-  PolarRadiusAxis,
-  Radar,
-  RadarChart,
-  ResponsiveContainer,
-  Treemap,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+const ReportsPanel = lazy(() =>
+  import("./components/ReportsPanel").then((module) => ({ default: module.ReportsPanel })),
+);
+const ModernOverview = lazy(() =>
+  import("./components/ModernOverview").then((module) => ({ default: module.ModernOverview })),
+);
+const ChartsTab = lazy(() =>
+  import("./components/ChartsTab").then((module) => ({ default: module.ChartsTab })),
+);
+const FleetActivationTab = lazy(() =>
+  import("./components/FleetActivationTab").then((module) => ({ default: module.FleetActivationTab })),
+);
+const CompanyInsightsTab = lazy(() =>
+  import("./components/CompanyInsightsTab").then((module) => ({ default: module.CompanyInsightsTab })),
+);
+const KpiPerformanceTab = lazy(() =>
+  import("./components/KpiPerformanceTab").then((module) => ({ default: module.KpiPerformanceTab })),
+);
 
-// Shared sub-components
-
-async function loadExcelJS() {
-  return (await import("exceljs")).default;
-}
-
-async function loadJsPdf() {
-  return (await import("jspdf")).jsPDF;
-}
-
-async function loadPptxgen() {
-  return (await import("pptxgenjs")).default;
-}
-
-async function loadWorkbookParser() {
-  return import("./lib/workbookParser");
-}
-
-function unionFleetmapRecords(
-  master: FleetmapRecord[],
-  fixed: FleetmapRecord[],
-): FleetmapRecord[] {
-  const map = new Map<string, FleetmapRecord>();
-  [...master, ...fixed].forEach((record) => {
-    const radioKey = normalizeRadioKey(record.radioId);
-    if (isKnownLabel(radioKey) && !map.has(radioKey)) map.set(radioKey, record);
-  });
-  return [...map.values()];
-}
-
-const COMPANY_TREEMAP_COLORS = [
-  "var(--chart-series-1)",
-  "var(--chart-series-2)",
-  "var(--chart-series-3)",
-  "var(--chart-series-4)",
-  "var(--chart-series-5)",
-  "var(--chart-series-6)",
-  "var(--chart-series-7)",
-  "var(--chart-series-8)",
-];
-const REGION_RADAR_COLORS = ["var(--chart-series-1)", "var(--chart-series-2)", "var(--chart-series-3)", "var(--chart-series-4)"];
-const REGION_RADAR_ORDER = ["South", "West", "East", "North"];
-const CALL_TYPE_SERIES = [
-  { key: "phoneCall", name: "Phone Call", color: "var(--chart-series-1)" },
-  { key: "groupCall", name: "Group Call", color: "var(--chart-series-2)" },
-  {
-    key: "environmentalListening",
-    name: "Environmental Listening",
-    color: "var(--chart-series-3)",
-  },
-  { key: "individualCall", name: "Individual Call", color: "var(--chart-series-4)" },
-  { key: "networkWide", name: "Network-wide", color: "var(--chart-series-5)" },
-  { key: "broadcast", name: "Broadcast", color: "var(--chart-series-6)" },
-];
-const MONTH_BUCKETS = [
-  { label: "Jan", match: "jan" },
-  { label: "Feb", match: "feb" },
-  { label: "Mar", match: "mar" },
-  { label: "Apr", match: "apr" },
-  { label: "May", match: "may" },
-  { label: "Jun", match: "jun" },
-  { label: "Jul", match: "jul" },
-  { label: "Aug", match: "aug" },
-  { label: "Sep", match: "sep" },
-  { label: "Oct", match: "oct" },
-  { label: "Nov", match: "nov" },
-  { label: "Dec", match: "dec" },
-];
-
-function callTypeMonthIndex(record: CallRecord) {
-  const text = `${record.month || record.callDate || ""}`.trim().toLowerCase();
-  const explicit = MONTH_BUCKETS.findIndex(
-    (month) => text.startsWith(month.match) || text.includes(` ${month.match}`),
-  );
-  if (explicit >= 0) return explicit;
-  const parsed = new Date(record.callDate);
-  return Number.isNaN(parsed.getTime()) ? -1 : parsed.getMonth();
-}
-
-function callTypeMixKey(value: string) {
-  const text = `${value || ""}`.toLowerCase();
-  if (text.includes("broadcast")) return "broadcast";
-  if (text.includes("network")) return "networkWide";
-  if (text.includes("environment") || text.includes("listen"))
-    return "environmentalListening";
-  if (text.includes("individual") || text.includes("private"))
-    return "individualCall";
-  if (text.includes("group")) return "groupCall";
-  return "phoneCall";
-}
-
-function StackedPercentLabel(props: any) {
-  const { x = 0, y = 0, width = 0, height = 0, value = 0 } = props;
-  const numeric = Number(value);
-  if (numeric < 9 || width < 18 || height < 18) return null;
+function LazyTabFallback({ label = "Loading section..." }: { label?: string }) {
   return (
-    <text
-      x={x + width / 2}
-      y={y + height / 2 + 4}
-      textAnchor="middle"
-      fill="var(--design-bg)"
-      fontSize={9}
-      fontWeight={900}
-    >
-      {formatDecimal(numeric, 0)}%
-    </text>
-  );
-}
-
-function CallTypeMixTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
-  const visible = payload.filter((item: any) => Number(item.value) > 0);
-  return (
-    <div className="custom-tooltip">
+    <section className="lazy-tab-fallback" aria-live="polite">
+      <Activity size={22} />
       <strong>{label}</strong>
-      {visible.map((item: any) => (
-        <span key={item.dataKey} style={{ color: item.color }}>
-          {item.name}: {formatDecimal(Number(item.value), 1)}% (
-          {formatNumber(Number(item.payload?.[`${item.dataKey}Count`] ?? 0))})
-        </span>
-      ))}
-    </div>
+    </section>
   );
 }
-
-function CompanyTreemapTile(props: any) {
-  const {
-    x = 0,
-    y = 0,
-    width = 0,
-    height = 0,
-    name = "",
-    calls = 0,
-    payload,
-    index = 0,
-  } = props;
-  const fill = payload?.fill ?? props.fill ?? COMPANY_TREEMAP_COLORS[0];
-  const tileName = payload?.name ?? name;
-  const tileCalls = Number(payload?.calls ?? calls ?? props.value ?? 0);
-  if (width < 8 || height < 8) return null;
-  const innerWidth = Math.max(0, width - 6);
-  const innerHeight = Math.max(0, height - 6);
-  const fontSize =
-    width > 128 && height > 58 ? 12 : width > 82 && height > 34 ? 10 : 8;
-  const maxChars = Math.max(
-    3,
-    Math.floor((innerWidth - 14) / (fontSize * 0.56)),
-  );
-  const showName = innerWidth > 26 && innerHeight > 18;
-  const showValue = innerWidth > 42 && innerHeight > 28;
-  const clipId =
-    `company-treemap-clip-${index}-${Math.round(x)}-${Math.round(y)}`.replace(
-      /[^a-zA-Z0-9_-]/g,
-      "",
-    );
-  return (
-    <g>
-      <defs>
-        <clipPath id={clipId}>
-          <rect
-            x={x + 3}
-            y={y + 3}
-            width={innerWidth}
-            height={innerHeight}
-            rx={9}
-            ry={9}
-          />
-        </clipPath>
-      </defs>
-      <title>{`${tileName}: ${formatNumber(tileCalls)} calls`}</title>
-      <rect
-        x={x + 3}
-        y={y + 3}
-        width={innerWidth}
-        height={innerHeight}
-        rx={9}
-        ry={9}
-        fill={fill}
-        fillOpacity={0.94}
-        stroke="rgba(237,246,250,0.34)"
-        strokeWidth={1.2}
-      />
-      <rect
-        x={x + 3}
-        y={y + 3}
-        width={innerWidth}
-        height={innerHeight}
-        rx={9}
-        ry={9}
-        fill="var(--design-bg)"
-        fillOpacity={0.08}
-      />
-      <g clipPath={`url(#${clipId})`}>
-        {showName && (
-          <text
-            x={x + 10}
-            y={y + fontSize + 10}
-            fill="var(--design-bg)"
-            fontSize={fontSize}
-            fontWeight={900}
-          >
-            {truncateLabel(String(tileName), maxChars)}
-          </text>
-        )}
-        {showValue && (
-          <text
-            x={x + 10}
-            y={y + fontSize * 2 + 16}
-            fill="var(--design-bg)"
-            fontSize={Math.max(8, fontSize - 1)}
-            fontWeight={850}
-          >
-            {formatNumber(tileCalls)} calls
-          </text>
-        )}
-      </g>
-    </g>
-  );
-}
-
-function RegionRadarTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="radar-tooltip">
-      <strong>{label}</strong>
-      {payload.map((item: any) => (
-        <span key={item.dataKey} style={{ color: item.color }}>
-          {item.name}:{" "}
-          {item.payload?.[`${item.dataKey}RawText`] ??
-            formatDecimal(Number(item.value), 1)}
-        </span>
-      ))}
-    </div>
-  );
-}
-
 
 type PortalMode = PortalRole;
 
@@ -453,6 +217,8 @@ function portalRoleLabel(role: PortalRole) {
   if (role === "customerAdmin") return "Customer Admin";
   return "Customer";
 }
+
+const MIN_PASSWORD_LENGTH = 12;
 
 
 type PortalSession = { role: PortalRole; username: string; token?: string };
@@ -483,9 +249,9 @@ function LoginScreen({
     setLoginError("");
     try {
       const ok = await onLogin(username, password);
-      if (!ok) setLoginError("Invalid username or password in MySQL.");
+      if (!ok) setLoginError("Invalid username or password.");
     } catch (error) {
-      setLoginError(error instanceof Error ? error.message : "Cannot connect to the MySQL API.");
+      setLoginError(error instanceof Error ? error.message : "Cannot connect to the dashboard service.");
     } finally {
       setIsSubmitting(false);
     }
@@ -504,7 +270,7 @@ function LoginScreen({
           <ShieldCheck size={38} />
           <span>{settings.companyName}</span>
           <h1>CDR Dashboard Login</h1>
-          <p>One interface with multiple permissions stored in MySQL.</p>
+          <p>One interface with secure dashboard permissions.</p>
         </div>
 
         <form className="local-login-form" onSubmit={submit}>
@@ -518,12 +284,12 @@ function LoginScreen({
           </label>
           {loginError && <div className="local-login-error">{loginError}</div>}
           <button className="button cdr-action-pill cdr-action-primary" type="submit" disabled={isSubmitting}>
-            <ShieldCheck size={18} /> {isSubmitting ? "Checking MySQL..." : "Login"}
+            <ShieldCheck size={18} /> {isSubmitting ? "Checking access..." : "Login"}
           </button>
         </form>
 
         <div className="local-login-note">
-          <strong>MySQL credentials</strong>
+          <strong>Dashboard access</strong>
           <span>The portal privilege is detected automatically from the saved username. No role selection is required.</span>
         </div>
       </section>
@@ -603,7 +369,7 @@ function LocalSettingsPanel({
         setUsers(nextUsers);
         setAuditLogs(nextLogs);
       })
-      .catch((error) => setStatus(error instanceof Error ? error.message : "Could not load MySQL users."))
+      .catch((error) => setStatus(error instanceof Error ? error.message : "Could not load dashboard users."))
       .finally(() => mounted && setIsLoadingUsers(false));
     return () => {
       mounted = false;
@@ -614,14 +380,14 @@ function LocalSettingsPanel({
 
   const saveSettings = async () => {
     await onSaveSettings(draft);
-    setStatus("Admin settings saved in MySQL database.");
+    setStatus("Admin settings saved.");
   };
 
   const saveCredential = async (role: PortalRole) => {
     const username = role === "admin" ? adminUsername : role === "customerAdmin" ? customerAdminUsername : customerUsername;
     const password = role === "admin" ? adminPassword : role === "customerAdmin" ? customerAdminPassword : customerPassword;
-    if (!username.trim() || password.length < 6) {
-      setStatus("Username is required and password must be at least 6 characters.");
+    if (!username.trim() || password.length < MIN_PASSWORD_LENGTH) {
+      setStatus(`Username is required and password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
       return;
     }
     await onSaveCredential(role, username, password);
@@ -637,12 +403,12 @@ function LocalSettingsPanel({
     }
     setUsers(await listMysqlUsers());
     setAuditLogs(await listMysqlAuditLogs(60));
-    setStatus(`${portalRoleLabel(role)} credential saved in MySQL database.`);
+    setStatus(`${portalRoleLabel(role)} credential saved.`);
   };
 
   const addMysqlUser = async () => {
-    if (!newUserName.trim() || newUserPassword.length < 6) {
-      setStatus("New user requires a username and a password of at least 6 characters.");
+    if (!newUserName.trim() || newUserPassword.length < MIN_PASSWORD_LENGTH) {
+      setStatus(`New user requires a username and a password of at least ${MIN_PASSWORD_LENGTH} characters.`);
       return;
     }
     const nextUsers = await createMysqlUser({ username: newUserName, password: newUserPassword, role: newUserRole, isActive: true });
@@ -650,7 +416,7 @@ function LocalSettingsPanel({
     setAuditLogs(await listMysqlAuditLogs(60));
     setNewUserName("");
     setNewUserPassword("");
-    setStatus("New MySQL user created.");
+    setStatus("New dashboard user created.");
   };
 
   const updateUserRole = async (user: AppUserRecord, role: PortalRole) => {
@@ -667,8 +433,8 @@ function LocalSettingsPanel({
 
   const resetUserPassword = async (user: AppUserRecord) => {
     const password = userPasswordDrafts[user.id] || "";
-    if (password.length < 6) {
-      setStatus("Reset password must be at least 6 characters.");
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setStatus(`Reset password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
       return;
     }
     setUsers(await updateMysqlUser({ id: user.id, password }));
@@ -719,6 +485,11 @@ function LocalSettingsPanel({
       uploadHeroImageDataUrl: DEFAULT_LOCAL_SETTINGS.uploadHeroImageDataUrl,
       radioShowcaseImageName: DEFAULT_LOCAL_SETTINGS.radioShowcaseImageName,
       radioShowcaseImageDataUrl: DEFAULT_LOCAL_SETTINGS.radioShowcaseImageDataUrl,
+      defaultTheme: DEFAULT_LOCAL_SETTINGS.defaultTheme,
+      showSampleDataButton: DEFAULT_LOCAL_SETTINGS.showSampleDataButton,
+      headerLogoSize: DEFAULT_LOCAL_SETTINGS.headerLogoSize,
+      headerTitleScale: DEFAULT_LOCAL_SETTINGS.headerTitleScale,
+      compactDashboardLayout: DEFAULT_LOCAL_SETTINGS.compactDashboardLayout,
     }));
     setStatus("Branding fields reset in the form. Press Save Interface Settings to apply.");
   };
@@ -735,13 +506,13 @@ function LocalSettingsPanel({
         </div>
 
         <div className="local-design-preview-grid" aria-label="Design proposal previews">
-          <button type="button" className={`local-design-preview-card ${theme === "proposal1" ? "active" : ""}`} onClick={() => onThemeChange("proposal1")}>
+          <button type="button" className={`local-design-preview-card ${theme === "proposal1" ? "active" : ""}`} onClick={() => { onThemeChange("proposal1"); setDraft((current) => ({ ...current, defaultTheme: "proposal1" })); }}>
             <span>Dark Blue</span><strong>Operations command center</strong><small>Navy panels, blue/cyan analytics, high contrast.</small>
           </button>
-          <button type="button" className={`local-design-preview-card ${theme === "proposal2" ? "active" : ""}`} onClick={() => onThemeChange("proposal2")}>
+          <button type="button" className={`local-design-preview-card ${theme === "proposal2" ? "active" : ""}`} onClick={() => { onThemeChange("proposal2"); setDraft((current) => ({ ...current, defaultTheme: "proposal2" })); }}>
             <span>Light Executive</span><strong>Management report view</strong><small>White cards, readable dark text, clean blue accents.</small>
           </button>
-          <button type="button" className={`local-design-preview-card ${theme === "proposal3" ? "active" : ""}`} onClick={() => onThemeChange("proposal3")}>
+          <button type="button" className={`local-design-preview-card ${theme === "proposal3" ? "active" : ""}`} onClick={() => { onThemeChange("proposal3"); setDraft((current) => ({ ...current, defaultTheme: "proposal3" })); }}>
             <span>Dark Emerald</span><strong>Network operations view</strong><small>Emerald panels, service-health accents, NOC style.</small>
           </button>
         </div>
@@ -755,6 +526,19 @@ function LocalSettingsPanel({
           <label>Support Email<input value={draft.supportEmail} onChange={(event) => setDraft({ ...draft, supportEmail: event.target.value })} /></label>
           <label>Support Phone<input value={draft.supportPhone} onChange={(event) => setDraft({ ...draft, supportPhone: event.target.value })} /></label>
           <label>Primary Color<input value={draft.primaryColor} onChange={(event) => setDraft({ ...draft, primaryColor: event.target.value })} /></label>
+          <label>Default Design
+            <select value={draft.defaultTheme} onChange={(event) => setDraft({ ...draft, defaultTheme: normalizeDesignProposal(event.target.value) })}>
+              {DESIGN_PROPOSALS.map((proposal) => <option key={proposal.value} value={proposal.value}>{proposal.label}</option>)}
+            </select>
+          </label>
+          <label>Header Logo Size
+            <input type="number" min={44} max={120} step={2} value={draft.headerLogoSize} onChange={(event) => setDraft({ ...draft, headerLogoSize: Number(event.target.value) || DEFAULT_LOCAL_SETTINGS.headerLogoSize })} />
+          </label>
+          <label>Header Title Scale
+            <input type="number" min={0.75} max={1.25} step={0.05} value={draft.headerTitleScale} onChange={(event) => setDraft({ ...draft, headerTitleScale: Number(event.target.value) || DEFAULT_LOCAL_SETTINGS.headerTitleScale })} />
+          </label>
+          <label className="local-settings-toggle"><input type="checkbox" checked={draft.showSampleDataButton} onChange={(event) => setDraft({ ...draft, showSampleDataButton: event.target.checked })} /><span>Show sample-data button on upload page</span></label>
+          <label className="local-settings-toggle"><input type="checkbox" checked={draft.compactDashboardLayout} onChange={(event) => setDraft({ ...draft, compactDashboardLayout: event.target.checked })} /><span>Use compact dashboard spacing</span></label>
           <label className="local-settings-wide">Admin Portal Description<textarea value={draft.adminPortalDescription} onChange={(event) => setDraft({ ...draft, adminPortalDescription: event.target.value })} /></label>
           <label className="local-settings-wide">Customer Portal Description<textarea value={draft.customerPortalDescription} onChange={(event) => setDraft({ ...draft, customerPortalDescription: event.target.value })} /></label>
         </div>
@@ -801,7 +585,7 @@ function LocalSettingsPanel({
           </div>
         </div>
 
-        <div className="local-settings-status local-settings-guidance">Recommended image sizes: header logos 320×96 px transparent PNG/SVG, upload page picture 1600×1000 px JPG/PNG/WebP, radio showcase picture 1200×1280 px transparent PNG/WebP (or keep original ratio near 1275×1359).</div>
+        <div className="local-settings-status local-settings-guidance">Recommended image sizes: header logos 320x96 px transparent PNG/SVG, upload page picture 1600x1000 px JPG/PNG/WebP, radio showcase picture 1200x1280 px transparent PNG/WebP (or keep original ratio near 1275x1359).</div>
         <div className="local-settings-actions-row">
           <button className="button cdr-action-pill cdr-action-primary" type="button" onClick={saveSettings}>Save Interface Settings</button>
           <button className="button cdr-action-pill" type="button" onClick={resetBrandingDefaults}>Reset Branding Defaults</button>
@@ -834,7 +618,7 @@ function LocalSettingsPanel({
           <div className="local-admin-management">
             <div className="local-admin-section-head">
               <div><span>System Admin</span><h3>User Management</h3></div>
-              <small>{isLoadingUsers ? "Loading users..." : `${users.length} users in MySQL`}</small>
+              <small>{isLoadingUsers ? "Loading users..." : `${users.length} dashboard users`}</small>
             </div>
             <div className="local-user-create-row">
               <select value={newUserRole} onChange={(event) => setNewUserRole(event.target.value as PortalRole)}>
@@ -963,14 +747,16 @@ export default function App() {
     ensureLocalAppDatabase()
       .then(({ settings }) => {
         if (!mounted) return;
-        setAppSettings(settings);
+        const normalizedSettings = { ...settings, defaultTheme: normalizeDesignProposal(settings.defaultTheme) };
+        setAppSettings(normalizedSettings);
+        setTheme(normalizedSettings.defaultTheme);
         setIsLocalDbReady(true);
       })
       .catch(() => setIsLocalDbReady(true));
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [setTheme]);
 
   const handlePortalLogin = useCallback(async (username: string, password: string) => {
     const verified = await verifyLocalCredentialByUsername(username, password);
@@ -994,8 +780,10 @@ export default function App() {
 
   const handleSaveLocalSettings = useCallback(async (settings: LocalAppSettings) => {
     const next = await saveLocalAppSettings(settings);
-    setAppSettings(next);
-  }, []);
+    const normalizedSettings = { ...next, defaultTheme: normalizeDesignProposal(next.defaultTheme) };
+    setAppSettings(normalizedSettings);
+    setTheme(normalizedSettings.defaultTheme);
+  }, [setTheme]);
 
   const handleSaveLocalCredential = useCallback(async (role: PortalRole, username: string, password: string) => {
     await updateLocalCredential(role, username, password);
@@ -1708,222 +1496,12 @@ export default function App() {
     });
   }, [filtered, regionPerformanceRows, regionRadarSeries]);
 
-  const fleetActivation = useMemo(() => {
-    const liveFleetmap = unionFleetmapRecords(
-      masterFleetmap.records,
-      fixedFleetmap.records,
-    );
-    const savedFleetmap = data?.fleetmapRecords ?? [];
-    const lookupFleetmapFallback: FleetmapRecord[] = (
-      data?.lookupRecords ?? []
-    ).map((record) => ({
-      radioId: record.radioId,
-      radioAlias: "",
-      employeeName: "",
-      employeeId: "",
-      company: record.company,
-      region: record.region,
-      talkgroup: record.talkgroup,
-      mobileType: "Unknown",
-      source: "master",
-    }));
-
-    const fleetmapCandidates = [
-      ...liveFleetmap,
-      ...savedFleetmap,
-      ...lookupFleetmapFallback,
-    ];
-
-    const activeRadioIds = new Set(
-      filtered
-        .map((record) => normalizeRadioKey(record.radioId))
-        .filter((radioId) => isKnownLabel(radioId)),
-    );
-
-    const registeredMap = new Map<string, FleetmapRecord>();
-    fleetmapCandidates.forEach((record) => {
-      const radioKey = normalizeRadioKey(record.radioId);
-      if (isKnownLabel(radioKey) && !registeredMap.has(radioKey))
-        registeredMap.set(radioKey, record);
-    });
-
-    const registered = [...registeredMap.entries()].map(
-      ([radioKey, record]) => ({ radioKey, record }),
-    );
-    const activeRegistered = registered.filter((item) =>
-      activeRadioIds.has(item.radioKey),
-    );
-    const inactive = registered
-      .filter((item) => !activeRadioIds.has(item.radioKey))
-      .map((item) => item.record);
-    const activeRegisteredRecords = activeRegistered.map((item) => item.record);
-    const registeredRecords = registered.map((item) => item.record);
-
-    const buildAllDimensionRows = (
-      getRegisteredName: (record: FleetmapRecord) => string,
-      getFilteredName: (record: CallRecord) => string,
-    ) => {
-      const map = new Map<string, number>();
-
-      registeredRecords.forEach((record) => {
-        const name = cleanText(getRegisteredName(record), "Unknown");
-        if (isKnownLabel(name) && !map.has(name)) map.set(name, 0);
-      });
-
-      filtered.forEach((record) => {
-        const name = cleanText(getFilteredName(record), "Unknown");
-        if (isKnownLabel(name) && !map.has(name)) map.set(name, 0);
-      });
-
-      const activeMap = new Map<string, number>();
-
-      activeRegisteredRecords.forEach((record) => {
-        const name = cleanText(getRegisteredName(record), "Unknown");
-        if (isKnownLabel(name))
-          activeMap.set(name, (activeMap.get(name) ?? 0) + 1);
-      });
-
-      /*
-        If no registered fleetmap rows are available, still show Active Radios
-        from the filtered CDR rows so the table remains useful.
-      */
-      if (registeredRecords.length === 0) {
-        const activeFilteredKeys = new Map<string, Set<string>>();
-        filtered.forEach((record) => {
-          const name = cleanText(getFilteredName(record), "Unknown");
-          const radioKey = normalizeRadioKey(record.radioId);
-          if (!isKnownLabel(name) || !isKnownLabel(radioKey)) return;
-          const set = activeFilteredKeys.get(name) ?? new Set<string>();
-          set.add(radioKey);
-          activeFilteredKeys.set(name, set);
-        });
-        activeFilteredKeys.forEach((set, name) =>
-          activeMap.set(name, set.size),
-        );
-      }
-
-      inactive.forEach((record) => {
-        const name = cleanText(getRegisteredName(record), "Unknown");
-        if (isKnownLabel(name)) map.set(name, (map.get(name) ?? 0) + 1);
-      });
-
-      activeMap.forEach((_count, name) => {
-        if (isKnownLabel(name) && !map.has(name)) map.set(name, 0);
-      });
-
-      return [...map.entries()]
-        .map(([name, count]) => ({
-          name,
-          count,
-          activeCount: activeMap.get(name) ?? 0,
-        }))
-        .sort(
-          (a, b) =>
-            b.count - a.count ||
-            b.activeCount - a.activeCount ||
-            a.name.localeCompare(b.name),
-        );
-    };
-
-    return {
-      registeredCount: registered.length,
-      activeRegisteredCount: activeRegistered.length,
-      inactiveCount: inactive.length,
-      activationRate: registered.length
-        ? (activeRegistered.length / registered.length) * 100
-        : 0,
-      inactiveByCompany: buildAllDimensionRows(
-        (record) => record.company,
-        (record) => record.company,
-      ),
-      inactiveByRegion: buildAllDimensionRows(
-        (record) => record.region,
-        (record) => record.region,
-      ),
-      inactiveByMobileType: buildAllDimensionRows(
-        (record) => record.mobileType,
-        (record) => record.mobileType,
-      ),
-    };
-  }, [
-    data?.fleetmapRecords,
-    data?.lookupRecords,
+  const { fleetActivation, unmatchedFleetmapReportRows } = useFleetActivation({
+    data,
     filtered,
-    masterFleetmap.records,
-    fixedFleetmap.records,
-  ]);
-
-  const unmatchedFleetmapReportRows = useMemo(() => {
-    const map = new Map<
-      string,
-      {
-        callerNumber: string;
-        callerAlias: string;
-        talkgroup: string;
-        firstSeen: string;
-        lastSeen: string;
-        calls: number;
-        totalDuration: number;
-        baseStations: Set<string>;
-        reason: string;
-      }
-    >();
-
-    filtered.forEach((record) => {
-      const isUnmatchedFleetmap = record.region === "Unmatched Fleetmap";
-      const isUnknownCompany = record.company === "Unknown";
-      if (!isUnmatchedFleetmap && !isUnknownCompany) return;
-
-      const callerNumber =
-        normalizeRadioKey(record.radioId) ||
-        cleanText(record.radioId, "Unknown");
-      const reason = isUnmatchedFleetmap
-        ? "Caller Number not found in Master/Fixed Fleetmap Radio ID"
-        : "Fleetmap match incomplete or Company missing";
-      const current = map.get(callerNumber) ?? {
-        callerNumber,
-        callerAlias: cleanText(record.radioAlias, "Not labelled"),
-        talkgroup: cleanText(record.talkgroup, "Unknown"),
-        firstSeen: record.startTime,
-        lastSeen: record.endTime || record.startTime,
-        calls: 0,
-        totalDuration: 0,
-        baseStations: new Set<string>(),
-        reason,
-      };
-
-      current.calls += 1;
-      current.totalDuration += record.durationSeconds;
-      if (isKnownLabel(record.baseStation))
-        current.baseStations.add(record.baseStation);
-      if (
-        record.startTime &&
-        (!current.firstSeen || record.startTime < current.firstSeen)
-      )
-        current.firstSeen = record.startTime;
-      if (
-        record.endTime &&
-        (!current.lastSeen || record.endTime > current.lastSeen)
-      )
-        current.lastSeen = record.endTime;
-      if (!isKnownLabel(current.callerAlias) && isKnownLabel(record.radioAlias))
-        current.callerAlias = record.radioAlias;
-      if (!isKnownLabel(current.talkgroup) && isKnownLabel(record.talkgroup))
-        current.talkgroup = record.talkgroup;
-      map.set(callerNumber, current);
-    });
-
-    return [...map.values()]
-      .map((row) => ({
-        ...row,
-        baseStationsText: [...row.baseStations].sort().join(", ") || "Unknown",
-      }))
-      .sort(
-        (a, b) =>
-          b.calls - a.calls || a.callerNumber.localeCompare(b.callerNumber),
-      );
-  }, [filtered]);
-
+    masterFleetmapRecords: masterFleetmap.records,
+    fixedFleetmapRecords: fixedFleetmap.records,
+  });
   const trafficIntensity = useMemo(() => {
     const busyTrafficHour = [...rankings.hour].sort(
       (a, b) => b.trafficHours - a.trafficHours || b.calls - a.calls,
@@ -2286,153 +1864,19 @@ export default function App() {
       );
   }, [filtered, mobileTypes]);
 
-  const kpiRows = useMemo(() => {
-    const map = new Map<
-      string,
-      {
-        calls: number;
-        durationSeconds: number;
-        talkgroups: Set<string>;
-        radios: Set<string>;
-      }
-    >();
-    const lookupCompanies = new Set(
-      (data?.lookupRecords ?? []).map((r) => r.company),
-    );
-    const lookupCompanyCounts = new Map<string, number>();
-    (data?.lookupRecords ?? [])
-      .filter(
-        (r) => filters.region.length === 0 || filters.region.includes(r.region),
-      )
-      .forEach((r) =>
-        lookupCompanyCounts.set(
-          r.company,
-          (lookupCompanyCounts.get(r.company) ?? 0) + 1,
-        ),
-      );
-    const unlistedCount = filtered.filter(
-      (r) => !lookupCompanies.has(r.company),
-    ).length;
-    filtered.forEach((r) => {
-      const cur = map.get(r.company) ?? {
-        calls: 0,
-        durationSeconds: 0,
-        talkgroups: new Set<string>(),
-        radios: new Set<string>(),
-      };
-      cur.calls += 1;
-      cur.durationSeconds += r.durationSeconds;
-      if (r.talkgroup !== "Unknown") cur.talkgroups.add(r.talkgroup);
-      if (r.radioId !== "Unknown") cur.radios.add(r.radioId);
-      map.set(r.company, cur);
-    });
-    return Array.from(map.entries())
-      .filter(([company]) => company !== "Unknown" && company !== "Not Found")
-      .map(([company, value]) => {
-        const lookupActivated =
-          lookupCompanyCounts.get(company) ??
-          (lookupCompanies.has(company) ? 0 : unlistedCount);
-        return {
-          company,
-          talkgroupsInUse: value.talkgroups.size,
-          calls: value.calls,
-          durationSeconds: value.durationSeconds,
-          usersActivated: lookupActivated || value.radios.size,
-          callingUsers: value.radios.size,
-          kpiAvgDurationPerUser: 0,
-        };
-      })
-      .map((row) => ({
-        ...row,
-        kpiAvgDurationPerUser: row.usersActivated
-          ? row.durationSeconds / row.usersActivated
-          : 0,
-      }))
-      .sort((a, b) => a.company.localeCompare(b.company));
-  }, [data?.lookupRecords, filtered, filters.region]);
-
-  const kpiAverage = useMemo(() => {
-    const values = kpiRows
-      .map((r) => r.kpiAvgDurationPerUser)
-      .filter((v) => v > 0);
-    return values.length
-      ? values.reduce((sum, v) => sum + v, 0) / values.length
-      : 0;
-  }, [kpiRows]);
-
-  const monthlyKpi = useMemo(() => {
-    const companies = uniqueOptions(filtered, (r) => r.company)
-      .filter((c) => c !== "Unknown" && c !== "Not Found")
-      .sort((a, b) => a.localeCompare(b));
-    const months = uniqueOptions(filtered, (r) => r.month, true).sort(
-      (a, b) => monthSortValue(a) - monthSortValue(b) || a.localeCompare(b),
-    );
-    const stats = new Map<string, { calls: number; durationSeconds: number }>();
-    filtered.forEach((r) => {
-      if (r.company === "Unknown" || r.company === "Not Found") return;
-      const key = `${r.company}||${r.month}`;
-      const cur = stats.get(key) ?? { calls: 0, durationSeconds: 0 };
-      cur.calls += 1;
-      cur.durationSeconds += r.durationSeconds;
-      stats.set(key, cur);
-    });
-    const rows = companies.map((company) => {
-      const row: Record<string, string | number | null> = { company };
-      months.forEach((month) => {
-        const cur = stats.get(`${company}||${month}`);
-        row[dataKey(month)] = cur?.calls
-          ? cur.durationSeconds / cur.calls
-          : null;
-      });
-      return row;
-    });
-    return {
-      rows,
-      months: months.map((month, i) => ({
-        name: month,
-        key: dataKey(month),
-        color: COLORS[i % COLORS.length],
-      })),
-    };
-  }, [filtered]);
-
-  const monthlyKpiPieData = useMemo(() => {
-    return [...rankings.month]
-      .sort(
-        (a, b) =>
-          monthSortValue(a.name) - monthSortValue(b.name) ||
-          a.name.localeCompare(b.name),
-      )
-      .filter((r) => r.calls > 0 && r.durationSeconds > 0)
-      .map((r) => ({
-        name: shortMonthLabel(r.name),
-        value: r.durationSeconds / r.calls,
-      }));
-  }, [rankings.month]);
-
-  const monthlyKpiPieTotal = useMemo(
-    () => monthlyKpiPieData.reduce((sum, item) => sum + item.value, 0),
-    [monthlyKpiPieData],
-  );
-
-  const CompanyPeriodLabel = useMemo(() => {
-    const years = [...filters.year].sort(
-      (a, b) => Number(a) - Number(b) || a.localeCompare(b),
-    );
-    const months = [...filters.month]
-      .sort(
-        (a, b) => monthSortValue(a) - monthSortValue(b) || a.localeCompare(b),
-      )
-      .map(shortMonthLabel);
-    if (months.length) {
-      const t = months.join(", ");
-      const hasYear = months.some((m) => /(19|20)\d{2}/.test(m));
-      return !hasYear && years.length ? `${t} ${years.join(", ")}` : t;
-    }
-    if (years.length) return years.join(", ");
-    return "selected period";
-  }, [filters.month, filters.year]);
-
+  const {
+    kpiRows,
+    kpiAverage,
+    monthlyKpi,
+    monthlyKpiPieData,
+    monthlyKpiPieTotal,
+    CompanyPeriodLabel,
+  } = useKpiAnalytics({
+    data,
+    filtered,
+    filters,
+    monthRankings: rankings.month,
+  });
   const exportTitle = useCallback(
     (title: string) => `${title} - ${CompanyPeriodLabel}`,
     [CompanyPeriodLabel],
@@ -3311,59 +2755,6 @@ export default function App() {
     );
   }, [CompanyPeriodLabel, exportTitle, unmatchedFleetmapReportRows]);
 
-  const exportTablePdf = useCallback(
-    async (
-      fileName: string,
-      title: string,
-      headers: string[],
-      rows: (string | number)[][],
-    ) => {
-      const jsPDF = await loadJsPdf();
-      const pdf = new jsPDF({
-        orientation: "landscape",
-        unit: "pt",
-        format: "a4",
-      });
-      await ensurePdfArabicFont(pdf);
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 24;
-      const tableWidth = pageWidth - margin * 2;
-      const colWidth = tableWidth / Math.max(1, headers.length);
-      const rowHeight = 20;
-      let y = 54;
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(15);
-      pdf.setTextColor(0, 0, 0);
-      pdfText(pdf, exportTitle(title), pageWidth / 2, 28, { align: "center" });
-      const drawRow = (row: (string | number)[], isHeader = false) => {
-        if (y + rowHeight > pageHeight - margin) {
-          pdf.addPage("a4", "landscape");
-          y = margin;
-        }
-        let x = margin;
-        row.forEach((cell) => {
-          pdf.setDrawColor(20, 36, 48);
-          pdf.setFillColor(isHeader ? "#fff200" : "#ffffff");
-          pdf.rect(x, y, colWidth, rowHeight, "FD");
-          pdf.setFont("helvetica", isHeader ? "bold" : "normal");
-          pdf.setFontSize(isHeader ? 7 : 7.2);
-          pdf.setTextColor(0, 0, 0);
-          pdfText(pdf, cell, x + colWidth / 2, y + 13, {
-            align: "center",
-            maxWidth: colWidth - 4,
-          });
-          x += colWidth;
-        });
-        y += rowHeight;
-      };
-      drawRow(headers, true);
-      rows.forEach((row) => drawRow(row));
-      downloadPdf(pdf, fileName);
-    },
-    [exportTitle],
-  );
-
   const regionPerformanceHeaders = [
     "Region",
     "Calls",
@@ -3408,14 +2799,17 @@ export default function App() {
     [CompanyPeriodLabel, exportTitle, regionPerformanceExportRows],
   );
   const exportRegionPerformancePdf = useCallback(
-    () =>
-      exportTablePdf(
-        `region-performance-${fileSlug(CompanyPeriodLabel)}.pdf`,
-        "Region Performance Matrix",
-        regionPerformanceHeaders,
-        regionPerformanceExportRows,
-      ),
-    [CompanyPeriodLabel, exportTablePdf, regionPerformanceExportRows],
+    async () => {
+      const { exportTablePdf } = await loadTablePdfExport();
+      return exportTablePdf({
+        fileName: `region-performance-${fileSlug(CompanyPeriodLabel)}.pdf`,
+        title: "Region Performance Matrix",
+        headers: regionPerformanceHeaders,
+        rows: regionPerformanceExportRows,
+        titleFor: exportTitle,
+      });
+    },
+    [CompanyPeriodLabel, exportTitle, regionPerformanceExportRows],
   );
 
   const talkgroupEfficiencyHeaders = [
@@ -3460,14 +2854,17 @@ export default function App() {
     [CompanyPeriodLabel, exportTitle, talkgroupEfficiencyExportRows],
   );
   const exportTalkgroupEfficiencyPdf = useCallback(
-    () =>
-      exportTablePdf(
-        `talkgroup-efficiency-${fileSlug(CompanyPeriodLabel)}.pdf`,
-        "Talkgroup Efficiency",
-        talkgroupEfficiencyHeaders,
-        talkgroupEfficiencyExportRows,
-      ),
-    [CompanyPeriodLabel, exportTablePdf, talkgroupEfficiencyExportRows],
+    async () => {
+      const { exportTablePdf } = await loadTablePdfExport();
+      return exportTablePdf({
+        fileName: `talkgroup-efficiency-${fileSlug(CompanyPeriodLabel)}.pdf`,
+        title: "Talkgroup Efficiency",
+        headers: talkgroupEfficiencyHeaders,
+        rows: talkgroupEfficiencyExportRows,
+        titleFor: exportTitle,
+      });
+    },
+    [CompanyPeriodLabel, exportTitle, talkgroupEfficiencyExportRows],
   );
 
   const exportRowsPdfPage = useCallback(async () => {
@@ -3885,7 +3282,7 @@ export default function App() {
     const chart = monthlyCompanyChartRef.current?.querySelector(
       ".recharts-wrapper",
     ) as HTMLElement | null;
-    if (!chart) throw new Error("Chart is not ready yet.");
+    if (!chart) return "";
     return captureElementPng(chart, "#0f1b24");
   }, []);
 
@@ -4116,24 +3513,26 @@ export default function App() {
         true,
       );
     });
-    const tableBottom = y + rowH;
-    const gap = 18;
-    const props = pdf.getImageProperties(chartPng);
-    const remainingHeight = pageHeight - tableBottom - gap - margin;
-    const samePage = remainingHeight >= 170;
-    if (!samePage) pdf.addPage("a4", "landscape");
-    const chartTop = samePage ? tableBottom + gap : margin;
-    const maxW = pageWidth - margin * 2;
-    const maxH = samePage ? remainingHeight : pageHeight - margin * 2;
-    const ratio = Math.min(maxW / props.width, maxH / props.height);
-    pdf.addImage(
-      chartPng,
-      "PNG",
-      (pageWidth - props.width * ratio) / 2,
-      samePage ? chartTop : (pageHeight - props.height * ratio) / 2,
-      props.width * ratio,
-      props.height * ratio,
-    );
+    if (chartPng) {
+      const tableBottom = y + rowH;
+      const gap = 18;
+      const props = pdf.getImageProperties(chartPng);
+      const remainingHeight = pageHeight - tableBottom - gap - margin;
+      const samePage = remainingHeight >= 170;
+      if (!samePage) pdf.addPage("a4", "landscape");
+      const chartTop = samePage ? tableBottom + gap : margin;
+      const maxW = pageWidth - margin * 2;
+      const maxH = samePage ? remainingHeight : pageHeight - margin * 2;
+      const ratio = Math.min(maxW / props.width, maxH / props.height);
+      pdf.addImage(
+        chartPng,
+        "PNG",
+        (pageWidth - props.width * ratio) / 2,
+        samePage ? chartTop : (pageHeight - props.height * ratio) / 2,
+        props.width * ratio,
+        props.height * ratio,
+      );
+    }
     downloadPdf(pdf, "calls-duration-per-company.pdf");
   }, [captureMonthlyCompanyChart, exportTitle, monthlyCompanyPivot]);
 
@@ -4452,191 +3851,29 @@ export default function App() {
     topTalkgroupDistribution,
   ]);
 
-  const exportChartWorkbookXlsx = useCallback(
-    async (fileName: string, datasets: Record<string, ChartExportDataset>) => {
-      const ExcelJS = await loadExcelJS();
-      const workbook = new ExcelJS.Workbook();
-      workbook.creator = "CDR Dashboard";
-      workbook.created = new Date();
-      const border = {
-        top: { style: "thin" as const },
-        left: { style: "thin" as const },
-        bottom: { style: "thin" as const },
-        right: { style: "thin" as const },
-      };
-      const headerFill = {
-        type: "pattern" as const,
-        pattern: "solid" as const,
-        fgColor: { argb: "FF0F5F8F" },
-      };
-      const titleFill = {
-        type: "pattern" as const,
-        pattern: "solid" as const,
-        fgColor: { argb: "FF082033" },
-      };
-      const usedSheetNames = new Set<string>();
-      const chartConfigs: NativeChartConfig[] = [];
-      const isNumericLike = (value: unknown) => {
-        if (typeof value === "number") return Number.isFinite(value);
-        if (typeof value !== "string") return false;
-        const normalized = value.replace(/,/g, "").trim();
-        return normalized !== "" && Number.isFinite(Number(normalized));
-      };
-      const toNumericValue = (value: unknown) => {
-        if (typeof value === "number") return value;
-        if (typeof value === "string") {
-          const normalized = value.replace(/,/g, "").trim();
-          return normalized === "" ? value : Number(normalized);
-        }
-        return value;
-      };
-      const safeSheetName = (value: string) => {
-        const base =
-          value
-            .replace(/[\\/?*[\]:]/g, " ")
-            .replace(/\s+/g, " ")
-            .trim()
-            .slice(0, 31) || "Chart Data";
-        let name = base;
-        let index = 2;
-        while (usedSheetNames.has(name)) {
-          const suffix = ` ${index}`;
-          name = `${base.slice(0, 31 - suffix.length)}${suffix}`;
-          index += 1;
-        }
-        usedSheetNames.add(name);
-        return name;
-      };
-      const chartTypeForTitle = (title: string): NativeChartConfig["type"] => {
-        const lower = title.toLowerCase();
-        if (lower.includes("radios per month") || lower.includes("total avg"))
-          return "doughnut";
-        if (
-          lower.includes("month") ||
-          lower.includes("hour") ||
-          lower.includes("kpi")
-        )
-          return "line";
-        return "bar";
-      };
-
-      Object.entries(datasets).forEach(([title, dataset]) => {
-        if (!dataset.headers.length) return;
-        const sheetName = safeSheetName(title);
-        const sheetIndex = workbook.worksheets.length + 1;
-        const worksheet = workbook.addWorksheet(sheetName, {
-          views: [{ showGridLines: false }],
-        });
-        const numericColumns = dataset.headers
-          .map((_, index) => index)
-          .filter(
-            (index) =>
-              index > 0 &&
-              dataset.rows.some((row) => isNumericLike(row[index])),
-          );
-        const chartRows = dataset.rows.map((row) =>
-          row.map((cell, index) =>
-            numericColumns.includes(index) ? toNumericValue(cell) : cell,
-          ),
-        );
-
-        worksheet.addRow([exportTitle(title)]);
-        worksheet.mergeCells(1, 1, 1, Math.max(1, dataset.headers.length));
-        worksheet.addRow([]);
-        worksheet.addRow(dataset.headers);
-        chartRows.forEach((row) => worksheet.addRow(row));
-        worksheet.columns = dataset.headers.map((header, index) => {
-          const max = Math.max(
-            `${header}`.length,
-            ...chartRows.map((row) => `${row[index] ?? ""}`.length),
-          );
-          return { width: Math.min(42, Math.max(12, max + 2)) };
-        });
-        worksheet.eachRow((row, rowNumber) => {
-          row.height = rowNumber === 1 ? 26 : 22;
-          row.eachCell((cell) => {
-            cell.alignment = {
-              horizontal: "center",
-              vertical: "middle",
-              wrapText: true,
-            };
-            cell.border = border;
-            if (rowNumber === 1) {
-              cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 13 };
-              cell.fill = titleFill;
-            } else if (rowNumber === 3) {
-              cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-              cell.fill = headerFill;
-            }
-          });
-        });
-
-        if (numericColumns.length > 0 && chartRows.length > 0) {
-          const type = chartTypeForTitle(title);
-          const firstDataRow = 4;
-          const lastDataRow = firstDataRow + chartRows.length - 1;
-          const seriesColumns =
-            type === "doughnut"
-              ? numericColumns.slice(0, 1)
-              : numericColumns.slice(0, 8);
-          chartConfigs.push({
-            sheetIndex,
-            chartIndex: chartConfigs.length + 1,
-            title: exportTitle(title),
-            type,
-            categoriesRef: excelRange(sheetName, 1, firstDataRow, lastDataRow),
-            series: seriesColumns.map((columnIndex, seriesIndex) => ({
-              name: dataset.headers[columnIndex],
-              valuesRef: excelRange(
-                sheetName,
-                columnIndex + 1,
-                firstDataRow,
-                lastDataRow,
-              ),
-              color: COLORS[seriesIndex % COLORS.length]
-                .replace("#", "")
-                .toUpperCase(),
-            })),
-            from: { col: Math.max(4, dataset.headers.length + 1), row: 1 },
-            to: { col: Math.max(14, dataset.headers.length + 11), row: 24 },
-          });
-        }
-      });
-
-      applyWorkbookArabicSupport(workbook);
-      let output: Blob | ExcelJS.Buffer = await workbook.xlsx.writeBuffer();
-      if (chartConfigs.length > 0) {
-        output = await patchWorkbookWithNativeCharts(output, chartConfigs);
-      }
-      downloadBlob(
-        fileName,
-        output instanceof Blob
-          ? output
-          : new Blob([output], {
-              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            }),
-      );
-    },
-    [exportTitle],
-  );
-
   const exportAllChartDataXlsx = useCallback(
-    () =>
-      exportChartWorkbookXlsx(
-        `all-chart-data-${fileSlug(CompanyPeriodLabel)}.xlsx`,
-        chartExportDatasets,
-      ),
-    [CompanyPeriodLabel, chartExportDatasets, exportChartWorkbookXlsx],
+    async () => {
+      const { exportChartWorkbookXlsx } = await loadChartWorkbookExport();
+      return exportChartWorkbookXlsx({
+        fileName: `all-chart-data-${fileSlug(CompanyPeriodLabel)}.xlsx`,
+        datasets: chartExportDatasets,
+        titleFor: exportTitle,
+      });
+    },
+    [CompanyPeriodLabel, chartExportDatasets, exportTitle],
   );
 
   const exportSingleChartDataXlsx = useCallback(
-    (title: string, dataset: ChartExportDataset) =>
-      exportChartWorkbookXlsx(`${fileSlug(exportTitle(title))}.xlsx`, {
-        [title]: dataset,
-      }),
-    [exportChartWorkbookXlsx, exportTitle],
+    async (title: string, dataset: ChartExportDataset) => {
+      const { exportChartWorkbookXlsx } = await loadChartWorkbookExport();
+      return exportChartWorkbookXlsx({
+        fileName: `${fileSlug(exportTitle(title))}.xlsx`,
+        datasets: { [title]: dataset },
+        titleFor: exportTitle,
+      });
+    },
+    [exportTitle],
   );
-
   const chartExportItems = useMemo(
     () =>
       Object.entries(chartExportDatasets).map(([title, dataset]) => ({
@@ -4709,8 +3946,8 @@ export default function App() {
       <main className={`local-login-shell ${themeClass(theme)}`}>
         <section className="local-login-card local-login-loading">
           <ShieldCheck size={38} />
-          <h1>Connecting to MySQL...</h1>
-          <p>Preparing saved credentials and interface settings from the MySQL backend.</p>
+          <h1>Connecting to dashboard service...</h1>
+          <p>Preparing saved credentials and interface settings.</p>
         </section>
       </main>
     );
@@ -4797,6 +4034,16 @@ export default function App() {
       "Centralized report generation, report type selection, recent history, and download status.",
   }[activeTab];
 
+  const appShellStyle = useMemo(() => {
+    const logoSize = Math.min(120, Math.max(44, Number(appSettings.headerLogoSize) || DEFAULT_LOCAL_SETTINGS.headerLogoSize));
+    const titleScale = Math.min(1.25, Math.max(0.75, Number(appSettings.headerTitleScale) || DEFAULT_LOCAL_SETTINGS.headerTitleScale));
+    return {
+      "--cdr-admin-logo-size": `${logoSize}px`,
+      "--cdr-admin-title-scale": `${titleScale}`,
+      "--cdr-admin-primary-color": appSettings.primaryColor || DEFAULT_LOCAL_SETTINGS.primaryColor,
+    } as CSSProperties;
+  }, [appSettings.headerLogoSize, appSettings.headerTitleScale, appSettings.primaryColor]);
+
   const commandHeaderActions = (
     <div className="cdr-header-actions" aria-label="Dashboard quick actions">
       <ThemeSelector theme={theme} onThemeChange={setTheme} compact label="Design" />
@@ -4852,7 +4099,7 @@ export default function App() {
           <RefreshCw size={18} /> {isSystemAdmin ? "New workbook(s)" : "Upload Sheet"}
           <input
             type="file"
-            accept=".xlsx,.xls,.xlsm,.xlsb"
+            accept=".xlsx,.xlsm"
             multiple
             onChange={handleAddMoreCdr}
           />
@@ -4896,7 +4143,10 @@ export default function App() {
   // Customer permissions are handled by hiding only Admin-only controls such as Admin Settings.
   return (
     <>
-    <main className={`app-shell ${themeClass(theme)} active-tab-${activeTab}`}>
+    <main
+      className={`app-shell ${themeClass(theme)} active-tab-${activeTab} ${appSettings.compactDashboardLayout ? "compact-dashboard-layout" : ""}`}
+      style={appShellStyle}
+    >
       <section className="cdr-command-shell">
         <header className="topbar followup-style-topbar cdr-navy-banner">
           <div className="cdr-banner-art" aria-hidden="true">
@@ -5223,14 +4473,14 @@ export default function App() {
           </div>
         </header>
 
-        {headerWorkbookProfile}
-
         <DashboardTabs
           tabs={DASHBOARD_TABS}
           activeTab={activeTab}
           onChange={handleTabChange}
           actions={commandHeaderActions}
         />
+
+        {headerWorkbookProfile}
 
         <DashboardFilters
           filters={filters}
@@ -5286,60 +4536,64 @@ export default function App() {
       </section>
 
       {showReportsTab && (
-        <ReportsPanel
-          showRegister={showReportsCdrRegister}
-          pagedRecords={pagedRecords}
-          totalFiltered={filtered.length}
-          totalRecords={records.length}
-          page={page}
-          pageCount={pageCount}
-          formatNumber={formatNumber}
-          onToggleRegister={toggleReportsCdrRegister}
-          onPreviousPage={goToPreviousPage}
-          onNextPage={goToNextPage}
-          onExportRowsXlsx={exportRowsXlsx}
-          onExportRowsPdf={exportRowsPdfPage}
-          onExportKpiXlsx={exportKpiXlsx}
-          onExportKpiPdf={exportKpiPdf}
-          onExportKpiPpt={exportKpiPpt}
-          onOpenCompanyContribution={openMonthlyCompanyTable}
-          onExportCompanyContributionXlsx={exportMonthlyCompanyXlsx}
-          onExportCompanyContributionPdf={exportMonthlyCompanyPdf}
-          onExportCompanyContributionPpt={exportMonthlyCompanyPpt}
-          onExportRegionPerformanceXlsx={exportRegionPerformanceXlsx}
-          onExportRegionPerformancePdf={exportRegionPerformancePdf}
-          onExportTalkgroupEfficiencyXlsx={exportTalkgroupEfficiencyXlsx}
-          onExportTalkgroupEfficiencyPdf={exportTalkgroupEfficiencyPdf}
-          onExportUtilizationXlsx={exportUtilizationXlsx}
-          onExportUtilizationPdf={exportUtilizationPdf}
-          onExportUnmatchedFleetmapXlsx={exportUnmatchedFleetmapXlsx}
-          onExportChartDataXlsx={exportAllChartDataXlsx}
-          chartExportItems={chartExportItems}
-        />
+        <Suspense fallback={<LazyTabFallback label="Loading reports..." />}>
+          <ReportsPanel
+            showRegister={showReportsCdrRegister}
+            pagedRecords={pagedRecords}
+            totalFiltered={filtered.length}
+            totalRecords={records.length}
+            page={page}
+            pageCount={pageCount}
+            formatNumber={formatNumber}
+            onToggleRegister={toggleReportsCdrRegister}
+            onPreviousPage={goToPreviousPage}
+            onNextPage={goToNextPage}
+            onExportRowsXlsx={exportRowsXlsx}
+            onExportRowsPdf={exportRowsPdfPage}
+            onExportKpiXlsx={exportKpiXlsx}
+            onExportKpiPdf={exportKpiPdf}
+            onExportKpiPpt={exportKpiPpt}
+            onOpenCompanyContribution={openMonthlyCompanyTable}
+            onExportCompanyContributionXlsx={exportMonthlyCompanyXlsx}
+            onExportCompanyContributionPdf={exportMonthlyCompanyPdf}
+            onExportCompanyContributionPpt={exportMonthlyCompanyPpt}
+            onExportRegionPerformanceXlsx={exportRegionPerformanceXlsx}
+            onExportRegionPerformancePdf={exportRegionPerformancePdf}
+            onExportTalkgroupEfficiencyXlsx={exportTalkgroupEfficiencyXlsx}
+            onExportTalkgroupEfficiencyPdf={exportTalkgroupEfficiencyPdf}
+            onExportUtilizationXlsx={exportUtilizationXlsx}
+            onExportUtilizationPdf={exportUtilizationPdf}
+            onExportUnmatchedFleetmapXlsx={exportUnmatchedFleetmapXlsx}
+            onExportChartDataXlsx={exportAllChartDataXlsx}
+            chartExportItems={chartExportItems}
+          />
+        </Suspense>
       )}
       {showOverviewTab && (
         <>
-          <ModernOverview
-            metrics={metrics}
-            rankings={rankings}
-            filteredCount={filtered.length}
-            totalCount={records.length}
-            periodLabel={CompanyPeriodLabel}
-            loadedAt={data.loadedAt}
-            data={data}
-            filteredRecords={filtered}
-            masterFleetmap={masterFleetmap}
-            fixedFleetmap={fixedFleetmap}
-            maxDuration={maxDuration}
-            minDuration={minDuration}
-            qualityScore={qualityScore}
-            qualityIssues={qualityIssues}
-            peakUserParts={peakUserParts}
-            peakWeekName={peakWeekEntry?.[0] ?? "Unknown"}
-            peakDayName={peakDayEntry?.[0] ?? "Unknown"}
-            trafficIntensity={trafficIntensity}
-            showProfile={false}
-          />
+          <Suspense fallback={<LazyTabFallback label="Loading overview..." />}>
+            <ModernOverview
+              metrics={metrics}
+              rankings={rankings}
+              filteredCount={filtered.length}
+              totalCount={records.length}
+              periodLabel={CompanyPeriodLabel}
+              loadedAt={data.loadedAt}
+              data={data}
+              filteredRecords={filtered}
+              masterFleetmap={masterFleetmap}
+              fixedFleetmap={fixedFleetmap}
+              maxDuration={maxDuration}
+              minDuration={minDuration}
+              qualityScore={qualityScore}
+              qualityIssues={qualityIssues}
+              peakUserParts={peakUserParts}
+              peakWeekName={peakWeekEntry?.[0] ?? "Unknown"}
+              peakDayName={peakDayEntry?.[0] ?? "Unknown"}
+              trafficIntensity={trafficIntensity}
+              showProfile={false}
+            />
+          </Suspense>
 
           {filtered.length === 0 && (
             <div className="empty-state" role="status">
@@ -5362,1213 +4616,85 @@ export default function App() {
       )}
 
       {showFleetTab && (
-        <>
-          <SectionTitle
-            id="networkUtilization"
-            eyebrow="Fleet activation"
-            title={`Network Utilization & Fleet Activation in ${CompanyPeriodLabel}`}
-            text="Compare registered fleetmap radios against radios that made calls in the filtered period."
-            collapsed={isSectionCollapsed("networkUtilization")}
-            onToggle={() => toggleSection("networkUtilization")}
+        <Suspense fallback={<LazyTabFallback label="Loading fleet activation..." />}>
+          <FleetActivationTab
+            periodLabel={CompanyPeriodLabel}
+            fleetActivation={fleetActivation}
+            trafficIntensity={trafficIntensity}
+            unmatchedFleetmapReportRows={unmatchedFleetmapReportRows}
+            radioImageDataUrl={appSettings.radioShowcaseImageDataUrl}
+            radioImageName={appSettings.radioShowcaseImageName}
+            isSectionCollapsed={isSectionCollapsed}
+            toggleSection={toggleSection}
+            formatNumber={formatNumber}
+            formatDecimal={formatDecimal}
+            secondsToClock={secondsToClock}
           />
-          <section
-            id="networkUtilization-content"
-            className={`network-utilization-section fleet-activation-panel ${isSectionCollapsed("networkUtilization") ? "section-content-collapsed" : ""}`}
-          >
-            <div className="summary-cards network-utilization-cards">
-              <div className="summary-card yellow">
-                <span
-                  style={{
-                    fontSize: "0.78rem",
-                    fontWeight: 600,
-                    color: "var(--design-faint)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  Registered Radios
-                </span>
-                <strong
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: 900,
-                    color: "var(--design-warning)",
-                  }}
-                >
-                  {formatNumber(fleetActivation.registeredCount)}
-                </strong>
-                <small style={{ fontSize: "0.75rem", color: "var(--design-muted)" }}>
-                  From fleetmap
-                </small>
-              </div>
-              <div className="summary-card green">
-                <span
-                  style={{
-                    fontSize: "0.78rem",
-                    fontWeight: 600,
-                    color: "var(--design-faint)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  Active Registered
-                </span>
-                <strong
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: 900,
-                    color: "var(--design-success)",
-                  }}
-                >
-                  {formatNumber(fleetActivation.activeRegisteredCount)}
-                </strong>
-                <small style={{ fontSize: "0.75rem", color: "var(--design-muted)" }}>
-                  Made calls
-                </small>
-              </div>
-              <div className="summary-card yellow">
-                <span
-                  style={{
-                    fontSize: "0.78rem",
-                    fontWeight: 600,
-                    color: "var(--design-faint)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  Inactive Radios
-                </span>
-                <strong
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: 900,
-                    color: "var(--design-warning)",
-                  }}
-                >
-                  {formatNumber(fleetActivation.inactiveCount)}
-                </strong>
-                <small style={{ fontSize: "0.75rem", color: "var(--design-muted)" }}>
-                  No calls found
-                </small>
-              </div>
-              <div className="summary-card green">
-                <span
-                  style={{
-                    fontSize: "0.78rem",
-                    fontWeight: 600,
-                    color: "var(--design-faint)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  Activation %
-                </span>
-                <strong
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: 900,
-                    color: "var(--design-success)",
-                  }}
-                >
-                  {formatDecimal(fleetActivation.activationRate, 1)}%
-                </strong>
-                <small style={{ fontSize: "0.75rem", color: "var(--design-muted)" }}>
-                  Active / registered
-                </small>
-              </div>
-              <div className="summary-card yellow">
-                <span
-                  style={{
-                    fontSize: "0.78rem",
-                    fontWeight: 600,
-                    color: "var(--design-faint)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  Traffic / Active Radio
-                </span>
-                <strong
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: 900,
-                    color: "var(--design-warning)",
-                  }}
-                >
-                  {formatDecimal(trafficIntensity.trafficPerRadio, 2)}
-                </strong>
-                <small style={{ fontSize: "0.75rem", color: "var(--design-muted)" }}>
-                  Erlangs per radio
-                </small>
-              </div>
-            </div>
-            <div className="quality-grid fleet-activation-tables">
-              <article className="table-card inactive-radio-table-card">
-                <h3>Inactive Radios by Company</h3>
-                <table className="inactive-radio-table">
-                  <thead>
-                    <tr>
-                      <th>Company</th>
-                      <th className="inactive-count-header">Inactive Radios</th>
-                      <th className="active-count-header">Active Radios</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {fleetActivation.inactiveByCompany.map((item) => (
-                      <tr key={item.name}>
-                        <td>{item.name}</td>
-                        <td className="inactive-count-cell">
-                          {formatNumber(Number(item.count ?? 0))}
-                        </td>
-                        <td className="active-count-cell">
-                          {formatNumber(Number(item.activeCount ?? 0))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </article>
-              <article className="table-card inactive-radio-table-card">
-                <h3>Inactive Radios by Region</h3>
-                <table className="inactive-radio-table">
-                  <thead>
-                    <tr>
-                      <th>Region</th>
-                      <th className="inactive-count-header">Inactive Radios</th>
-                      <th className="active-count-header">Active Radios</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {fleetActivation.inactiveByRegion.map((item) => (
-                      <tr key={item.name}>
-                        <td>{item.name}</td>
-                        <td className="inactive-count-cell">
-                          {formatNumber(Number(item.count ?? 0))}
-                        </td>
-                        <td className="active-count-cell">
-                          {formatNumber(Number(item.activeCount ?? 0))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </article>
-            </div>
-          </section>
-
-          <SectionTitle
-            id="unmatchedFleetmap"
-            eyebrow="Fleetmap audit"
-            title={`Unmatched Fleetmap Report in ${CompanyPeriodLabel}`}
-            text="Unique raw Caller Numbers that did not match Master/Fixed Fleetmap Radio ID, or matched with incomplete fleetmap details."
-            collapsed={isSectionCollapsed("unmatchedFleetmap")}
-            onToggle={() => toggleSection("unmatchedFleetmap")}
-          />
-          <section
-            id="unmatchedFleetmap-content"
-            className={`unmatched-fleetmap-report-section fleet-unmatched-section ${isSectionCollapsed("unmatchedFleetmap") ? "section-content-collapsed" : ""}`}
-          >
-            <div className="fleet-unmatched-layout">
-              <article className="table-card wide-table-card unmatched-fleetmap-report-card">
-                <h3>Unmatched Raw Caller Numbers</h3>
-                <p className="table-note">
-                  {unmatchedFleetmapReportRows.length
-                    ? `${formatNumber(unmatchedFleetmapReportRows.length)} unique Caller Number(s) need fleetmap review.`
-                    : "No unmatched Caller Numbers found in the current selected period."}
-                </p>
-                <div className="table-wrap unmatched-fleetmap-table-wrap">
-                  <table className="unmatched-fleetmap-table">
-                    <thead>
-                      <tr>
-                        <th>Caller Number</th>
-                        <th>Caller Alias</th>
-                        <th>Talkgroup</th>
-                        <th>Calls</th>
-                        <th>Total Duration</th>
-                        <th>First Seen</th>
-                        <th>Last Seen</th>
-                        <th>Base Stations</th>
-                        <th>Reason</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {unmatchedFleetmapReportRows.length ? (
-                        unmatchedFleetmapReportRows.map((row) => (
-                          <tr key={row.callerNumber}>
-                            <td>{row.callerNumber}</td>
-                            <td>{row.callerAlias}</td>
-                            <td>{row.talkgroup}</td>
-                            <td>{formatNumber(row.calls)}</td>
-                            <td>{secondsToClock(row.totalDuration)}</td>
-                            <td>{row.firstSeen}</td>
-                            <td>{row.lastSeen}</td>
-                            <td>{row.baseStationsText}</td>
-                            <td>{row.reason}</td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={9}>
-                            All raw Caller Numbers are matched to the
-                            Master/Fixed Fleetmap for the current filters.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-              <aside
-                className="fleet-radio-showcase"
-                aria-label="Hytera radio fleet visual"
-              >
-                <img
-                  src={appSettings.radioShowcaseImageDataUrl || "/assets/radio.png"}
-                  alt={appSettings.radioShowcaseImageName || "Hytera radio on display stand"}
-                />
-              </aside>
-            </div>
-          </section>
-        </>
+        </Suspense>
       )}
 
       {showCompanyTab && (
-        <>
-          <FilteredCallsRegister
-            id="ticket-portal-cdr-register"
-            title="Ticket Portal Register"
-            eyebrow="CDR Register"
-            records={pagedRecords}
+        <Suspense fallback={<LazyTabFallback label="Loading company insights..." />}>
+          <CompanyInsightsTab
+            pagedRecords={pagedRecords}
             totalFiltered={filtered.length}
             totalRecords={records.length}
             page={page}
             pageCount={pageCount}
-            showTopButton
+            regionPerformanceRows={regionPerformanceRows}
+            talkgroupEfficiencyRows={talkgroupEfficiencyRows}
+            radioBehaviorRows={radioBehaviorRows}
+            userBehaviorRows={userBehaviorRows}
             formatNumber={formatNumber}
+            formatDecimal={formatDecimal}
+            secondsToClock={secondsToClock}
             onPreviousPage={goToPreviousPage}
             onNextPage={goToNextPage}
           />
-          <section
-            id="companyMatrices-content"
-            className="company-matrix-pair"
-            aria-label="Region and talkgroup performance matrices"
-          >
-            <section
-              id="regionPerformance-content"
-              className="region-performance-section company-matrix-section"
-            >
-              <article className="table-card wide-table-card company-matrix-card region-matrix-card">
-                <h3>Region Performance Matrix</h3>
-                <div className="records-scroll small no-scroll-table fixed-row-table company-matrix-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Region</th>
-                        <th>Calls</th>
-                        <th>Total Duration</th>
-                        <th>Traffic</th>
-                        <th>Active Radios</th>
-                        <th>TGs</th>
-                        <th>Companies</th>
-                        <th>BS</th>
-                        <th>Avg Duration</th>
-                        <th>Peak Hour</th>
-                        <th>Top Company</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {regionPerformanceRows.map((row) => (
-                        <tr key={row.name}>
-                          <td>{row.name}</td>
-                          <td>{formatNumber(row.calls)}</td>
-                          <td>{secondsToClock(row.durationSeconds)}</td>
-                          <td>{formatDecimal(row.trafficHours, 2)}</td>
-                          <td>{formatNumber(row.radios)}</td>
-                          <td>{formatNumber(row.talkgroups)}</td>
-                          <td>{formatNumber(row.companies)}</td>
-                          <td>{formatNumber(row.stations)}</td>
-                          <td>{secondsToClock(row.averageDuration)}</td>
-                          <td>{row.peakHour}</td>
-                          <td>{row.topCompany}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-            </section>
-            <section
-              id="talkgroupEfficiency-content"
-              className="talkgroup-efficiency-section company-matrix-section"
-            >
-              <article className="table-card wide-table-card company-matrix-card tg-efficiency-card">
-                <h3>TG Efficiency Matrix</h3>
-                <div className="records-scroll small no-scroll-table fixed-row-table company-matrix-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>TG</th>
-                        <th>Calls</th>
-                        <th>Duration</th>
-                        <th>Traffic</th>
-                        <th>Active Radios</th>
-                        <th>Active Users</th>
-                        <th>Avg Duration</th>
-                        <th>Peak Hour</th>
-                        <th>Peak Region</th>
-                        <th>Peak Company</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {talkgroupEfficiencyRows.map((row) => (
-                        <tr key={row.name}>
-                          <td>{row.name}</td>
-                          <td>{formatNumber(row.calls)}</td>
-                          <td>{secondsToClock(row.durationSeconds)}</td>
-                          <td>{formatDecimal(row.trafficHours, 2)}</td>
-                          <td>{formatNumber(row.radios)}</td>
-                          <td>{formatNumber(row.users)}</td>
-                          <td>{secondsToClock(row.averageDuration)}</td>
-                          <td>{row.peakHour}</td>
-                          <td>{row.peakRegion}</td>
-                          <td>{row.peakCompany}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-            </section>
-          </section>
-        </>
+        </Suspense>
       )}
 
       {showKpiTab && (
-        <>
-          <SectionTitle
-            id="kpi"
-            eyebrow="1"
-            title="Key KPI Profiles: Aggregate Metrics"
-            text={`Data grid and KPI chart profiles in ${CompanyPeriodLabel}.`}
-            collapsed={isSectionCollapsed("kpi")}
-            onToggle={() => toggleSection("kpi")}
+        <Suspense fallback={<LazyTabFallback label="Loading KPI analytics..." />}>
+          <KpiPerformanceTab
+            periodLabel={CompanyPeriodLabel}
+            kpiRows={kpiRows}
+            kpiAverage={kpiAverage}
+            monthlyKpi={monthlyKpi}
+            monthlyKpiPieData={monthlyKpiPieData}
+            monthlyKpiPieTotal={monthlyKpiPieTotal}
+            regionRadarData={regionRadarData}
+            regionRadarSeries={regionRadarSeries}
+            rankings={rankings}
+            kpiTableRef={kpiTableRef}
+            kpiAverageChartRef={kpiAverageChartRef}
+            kpiCallsDurationChartRef={kpiCallsDurationChartRef}
+            monthlyKpiChartRef={monthlyKpiChartRef}
+            kpiTotalAvgChartRef={kpiTotalAvgChartRef}
+            isSectionCollapsed={isSectionCollapsed}
+            toggleSection={toggleSection}
           />
-          <section
-            id="kpi-content"
-            className={`kpi-grid ${isSectionCollapsed("kpi") ? "section-content-collapsed" : ""}`}
-          >
-            <article className="table-card kpi-table kpi-measurements-table-card">
-              <h3>KPI Measurements</h3>
-              <div className="records-scroll small" ref={kpiTableRef}>
-                <table className="kpi-measurements-table">
-                  <colgroup>
-                    <col className="kpi-source-col" />
-                    <col className="kpi-small-col" />
-                    <col className="kpi-small-col" />
-                    <col className="kpi-medium-col" />
-                    <col className="kpi-medium-col" />
-                    <col className="kpi-medium-col" />
-                    <col className="kpi-medium-col" />
-                    <col className="kpi-wide-col" />
-                    <col className="kpi-tiny-col" />
-                  </colgroup>
-                  <thead>
-                    <tr>
-                      <th>Call Source</th>
-                      <th>Talkgroups</th>
-                      <th>Calls</th>
-                      <th>Duration Sec</th>
-                      <th>Duration</th>
-                      <th>Users Activated</th>
-                      <th>Calling Users</th>
-                      <th>Avg Duration / User</th>
-                      <th>KPI</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {kpiRows.map((row, i) => (
-                      <tr key={row.company}>
-                        <td>{row.company}</td>
-                        <td>{formatNumber(row.talkgroupsInUse)}</td>
-                        <td>{formatNumber(row.calls)}</td>
-                        <td>{formatNumber(row.durationSeconds)}</td>
-                        <td>{secondsToClock(row.durationSeconds)}</td>
-                        <td>{formatNumber(row.usersActivated)}</td>
-                        <td>{formatNumber(row.callingUsers)}</td>
-                        <td>{formatNumber(row.kpiAvgDurationPerUser)}</td>
-                        <td>{i === 0 ? formatNumber(kpiAverage) : ""}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </article>
-            <article
-              className="chart-card kpi-average-card"
-              ref={kpiAverageChartRef}
-            >
-              <h3>KPI Average Duration per Company</h3>
-              <ResponsiveContainer
-                width="100%"
-                height={Math.max(340, kpiRows.length * 34)}
-              >
-                <BarChart
-                  layout="vertical"
-                  data={kpiRows}
-                  margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    stroke={CHART_COLORS.grid}
-                    strokeDasharray="3 3"
-                    opacity={0.32}
-                    horizontal={false}
-                  />
-                  <XAxis
-                    type="number"
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="company"
-                    width={140}
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                    tickFormatter={(v) => truncateLabel(v, 18)}
-                    interval={0}
-                  />
-                  <Tooltip
-                    contentStyle={TOOLTIP_STYLE}
-                    formatter={(v: number) => [
-                      `${formatDecimal(v, 1)} sec`,
-                      "KPI avg duration",
-                    ]}
-                  />
-                  <Bar
-                    dataKey="kpiAvgDurationPerUser"
-                    fill={CHART_COLORS.calls}
-                  >
-                    <LabelList
-                      dataKey="kpiAvgDurationPerUser"
-                      content={RightValueLabel}
-                    />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-              <ChartLegend
-                items={[
-                  {
-                    name: "Average duration per activated user",
-                    color: CHART_COLORS.calls,
-                  },
-                ]}
-              />
-            </article>
-            <article
-              className="chart-card kpi-calls-duration-card"
-              ref={kpiCallsDurationChartRef}
-            >
-              <h3>KPI Calls and Duration per Company</h3>
-              <ResponsiveContainer width="100%" height={390}>
-                <ComposedChart
-                  data={kpiRows}
-                  margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    stroke={CHART_COLORS.grid}
-                    strokeDasharray="3 3"
-                    opacity={0.32}
-                  />
-                  <XAxis
-                    dataKey="company"
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                    angle={-55}
-                    textAnchor="end"
-                    interval={0}
-                    tickMargin={12}
-                    height={128}
-                    tickFormatter={(v) => truncateLabel(v, 18)}
-                  />
-                  <YAxis
-                    yAxisId="calls"
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                  />
-                  <YAxis
-                    yAxisId="duration"
-                    orientation="right"
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                  />
-                  <Tooltip
-                    contentStyle={TOOLTIP_STYLE}
-                    formatter={(v: number) => formatNumber(v)}
-                  />
-                  <Line
-                    yAxisId="calls"
-                    dataKey="calls"
-                    stroke={CHART_COLORS.calls}
-                    strokeWidth={3}
-                    dot={{ r: 4, fill: CHART_COLORS.calls }}
-                    name="Calls"
-                  >
-                    <LabelList dataKey="calls" content={KpiBarLabel} />
-                  </Line>
-                  <Line
-                    yAxisId="duration"
-                    dataKey="durationSeconds"
-                    stroke={CHART_COLORS.duration}
-                    strokeWidth={3}
-                    name="Duration seconds"
-                  >
-                    <LabelList
-                      dataKey="durationSeconds"
-                      content={KpiLineLabel}
-                    />
-                  </Line>
-                </ComposedChart>
-              </ResponsiveContainer>
-              <ChartLegend
-                items={[
-                  { name: "Calls", color: CHART_COLORS.calls },
-                  { name: "Duration seconds", color: CHART_COLORS.duration },
-                ]}
-              />
-            </article>
-            <article
-              className="chart-card monthly-kpi-card kpi-monthly-card"
-              ref={monthlyKpiChartRef}
-            >
-              <h3>Monthly KPI</h3>
-              <p>(Avg. call duration per company) in sec</p>
-              <ResponsiveContainer width="100%" height={430}>
-                <LineChart
-                  data={monthlyKpi.rows}
-                  margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    stroke={CHART_COLORS.grid}
-                    strokeDasharray="3 3"
-                    opacity={0.32}
-                  />
-                  <XAxis
-                    dataKey="company"
-                    tick={{
-                      fill: CHART_COLORS.axis,
-                      fontSize: 11,
-                      fontWeight: 700,
-                    }}
-                    tickFormatter={(v) => truncateLabel(v, 22)}
-                    interval={0}
-                    angle={-35}
-                    textAnchor="end"
-                    tickMargin={12}
-                    height={82}
-                  />
-                  <YAxis
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                    tickFormatter={(v) => `${formatDecimal(Number(v), 0)}s`}
-                    domain={[0, "dataMax + 20"]}
-                    label={{
-                      value: "Average duration (sec)",
-                      angle: -90,
-                      position: "insideLeft",
-                      fill: CHART_COLORS.axis,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Tooltip
-                    contentStyle={TOOLTIP_STYLE}
-                    formatter={(v: number, name: string) => [
-                      v == null ? "" : `${formatDecimal(v, 2)} sec`,
-                      name,
-                    ]}
-                  />
-                  {monthlyKpi.months.map((month) => (
-                    <Line
-                      key={month.key}
-                      type="monotone"
-                      dataKey={month.key}
-                      name={shortMonthLabel(month.name)}
-                      stroke={month.color}
-                      strokeWidth={3}
-                      dot={{ r: 6 }}
-                      activeDot={{ r: 8 }}
-                      connectNulls={false}
-                    >
-                      <LabelList
-                        dataKey={month.key}
-                        content={(props) => (
-                          <PointValueLabel {...props} fill={month.color} />
-                        )}
-                      />
-                    </Line>
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
-              <ChartLegend
-                items={monthlyKpi.months.map((m) => ({
-                  name: shortMonthLabel(m.name),
-                  color: m.color,
-                }))}
-              />
-            </article>
-            <article
-              className="chart-card monthly-kpi-card kpi-total-avg-card"
-              ref={kpiTotalAvgChartRef}
-            >
-              <h3>KPI Total Avg. Duration</h3>
-              <p>Average call duration by month in sec</p>
-              <div className="Company-pie-layout">
-                <ResponsiveContainer width="64%" height={430}>
-                  <PieChart margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
-                    <Pie
-                      data={monthlyKpiPieData}
-                      dataKey="value"
-                      nameKey="name"
-                      outerRadius={180}
-                      innerRadius={100}
-                      paddingAngle={2}
-                      label={PieOuterDecimalLabel}
-                      labelLine
-                    >
-                      {monthlyKpiPieData.map((entry, i) => (
-                        <Cell
-                          key={entry.name}
-                          fill={COLORS[i % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <text
-                      x="50%"
-                      y="47%"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="modern-pie-center-value"
-                    >
-                      {formatDecimal(monthlyKpiPieTotal, 2)}
-                    </text>
-                    <text
-                      x="50%"
-                      y="57%"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="modern-pie-center-label"
-                    >
-                      Total
-                    </text>
-                    <Tooltip
-                      contentStyle={TOOLTIP_STYLE}
-                      formatter={(v: number) => [
-                        `${formatDecimal(v, 2)} sec`,
-                        "Average duration",
-                      ]}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <ChartLegend
-                  className="pie-legend kpi-total-avg-legend"
-                  items={monthlyKpiPieData.map((item, i) => ({
-                    name: item.name,
-                    color: COLORS[i % COLORS.length],
-                  }))}
-                />
-              </div>
-            </article>
-          </section>
-        </>
+        </Suspense>
       )}
-
       {showChartsTab && (
-        <ChartsTab
-          monthlyCompanyChartRef={monthlyCompanyChartRef}
-          monthlyCompanyRows={monthlyCompanyRows}
-          mobileTypeByMonth={mobileTypeByMonth}
-          mobileTypeByCompany={mobileTypeByCompany}
-          mobileTypes={mobileTypes}
-          rankings={rankings}
-          callTypeMonthlyMix={callTypeMonthlyMix}
-          callTypeSeries={CALL_TYPE_SERIES}
-          stackedPercentLabel={StackedPercentLabel}
-          callTypeMixTooltip={<CallTypeMixTooltip />}
-          topTalkgroupDistribution={topTalkgroupDistribution}
-          topCompanyTreemapData={topCompanyTreemapData}
-          companyTreemapTile={<CompanyTreemapTile />}
-          CompanyChartData={CompanyChartData}
-        />
-      )}
-
-      {showKpiTab && (
-        <>
-          <SectionTitle
-            id="Performance"
-            eyebrow="2"
-            title="Performance Dimensions: Deep Dive"
-            text={`Calls, duration, and utilization dimensions in ${CompanyPeriodLabel}.`}
-            collapsed={isSectionCollapsed("Performance")}
-            onToggle={() => toggleSection("Performance")}
+        <Suspense fallback={<LazyTabFallback label="Loading charts..." />}>
+          <ChartsTab
+            monthlyCompanyChartRef={monthlyCompanyChartRef}
+            monthlyCompanyRows={monthlyCompanyRows}
+            mobileTypeByMonth={mobileTypeByMonth}
+            mobileTypeByCompany={mobileTypeByCompany}
+            mobileTypes={mobileTypes}
+            rankings={rankings}
+            callTypeMonthlyMix={callTypeMonthlyMix}
+            callTypeSeries={CALL_TYPE_SERIES}
+            stackedPercentLabel={StackedPercentLabel}
+            callTypeMixTooltip={<CallTypeMixTooltip />}
+            topTalkgroupDistribution={topTalkgroupDistribution}
+            topCompanyTreemapData={topCompanyTreemapData}
+            companyTreemapTile={<CompanyTreemapTile />}
+            CompanyChartData={CompanyChartData}
           />
-          <section
-            id="Performance-content"
-            className={`chart-grid performance-chart-grid ${isSectionCollapsed("Performance") ? "section-content-collapsed" : ""}`}
-          >
-            <article className="chart-card performance-region region-radar-card">
-              <h3>Regions Performance</h3>
-              <p>
-                Normalized view across calls, duration, peak hour, and TG
-                activity.
-              </p>
-              <ResponsiveContainer width="100%" height={350}>
-                <RadarChart data={regionRadarData} outerRadius="74%">
-                  <PolarGrid stroke={CHART_COLORS.grid} strokeOpacity={0.48} />
-                  <PolarAngleAxis
-                    dataKey="metric"
-                    tick={{
-                      fill: CHART_COLORS.axis,
-                      fontSize: 11,
-                      fontWeight: 700,
-                    }}
-                  />
-                  <PolarRadiusAxis
-                    angle={90}
-                    domain={[0, 100]}
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 10 }}
-                    tickFormatter={(value) =>
-                      `${formatDecimal(Number(value), 0)}%`
-                    }
-                  />
-                  <Tooltip content={<RegionRadarTooltip />} />
-                  {regionRadarSeries.map((series) => (
-                    <Radar
-                      key={series.key}
-                      name={series.name}
-                      dataKey={series.key}
-                      stroke={series.color}
-                      fill={series.color}
-                      fillOpacity={0.16}
-                      strokeWidth={2.4}
-                      dot={{ r: 3, fill: series.color }}
-                    />
-                  ))}
-                </RadarChart>
-              </ResponsiveContainer>
-              <ChartLegend
-                items={regionRadarSeries.map((series) => ({
-                  name: series.name,
-                  color: series.color,
-                }))}
-              />
-            </article>
-            <article className="chart-card performance-month">
-              <CallsDurationPerformanceChart
-                title="Monthly Performance"
-                data={rankings.month}
-                gradientId="performanceMonth"
-                xTickFormatter={shortMonthLabel}
-              />
-            </article>
-            <article className="chart-card performance-company">
-              <CallsDurationPerformanceChart
-                title="Companies Performance"
-                data={rankings.company}
-                gradientId="performanceCompany"
-              />
-            </article>
-            <article className="chart-card performance-talkgroup">
-              <CallsDurationPerformanceChart
-                title="Talkgroups Performance"
-                data={rankings.talkgroup.slice(0, 12)}
-                gradientId="performanceTalkgroup"
-              />
-            </article>
-            <article className="chart-card performance-basestation">
-              <CallsDurationPerformanceChart
-                title="Base Stations Performance"
-                data={rankings.station.slice(0, 12)}
-                gradientId="performanceStation"
-              />
-            </article>
-            <article className="chart-card performance-hour">
-              <CallsDurationPerformanceChart
-                title="Hours Performance"
-                data={rankings.hour}
-                gradientId="performanceHour"
-                xTickFormatter={(v) => `${v ?? ""}`}
-              />
-            </article>
-          </section>
-        </>
-      )}
-
-      {false && showChartsTab && (
-        <>
-          <SectionTitle
-            id="General"
-            eyebrow="General"
-            title={`General Charts in ${CompanyPeriodLabel}`}
-            text="Monthly radio activity and source call attributes from the filtered CDR records."
-            collapsed={isSectionCollapsed("General")}
-            onToggle={() => toggleSection("General")}
-          />
-          <section
-            id="General-content"
-            className={`chart-grid dashboard-chart-grid general-chart-grid ${isSectionCollapsed("General") ? "section-content-collapsed" : ""}`}
-          >
-            <article className="chart-card general-mobile-type wide">
-              <h3>Radio Type per Month</h3>
-              <p>
-                Total radios{" "}
-                {formatNumber(
-                  mobileTypeByMonth.reduce(
-                    (s, r) => s + Number(r.total ?? 0),
-                    0,
-                  ),
-                )}
-              </p>
-              <ChartLegend
-                items={mobileTypes.map((type) => ({
-                  name: type,
-                  color: mobileTypeColor(type),
-                }))}
-              />
-              <ResponsiveContainer width="100%" height={340}>
-                <LineChart
-                  data={mobileTypeByMonth}
-                  margin={{ left: 0, right: 16, top: 14, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    stroke={CHART_COLORS.grid}
-                    strokeDasharray="3 3"
-                    opacity={0.32}
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 9 }}
-                    axisLine={false}
-                    tickLine={false}
-                    interval={0}
-                    angle={-35}
-                    textAnchor="end"
-                    height={52}
-                    tickMargin={8}
-                    tickFormatter={shortMonthLabel}
-                  />
-                  <YAxis
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(v) => formatNumber(v)}
-                    domain={[0, (dm: number) => Math.ceil(dm * 1.18)]}
-                  />
-                  <Tooltip
-                    content={(props) => (
-                      <MobileTypeTooltip {...props} mobileTypes={mobileTypes} />
-                    )}
-                  />
-                  {mobileTypes.map((type) => (
-                    <Line
-                      key={type}
-                      type="monotone"
-                      dataKey={mobileTypeKey(type)}
-                      name={type}
-                      stroke={mobileTypeColor(type)}
-                      strokeWidth={2.2}
-                      dot={{ r: 3, fill: mobileTypeColor(type) }}
-                      activeDot={{ r: 5 }}
-                    />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
-            </article>
-            <article className="chart-card">
-              <CallsDurationPerformanceChart
-                title="Call Type"
-                data={rankings.callType}
-                gradientId="callTypePerformance"
-              />
-            </article>
-            <article className="chart-card">
-              <h3>Duplex Type</h3>
-              <ResponsiveContainer width="100%" height={340}>
-                <BarChart
-                  data={rankings.duplexType}
-                  margin={{ left: 0, right: 8, top: 18, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    stroke={CHART_COLORS.grid}
-                    strokeDasharray="3 3"
-                    opacity={0.32}
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 10 }}
-                    interval={0}
-                    angle={-30}
-                    textAnchor="end"
-                    height={62}
-                    tickFormatter={(v) => truncateLabel(v, 18)}
-                  />
-                  <YAxis
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                    tickFormatter={chartLabel}
-                  />
-                  <Tooltip
-                    content={<CompanyPerformanceTooltip />}
-                    cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                  />
-                  <Bar
-                    dataKey="durationSeconds"
-                    name="Duration seconds"
-                    fill={CHART_COLORS.duration}
-                    radius={[8, 8, 0, 0]}
-                    maxBarSize={58}
-                  >
-                    <LabelList
-                      dataKey="durationSeconds"
-                      content={TopValueLabel}
-                    />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-              <ChartLegend
-                items={[
-                  { name: "Duration seconds", color: CHART_COLORS.duration },
-                ]}
-              />
-            </article>
-
-            <article className="chart-card">
-              <CallsDurationPerformanceChart
-                title="Call Priority"
-                data={rankings.callPriority}
-                gradientId="callPriorityPerformance"
-              />
-            </article>
-            <article className="chart-card">
-              <CallsDurationPerformanceChart
-                title="Encrypted"
-                data={rankings.encrypted}
-                gradientId="encryptedPerformance"
-              />
-            </article>
-          </section>
-        </>
-      )}
-
-      {false && showChartsTab && (
-        <>
-          <SectionTitle
-            id="Charts"
-            eyebrow="Top 10"
-            title={`Top 10 per Calls in ${CompanyPeriodLabel}`}
-            text="Highest call contributors by company, base station, and talkgroup."
-            collapsed={isSectionCollapsed("Charts")}
-            onToggle={() => toggleSection("Charts")}
-          />
-          <section
-            id="Charts-content"
-            className={`chart-grid top-10-row ${isSectionCollapsed("Charts") ? "section-content-collapsed" : ""}`}
-          >
-            <article className="chart-card">
-              <h3>Top Companies by Calls</h3>
-              <ResponsiveContainer width="100%" height={340}>
-                <BarChart
-                  layout="vertical"
-                  data={rankings.company.slice(0, 10)}
-                  margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    stroke={CHART_COLORS.grid}
-                    strokeDasharray="3 3"
-                    opacity={0.32}
-                    horizontal={false}
-                  />
-                  <XAxis
-                    type="number"
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    width={130}
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                    tickFormatter={(v) => truncateLabel(v, 18)}
-                    interval={0}
-                  />
-                  <Tooltip
-                    contentStyle={TOOLTIP_STYLE}
-                    formatter={(v: number) => formatNumber(v)}
-                  />
-                  <Bar dataKey="calls" fill={CHART_COLORS.usedGreen}>
-                    <LabelList dataKey="calls" content={RightValueLabel} />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-              <ChartLegend
-                items={[{ name: "Calls", color: CHART_COLORS.usedGreen }]}
-              />
-            </article>
-            <article className="chart-card">
-              <h3>Top Base Stations by Calls</h3>
-              <ResponsiveContainer width="100%" height={340}>
-                <BarChart
-                  layout="vertical"
-                  data={rankings.station.slice(0, 10)}
-                  margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    stroke={CHART_COLORS.grid}
-                    strokeDasharray="3 3"
-                    opacity={0.32}
-                    horizontal={false}
-                  />
-                  <XAxis
-                    type="number"
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    width={140}
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                    tickFormatter={(v) => truncateLabel(v, 18)}
-                    interval={0}
-                  />
-                  <Tooltip
-                    contentStyle={TOOLTIP_STYLE}
-                    formatter={(v: number) => formatNumber(v)}
-                  />
-                  <Bar dataKey="calls" fill={CHART_COLORS.duration}>
-                    <LabelList dataKey="calls" content={RightValueLabel} />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-              <ChartLegend
-                items={[{ name: "Calls", color: CHART_COLORS.duration }]}
-              />
-            </article>
-            <article className="chart-card">
-              <h3>Top Talkgroups by Calls</h3>
-              <ResponsiveContainer width="100%" height={340}>
-                <BarChart
-                  layout="vertical"
-                  data={rankings.talkgroup.slice(0, 10)}
-                  margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    stroke={CHART_COLORS.grid}
-                    strokeDasharray="3 3"
-                    opacity={0.32}
-                    horizontal={false}
-                  />
-                  <XAxis
-                    type="number"
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    width={140}
-                    tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
-                    tickFormatter={(v) => truncateLabel(v, 18)}
-                    interval={0}
-                  />
-                  <Tooltip
-                    contentStyle={TOOLTIP_STYLE}
-                    formatter={(v: number) => formatNumber(v)}
-                  />
-                  <Bar dataKey="calls" fill={CHART_COLORS.calls}>
-                    <LabelList dataKey="calls" content={RightValueLabel} />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-              <ChartLegend
-                items={[{ name: "Calls", color: CHART_COLORS.calls }]}
-              />
-            </article>
-          </section>
-        </>
-      )}
-
-      {showCompanyTab && (
-        <>
-          <section
-            id="users-content"
-            className="behavior-grid company-behavior-grid"
-          >
-            <article className="table-card company-behavior-card">
-              <h3>Radio Behavior Insights</h3>
-              <div className="records-scroll small no-scroll-table fixed-row-table company-matrix-scroll">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Radio ID</th>
-                      <th>Alias</th>
-                      <th>Company</th>
-                      <th>Calls</th>
-                      <th>Duration</th>
-                      <th>Avg Duration</th>
-                      <th>TGs</th>
-                      <th>BS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {radioBehaviorRows.map((item) => (
-                      <tr key={item.radioId}>
-                        <td>{item.radioId}</td>
-                        <td>{item.alias}</td>
-                        <td>{item.company}</td>
-                        <td>{formatNumber(item.calls)}</td>
-                        <td>{secondsToClock(item.durationSeconds)}</td>
-                        <td>{secondsToClock(item.averageDuration)}</td>
-                        <td>{formatNumber(item.talkgroups)}</td>
-                        <td>{formatNumber(item.stations)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </article>
-            <article className="table-card user-behavior-table-card company-behavior-card">
-              <h3>User Behavior Insights</h3>
-              <div className="records-scroll small no-scroll-table fixed-row-table company-matrix-scroll">
-                <table>
-                  <colgroup>
-                    <col className="user-col" />
-                    <col className="compact-col" />
-                    <col className="duration-col" />
-                    <col className="duration-col" />
-                    <col className="compact-col" />
-                    <col className="compact-col" />
-                    <col className="compact-col" />
-                  </colgroup>
-                  <thead>
-                    <tr>
-                      <th>User</th>
-                      <th>Calls</th>
-                      <th>Duration</th>
-                      <th>Avg Duration</th>
-                      <th>Radios</th>
-                      <th>TGs</th>
-                      <th>BS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {userBehaviorRows.map((item) => (
-                      <tr key={item.name}>
-                        <td>{item.name}</td>
-                        <td>{formatNumber(item.calls)}</td>
-                        <td>{secondsToClock(item.durationSeconds)}</td>
-                        <td>{secondsToClock(item.averageDuration)}</td>
-                        <td>{formatNumber(item.radios)}</td>
-                        <td>{formatNumber(item.talkgroups)}</td>
-                        <td>{formatNumber(item.stations)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </article>
-          </section>
-        </>
+        </Suspense>
       )}
 
       {isAddingMoreCdr && (

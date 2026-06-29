@@ -1,0 +1,323 @@
+﻿/* Filter width, search, and compact controls. Source split from src/styles.css lines 3472-3793. */
+/* ============================================================
+   FINAL FIX: Search Radio / User label must stay one line
+   Works with this JSX structure:
+   <label class="search-box search-compact">
+     <span>Search Radio / User</span>
+     <Search />
+     <input />
+   </label>
+   ============================================================ */
+
+.app-shell .filters-panel > .search-box.search-compact {
+  min-width: 300px !important;
+  max-width: none !important;
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto 32px !important;
+  align-items: end !important;
+  gap: 4px !important;
+  overflow: visible !important;
+}
+
+.app-shell .filters-panel > .search-box.search-compact > span {
+  display: block !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  line-height: 1 !important;
+  font-size: 10px !important;
+  letter-spacing: 0.06em !important;
+  text-align: left !important;
+}
+
+.app-shell .filters-panel > .search-box.search-compact > svg {
+  position: absolute !important;
+  left: 9px !important;
+  bottom: 8px !important;
+  top: auto !important;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  flex: 0 0 16px !important;
+  pointer-events: none !important;
+}
+
+.app-shell .filters-panel > .search-box.search-compact > input {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding-left: 31px !important;
+}
+
+/* Give the first filter column enough width so the label cannot split. */
+.app-shell .filters-panel {
+  grid-template-columns:
+    minmax(300px, 2fr)
+    repeat(3, minmax(92px, 0.62fr))
+    minmax(135px, 0.9fr)
+    minmax(170px, 1.15fr)
+    minmax(145px, 1fr)
+    auto
+    auto !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .filters-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell .filters-panel > .search-box.search-compact {
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell .filters-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell .filters-panel > .search-box.search-compact > span {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* ============================================================
+   Align Data Quality cards with the summary cards above
+   Makes the quality score + issue cards use the same 5-card row grid.
+   ============================================================ */
+
+.app-shell .data-quality-panel {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 12px 0 22px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-shell .data-quality-panel .quality-issue-grid {
+  display: contents !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card,
+.app-shell .data-quality-panel .quality-issue {
+  min-width: 0 !important;
+  min-height: 74px !important;
+  width: 100% !important;
+  display: grid !important;
+  align-content: center !important;
+  justify-items: center !important;
+  text-align: center !important;
+  padding: 9px 10px !important;
+  border-radius: 5px !important;
+  overflow: hidden !important;
+  background: var(--theme-card-bg) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card span,
+.app-shell .data-quality-panel .quality-issue span,
+.app-shell .data-quality-panel .quality-score-card strong,
+.app-shell .data-quality-panel .quality-issue strong,
+.app-shell .data-quality-panel .quality-score-card small,
+.app-shell .data-quality-panel .quality-issue small {
+  max-width: 100% !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card span,
+.app-shell .data-quality-panel .quality-issue span {
+  margin: -9px -10px 6px !important;
+  padding: 4px 6px !important;
+  width: calc(100% + 20px) !important;
+  line-height: 1.15 !important;
+  font-size: 10px !important;
+  color: #07131b !important;
+  background: #e8f3fb !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card strong,
+.app-shell .data-quality-panel .quality-issue strong {
+  margin-top: 0 !important;
+  font-size: clamp(14px, 1.3vw, 20px) !important;
+  line-height: 1.1 !important;
+}
+
+.app-shell .data-quality-panel .quality-score-card small,
+.app-shell .data-quality-panel .quality-issue small {
+  margin-top: 4px !important;
+  font-size: 10px !important;
+  line-height: 1.1 !important;
+}
+
+@media (max-width: 1480px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ============================================================
+   Hero call icon beside Live workbook profile block
+   Uses /assets/call.png from the public assets folder.
+   ============================================================ */
+
+.app-shell .hero-main.hero-main-with-icon {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: clamp(16px, 2.4vw, 34px) !important;
+  text-align: left !important;
+  min-height: 100% !important;
+}
+
+.app-shell .hero-call-icon {
+  flex: 0 0 auto !important;
+  width: 150px !important;
+  height: 150px !important;
+  object-fit: contain !important;
+  display: block !important;
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.20)) !important;
+}
+
+.app-shell .hero-profile-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  min-width: 0 !important;
+}
+
+.app-shell .hero-profile-copy .eyebrow,
+.app-shell .hero-profile-copy h2,
+.app-shell .hero-profile-copy .hero-subtitle {
+  width: auto !important;
+  text-align: left !important;
+}
+
+.app-shell .hero-profile-copy .eyebrow {
+  margin: 0 0 8px !important;
+}
+
+.app-shell .hero-profile-copy h2 {
+  margin: 0 !important;
+  line-height: 0.92 !important;
+}
+
+.app-shell .hero-profile-copy .hero-subtitle {
+  margin: 8px 0 0 !important;
+}
+
+.app-shell.light-background-theme .hero-call-icon {
+  filter: drop-shadow(0 14px 24px rgba(17, 86, 128, 0.16)) !important;
+}
+
+@media (max-width: 720px) {
+  .app-shell .hero-main.hero-main-with-icon {
+    flex-direction: column !important;
+    gap: 12px !important;
+    text-align: center !important;
+  }
+}
+
+  .app-shell .hero-profile-copy {
+    align-items: center !important;
+  }
+
+  .app-shell .hero-profile-copy .eyebrow,
+  .app-shell .hero-profile-copy h2,
+  .app-shell .hero-profile-copy .hero-subtitle {
+    text-align: center !important;
+  }
+
+  /* ============================================================
+   Hero call icon + workbook profile centered as one group
+   ============================================================ */
+
+.app-shell .hero-main {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.app-shell .hero-call-content {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 28px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+.app-shell .hero-call-icon {
+  flex: 0 0 auto !important;
+  width: 150px !important;
+  height: 150px !important;
+  object-fit: contain !important;
+}
+
+.app-shell .hero-call-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: auto !important;
+}
+
+.app-shell .hero-call-text .eyebrow,
+.app-shell .hero-call-text h2,
+.app-shell .hero-call-text .hero-subtitle {
+  width: auto !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: center !important;
+}
+
+.app-shell .hero-call-text .eyebrow {
+  margin: 0 0 8px !important;
+}
+
+.app-shell .hero-call-text h2 {
+  margin: 0 0 6px !important;
+  line-height: 0.95 !important;
+}
+
+.app-shell .hero-call-text .hero-subtitle {
+  margin: 0 !important;
+}

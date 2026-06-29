@@ -15,12 +15,11 @@ Then open the local URL shown by Vite.
 
 - `.xlsx`
 - `.xlsm`
-- `.xls`
-- `.xlsb`
+- `.csv` raw call logs
 
 The workbook is parsed in the browser. It is not uploaded to a server and is not modified.
 
-## MySQL credentials and settings database
+## Dashboard service, credentials, and settings
 
 This version uses a MySQL backend for user credentials, roles, portal permissions, branding and interface settings.
 
@@ -38,12 +37,13 @@ Default database:
 cdr_dashboard
 ```
 
-Default seeded users:
+Default users are not seeded unless `CDR_SEED_DEFAULT_USERS=1` is set in `.env`.
+For local bootstrap only, set strong passwords in these variables before running `yarn mysql:init`:
 
 ```text
-System Admin:    admin / Admin@12345
-Customer Admin:  customeradmin / CustomerAdmin@12345
-Customer:        customer / Customer@12345
+CDR_DEFAULT_ADMIN_PASSWORD=<strong password>
+CDR_DEFAULT_CUSTOMER_ADMIN_PASSWORD=<strong password>
+CDR_DEFAULT_CUSTOMER_PASSWORD=<strong password>
 ```
 
 ### Run
@@ -64,8 +64,44 @@ yarn dev:api
 yarn dev
 ```
 
-For development, Vite proxies `/api` to `http://127.0.0.1:4000`.
-For production hosting, serve the frontend from the same domain as the Node API, or set `window.__CDR_API_BASE__` before the app bundle loads.
+For development, Vite proxies `/api` to `http://127.0.0.1:4100` unless `CDR_API_PORT` or `CDR_API_PROXY_TARGET` is set.
+For production hosting, set `public/config.js` before the app bundle loads. Current Namecheap value:
+
+```js
+window.__CDR_API_BASE__ = "https://api.cdr.hitham.app/api";
+```
+
+## Namecheap upload package
+
+Build and prepare FileZilla/cPanel-ready folders:
+
+```powershell
+yarn prepare:namecheap
+```
+
+Use this when the app is already built and you only want to recreate the upload folders:
+
+```powershell
+yarn prepare:namecheap:skip-build
+```
+
+The script creates:
+
+```text
+artifacts/namecheap-upload/FileZilla-upload-ready/UPLOAD_TO_public_html_cdr
+artifacts/namecheap-upload/FileZilla-upload-ready/UPLOAD_TO_api-cdr
+artifacts/namecheap-upload/FileZilla-upload-ready/cdr-web-upload-for-cpanel-filemanager.zip
+artifacts/namecheap-upload/FileZilla-upload-ready/cdr-api-upload-for-cpanel-filemanager.zip
+```
+
+For FileZilla, upload the contents of `UPLOAD_TO_public_html_cdr` to `public_html/cdr`.
+Delete the old remote `public_html/cdr/assets` folder before uploading a new frontend build.
+
+For the backend, upload the contents of `UPLOAD_TO_api-cdr` to `/home/hitham/api-cdr`, run NPM Install in cPanel, restart the Node.js app, then test:
+
+```text
+https://api.cdr.hitham.app/api/health
+```
 
 ## v8 UI/UX improvement patch
 

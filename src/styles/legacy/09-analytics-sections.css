@@ -1,0 +1,116 @@
+﻿/* Network, region, traffic, talkgroup and behavior sections. Source split from src/styles.css lines 2548-2662. */
+/* ============================================================
+   New data sections: network utilization, region performance,
+   traffic intensity heatmap, talkgroup efficiency, behavior tables
+   ============================================================ */
+
+.network-utilization-section,
+.region-performance-section,
+.traffic-intensity-section,
+.talkgroup-efficiency-section,
+.behavior-grid {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 18px;
+}
+
+.network-utilization-cards,
+.traffic-intensity-cards {
+  margin: 0 !important;
+}
+
+.wide-table-card {
+  width: 100%;
+  min-width: 0;
+}
+
+.wide-table-card table,
+.behavior-grid table,
+.busy-heatmap-table {
+  min-width: 980px;
+}
+
+.behavior-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.heatmap-scroll {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow: auto;
+  border: 1px solid var(--theme-border, rgba(116, 181, 214, 0.30));
+  border-radius: 8px;
+  background: var(--theme-card-bg, rgba(3, 15, 23, 0.62));
+}
+
+.busy-heatmap-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.busy-heatmap-table th,
+.busy-heatmap-table td {
+  text-align: center !important;
+  white-space: nowrap;
+}
+
+.busy-heatmap-table td:first-child,
+.busy-heatmap-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  text-align: left !important;
+  min-width: 150px;
+}
+
+.busy-heat-cell {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  min-height: 24px;
+  padding: 4px 7px;
+  border-radius: 7px;
+  font-weight: 900;
+  color: #ffffff !important;
+  background: #0078d4 !important;
+  box-shadow: 0 6px 16px rgba(0, 120, 212, 0.22);
+}
+
+.app-shell.light-background-theme .busy-heatmap-table td:first-child,
+.app-shell.light-background-theme .busy-heatmap-table th:first-child {
+  background: #eef7fc !important;
+  color: #092033 !important;
+}
+
+.app-shell.dark-background-theme .busy-heatmap-table td:first-child,
+.app-shell.dark-background-theme .busy-heatmap-table th:first-child {
+  background: #092536 !important;
+  color: #f4fbff !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .summary-card,
+.app-shell.light-background-theme .traffic-intensity-section .summary-card,
+.app-shell.light-background-theme .region-performance-section .table-card,
+.app-shell.light-background-theme .talkgroup-efficiency-section .table-card,
+.app-shell.light-background-theme .behavior-grid .table-card {
+  background: #ffffff !important;
+  color: #092033 !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .summary-card,
+.app-shell.dark-background-theme .traffic-intensity-section .summary-card,
+.app-shell.dark-background-theme .region-performance-section .table-card,
+.app-shell.dark-background-theme .talkgroup-efficiency-section .table-card,
+.app-shell.dark-background-theme .behavior-grid .table-card {
+  background: #071c2a !important;
+  color: #f4fbff !important;
+}
+
+@media (max-width: 1180px) {
+  .behavior-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+

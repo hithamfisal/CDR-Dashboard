@@ -1,0 +1,347 @@
+﻿/* Compact spacing and report management flow. Source split from src/styles.css lines 12890-13307. */
+/* Compact Data Quality card height */
+.app-shell .visual-quality-panel .visual-quality-card,
+.app-shell .visual-quality-panel .visual-quality-issue,
+.app-shell .quality-score-card,
+.app-shell .quality-issue {
+  min-height: 96px !important;
+  padding-top: 8px !important;
+  padding-bottom: 10px !important;
+  gap: 1px !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head {
+  min-height: 38px !important;
+  gap: 2px !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-icon {
+  width: clamp(24px, 1.45vw, 30px) !important;
+  height: clamp(24px, 1.45vw, 30px) !important;
+  padding: 5px !important;
+}
+
+.app-shell .visual-quality-panel .summary-card-head span {
+  font-size: clamp(8px, 0.58vw, 10.5px) !important;
+  line-height: 1.02 !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card strong,
+.app-shell .visual-quality-panel .visual-quality-issue strong {
+  font-size: clamp(16px, 1.08vw, 22px) !important;
+  margin-top: 1px !important;
+}
+
+.app-shell .visual-quality-panel .visual-quality-card small,
+.app-shell .visual-quality-panel .visual-quality-issue small {
+  font-size: clamp(8px, 0.55vw, 10px) !important;
+  margin: 1px 0 7px !important;
+}
+
+/* Final compact command/filter spacing */
+.app-shell .cdr-command-shell,
+.app-shell.dark-background-theme .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.se-theme .cdr-command-shell,
+.app-shell.se-theme.light-background-theme .cdr-command-shell {
+  margin-bottom: 1px !important;
+  padding-bottom: 0 !important;
+}
+
+.app-shell .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.light-background-theme .cdr-command-shell > .cdr-banner-control-bar,
+.app-shell.se-theme.light-background-theme .cdr-command-shell > .cdr-banner-control-bar {
+  min-height: 0 !important;
+  height: auto !important;
+  margin-top: 6px !important;
+  margin-bottom: 0 !important;
+  padding: 8px 16px 6px !important;
+  align-items: center !important;
+}
+
+.app-shell .cdr-command-shell > .cdr-banner-control-bar .cdr-control-actions {
+  transform: none !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell .filters-panel {
+  margin-bottom: 0 !important;
+}
+
+.app-shell .reports-tab-panel,
+.app-shell .hero-panel,
+.app-shell .section-title,
+.app-shell .chart-grid,
+.app-shell .table-card {
+  margin-top: 2px !important;
+}
+
+/* Reports tab: report-management flow */
+.app-shell.active-tab-reports .reports-tab-panel {
+  gap: 10px !important;
+  margin-top: 4px !important;
+}
+
+.app-shell .report-management-card {
+  padding: clamp(14px, 1vw, 20px) !important;
+  border-radius: 10px !important;
+}
+
+.app-shell .report-management-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  margin-bottom: 12px !important;
+}
+
+.app-shell .report-management-header h3 {
+  margin: 0 0 6px !important;
+  color: var(--theme-text, #f4fbff) !important;
+  font-size: clamp(18px, 1.2vw, 24px) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+}
+
+.app-shell .report-management-header p {
+  margin: 0 !important;
+  color: var(--theme-muted, #9eb9ca) !important;
+  font-size: clamp(12px, 0.72vw, 14px) !important;
+  font-weight: 750 !important;
+}
+
+.app-shell .report-search-box {
+  width: min(280px, 34vw) !important;
+  min-height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(125, 211, 252, 0.26) !important;
+  background: rgba(4, 20, 33, 0.72) !important;
+  color: var(--theme-text, #edf8ff) !important;
+}
+
+.app-shell .report-search-box input {
+  width: 100% !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  color: inherit !important;
+  font: inherit !important;
+  font-weight: 750 !important;
+}
+
+.app-shell .report-management-grid {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 0.38fr) minmax(0, 1fr) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+.app-shell .report-generator-panel {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.app-shell .generate-report-tile {
+  min-height: 126px !important;
+  display: grid !important;
+  place-items: center !important;
+  gap: 10px !important;
+  border: 1px solid rgba(45, 212, 191, 0.72) !important;
+  border-radius: 10px !important;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(45, 212, 191, 0.34), transparent 34%),
+    linear-gradient(135deg, rgba(14, 47, 64, 0.92), rgba(7, 25, 38, 0.92)) !important;
+  color: #f3fbff !important;
+  font-size: clamp(16px, 1vw, 20px) !important;
+  font-weight: 950 !important;
+  box-shadow:
+    0 0 0 1px rgba(236, 72, 153, 0.38),
+    0 0 28px rgba(45, 212, 191, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  cursor: pointer !important;
+}
+
+.app-shell .generate-report-tile svg {
+  width: 48px !important;
+  height: 48px !important;
+  padding: 10px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(125, 211, 252, 0.48) !important;
+  color: #7dd3fc !important;
+  background: rgba(3, 14, 24, 0.38) !important;
+  box-shadow: 0 0 22px rgba(45, 212, 191, 0.32) !important;
+}
+
+.app-shell .report-generation-form,
+.app-shell .generated-reports-panel {
+  padding: 14px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(77, 178, 232, 0.24) !important;
+  background:
+    linear-gradient(145deg, rgba(12, 42, 56, 0.82), rgba(5, 21, 34, 0.82)),
+    radial-gradient(circle at 10% 0, rgba(45, 212, 191, 0.12), transparent 36%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.app-shell .report-generation-form {
+  display: grid !important;
+  gap: 11px !important;
+}
+
+.app-shell .report-generation-form h4,
+.app-shell .generated-reports-title h4 {
+  margin: 0 !important;
+  color: var(--theme-text, #edf8ff) !important;
+  font-size: clamp(13px, 0.82vw, 16px) !important;
+  font-weight: 950 !important;
+}
+
+.app-shell .report-generation-form label {
+  display: grid !important;
+  gap: 6px !important;
+  color: var(--theme-muted, #a7c1d2) !important;
+  font-size: clamp(11px, 0.68vw, 13px) !important;
+  font-weight: 850 !important;
+}
+
+.app-shell .report-generation-form select,
+.app-shell .report-generation-form input {
+  height: 40px !important;
+  width: 100% !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(125, 211, 252, 0.28) !important;
+  background: rgba(4, 18, 29, 0.82) !important;
+  color: var(--theme-text, #edf8ff) !important;
+  padding: 0 10px !important;
+  font-size: clamp(12px, 0.72vw, 14px) !important;
+  font-weight: 750 !important;
+}
+
+.app-shell .generated-reports-panel {
+  min-height: 300px !important;
+  display: grid !important;
+  grid-template-rows: auto auto 1fr !important;
+}
+
+.app-shell .generated-reports-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 10px !important;
+}
+
+.app-shell .generated-reports-title span {
+  color: var(--theme-muted, #a7c1d2) !important;
+  font-size: clamp(11px, 0.65vw, 13px) !important;
+  font-weight: 850 !important;
+}
+
+.app-shell .generated-reports-table-wrap {
+  overflow: auto !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(125, 211, 252, 0.18) !important;
+}
+
+.app-shell .generated-preview-notice {
+  margin: 0 0 10px !important;
+  padding: 9px 11px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(245, 158, 11, 0.32) !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: var(--theme-text, #f8fbff) !important;
+  font-size: clamp(11px, 0.66vw, 13px) !important;
+  font-weight: 800 !important;
+}
+
+.app-shell .generated-reports-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+}
+
+.app-shell .generated-reports-table th,
+.app-shell .generated-reports-table td {
+  height: 34px !important;
+  padding: 7px 10px !important;
+  border: 1px solid rgba(125, 211, 252, 0.12) !important;
+  color: var(--theme-text, #edf8ff) !important;
+  font-size: clamp(11px, 0.65vw, 13px) !important;
+  vertical-align: middle !important;
+}
+
+.app-shell .generated-reports-table th {
+  background: rgba(72, 196, 255, 0.09) !important;
+  font-weight: 950 !important;
+  text-align: center !important;
+}
+
+.app-shell .generated-reports-table td {
+  font-weight: 500 !important;
+  text-align: center !important;
+}
+
+.app-shell .generated-reports-table th:first-child,
+.app-shell .generated-reports-table td:first-child {
+  text-align: left !important;
+  width: 44% !important;
+}
+
+.app-shell .generate-report-tile:disabled,
+.app-shell .export-button.is-generating {
+  opacity: 0.62 !important;
+  cursor: progress !important;
+  filter: saturate(0.8) !important;
+}
+
+.app-shell .export-button.is-generating {
+  border-color: rgba(45, 212, 191, 0.62) !important;
+  box-shadow: 0 0 18px rgba(45, 212, 191, 0.22) !important;
+}
+
+.app-shell .generated-reports-empty {
+  height: 94px !important;
+  color: var(--theme-muted, #a7c1d2) !important;
+  text-align: center !important;
+}
+
+.app-shell.light-background-theme .report-search-box,
+.app-shell.light-background-theme .report-generation-form select,
+.app-shell.light-background-theme .report-generation-form input {
+  background: rgba(255, 255, 255, 0.88) !important;
+  color: #0b2738 !important;
+}
+
+.app-shell.light-background-theme .report-generation-form,
+.app-shell.light-background-theme .generated-reports-panel {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-color: rgba(0, 119, 190, 0.22) !important;
+}
+
+.app-shell.light-background-theme .generated-reports-table th {
+  background: rgba(14, 165, 233, 0.14) !important;
+  color: #0b2738 !important;
+}
+
+.app-shell.light-background-theme .generated-reports-table td {
+  color: #0b2738 !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .report-management-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell .report-management-header {
+    flex-direction: column !important;
+  }
+
+  .app-shell .report-search-box {
+    width: 100% !important;
+  }
+}
+

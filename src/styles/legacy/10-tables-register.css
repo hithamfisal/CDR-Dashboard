@@ -1,0 +1,522 @@
+﻿/* Register and matrix table sizing refinements. Source split from src/styles.css lines 2663-3183. */
+/* ============================================================
+   Table row-height and no-scroll refinements
+   Applies to:
+   - Talkgroup Efficiency Matrix
+   - Radio Behavior Insights
+   - User Behavior Insights
+   - Filtered Calls Register in selected period
+   ============================================================ */
+
+/* Show the full matrix/table area without an inner scroll box. */
+.app-shell .talkgroup-efficiency-section .no-scroll-table,
+.app-shell .behavior-grid .no-scroll-table,
+.app-shell .records-scroll-fixed-register {
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  border-radius: 8px !important;
+}
+
+/* Fit these tables into their cards instead of forcing horizontal scrolling. */
+.app-shell .talkgroup-efficiency-section .no-scroll-table table,
+.app-shell .behavior-grid .no-scroll-table table,
+.app-shell .records-scroll-fixed-register table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+
+/* Fixed clean row height. Long values are kept on one line with ellipsis. */
+.app-shell .fixed-row-table th,
+.app-shell .fixed-row-table td {
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  padding: 7px 8px !important;
+  line-height: 1.15 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Give key text columns a little more room in fixed-layout mode. */
+.app-shell .talkgroup-efficiency-section .fixed-row-table th:first-child,
+.app-shell .talkgroup-efficiency-section .fixed-row-table td:first-child,
+.app-shell .behavior-grid .fixed-row-table th:first-child,
+.app-shell .behavior-grid .fixed-row-table td:first-child,
+.app-shell .records-scroll-fixed-register th:nth-child(3),
+.app-shell .records-scroll-fixed-register td:nth-child(3),
+.app-shell .records-scroll-fixed-register th:nth-child(5),
+.app-shell .records-scroll-fixed-register td:nth-child(5),
+.app-shell .records-scroll-fixed-register th:nth-child(9),
+.app-shell .records-scroll-fixed-register td:nth-child(9) {
+  width: 14% !important;
+}
+
+/* Keep the register compact enough to fit without scroll. */
+.app-shell .records-scroll-fixed-register th,
+.app-shell .records-scroll-fixed-register td {
+  font-size: 10px !important;
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}
+
+/* Company inactive table now intentionally shows every company, including zero inactive. */
+.app-shell .network-utilization-section .table-card table td:nth-child(2),
+.app-shell .network-utilization-section .table-card table th:nth-child(2) {
+  text-align: right !important;
+}
+
+
+/* ============================================================
+   Filtered Calls Register column-width refinement
+   Keeps small fields compact while the table fills the full card.
+   ============================================================ */
+
+.app-shell .records-scroll-fixed-register {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: visible !important;
+}
+
+.app-shell .records-scroll-fixed-register .filtered-register-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+/* Compact fields */
+.app-shell .filtered-register-table .col-sn { width: 3.2% !important; }
+.app-shell .filtered-register-table .col-radio-id { width: 6.2% !important; }
+.app-shell .filtered-register-table .col-employee-id { width: 6.2% !important; }
+.app-shell .filtered-register-table .col-region { width: 6.8% !important; }
+.app-shell .filtered-register-table .col-duration { width: 6.2% !important; }
+
+/* Medium fields */
+.app-shell .filtered-register-table .col-radio-type { width: 8.4% !important; }
+.app-shell .filtered-register-table .col-start { width: 8.5% !important; }
+.app-shell .filtered-register-table .col-end { width: 8.5% !important; }
+.app-shell .filtered-register-table .col-base-station { width: 8.5% !important; }
+
+/* Wider descriptive fields */
+.app-shell .filtered-register-table .col-radio-alias { width: 9.4% !important; }
+.app-shell .filtered-register-table .col-employee-name { width: 10.2% !important; }
+.app-shell .filtered-register-table .col-company { width: 9.7% !important; }
+.app-shell .filtered-register-table .col-talkgroup { width: 8.2% !important; }
+
+/* Override earlier generic 14% column rule for this specific register table. */
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(3),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(3),
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(5),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(5),
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(9),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(9) {
+  width: auto !important;
+}
+
+.app-shell .filtered-register-table th,
+.app-shell .filtered-register-table td {
+  box-sizing: border-box !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 6px 7px !important;
+  line-height: 1.15 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Align small numeric fields cleanly. */
+.app-shell .filtered-register-table th:nth-child(1),
+.app-shell .filtered-register-table td:nth-child(1),
+.app-shell .filtered-register-table th:nth-child(12),
+.app-shell .filtered-register-table td:nth-child(12) {
+  text-align: center !important;
+}
+
+/* Slightly smaller register text only on narrower screens so all columns remain visible. */
+@media (max-width: 1440px) {
+  .app-shell .filtered-register-table th,
+  .app-shell .filtered-register-table td {
+    font-size: 9.5px !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .app-shell .records-scroll-fixed-register {
+    overflow-x: auto !important;
+  }
+  .app-shell .records-scroll-fixed-register .filtered-register-table {
+    min-width: 1100px !important;
+  }
+}
+
+/* ============================================================
+   Filtered Calls Register: center all fields
+   Keeps previous optimized column widths, but centers every
+   header and body cell in the selected-period register table.
+   ============================================================ */
+
+.app-shell .records-card table,
+.app-shell .filtered-register-table,
+.app-shell .records-card .filtered-register-table {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.app-shell .records-card th,
+.app-shell .records-card td,
+.app-shell .filtered-register-table th,
+.app-shell .filtered-register-table td,
+.app-shell .records-card .filtered-register-table th,
+.app-shell .records-card .filtered-register-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.app-shell .records-card td *,
+.app-shell .filtered-register-table td * {
+  text-align: center !important;
+}
+
+.app-shell .records-card td,
+.app-shell .filtered-register-table td {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ============================================================
+   Filtered Calls Register: wider Base Station column
+   Keeps all fields centered, but gives Base Station enough room
+   to display complete/near-complete values while table fills width.
+   ============================================================ */
+
+.app-shell .records-scroll-fixed-register .filtered-register-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+/* Rebalanced 13-column register layout = 100% total width */
+.app-shell .filtered-register-table .col-sn { width: 3% !important; }
+.app-shell .filtered-register-table .col-radio-id { width: 5.6% !important; }
+.app-shell .filtered-register-table .col-radio-alias { width: 8.4% !important; }
+.app-shell .filtered-register-table .col-radio-type { width: 6.8% !important; }
+.app-shell .filtered-register-table .col-employee-name { width: 9.6% !important; }
+.app-shell .filtered-register-table .col-employee-id { width: 5.6% !important; }
+.app-shell .filtered-register-table .col-region { width: 5.8% !important; }
+.app-shell .filtered-register-table .col-company { width: 8.8% !important; }
+.app-shell .filtered-register-table .col-talkgroup { width: 9% !important; }
+.app-shell .filtered-register-table .col-start { width: 7.2% !important; }
+.app-shell .filtered-register-table .col-end { width: 7.2% !important; }
+.app-shell .filtered-register-table .col-duration { width: 5.2% !important; }
+.app-shell .filtered-register-table .col-base-station { width: 17.8% !important; }
+
+/* Base Station needs a little more readable space than compact fields. */
+.app-shell .filtered-register-table th:nth-child(13),
+.app-shell .filtered-register-table td:nth-child(13) {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  font-size: 10.5px !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Keep headers and values centered after the width change. */
+.app-shell .filtered-register-table th,
+.app-shell .filtered-register-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* On smaller screens, allow horizontal scroll instead of crushing Base Station. */
+@media (max-width: 1360px) {
+  .app-shell .records-scroll-fixed-register {
+    overflow-x: auto !important;
+  }
+  .app-shell .records-scroll-fixed-register .filtered-register-table {
+    min-width: 1280px !important;
+  }
+}
+
+/* ============================================================
+   Filtered Calls Register: no cut values, no wrap, auto width
+   Radio Type + Base Station get readable width.
+   Table fills the card, and only uses horizontal scroll if needed.
+   ============================================================ */
+
+.app-shell .records-scroll-fixed-register {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.app-shell .records-scroll-fixed-register .filtered-register-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
+/* No wrapping and no ellipsis/cutting for the selected-period register. */
+.app-shell .records-scroll-fixed-register .filtered-register-table th,
+.app-shell .records-scroll-fixed-register .filtered-register-table td {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 6px 9px !important;
+  line-height: 1.15 !important;
+  box-sizing: border-box !important;
+}
+
+/* Auto-fit column minimums. Small fields stay compact; long fields get enough space. */
+.app-shell .filtered-register-table .col-sn { width: 48px !important; min-width: 48px !important; }
+.app-shell .filtered-register-table .col-radio-id { width: 96px !important; min-width: 96px !important; }
+.app-shell .filtered-register-table .col-radio-alias { width: 160px !important; min-width: 160px !important; }
+.app-shell .filtered-register-table .col-radio-type { width: 230px !important; min-width: 230px !important; }
+.app-shell .filtered-register-table .col-employee-name { width: 170px !important; min-width: 170px !important; }
+.app-shell .filtered-register-table .col-employee-id { width: 110px !important; min-width: 110px !important; }
+.app-shell .filtered-register-table .col-region { width: 115px !important; min-width: 115px !important; }
+.app-shell .filtered-register-table .col-company { width: 210px !important; min-width: 210px !important; }
+.app-shell .filtered-register-table .col-talkgroup { width: 180px !important; min-width: 180px !important; }
+.app-shell .filtered-register-table .col-start { width: 150px !important; min-width: 150px !important; }
+.app-shell .filtered-register-table .col-end { width: 150px !important; min-width: 150px !important; }
+.app-shell .filtered-register-table .col-duration { width: 105px !important; min-width: 105px !important; }
+.app-shell .filtered-register-table .col-base-station { width: 300px !important; min-width: 300px !important; }
+
+/* Keep Radio Type and Base Station extra readable. */
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(4),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(4),
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(13),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(13) {
+  font-size: 10.5px !important;
+  letter-spacing: -0.01em !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+/* Make the horizontal scrollbar easier to use when the register exceeds screen width. */
+.app-shell .records-scroll-fixed-register::-webkit-scrollbar {
+  height: 10px !important;
+}
+
+.app-shell .records-scroll-fixed-register::-webkit-scrollbar-thumb {
+  border-radius: 999px !important;
+  background: rgba(0, 120, 212, 0.35) !important;
+}
+
+.app-shell.dark-background-theme .records-scroll-fixed-register::-webkit-scrollbar-thumb {
+  background: rgba(116, 181, 214, 0.45) !important;
+}
+
+.app-shell.light-background-theme .records-scroll-fixed-register::-webkit-scrollbar-thumb {
+  background: rgba(0, 100, 150, 0.32) !important;
+}
+
+
+/* ============================================================
+   FINAL: Register auto-fit inside card
+   User request: no horizontal scrolling, no wrapping.
+   This uses fixed-layout percentage columns + compact text so the
+   register fills the available card width instead of exceeding it.
+   ============================================================ */
+
+.app-shell .records-scroll-fixed-register {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+
+.app-shell .records-scroll-fixed-register .filtered-register-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell .records-scroll-fixed-register .filtered-register-table th,
+.app-shell .records-scroll-fixed-register .filtered-register-table td {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  height: 34px !important;
+  min-height: 28px !important;
+  max-height: 34px !important;
+  padding: 5px 3px !important;
+  line-height: 1.08 !important;
+  box-sizing: border-box !important;
+  font-size: clamp(7px, 0.46vw, 10px) !important;
+  letter-spacing: -0.045em !important;
+}
+
+/* 13-column layout = 100%. Small fields are compact, long fields get priority. */
+.app-shell .filtered-register-table .col-sn { width: 2.7% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-radio-id { width: 4.7% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-radio-alias { width: 7.7% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-radio-type { width: 12.2% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-employee-name { width: 7.8% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-employee-id { width: 4.8% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-region { width: 5.1% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-company { width: 8.9% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-talkgroup { width: 7.9% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-start { width: 7.3% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-end { width: 7.3% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-duration { width: 4.3% !important; min-width: 0 !important; }
+.app-shell .filtered-register-table .col-base-station { width: 19.3% !important; min-width: 0 !important; }
+
+/* Important long-value columns stay slightly more readable. */
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(4),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(4),
+.app-shell .records-scroll-fixed-register .filtered-register-table th:nth-child(13),
+.app-shell .records-scroll-fixed-register .filtered-register-table td:nth-child(13) {
+  font-size: clamp(6.6px, 0.44vw, 9.6px) !important;
+  letter-spacing: -0.06em !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+}
+
+/* Remove earlier responsive scroll/min-width overrides for the register. */
+@media (max-width: 1360px), (max-width: 1180px) {
+  .app-shell .records-scroll-fixed-register {
+    overflow-x: hidden !important;
+  }
+  .app-shell .records-scroll-fixed-register .filtered-register-table {
+    min-width: 0 !important;
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+}
+
+/* Ultra-compact fallback for laptop/tablet widths while still avoiding scroll/wrap. */
+@media (max-width: 1280px) {
+  .app-shell .records-scroll-fixed-register .filtered-register-table th,
+  .app-shell .records-scroll-fixed-register .filtered-register-table td {
+    font-size: clamp(6px, 0.52vw, 8px) !important;
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+    letter-spacing: -0.075em !important;
+  }
+}
+
+
+/* ============================================================
+   Fix search field label/icon wrapping
+   Keeps "Search Radio / User" in one line
+   ============================================================ */
+
+.app-shell .search-box > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  width: max-content !important;
+  max-width: 100% !important;
+}
+
+.app-shell .search-box {
+  min-width: 260px !important;
+}
+
+.app-shell .filters-panel {
+  align-items: end !important;
+}
+
+/* ============================================================
+   Filter count alignment
+   Keeps "124,175 from 124,175 - 100.0%" vertically centered
+   and inline with the filter boxes.
+   ============================================================ */
+
+.app-shell .filters-panel {
+  align-items: end !important;
+}
+
+.app-shell .filter-count {
+  align-self: end !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  border-radius: 999px !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell.light-background-theme .filter-count {
+  background: rgba(255, 255, 255, 0.86) !important;
+  border: 1px solid rgba(0, 100, 150, 0.22) !important;
+  color: #294c5f !important;
+}
+
+.app-shell.dark-background-theme .filter-count {
+  background: rgba(9, 37, 54, 0.92) !important;
+  border: 1px solid rgba(116, 181, 214, 0.30) !important;
+  color: #a8c8d8 !important;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .filter-count {
+    justify-self: start !important;
+    width: fit-content !important;
+  }
+}
+
+/* ============================================================
+   Section nav stability fix
+   Keeps the section navigation in normal page flow above the hero
+   instead of moving/sticking while the page scrolls.
+   ============================================================ */
+
+.app-shell .section-nav,
+.app-shell.dark-background-theme .section-nav,
+.app-shell.light-background-theme .section-nav,
+.app-shell.se-theme.light-background-theme .section-nav {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: 5 !important;
+  transform: none !important;
+  margin: 14px 0 22px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Make sure the hero starts cleanly below the nav. */
+.app-shell .section-nav + .hero-panel,
+.app-shell.dark-background-theme .section-nav + .hero-panel,
+.app-shell.light-background-theme .section-nav + .hero-panel {
+  margin-top: 0 !important;
+}
+
+/* Keep nav buttons stable inside the non-sticky toolbar. */
+.app-shell .section-nav .section-nav-button,
+.app-shell .section-nav button {
+  position: relative !important;
+  top: auto !important;
+  transform: none !important;
+}
+

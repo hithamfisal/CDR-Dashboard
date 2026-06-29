@@ -1,0 +1,1920 @@
+﻿/* Admin/customer access and portal separation layouts. Source split from src/styles.css lines 19238-21156. */
+/* ============================================================
+   GLOBAL VIEW LAYOUT ADJUSTMENT - match reference command screen
+   Scope: first tab only. No data/KPI/chart elements removed.
+   ============================================================ */
+.app-shell.active-tab-overview {
+  --cdr-sidebar-width: 168px !important;
+  padding: 0 10px 14px calc(var(--cdr-sidebar-width) + 10px) !important;
+  background: #06101f !important;
+}
+
+.app-shell.active-tab-overview .cdr-portal-sidebar {
+  width: var(--cdr-sidebar-width) !important;
+  padding: 8px 8px !important;
+  gap: 8px !important;
+  background: linear-gradient(180deg, #071a30 0%, #06182c 58%, #06101f 100%) !important;
+  border-right: 1px solid rgba(80, 151, 206, 0.28) !important;
+  box-shadow: 10px 0 24px rgba(0,0,0,0.30) !important;
+}
+
+.app-shell.active-tab-overview .cdr-sidebar-brand {
+  min-height: 76px !important;
+  grid-template-columns: 52px minmax(0, 1fr) !important;
+  padding: 5px 5px 10px !important;
+  border-bottom: 1px solid rgba(99, 192, 255, 0.18) !important;
+}
+
+.app-shell.active-tab-overview .cdr-sidebar-brand img {
+  width: 50px !important;
+  height: 50px !important;
+  background: rgba(255,255,255,0.96) !important;
+  border-radius: 3px !important;
+  padding: 2px !important;
+}
+
+.app-shell.active-tab-overview .cdr-sidebar-brand span {
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.app-shell.active-tab-overview .cdr-portal-sidebar .dashboard-tabs {
+  gap: 6px !important;
+}
+
+.app-shell.active-tab-overview .cdr-portal-sidebar .dashboard-tab {
+  min-height: 34px !important;
+  padding: 8px 10px !important;
+  border-radius: 5px !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  justify-content: center !important;
+  text-align: center !important;
+  color: #b7cfe2 !important;
+  background: rgba(10, 36, 63, 0.72) !important;
+  border: 1px solid rgba(99, 192, 255, 0.14) !important;
+}
+
+.app-shell.active-tab-overview .cdr-portal-sidebar .dashboard-tab.active,
+.app-shell.active-tab-overview .cdr-portal-sidebar .dashboard-tab:hover {
+  background: linear-gradient(180deg, #18c3f4, #0799cf) !important;
+  border-color: rgba(118, 226, 255, 0.65) !important;
+  color: #061527 !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18), 0 8px 18px rgba(0,183,255,0.22) !important;
+}
+
+.app-shell.active-tab-overview .cdr-command-shell {
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  border-radius: 0 0 7px 7px !important;
+  background: #07182b !important;
+  border: 1px solid rgba(73, 137, 190, 0.26) !important;
+  border-top: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.app-shell.active-tab-overview .cdr-command-shell .topbar.followup-style-topbar,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar {
+  min-height: 58px !important;
+  height: 58px !important;
+  margin: 0 !important;
+  padding: 4px 12px !important;
+  border-radius: 0 !important;
+  grid-template-columns: 150px minmax(320px, 1fr) 150px !important;
+  background: #07182b !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(73, 137, 190, 0.26) !important;
+  box-shadow: none !important;
+}
+
+.app-shell.active-tab-overview .cdr-header-logo {
+  height: 50px !important;
+}
+
+.app-shell.active-tab-overview .cdr-header-logo img {
+  max-width: 130px !important;
+  max-height: 44px !important;
+}
+
+.app-shell.active-tab-overview .followup-dashboard-title {
+  min-height: 42px !important;
+  width: auto !important;
+  padding: 2px 10px !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell.active-tab-overview .followup-dashboard-title h1 {
+  font-size: clamp(18px, 1.55vw, 27px) !important;
+  letter-spacing: 0.035em !important;
+  line-height: 1 !important;
+}
+
+.app-shell.active-tab-overview .followup-dashboard-title p {
+  margin-top: 7px !important;
+  font-size: 9px !important;
+  letter-spacing: 0.32em !important;
+  color: #9be7ff !important;
+}
+
+.app-shell.active-tab-overview .dashboard-tabs-row {
+  margin: 0 !important;
+  padding: 5px 8px !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(73, 137, 190, 0.26) !important;
+  background: #0a2038 !important;
+  box-shadow: none !important;
+}
+
+.app-shell.active-tab-overview .cdr-control-actions {
+  justify-content: flex-end !important;
+  gap: 6px !important;
+}
+
+.app-shell.active-tab-overview .cdr-action-pill {
+  min-height: 28px !important;
+  height: 28px !important;
+  padding: 5px 9px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+}
+
+.app-shell.active-tab-overview .cdr-action-pill svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+  margin: 0 !important;
+  padding: 7px 8px !important;
+  border-radius: 0 0 7px 7px !important;
+  display: grid !important;
+  grid-template-columns: minmax(190px, 1.5fr) repeat(5, minmax(118px, 1fr)) !important;
+  gap: 7px !important;
+  background: #09213a !important;
+  border: 0 !important;
+}
+
+.app-shell.active-tab-overview .search-box,
+.app-shell.active-tab-overview .filter-field,
+.app-shell.active-tab-overview .multi-select-field {
+  min-height: 42px !important;
+}
+
+.app-shell.active-tab-overview .search-box > span,
+.app-shell.active-tab-overview .filter-field > span,
+.app-shell.active-tab-overview .multi-select-field > span {
+  font-size: 9px !important;
+  letter-spacing: 0.06em !important;
+  margin-bottom: 3px !important;
+}
+
+.app-shell.active-tab-overview .search-box input,
+.app-shell.active-tab-overview .multi-select-trigger,
+.app-shell.active-tab-overview .filter-field input,
+.app-shell.active-tab-overview .filter-field select {
+  min-height: 28px !important;
+  height: 28px !important;
+  border-radius: 4px !important;
+  font-size: 10.5px !important;
+}
+
+.app-shell.active-tab-overview .cdr-page-intro {
+  display: none !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-overview {
+  margin-top: 0 !important;
+  gap: 8px !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30,
+.app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 {
+  order: 1 !important;
+  position: relative !important;
+  padding-top: 26px !important;
+  display: grid !important;
+  grid-template-columns: repeat(10, minmax(82px, 1fr)) !important;
+  gap: 6px !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30::before {
+  content: "Executive Pulse" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  font-size: 15px !important;
+  line-height: 22px !important;
+  font-weight: 950 !important;
+  color: #f5fbff !important;
+  letter-spacing: 0.01em !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile,
+.app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 .modern-stat-tile {
+  min-height: 58px !important;
+  height: 58px !important;
+  padding: 5px 5px !important;
+  border-radius: 6px !important;
+  background: linear-gradient(180deg, #0c2037, #07182b) !important;
+  border: 1px solid rgba(74, 140, 190, 0.28) !important;
+  gap: 2px !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon svg {
+  width: 11px !important;
+  height: 11px !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile span {
+  font-size: 7.5px !important;
+  line-height: 1 !important;
+  color: #a8c8dc !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong {
+  font-size: clamp(12px, 0.85vw, 16px) !important;
+  color: #eaf9ff !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-profile-band {
+  order: 2 !important;
+  position: relative !important;
+  padding-top: 26px !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(200px, 1.05fr) !important;
+  gap: 6px !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-profile-band::before {
+  content: "Operating Performance Gauges" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  font-size: 15px !important;
+  line-height: 22px !important;
+  font-weight: 950 !important;
+  color: #f5fbff !important;
+  letter-spacing: 0.01em !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-main,
+.app-shell.active-tab-overview .modern-profile-card {
+  min-height: 76px !important;
+  height: 76px !important;
+  border-radius: 6px !important;
+  background: linear-gradient(180deg, #0c2037, #07182b) !important;
+  border: 1px solid rgba(74, 140, 190, 0.28) !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-main {
+  grid-column: span 2 !important;
+  grid-template-columns: 56px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  padding: 7px 10px !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-main img {
+  width: 52px !important;
+  height: 52px !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-main span,
+.app-shell.active-tab-overview .modern-profile-card span {
+  font-size: 8px !important;
+  letter-spacing: 0.08em !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-main strong {
+  font-size: clamp(27px, 2.5vw, 42px) !important;
+  line-height: 0.9 !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-main p {
+  font-size: clamp(13px, 1vw, 18px) !important;
+  line-height: 0.95 !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-card {
+  grid-column: span 3 !important;
+  grid-template-columns: 24px minmax(0, 1fr) !important;
+  padding: 7px 10px !important;
+  gap: 8px !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-card svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-card strong {
+  font-size: 11px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-card p,
+.app-shell.active-tab-overview .modern-profile-card small,
+.app-shell.active-tab-overview .modern-source-chips em {
+  font-size: 8px !important;
+  line-height: 1.1 !important;
+}
+
+.app-shell.active-tab-overview .modern-source-chips {
+  gap: 3px !important;
+  margin: 3px 0 !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-overview-grid {
+  order: 3 !important;
+}
+
+.app-shell.active-tab-overview .cdr-performance-matrix-panel { order: 4 !important; }
+.app-shell.active-tab-overview .cdr-deep-dive-grid { order: 5 !important; }
+.app-shell.active-tab-overview .cdr-top-entities-grid { order: 6 !important; }
+.app-shell.active-tab-overview .cdr-behavior-grid { order: 7 !important; }
+.app-shell.active-tab-overview .cdr-quality-footer-strip { order: 8 !important; }
+.app-shell.active-tab-overview .cdr-saas-footer { order: 9 !important; }
+
+@media (max-width: 1450px) {
+  .app-shell.active-tab-overview .cdr-kpi-strip-30,
+  .app-shell.active-tab-overview .modern-stat-deck.cdr-kpi-strip-30 {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+  .app-shell.active-tab-overview .cdr-saas-profile-band {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr) !important;
+  }
+  .app-shell.active-tab-overview .modern-profile-main,
+  .app-shell.active-tab-overview .modern-profile-card {
+    grid-column: auto !important;
+  }
+}
+
+/* ============================================================
+   HEADER / SIDEBAR / FILTER POSITION PATCH
+   - Header spans the full page width.
+   - Sidebar tabs sit at the far-left edge below the header.
+   - Filters sit beside the tabs, not below a large blank area.
+   - Sidebar logo removed.
+   - Dashboard PDF action removed in App.tsx.
+   ============================================================ */
+.app-shell[class*="active-tab-"],
+.app-shell.active-tab-overview {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 0 18px !important;
+}
+
+.app-shell .cdr-command-shell,
+.app-shell.active-tab-overview .cdr-command-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: 250px minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  align-items: start !important;
+  gap: 0 !important;
+  border-radius: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  overflow: visible !important;
+  background: #061426 !important;
+}
+
+.app-shell .cdr-command-shell .topbar.followup-style-topbar,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell.active-tab-overview .cdr-command-shell .topbar.followup-style-topbar,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  min-height: 104px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 8px 20px 12px !important;
+  display: grid !important;
+  grid-template-columns: 150px minmax(0, 1fr) 150px !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  gap: 8px 16px !important;
+  border-radius: 0 !important;
+  background: #061426 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(73, 137, 190, 0.30) !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-logo-left,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-left {
+  grid-column: 1 !important;
+  grid-row: 1 / span 2 !important;
+  justify-content: flex-start !important;
+  align-self: center !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-logo-right,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-right {
+  grid-column: 3 !important;
+  grid-row: 1 / span 2 !important;
+  justify-content: flex-end !important;
+  align-self: center !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-logo img,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo img {
+  max-width: 118px !important;
+  max-height: 72px !important;
+  object-fit: contain !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title,
+.app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: center !important;
+  align-self: center !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 42px !important;
+  padding: 0 10px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  text-align: center !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title h1 {
+  font-size: clamp(27px, 3vw, 44px) !important;
+  line-height: 0.98 !important;
+  letter-spacing: 0.055em !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title p,
+.app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title p {
+  margin-top: 10px !important;
+  font-size: 13px !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.42em !important;
+  color: #b5f2ff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-actions,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  justify-self: center !important;
+  align-self: center !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: auto !important;
+  max-width: 100% !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-actions .button,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions .button {
+  min-height: 42px !important;
+  height: 42px !important;
+  padding: 9px 15px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-actions .button svg,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions .button svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-portal-sidebar,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar {
+  position: static !important;
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  inset: auto !important;
+  width: 250px !important;
+  min-height: 100% !important;
+  height: auto !important;
+  padding: 10px 10px 12px !important;
+  align-self: stretch !important;
+  border-right: 1px solid rgba(73, 137, 190, 0.30) !important;
+  border-top: 0 !important;
+  box-shadow: none !important;
+  background: #07182b !important;
+  z-index: 2 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-sidebar-brand,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-sidebar-brand {
+  min-height: 0 !important;
+  display: block !important;
+  padding: 4px 4px 11px !important;
+  margin: 0 0 10px !important;
+  border-bottom: 1px solid rgba(99, 192, 255, 0.18) !important;
+}
+
+.app-shell .cdr-command-shell .cdr-sidebar-brand img,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-sidebar-brand img {
+  display: none !important;
+}
+
+.app-shell .cdr-command-shell .cdr-sidebar-brand span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-sidebar-brand span {
+  display: block !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  letter-spacing: 0.10em !important;
+  color: #dff8ff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-portal-sidebar .dashboard-tabs,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar .dashboard-tabs {
+  gap: 7px !important;
+}
+
+.app-shell .cdr-command-shell .cdr-portal-sidebar .dashboard-tab,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar .dashboard-tab {
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 8px 10px !important;
+  justify-content: center !important;
+  text-align: center !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-row,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-row {
+  display: none !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  align-self: stretch !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+  padding: 14px 18px 12px !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: #09213a !important;
+  display: grid !important;
+  grid-template-columns: minmax(260px, 1.35fr) repeat(5, minmax(140px, 1fr)) !important;
+  gap: 12px 16px !important;
+  align-content: start !important;
+  align-items: end !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > .search-box.search-compact,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel > .search-box.search-compact {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .filter-field,
+.app-shell .cdr-command-shell .filters-panel .multi-select-field,
+.app-shell .cdr-command-shell .filters-panel .search-box,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .filter-field,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .multi-select-field,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .search-box {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .filter-count,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .filter-count {
+  justify-self: end !important;
+  width: max-content !important;
+  min-width: 220px !important;
+  max-width: 100% !important;
+}
+
+.app-shell > *:not(.cdr-command-shell),
+.app-shell.active-tab-overview > *:not(.cdr-command-shell) {
+  width: calc(100% - 20px) !important;
+  max-width: none !important;
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+
+.app-shell .cdr-saas-overview,
+.app-shell.active-tab-overview .cdr-saas-overview,
+.app-shell .section-body,
+.app-shell .chart-grid,
+.app-shell .records-card,
+.app-shell .table-card {
+  max-width: none !important;
+}
+
+@media (max-width: 1280px) {
+  .app-shell .cdr-command-shell,
+  .app-shell.active-tab-overview .cdr-command-shell {
+    grid-template-columns: 210px minmax(0, 1fr) !important;
+  }
+  .app-shell .cdr-command-shell .cdr-portal-sidebar,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar {
+    width: 210px !important;
+  }
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell .cdr-command-shell,
+  .app-shell.active-tab-overview .cdr-command-shell {
+    grid-template-columns: 1fr !important;
+  }
+  .app-shell .cdr-command-shell .topbar.followup-style-topbar,
+  .app-shell.active-tab-overview .cdr-command-shell .topbar.followup-style-topbar {
+    grid-column: 1 !important;
+    grid-template-columns: 1fr !important;
+  }
+  .app-shell .cdr-command-shell .cdr-header-logo,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo {
+    display: none !important;
+  }
+  .app-shell .cdr-command-shell .followup-dashboard-title,
+  .app-shell .cdr-command-shell .cdr-header-actions,
+  .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions,
+  .app-shell .cdr-command-shell .cdr-portal-sidebar,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar,
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+    grid-column: 1 !important;
+  }
+  .app-shell .cdr-command-shell .cdr-portal-sidebar,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar {
+    grid-row: 2 !important;
+    width: 100% !important;
+  }
+  .app-shell .cdr-command-shell .cdr-portal-sidebar .dashboard-tabs,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar .dashboard-tabs {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+  }
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+    grid-row: 3 !important;
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   HEADER RESTORE FINAL PATCH
+   Fixes the missing/clipped top header after moving filters beside tabs.
+   Keeps sidebar logo removed and Dashboard PDF button removed.
+   ============================================================ */
+.app-shell .cdr-command-shell,
+.app-shell.active-tab-overview .cdr-command-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: 255px minmax(0, 1fr) !important;
+  grid-template-areas:
+    "cdrHeader cdrHeader"
+    "cdrTabs cdrFilters" !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  background: #051224 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  grid-area: cdrHeader !important;
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 128px !important;
+  height: 128px !important;
+  margin: 0 !important;
+  padding: 10px 22px 12px !important;
+  display: grid !important;
+  grid-template-columns: 150px minmax(0, 1fr) 150px !important;
+  grid-template-rows: minmax(56px, auto) minmax(42px, auto) !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  gap: 8px 18px !important;
+  background: #061426 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(74, 163, 225, 0.32) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22) !important;
+  overflow: hidden !important;
+  z-index: 20 !important;
+  transform: none !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar .cdr-banner-art,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner .cdr-banner-art,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar .cdr-banner-art,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner .cdr-banner-art {
+  display: none !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-logo,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo {
+  position: static !important;
+  transform: none !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  z-index: 2 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-logo-left,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-left {
+  grid-column: 1 !important;
+  grid-row: 1 / 3 !important;
+  justify-content: flex-start !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-logo-right,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-right {
+  grid-column: 3 !important;
+  grid-row: 1 / 3 !important;
+  justify-content: flex-end !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-logo img,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo img {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 118px !important;
+  max-height: 74px !important;
+  object-fit: contain !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title,
+.app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title {
+  position: static !important;
+  transform: none !important;
+  inset: auto !important;
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  align-self: center !important;
+  justify-self: center !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 0 12px !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  text-align: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  z-index: 2 !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title h1 {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-family: Arial, system-ui, sans-serif !important;
+  font-size: clamp(30px, 3vw, 46px) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.055em !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+  text-align: center !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.75) !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title p,
+.app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title p {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-family: Arial, system-ui, sans-serif !important;
+  font-size: clamp(11px, 1.05vw, 15px) !important;
+  line-height: 1.1 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.34em !important;
+  text-transform: uppercase !important;
+  color: #baf5ff !important;
+  text-align: center !important;
+  text-shadow: 0 0 12px rgba(0, 206, 209, 0.35) !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-actions,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions {
+  position: static !important;
+  transform: none !important;
+  inset: auto !important;
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  align-self: center !important;
+  justify-self: center !important;
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  z-index: 2 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-actions .button,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions .button {
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-portal-sidebar,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar {
+  grid-area: cdrTabs !important;
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  left: auto !important;
+  width: 255px !important;
+  max-width: 255px !important;
+  min-height: 0 !important;
+  height: auto !important;
+  align-self: stretch !important;
+  margin: 0 !important;
+  padding: 18px 12px 14px !important;
+  background: #07192d !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(74, 163, 225, 0.30) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  z-index: 5 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-sidebar-brand,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-sidebar-brand {
+  display: block !important;
+  min-height: 0 !important;
+  margin: 0 0 14px !important;
+  padding: 8px 4px 14px !important;
+  border-bottom: 1px solid rgba(99, 192, 255, 0.20) !important;
+  text-align: center !important;
+}
+
+.app-shell .cdr-command-shell .cdr-sidebar-brand img,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-sidebar-brand img {
+  display: none !important;
+}
+
+.app-shell .cdr-command-shell .cdr-sidebar-brand span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-sidebar-brand span {
+  display: block !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  line-height: 1.15 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.08em !important;
+  color: #e4fbff !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+  grid-area: cdrFilters !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  height: auto !important;
+  align-self: stretch !important;
+  margin: 0 !important;
+  padding: 20px 22px 18px !important;
+  background: #09213a !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  display: grid !important;
+  grid-template-columns: minmax(260px, 1.28fr) repeat(5, minmax(130px, 1fr)) !important;
+  gap: 16px 20px !important;
+  align-content: start !important;
+  align-items: end !important;
+  overflow: visible !important;
+  z-index: 4 !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .filter-control,
+.app-shell .cdr-command-shell .filters-panel .search-input,
+.app-shell .cdr-command-shell .filters-panel .multi-select-trigger,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .filter-control,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .search-input,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .multi-select-trigger {
+  min-height: 54px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .filter-count,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .filter-count {
+  justify-self: start !important;
+  align-self: end !important;
+  width: max-content !important;
+  max-width: 100% !important;
+  min-width: 210px !important;
+  height: 54px !important;
+}
+
+.app-shell > *:not(.cdr-command-shell),
+.app-shell.active-tab-overview > *:not(.cdr-command-shell) {
+  width: calc(100% - 20px) !important;
+  max-width: none !important;
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+
+@media (max-width: 1350px) {
+  .app-shell .cdr-command-shell,
+  .app-shell.active-tab-overview .cdr-command-shell {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+  }
+  .app-shell .cdr-command-shell .cdr-portal-sidebar,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar {
+    width: 220px !important;
+    max-width: 220px !important;
+  }
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell .cdr-command-shell,
+  .app-shell.active-tab-overview .cdr-command-shell {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "cdrHeader"
+      "cdrTabs"
+      "cdrFilters" !important;
+  }
+  .app-shell .cdr-command-shell > .topbar.followup-style-topbar,
+  .app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar {
+    height: auto !important;
+    min-height: 118px !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+  }
+  .app-shell .cdr-command-shell .cdr-header-logo,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo {
+    display: none !important;
+  }
+  .app-shell .cdr-command-shell .followup-dashboard-title,
+  .app-shell .cdr-command-shell .cdr-header-actions,
+  .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions {
+    grid-column: 1 !important;
+  }
+  .app-shell .cdr-command-shell .cdr-portal-sidebar,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* =====================================================================
+   CDR header + filters alignment patch
+   Goal: restore the clean original top header, horizontal tabs, compact
+   filters, and immediate workbook profile/info layout matching the approved
+   command-center reference. No dashboard data/KPIs are removed.
+   ===================================================================== */
+.app-shell .cdr-command-shell,
+.app-shell.active-tab-overview .cdr-command-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 0 10px 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-areas:
+    "cdrHeader"
+    "cdrTabs"
+    "cdrFilters" !important;
+  gap: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  grid-area: cdrHeader !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 116px !important;
+  height: 116px !important;
+  margin: 0 !important;
+  padding: 0 18px !important;
+  position: relative !important;
+  display: block !important;
+  background: linear-gradient(180deg, rgba(4, 19, 31, 0.98), rgba(5, 24, 38, 0.96)) !important;
+  border: 1px solid rgba(62, 168, 220, 0.30) !important;
+  border-radius: 0 !important;
+  box-shadow: inset 0 -1px 0 rgba(43, 190, 255, 0.22), 0 8px 24px rgba(0,0,0,0.22) !important;
+  overflow: hidden !important;
+  z-index: 20 !important;
+}
+
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar .cdr-banner-art,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner .cdr-banner-art,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar .cdr-banner-art,
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner .cdr-banner-art {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0.56 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-logo,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo {
+  position: absolute !important;
+  top: 20px !important;
+  width: 76px !important;
+  height: 76px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  z-index: 3 !important;
+}
+.app-shell .cdr-command-shell .cdr-header-logo-left,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-left { left: 20px !important; }
+.app-shell .cdr-command-shell .cdr-header-logo-right,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-right { right: 20px !important; }
+.app-shell .cdr-command-shell .cdr-header-logo img,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo img {
+  width: 72px !important;
+  height: 72px !important;
+  max-width: 72px !important;
+  max-height: 72px !important;
+  object-fit: contain !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title,
+.app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title {
+  position: absolute !important;
+  top: 8px !important;
+  left: 140px !important;
+  right: 140px !important;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  text-align: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  z-index: 2 !important;
+}
+.app-shell .cdr-command-shell .followup-dashboard-title h1,
+.app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: clamp(24px, 2.05vw, 38px) !important;
+  line-height: 1.02 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.01em !important;
+  text-transform: none !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.75) !important;
+}
+.app-shell .cdr-command-shell .followup-dashboard-title p,
+.app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title p {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: clamp(10px, 0.85vw, 13px) !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.28em !important;
+  text-transform: uppercase !important;
+  color: #b8f2ff !important;
+}
+
+.app-shell .cdr-command-shell .cdr-header-actions,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions {
+  position: absolute !important;
+  right: 18px !important;
+  bottom: 20px !important;
+  left: auto !important;
+  top: auto !important;
+  width: auto !important;
+  max-width: calc(100% - 720px) !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  z-index: 4 !important;
+}
+.app-shell .cdr-command-shell .cdr-header-actions .button,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions .button {
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .cdr-portal-sidebar,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar {
+  grid-area: cdrTabs !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 54px !important;
+  height: 54px !important;
+  margin: 0 !important;
+  padding: 8px 18px !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  background: rgba(5, 22, 37, 0.98) !important;
+  border: 1px solid rgba(62, 168, 220, 0.30) !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  z-index: 8 !important;
+}
+.app-shell .cdr-command-shell .cdr-sidebar-brand,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-sidebar-brand,
+.app-shell .cdr-command-shell .cdr-sidebar-brand img,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-sidebar-brand img,
+.app-shell .cdr-command-shell .cdr-sidebar-brand span,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-sidebar-brand span {
+  display: none !important;
+}
+.app-shell .cdr-command-shell .cdr-portal-sidebar .dashboard-tabs,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar .dashboard-tabs {
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.app-shell .cdr-command-shell .cdr-portal-sidebar .dashboard-tab,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar .dashboard-tab {
+  width: auto !important;
+  min-width: 108px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 16px !important;
+  border-radius: 5px !important;
+  border: 1px solid rgba(95, 180, 236, 0.42) !important;
+  background: rgba(9, 31, 48, 0.92) !important;
+  color: #e8f8ff !important;
+  font-size: 12px !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  box-shadow: none !important;
+}
+.app-shell .cdr-command-shell .cdr-portal-sidebar .dashboard-tab.active,
+.app-shell .cdr-command-shell .cdr-portal-sidebar .dashboard-tab:hover,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar .dashboard-tab.active,
+.app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar .dashboard-tab:hover {
+  background: linear-gradient(180deg, #48caff, #16aee8) !important;
+  border-color: rgba(73, 205, 255, 0.95) !important;
+  color: #001421 !important;
+}
+.app-shell .cdr-command-shell .dashboard-tabs-row,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-row { display: none !important; }
+
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+  grid-area: cdrFilters !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 14px 18px 12px !important;
+  background: rgba(12, 29, 55, 0.96) !important;
+  border: 1px solid rgba(62, 168, 220, 0.28) !important;
+  border-top: 0 !important;
+  border-radius: 0 0 14px 14px !important;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.18) !important;
+  display: grid !important;
+  grid-template-columns: minmax(260px, 1.55fr) repeat(5, minmax(125px, 1fr)) !important;
+  gap: 13px 22px !important;
+  align-content: start !important;
+  align-items: end !important;
+  overflow: visible !important;
+  z-index: 6 !important;
+}
+.app-shell .cdr-command-shell .filters-panel .filter-field,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .filter-field {
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+.app-shell .cdr-command-shell .filters-panel .filter-field > span,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .filter-field > span {
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.04em !important;
+  color: #baf2ff !important;
+}
+.app-shell .cdr-command-shell .filters-panel .filter-control,
+.app-shell .cdr-command-shell .filters-panel .search-input,
+.app-shell .cdr-command-shell .filters-panel .multi-select-trigger,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .filter-control,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .search-input,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .multi-select-trigger {
+  min-height: 34px !important;
+  height: 34px !important;
+  border-radius: 13px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+}
+.app-shell .cdr-command-shell .filters-panel .filter-count,
+.app-shell.active-tab-overview .cdr-command-shell .filters-panel .filter-count {
+  justify-self: start !important;
+  align-self: end !important;
+  width: max-content !important;
+  max-width: 100% !important;
+  min-width: 180px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  border-radius: 13px !important;
+  padding: 0 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  font-weight: 950 !important;
+}
+.app-shell .cdr-command-shell .reset-filter-button,
+.app-shell.active-tab-overview .cdr-command-shell .reset-filter-button {
+  min-height: 34px !important;
+  height: 34px !important;
+  border-radius: 13px !important;
+}
+
+.app-shell.active-tab-overview .cdr-page-intro {
+  display: none !important;
+}
+
+.app-shell > *:not(.cdr-command-shell),
+.app-shell.active-tab-overview > *:not(.cdr-command-shell) {
+  width: calc(100% - 8px) !important;
+  max-width: none !important;
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+}
+
+@media (max-width: 1450px) {
+  .app-shell .cdr-command-shell .cdr-header-actions,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions {
+    max-width: calc(100% - 560px) !important;
+    gap: 6px !important;
+  }
+  .app-shell .cdr-command-shell .cdr-header-actions .button,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions .button {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    font-size: 12px !important;
+  }
+  .app-shell .cdr-command-shell .cdr-portal-sidebar .dashboard-tab,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-portal-sidebar .dashboard-tab {
+    min-width: 98px !important;
+    padding: 0 12px !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .app-shell .cdr-command-shell > .topbar.followup-style-topbar,
+  .app-shell .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner,
+  .app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar,
+  .app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+    height: auto !important;
+    min-height: 150px !important;
+  }
+  .app-shell .cdr-command-shell .followup-dashboard-title,
+  .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title {
+    left: 90px !important;
+    right: 90px !important;
+  }
+  .app-shell .cdr-command-shell .cdr-header-actions,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-actions {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 74px auto 12px !important;
+    max-width: calc(100% - 24px) !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .app-shell .cdr-command-shell .cdr-header-logo,
+  .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo {
+    display: none !important;
+  }
+  .app-shell .cdr-command-shell .followup-dashboard-title,
+  .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title {
+    left: 16px !important;
+    right: 16px !important;
+  }
+  .app-shell .cdr-command-shell .filters-panel,
+  .app-shell.active-tab-overview .cdr-command-shell .filters-panel {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Admin / Customer portal separation */
+.portal-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 999px;
+  background: rgba(3, 7, 18, 0.48);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.portal-switcher button {
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #b9c7d8;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.portal-switcher button:hover {
+  color: #fff;
+  background: rgba(56, 189, 248, 0.11);
+}
+
+.portal-switcher button.active {
+  color: #06131d;
+  background: linear-gradient(135deg, #67e8f9, #60a5fa);
+  box-shadow: 0 10px 22px rgba(14, 165, 233, 0.24);
+}
+
+.upload-portal-toolbar {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.upload-portal-toolbar .followup-theme-button {
+  position: static;
+}
+
+.customer-portal-shell,
+.customer-portal-empty {
+  min-height: 100vh;
+  padding: 18px;
+}
+
+.customer-portal-hero {
+  width: min(1560px, 100%);
+  margin: 0 auto 16px;
+  padding: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.20), transparent 34%),
+    radial-gradient(circle at 88% 28%, rgba(239, 68, 68, 0.16), transparent 32%),
+    linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(15, 23, 42, 0.86));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+
+.customer-portal-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.customer-portal-brand-row {
+  display: grid;
+  grid-template-columns: 150px minmax(280px, 1fr) 150px;
+  align-items: center;
+  gap: 18px;
+}
+
+.customer-portal-brand-row img {
+  max-width: 132px;
+  max-height: 72px;
+  object-fit: contain;
+  justify-self: center;
+}
+
+.customer-portal-brand-row span {
+  display: inline-flex;
+  color: #67e8f9;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.customer-portal-brand-row h1 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 0.96;
+  font-weight: 950;
+}
+
+.customer-portal-brand-row p {
+  max-width: 820px;
+  margin: 10px 0 0;
+  color: #aab8cc;
+  font-size: 0.98rem;
+  font-weight: 650;
+}
+
+.customer-empty-card {
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.62);
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  color: #e5f3ff;
+}
+
+.customer-empty-card strong {
+  font-size: 1.25rem;
+  font-weight: 950;
+}
+
+.customer-empty-card p {
+  margin: 0;
+  color: #9fb1c9;
+  font-weight: 650;
+}
+
+.customer-kpi-strip {
+  width: min(1560px, 100%);
+  margin: 14px auto 18px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.customer-kpi-strip div {
+  min-height: 105px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.80);
+  padding: 15px 16px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+
+.customer-kpi-strip span {
+  color: #9fb1c9;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 850;
+}
+
+.customer-kpi-strip strong {
+  color: #f8fafc;
+  font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+  line-height: 1;
+  font-weight: 950;
+}
+
+.customer-portal-shell .dashboard-tabs,
+.customer-portal-shell .cdr-header-actions,
+.customer-portal-shell .reports-panel {
+  display: none !important;
+}
+
+@media (max-width: 980px) {
+  .customer-portal-brand-row {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .customer-portal-brand-row p,
+  .customer-empty-card {
+    justify-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+  .customer-kpi-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .upload-portal-toolbar {
+    position: static;
+    margin-bottom: 16px;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .customer-kpi-strip {
+    grid-template-columns: 1fr;
+  }
+  .portal-switcher {
+    width: 100%;
+    justify-content: center;
+  }
+  .portal-switcher button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* Stronger Admin / Customer portal separation */
+.customer-portal-standalone {
+  justify-content: space-between;
+}
+.customer-readonly-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(15, 23, 42, 0.72);
+  color: #dbeafe;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.customer-portal-shell .portal-switcher,
+.customer-portal-empty .portal-switcher {
+  display: none !important;
+}
+.customer-portal-empty input[type="file"],
+.customer-portal-empty .cdr-action-file {
+  display: none !important;
+}
+.customer-upload-sheet {
+  position: relative;
+  overflow: hidden;
+}
+.customer-upload-sheet input[type="file"] {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  cursor: pointer !important;
+}
+.local-login-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background-size: cover;
+  background-position: center;
+}
+.local-login-card {
+  width: min(760px, 100%);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 28px;
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+  padding: 26px;
+  color: #e5f0ff;
+}
+.local-login-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+.local-login-brand {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 18px 10px 24px;
+}
+.local-login-brand svg {
+  color: #60a5fa;
+}
+.local-login-brand span {
+  color: #93c5fd;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+}
+.local-login-brand h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 46px);
+  letter-spacing: -0.04em;
+}
+.local-login-brand p {
+  margin: 0;
+  color: #a7bdd8;
+  font-weight: 700;
+}
+.local-login-form {
+  display: grid;
+  gap: 14px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.local-login-form label,
+.local-settings-grid label {
+  display: grid;
+  gap: 8px;
+  color: #b8c7dd;
+  font-size: 13px;
+  font-weight: 800;
+}
+.local-login-form input,
+.local-settings-grid input,
+.local-settings-grid textarea,
+.local-credential-card input {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #f8fafc;
+  padding: 12px 14px;
+  outline: none;
+}
+.local-settings-grid textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+.local-login-error {
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.22);
+  color: #fecaca;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 800;
+}
+.local-login-note {
+  display: grid;
+  gap: 6px;
+  margin: 22px auto 0;
+  max-width: 520px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(96, 165, 250, 0.24);
+  background: rgba(37, 99, 235, 0.11);
+  color: #bfdbfe;
+  font-size: 13px;
+}
+.local-login-loading {
+  text-align: center;
+}
+.local-admin-floating-actions {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 30;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.local-settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(2, 6, 23, 0.78);
+  backdrop-filter: blur(12px);
+}
+.local-settings-panel {
+  width: min(980px, 100%);
+  max-height: min(92vh, 920px);
+  overflow: auto;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 24px;
+  background: #0f172a;
+  color: #e2e8f0;
+  box-shadow: 0 32px 110px rgba(0, 0, 0, 0.5);
+  padding: 24px;
+}
+.local-settings-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.local-settings-head span {
+  color: #93c5fd;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.local-settings-head h2 {
+  margin: 5px 0 0;
+  font-size: 28px;
+}
+.local-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.local-settings-wide {
+  grid-column: 1 / -1;
+}
+.local-credential-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.local-credential-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.72);
+}
+.local-credential-card h3 {
+  margin: 0;
+  color: #dbeafe;
+}
+.local-settings-status {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(22, 163, 74, 0.16);
+  border: 1px solid rgba(74, 222, 128, 0.26);
+  color: #bbf7d0;
+  font-weight: 800;
+}
+@media (max-width: 760px) {
+  .local-settings-grid,
+  .local-credential-grid {
+    grid-template-columns: 1fr;
+  }
+  .local-admin-floating-actions {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+}
+.single-role-badge button { pointer-events: none; }
+.local-login-form select {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #f8fafc;
+  padding: 12px 14px;
+  outline: none;
+}
+.local-login-note span { display:block; margin-top:6px; }
+

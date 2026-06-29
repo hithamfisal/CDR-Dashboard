@@ -14,7 +14,9 @@
     "check": "tsc --noEmit",
     "dev:api": "node server/index.cjs",
     "dev:full": "concurrently -k \"node server/index.cjs\" \"vite --host 127.0.0.1\"",
-    "mysql:init": "node server/index.cjs --init-only"
+    "mysql:init": "node server/index.cjs --init-only",
+    "prepare:namecheap": "powershell -ExecutionPolicy Bypass -File .\\scripts\\prepare-namecheap-upload.ps1",
+    "prepare:namecheap:skip-build": "powershell -ExecutionPolicy Bypass -File .\\scripts\\prepare-namecheap-upload.ps1 -SkipBuild"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.4",
@@ -23,21 +25,29 @@
     "jspdf": "^4.2.1",
     "jszip": "^3.10.1",
     "lucide-react": "^0.453.0",
+    "mysql2": "^3.11.5",
     "pptxgenjs": "^4.0.1",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "recharts": "^2.15.4",
-    "vite": "^7.1.7",
-    "xlsx": "^0.18.5",
-    "mysql2": "^3.11.5"
+    "vite": "^7.3.5"
+  },
+  "resolutions": {
+    "@babel/core": "^7.29.6",
+    "tmp": "^0.2.6",
+    "uuid": "^11.1.1",
+    "dompurify": "^3.4.11",
+    "shell-quote": "^1.9.0",
+    "form-data": "^4.0.6",
+    "tar": "^7.5.17"
   },
   "devDependencies": {
     "@types/react": "^19.2.1",
     "@types/react-dom": "^19.2.1",
+    "concurrently": "^10.0.3",
+    "electron": "^42.5.0",
+    "electron-builder": "^26.15.3",
     "typescript": "5.6.3",
-    "electron": "^33.4.11",
-    "electron-builder": "^25.1.8",
-    "concurrently": "^9.1.2",
     "wait-on": "^8.0.1"
   },
   "main": "electron/main.cjs",

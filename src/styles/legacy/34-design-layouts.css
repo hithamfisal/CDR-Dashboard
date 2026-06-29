@@ -1,0 +1,1492 @@
+﻿/* Design proposals and layout selector legacy rules. Source split from src/styles.css lines 21157-22647. */
+/* =====================================================================
+   CDR unified portal tabs/actions adjustment
+   Keeps one interface + role actions, but prevents tab/action overlap.
+   ===================================================================== */
+.app-shell .cdr-command-shell .dashboard-tabs-row,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-row {
+  display: grid !important;
+  grid-template-columns: minmax(560px, 0.95fr) minmax(0, 1.35fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 58px !important;
+  margin: 8px 0 10px !important;
+  padding: 8px 12px !important;
+  border-radius: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  overflow: visible !important;
+  background: rgba(3, 18, 35, 0.92) !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tab,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tab {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 7px !important;
+  font-size: clamp(10px, 0.68vw, 13px) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: center !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: thin !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions::-webkit-scrollbar,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions::-webkit-scrollbar {
+  height: 5px !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions::-webkit-scrollbar-thumb,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.38) !important;
+  border-radius: 999px !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  width: max-content !important;
+  max-width: none !important;
+  min-width: max-content !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-action-pill,
+.app-shell .cdr-command-shell .dashboard-tabs-actions .theme-toggle.cdr-action-pill,
+.app-shell .cdr-command-shell .dashboard-tabs-actions label.cdr-action-pill,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions .cdr-action-pill,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions .theme-toggle.cdr-action-pill,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions label.cdr-action-pill {
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 13px !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  font-size: clamp(10px, 0.70vw, 13px) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  flex: 0 0 auto !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-action-pill svg,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions .cdr-action-pill svg {
+  width: 17px !important;
+  height: 17px !important;
+  flex: 0 0 auto !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .portal-switcher,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions .portal-switcher {
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 4px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
+}
+
+.app-shell .cdr-command-shell .dashboard-tabs-actions .portal-switcher button,
+.app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions .portal-switcher button {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  font-size: clamp(10px, 0.70vw, 13px) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+}
+
+@media (max-width: 1650px) {
+  .app-shell .cdr-command-shell .dashboard-tabs-row,
+  .app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-row {
+    grid-template-columns: 1fr !important;
+    min-height: 0 !important;
+    gap: 8px !important;
+  }
+
+  .app-shell .cdr-command-shell .dashboard-tabs-actions,
+  .app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions {
+    justify-content: flex-start !important;
+  }
+
+  .app-shell .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions,
+  .app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs-actions .cdr-header-actions {
+    justify-content: flex-start !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .app-shell .cdr-command-shell .dashboard-tabs,
+  .app-shell.active-tab-overview .cdr-command-shell .dashboard-tabs {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    padding-bottom: 4px !important;
+  }
+
+  .app-shell .cdr-command-shell .dashboard-tab,
+  .app-shell.active-tab-overview .cdr-command-shell .dashboard-tab {
+    width: auto !important;
+    min-width: 138px !important;
+  }
+}
+
+/* =========================================================
+   CDR V8 selectable UI themes
+   Added for: Dark Command Center / Light Modern Analytics / Neon Futuristic
+   The dashboard keeps one shared layout and switches visual identity by class.
+   ========================================================= */
+.cdr-theme-selector {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--theme-border, rgba(116, 181, 214, 0.34));
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(15, 33, 52, 0.9), rgba(8, 20, 34, 0.92));
+  color: var(--theme-text, #f8fafc);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+}
+
+.cdr-theme-selector.compact {
+  height: 38px;
+  padding-inline: 10px;
+}
+
+.cdr-theme-selector-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: currentColor;
+}
+
+.cdr-theme-selector select {
+  height: 28px;
+  max-width: 190px;
+  border: 0;
+  outline: 0;
+  border-radius: 999px;
+  padding: 0 28px 0 10px;
+  color: var(--theme-text, #f8fafc);
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cdr-theme-selector option {
+  color: #0f172a;
+  background: #ffffff;
+}
+
+.local-login-toolbar .cdr-theme-selector,
+.upload-portal-toolbar .cdr-theme-selector,
+.cdr-header-actions .cdr-theme-selector {
+  flex-shrink: 0;
+}
+
+.theme-light-modern .cdr-theme-selector {
+  color: #0f172a;
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(241,245,249,0.95));
+  border-color: rgba(37, 99, 235, 0.20);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+}
+
+.theme-light-modern .cdr-theme-selector select {
+  color: #0f172a;
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.theme-neon-futuristic .cdr-theme-selector {
+  color: #dffbff;
+  background: linear-gradient(135deg, rgba(7, 20, 38, 0.96), rgba(23, 8, 42, 0.92));
+  border-color: rgba(34, 211, 238, 0.55);
+  box-shadow: 0 0 26px rgba(6, 182, 212, 0.24), inset 0 0 18px rgba(139, 92, 246, 0.14);
+}
+
+.theme-neon-futuristic .cdr-theme-selector select {
+  color: #dffbff;
+  background: rgba(6, 182, 212, 0.12);
+}
+
+.app-shell.theme-dark-command,
+.upload-shell.theme-dark-command,
+.local-login-shell.theme-dark-command {
+  --theme-page-bg: #07111f;
+  --theme-panel-bg: #0b1628;
+  --theme-panel-bg-strong: #0a0f1a;
+  --theme-card-bg: #111827;
+  --theme-card-bg-soft: #162033;
+  --theme-text: #f8fafc;
+  --theme-muted: #94a3b8;
+  --theme-border: rgba(31, 41, 55, 0.95);
+  --theme-border-strong: rgba(59, 130, 246, 0.45);
+  --theme-accent: #2563eb;
+  --theme-accent-2: #06b6d4;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-danger: #ef4444;
+  --theme-shadow: 0 22px 50px rgba(0, 0, 0, 0.34);
+}
+
+.app-shell.theme-light-modern,
+.upload-shell.theme-light-modern,
+.local-login-shell.theme-light-modern {
+  --theme-page-bg: #f8fafc;
+  --theme-panel-bg: #ffffff;
+  --theme-panel-bg-strong: #f1f5f9;
+  --theme-card-bg: #ffffff;
+  --theme-card-bg-soft: #eff6ff;
+  --theme-text: #0f172a;
+  --theme-muted: #64748b;
+  --theme-border: rgba(226, 232, 240, 0.96);
+  --theme-border-strong: rgba(37, 99, 235, 0.25);
+  --theme-accent: #2563eb;
+  --theme-accent-2: #06b6d4;
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-danger: #dc2626;
+  --theme-shadow: 0 18px 40px rgba(15, 23, 42, 0.10);
+}
+
+.app-shell.theme-neon-futuristic,
+.upload-shell.theme-neon-futuristic,
+.local-login-shell.theme-neon-futuristic {
+  --theme-page-bg: #020617;
+  --theme-panel-bg: #06111f;
+  --theme-panel-bg-strong: #050b1a;
+  --theme-card-bg: #071426;
+  --theme-card-bg-soft: #0a1830;
+  --theme-text: #e0f2fe;
+  --theme-muted: #7dd3fc;
+  --theme-border: rgba(14, 165, 233, 0.46);
+  --theme-border-strong: rgba(217, 70, 239, 0.58);
+  --theme-accent: #06b6d4;
+  --theme-accent-2: #d946ef;
+  --theme-success: #22c55e;
+  --theme-warning: #eab308;
+  --theme-danger: #f43f5e;
+  --theme-shadow: 0 0 34px rgba(6, 182, 212, 0.18), 0 26px 60px rgba(0, 0, 0, 0.42);
+}
+
+.app-shell.theme-dark-command .topbar,
+.app-shell.theme-dark-command .section-nav,
+.app-shell.theme-dark-command .hero-panel,
+.app-shell.theme-dark-command .filters-panel,
+.app-shell.theme-dark-command .workbook-card,
+.app-shell.theme-dark-command .summary-card,
+.app-shell.theme-dark-command .chart-card,
+.app-shell.theme-dark-command .table-card,
+.app-shell.theme-dark-command .records-card,
+.app-shell.theme-dark-command .warning-strip,
+.upload-shell.theme-dark-command .followup-upload-card,
+.upload-shell.theme-dark-command .followup-mini-card,
+.upload-shell.theme-dark-command .followup-staged-upload,
+.local-login-shell.theme-dark-command .local-login-card {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.92), rgba(11, 22, 40, 0.94));
+  border-color: var(--theme-border);
+  color: var(--theme-text);
+  box-shadow: var(--theme-shadow);
+}
+
+.app-shell.theme-light-modern .topbar,
+.app-shell.theme-light-modern .section-nav,
+.app-shell.theme-light-modern .hero-panel,
+.app-shell.theme-light-modern .filters-panel,
+.app-shell.theme-light-modern .workbook-card,
+.app-shell.theme-light-modern .summary-card,
+.app-shell.theme-light-modern .chart-card,
+.app-shell.theme-light-modern .table-card,
+.app-shell.theme-light-modern .records-card,
+.app-shell.theme-light-modern .warning-strip,
+.upload-shell.theme-light-modern .followup-upload-card,
+.upload-shell.theme-light-modern .followup-mini-card,
+.upload-shell.theme-light-modern .followup-staged-upload,
+.local-login-shell.theme-light-modern .local-login-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.96));
+  border-color: var(--theme-border);
+  color: var(--theme-text);
+  box-shadow: var(--theme-shadow);
+}
+
+.app-shell.theme-neon-futuristic,
+.upload-shell.theme-neon-futuristic,
+.local-login-shell.theme-neon-futuristic {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(6, 182, 212, 0.22), transparent 30%),
+    radial-gradient(circle at 84% 18%, rgba(217, 70, 239, 0.22), transparent 34%),
+    linear-gradient(135deg, #020617 0%, #06111f 45%, #08051a 100%) !important;
+}
+
+.app-shell.theme-neon-futuristic .topbar,
+.app-shell.theme-neon-futuristic .section-nav,
+.app-shell.theme-neon-futuristic .hero-panel,
+.app-shell.theme-neon-futuristic .filters-panel,
+.app-shell.theme-neon-futuristic .workbook-card,
+.app-shell.theme-neon-futuristic .summary-card,
+.app-shell.theme-neon-futuristic .chart-card,
+.app-shell.theme-neon-futuristic .table-card,
+.app-shell.theme-neon-futuristic .records-card,
+.app-shell.theme-neon-futuristic .warning-strip,
+.upload-shell.theme-neon-futuristic .followup-upload-card,
+.upload-shell.theme-neon-futuristic .followup-mini-card,
+.upload-shell.theme-neon-futuristic .followup-staged-upload,
+.local-login-shell.theme-neon-futuristic .local-login-card {
+  background: linear-gradient(135deg, rgba(7, 20, 38, 0.92), rgba(10, 14, 35, 0.86));
+  border-color: var(--theme-border);
+  color: var(--theme-text);
+  box-shadow: var(--theme-shadow);
+}
+
+.theme-light-modern .topbar *,
+.theme-light-modern .section-nav *,
+.theme-light-modern .hero-panel *,
+.theme-light-modern .filters-panel *,
+.theme-light-modern .workbook-card *,
+.theme-light-modern .summary-card *,
+.theme-light-modern .chart-card *,
+.theme-light-modern .table-card *,
+.theme-light-modern .records-card *,
+.theme-light-modern .local-login-card *,
+.theme-light-modern .followup-upload-card * {
+  color: inherit;
+}
+
+.theme-dark-command .brand-block h1,
+.theme-dark-command .hero-main h2,
+.theme-dark-command .chart-card h3,
+.theme-dark-command .table-card h3,
+.theme-dark-command .summary-card strong,
+.theme-dark-command .workbook-card strong,
+.theme-dark-command .local-login-brand h1,
+.theme-dark-command .followup-upload-left h1,
+.theme-neon-futuristic .brand-block h1,
+.theme-neon-futuristic .hero-main h2,
+.theme-neon-futuristic .chart-card h3,
+.theme-neon-futuristic .table-card h3,
+.theme-neon-futuristic .summary-card strong,
+.theme-neon-futuristic .workbook-card strong,
+.theme-neon-futuristic .local-login-brand h1,
+.theme-neon-futuristic .followup-upload-left h1 {
+  color: var(--theme-text) !important;
+}
+
+.theme-light-modern .brand-block h1,
+.theme-light-modern .hero-main h2,
+.theme-light-modern .chart-card h3,
+.theme-light-modern .table-card h3,
+.theme-light-modern .summary-card strong,
+.theme-light-modern .workbook-card strong,
+.theme-light-modern .local-login-brand h1,
+.theme-light-modern .followup-upload-left h1 {
+  color: #0f172a !important;
+}
+
+.theme-dark-command .brand-block p,
+.theme-dark-command .chart-card p,
+.theme-dark-command .table-card p,
+.theme-dark-command .summary-card p,
+.theme-dark-command .summary-card small,
+.theme-dark-command .workbook-card p,
+.theme-dark-command .filter-count,
+.theme-dark-command .local-login-card p,
+.theme-dark-command .followup-lead,
+.theme-neon-futuristic .brand-block p,
+.theme-neon-futuristic .chart-card p,
+.theme-neon-futuristic .table-card p,
+.theme-neon-futuristic .summary-card p,
+.theme-neon-futuristic .summary-card small,
+.theme-neon-futuristic .workbook-card p,
+.theme-neon-futuristic .filter-count,
+.theme-neon-futuristic .local-login-card p,
+.theme-neon-futuristic .followup-lead {
+  color: var(--theme-muted) !important;
+}
+
+.theme-light-modern .brand-block p,
+.theme-light-modern .chart-card p,
+.theme-light-modern .table-card p,
+.theme-light-modern .summary-card p,
+.theme-light-modern .summary-card small,
+.theme-light-modern .workbook-card p,
+.theme-light-modern .filter-count,
+.theme-light-modern .local-login-card p,
+.theme-light-modern .followup-lead {
+  color: #64748b !important;
+}
+
+.theme-neon-futuristic .button.primary,
+.theme-neon-futuristic .cdr-action-primary,
+.theme-neon-futuristic .followup-primary-upload,
+.theme-neon-futuristic .followup-confirm-upload {
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6, #d946ef) !important;
+  border-color: rgba(34, 211, 238, 0.55) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 22px rgba(6, 182, 212, 0.30);
+}
+
+.theme-dark-command .button.primary,
+.theme-dark-command .cdr-action-primary,
+.theme-dark-command .followup-primary-upload,
+.theme-dark-command .followup-confirm-upload {
+  background: linear-gradient(135deg, #2563eb, #06b6d4) !important;
+  border-color: rgba(59, 130, 246, 0.48) !important;
+  color: #ffffff !important;
+}
+
+.theme-light-modern .button.primary,
+.theme-light-modern .cdr-action-primary,
+.theme-light-modern .followup-primary-upload,
+.theme-light-modern .followup-confirm-upload {
+  background: linear-gradient(135deg, #2563eb, #06b6d4) !important;
+  border-color: rgba(37, 99, 235, 0.35) !important;
+  color: #ffffff !important;
+}
+
+.theme-neon-futuristic .section-nav button.active,
+.theme-neon-futuristic .dashboard-tabs button.active,
+.theme-neon-futuristic .tab-button.active {
+  border-color: rgba(34, 211, 238, 0.70) !important;
+  box-shadow: inset 0 0 18px rgba(6, 182, 212, 0.18), 0 0 22px rgba(217, 70, 239, 0.20);
+}
+
+.theme-light-modern th,
+.theme-light-modern .records-card th,
+.theme-light-modern .table-card th {
+  background: linear-gradient(180deg, #f8fafc, #eef6ff) !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+.theme-light-modern td,
+.theme-light-modern .records-card td,
+.theme-light-modern .table-card td {
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+.theme-neon-futuristic th,
+.theme-neon-futuristic .records-card th,
+.theme-neon-futuristic .table-card th {
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.14), rgba(15, 23, 42, 0.96)) !important;
+  color: #e0f2fe !important;
+  border-color: rgba(14, 165, 233, 0.38) !important;
+}
+
+.theme-neon-futuristic td,
+.theme-neon-futuristic .records-card td,
+.theme-neon-futuristic .table-card td {
+  color: #c7f9ff !important;
+  border-color: rgba(14, 165, 233, 0.18) !important;
+}
+
+.theme-light-modern input,
+.theme-light-modern select,
+.theme-light-modern .multi-select-trigger,
+.theme-light-modern .search-box input,
+.theme-light-modern .filter-field input,
+.theme-light-modern .filter-field select {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.theme-neon-futuristic input,
+.theme-neon-futuristic select,
+.theme-neon-futuristic .multi-select-trigger,
+.theme-neon-futuristic .search-box input,
+.theme-neon-futuristic .filter-field input,
+.theme-neon-futuristic .filter-field select {
+  background: rgba(2, 6, 23, 0.78) !important;
+  color: #e0f2fe !important;
+  border-color: rgba(34, 211, 238, 0.34) !important;
+}
+
+.theme-neon-futuristic .summary-card::after,
+.theme-neon-futuristic .chart-card::after,
+.theme-neon-futuristic .records-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(217, 70, 239, 0.10), inset 0 0 26px rgba(6, 182, 212, 0.08);
+}
+
+.theme-neon-futuristic .summary-card,
+.theme-neon-futuristic .chart-card,
+.theme-neon-futuristic .records-card {
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .cdr-theme-selector {
+    width: 100%;
+    justify-content: space-between;
+    border-radius: 14px;
+  }
+
+  .cdr-theme-selector select {
+    max-width: min(55vw, 210px);
+  }
+}
+
+/* =========================================================
+   CDR V8 selectable layout proposals
+   Added for: Command Center / Executive Analytics / Futuristic Ops
+   Layout is independent from Theme. One app, three layout compositions.
+   ========================================================= */
+.cdr-layout-selector select {
+  max-width: 178px;
+}
+
+/* Proposal 1 - Command Center: preserve current full-width operational layout */
+.app-shell.layout-command-center .cdr-command-shell,
+.upload-shell.layout-command-center .followup-upload-card,
+.local-login-shell.layout-command-center .local-login-card {
+  --layout-density: compact;
+}
+
+/* Proposal 2 - Executive Analytics: cleaner, report-like spacing with softer grouping */
+.app-shell.layout-executive-analytics {
+  --layout-card-radius: 18px;
+  --layout-gap: 18px;
+}
+
+.app-shell.layout-executive-analytics .cdr-command-shell {
+  max-width: 1760px;
+  margin-inline: auto;
+  border-radius: 24px;
+  padding: 14px 16px 18px !important;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.20);
+}
+
+.app-shell.layout-executive-analytics .cdr-command-shell .followup-style-topbar {
+  min-height: 76px !important;
+  border-radius: 20px !important;
+}
+
+.app-shell.layout-executive-analytics .dashboard-tabs-row {
+  display: grid !important;
+  grid-template-columns: minmax(420px, 0.95fr) minmax(520px, 1.2fr) !important;
+  gap: 14px !important;
+  align-items: center !important;
+}
+
+.app-shell.layout-executive-analytics .dashboard-tabs,
+.app-shell.layout-executive-analytics .dashboard-tabs-actions,
+.app-shell.layout-executive-analytics .filters-panel,
+.app-shell.layout-executive-analytics .cdr-page-intro,
+.app-shell.layout-executive-analytics .modern-panel,
+.app-shell.layout-executive-analytics .chart-card,
+.app-shell.layout-executive-analytics .table-card,
+.app-shell.layout-executive-analytics .records-card {
+  border-radius: var(--layout-card-radius) !important;
+}
+
+.app-shell.layout-executive-analytics .filters-panel {
+  padding: 14px !important;
+  margin-top: 12px !important;
+}
+
+.app-shell.layout-executive-analytics .modern-stat-deck,
+.app-shell.layout-executive-analytics .cdr-kpi-strip-30 {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(150px, 1fr)) !important;
+  gap: var(--layout-gap) !important;
+}
+
+.app-shell.layout-executive-analytics .summary-cards-manual-rows .summary-card-row {
+  grid-template-columns: repeat(5, minmax(165px, 1fr)) !important;
+  gap: var(--layout-gap) !important;
+}
+
+.app-shell.layout-executive-analytics .modern-dashboard-grid,
+.app-shell.layout-executive-analytics .chart-grid {
+  gap: var(--layout-gap) !important;
+}
+
+.app-shell.layout-executive-analytics .cdr-saas-overview-grid {
+  grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr) !important;
+}
+
+.app-shell.layout-executive-analytics .cdr-deep-dive-grid,
+.app-shell.layout-executive-analytics .cdr-top-entities-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.app-shell.layout-executive-analytics .modern-panel-wide,
+.app-shell.layout-executive-analytics .modern-panel-table-wide {
+  grid-column: 1 / -1 !important;
+}
+
+.upload-shell.layout-executive-analytics .followup-upload-card,
+.local-login-shell.layout-executive-analytics .local-login-card {
+  max-width: 1180px;
+  border-radius: 28px !important;
+}
+
+.upload-shell.layout-executive-analytics .followup-upload-card {
+  grid-template-columns: minmax(460px, 0.88fr) minmax(420px, 1.12fr) !important;
+  gap: 28px !important;
+}
+
+.upload-shell.layout-executive-analytics .followup-mini-grid,
+.upload-shell.layout-executive-analytics .followup-primary-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Deprecated third theme/layout removed from UI. */
+.app-shell.layout-futuristic-ops {
+  --layout-card-radius: 12px;
+  --layout-gap: 10px;
+}
+
+.app-shell.layout-futuristic-ops .cdr-command-shell {
+  border-radius: 18px;
+  padding: 10px 12px 12px !important;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.16), 0 0 52px rgba(6, 182, 212, 0.12);
+}
+
+.app-shell.layout-futuristic-ops .cdr-command-shell .followup-style-topbar {
+  min-height: 70px !important;
+  border-radius: 14px !important;
+}
+
+.app-shell.layout-futuristic-ops .dashboard-tabs-row {
+  display: grid !important;
+  grid-template-columns: minmax(250px, 0.72fr) minmax(620px, 1.28fr) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+
+.app-shell.layout-futuristic-ops .dashboard-tabs,
+.app-shell.layout-futuristic-ops .cdr-header-actions {
+  gap: 8px !important;
+}
+
+.app-shell.layout-futuristic-ops .dashboard-tab,
+.app-shell.layout-futuristic-ops .cdr-action-pill,
+.app-shell.layout-futuristic-ops .cdr-theme-selector {
+  min-height: 34px !important;
+  border-radius: 10px !important;
+  font-size: 11px !important;
+}
+
+.app-shell.layout-futuristic-ops .filters-panel {
+  padding: 10px !important;
+  margin-top: 8px !important;
+  border-radius: 14px !important;
+}
+
+.app-shell.layout-futuristic-ops .filters-row {
+  gap: 8px !important;
+}
+
+.app-shell.layout-futuristic-ops .modern-stat-deck,
+.app-shell.layout-futuristic-ops .cdr-kpi-strip-30 {
+  display: grid !important;
+  grid-template-columns: repeat(8, minmax(124px, 1fr)) !important;
+  gap: var(--layout-gap) !important;
+}
+
+.app-shell.layout-futuristic-ops .summary-cards-manual-rows .summary-card-row {
+  grid-template-columns: repeat(10, minmax(118px, 1fr)) !important;
+  gap: var(--layout-gap) !important;
+}
+
+.app-shell.layout-futuristic-ops .summary-card,
+.app-shell.layout-futuristic-ops .modern-kpi-card,
+.app-shell.layout-futuristic-ops .modern-stat-tile,
+.app-shell.layout-futuristic-ops .modern-panel,
+.app-shell.layout-futuristic-ops .chart-card,
+.app-shell.layout-futuristic-ops .table-card,
+.app-shell.layout-futuristic-ops .records-card,
+.app-shell.layout-futuristic-ops .cdr-page-intro {
+  border-radius: var(--layout-card-radius) !important;
+}
+
+.app-shell.layout-futuristic-ops .summary-card,
+.app-shell.layout-futuristic-ops .modern-kpi-card,
+.app-shell.layout-futuristic-ops .modern-stat-tile {
+  min-height: 86px !important;
+  padding: 11px !important;
+}
+
+.app-shell.layout-futuristic-ops .summary-card strong,
+.app-shell.layout-futuristic-ops .modern-kpi-card strong,
+.app-shell.layout-futuristic-ops .modern-stat-tile strong {
+  font-size: clamp(17px, 1.2vw, 25px) !important;
+}
+
+.app-shell.layout-futuristic-ops .modern-dashboard-grid,
+.app-shell.layout-futuristic-ops .chart-grid {
+  gap: var(--layout-gap) !important;
+}
+
+.app-shell.layout-futuristic-ops .cdr-saas-overview-grid,
+.app-shell.layout-futuristic-ops .cdr-deep-dive-grid,
+.app-shell.layout-futuristic-ops .cdr-top-entities-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.app-shell.layout-futuristic-ops .modern-panel-wide,
+.app-shell.layout-futuristic-ops .modern-panel-table-wide {
+  grid-column: span 2 !important;
+}
+
+.app-shell.layout-futuristic-ops .records-card table,
+.app-shell.layout-futuristic-ops .table-card table,
+.app-shell.layout-futuristic-ops .modern-table {
+  font-size: 11px !important;
+}
+
+.upload-shell.layout-futuristic-ops .followup-upload-card,
+.local-login-shell.layout-futuristic-ops .local-login-card {
+  max-width: 1280px;
+  border-radius: 18px !important;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.18), 0 0 54px rgba(217, 70, 239, 0.12) !important;
+}
+
+.upload-shell.layout-futuristic-ops .followup-upload-card {
+  grid-template-columns: minmax(520px, 1fr) minmax(360px, 0.72fr) !important;
+  gap: 18px !important;
+}
+
+.upload-shell.layout-futuristic-ops .followup-mini-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+/* Layout selector responsiveness */
+@media (max-width: 1280px) {
+  .app-shell.layout-executive-analytics .dashboard-tabs-row,
+  .app-shell.layout-futuristic-ops .dashboard-tabs-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell.layout-executive-analytics .modern-stat-deck,
+  .app-shell.layout-executive-analytics .cdr-kpi-strip-30,
+  .app-shell.layout-futuristic-ops .modern-stat-deck,
+  .app-shell.layout-futuristic-ops .cdr-kpi-strip-30 {
+    grid-template-columns: repeat(4, minmax(140px, 1fr)) !important;
+  }
+
+  .app-shell.layout-futuristic-ops .summary-cards-manual-rows .summary-card-row {
+    grid-template-columns: repeat(5, minmax(130px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .cdr-layout-selector {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .app-shell.layout-executive-analytics .modern-stat-deck,
+  .app-shell.layout-executive-analytics .cdr-kpi-strip-30,
+  .app-shell.layout-futuristic-ops .modern-stat-deck,
+  .app-shell.layout-futuristic-ops .cdr-kpi-strip-30,
+  .app-shell.layout-executive-analytics .summary-cards-manual-rows .summary-card-row,
+  .app-shell.layout-futuristic-ops .summary-cards-manual-rows .summary-card-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell.layout-executive-analytics .cdr-saas-overview-grid,
+  .app-shell.layout-executive-analytics .cdr-deep-dive-grid,
+  .app-shell.layout-executive-analytics .cdr-top-entities-grid,
+  .app-shell.layout-futuristic-ops .cdr-saas-overview-grid,
+  .app-shell.layout-futuristic-ops .cdr-deep-dive-grid,
+  .app-shell.layout-futuristic-ops .cdr-top-entities-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* =========================================================
+   CDR clean proposal themes + visibly different layouts
+   Replaces the old dark/light toggle approach with 3 clean
+   CDR proposal themes and 3 visibly different page layouts.
+   ========================================================= */
+.theme-dark-command,
+.theme-light-modern,
+.theme-neon-futuristic {
+  --cdr-theme-transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  transition: var(--cdr-theme-transition);
+}
+
+.theme-dark-command {
+  --bg: #07111f;
+  --bg-2: #0b1628;
+  --panel: rgba(17, 24, 39, .94);
+  --panel-strong: rgba(15, 23, 42, .98);
+  --card: rgba(17, 24, 39, .96);
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --line: rgba(31, 41, 55, .95);
+  --blue: #2563eb;
+  --blue-soft: #38bdf8;
+  --cyan: #06b6d4;
+  --amber: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --theme-bg: #07111f;
+  --theme-header: #0a0f1a;
+  --theme-card: #111827;
+  --theme-card-2: #162033;
+  --theme-border: #1f2937;
+  --theme-text: #f8fafc;
+  --theme-muted: #94a3b8;
+  --theme-accent: #2563eb;
+  --theme-accent-2: #06b6d4;
+  --theme-shadow: 0 20px 58px rgba(0, 0, 0, .34);
+}
+
+.theme-light-modern {
+  --bg: #f8fafc;
+  --bg-2: #edf4ff;
+  --panel: rgba(255, 255, 255, .96);
+  --panel-strong: #ffffff;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --blue: #2563eb;
+  --blue-soft: #0284c7;
+  --cyan: #0891b2;
+  --amber: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --theme-bg: #f8fafc;
+  --theme-header: #ffffff;
+  --theme-card: #ffffff;
+  --theme-card-2: #f1f7ff;
+  --theme-border: #dbe7f5;
+  --theme-text: #0f172a;
+  --theme-muted: #64748b;
+  --theme-accent: #2563eb;
+  --theme-accent-2: #06b6d4;
+  --theme-shadow: 0 18px 48px rgba(15, 23, 42, .12);
+}
+
+.theme-neon-futuristic {
+  --bg: #020617;
+  --bg-2: #050b1a;
+  --panel: rgba(5, 11, 26, .94);
+  --panel-strong: rgba(2, 6, 23, .98);
+  --card: rgba(7, 20, 38, .96);
+  --text: #e0f2fe;
+  --muted: #7dd3fc;
+  --line: rgba(14, 165, 233, .42);
+  --blue: #06b6d4;
+  --blue-soft: #22d3ee;
+  --cyan: #06b6d4;
+  --amber: #eab308;
+  --green: #22c55e;
+  --red: #f43f5e;
+  --theme-bg: #020617;
+  --theme-header: #050b1a;
+  --theme-card: #071426;
+  --theme-card-2: #0b1630;
+  --theme-border: rgba(14, 165, 233, .50);
+  --theme-text: #e0f2fe;
+  --theme-muted: #7dd3fc;
+  --theme-accent: #06b6d4;
+  --theme-accent-2: #d946ef;
+  --theme-shadow: 0 0 0 1px rgba(34, 211, 238, .18), 0 24px 70px rgba(6, 182, 212, .18);
+}
+
+.app-shell.theme-dark-command,
+.upload-shell.theme-dark-command,
+.local-login-shell.theme-dark-command {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(37, 99, 235, .28), transparent 30rem),
+    radial-gradient(circle at 88% 0%, rgba(6, 182, 212, .18), transparent 32rem),
+    linear-gradient(135deg, #07111f, #0b1628 48%, #07111f) !important;
+  color: var(--theme-text) !important;
+}
+
+.app-shell.theme-light-modern,
+.upload-shell.theme-light-modern,
+.local-login-shell.theme-light-modern {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(37, 99, 235, .10), transparent 30rem),
+    radial-gradient(circle at 88% 6%, rgba(6, 182, 212, .10), transparent 32rem),
+    linear-gradient(135deg, #f8fafc, #eef6ff 52%, #ffffff) !important;
+  color: var(--theme-text) !important;
+}
+
+.app-shell.theme-neon-futuristic,
+.upload-shell.theme-neon-futuristic,
+.local-login-shell.theme-neon-futuristic {
+  background:
+    linear-gradient(90deg, rgba(14, 165, 233, .06) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(217, 70, 239, .05) 1px, transparent 1px),
+    radial-gradient(circle at 15% 10%, rgba(6, 182, 212, .32), transparent 28rem),
+    radial-gradient(circle at 88% 0%, rgba(217, 70, 239, .28), transparent 30rem),
+    linear-gradient(135deg, #020617, #050b1a 48%, #020617) !important;
+  background-size: auto, 34px 34px, auto, auto, auto !important;
+  color: var(--theme-text) !important;
+}
+
+.app-shell.theme-dark-command .cdr-command-shell,
+.app-shell.theme-light-modern .cdr-command-shell,
+.app-shell.theme-neon-futuristic .cdr-command-shell,
+.upload-shell.theme-dark-command .followup-upload-card,
+.upload-shell.theme-light-modern .followup-upload-card,
+.upload-shell.theme-neon-futuristic .followup-upload-card,
+.local-login-shell.theme-dark-command .local-login-card,
+.local-login-shell.theme-light-modern .local-login-card,
+.local-login-shell.theme-neon-futuristic .local-login-card {
+  background: color-mix(in srgb, var(--theme-card) 92%, transparent) !important;
+  color: var(--theme-text) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.theme-dark-command .topbar,
+.theme-dark-command .dashboard-tabs,
+.theme-dark-command .dashboard-tabs-actions,
+.theme-dark-command .filters-panel,
+.theme-dark-command .workbook-card,
+.theme-dark-command .hero-panel,
+.theme-dark-command .summary-card,
+.theme-dark-command .metric-card,
+.theme-dark-command .chart-card,
+.theme-dark-command .table-card,
+.theme-dark-command .records-card,
+.theme-dark-command .modern-panel,
+.theme-dark-command .modern-record-card,
+.theme-dark-command .data-quality-panel,
+.theme-dark-command .quality-score-card,
+.theme-dark-command .quality-issue,
+.theme-dark-command .warning-strip,
+.theme-dark-command .modal-panel,
+.theme-dark-command .multi-select-dropdown,
+.theme-dark-command .cdr-page-intro,
+.theme-dark-command .followup-mini-card,
+.theme-dark-command .followup-action-button,
+.theme-dark-command .followup-status-panel,
+.theme-dark-command .local-login-note,
+.theme-light-modern .topbar,
+.theme-light-modern .dashboard-tabs,
+.theme-light-modern .dashboard-tabs-actions,
+.theme-light-modern .filters-panel,
+.theme-light-modern .workbook-card,
+.theme-light-modern .hero-panel,
+.theme-light-modern .summary-card,
+.theme-light-modern .metric-card,
+.theme-light-modern .chart-card,
+.theme-light-modern .table-card,
+.theme-light-modern .records-card,
+.theme-light-modern .modern-panel,
+.theme-light-modern .modern-record-card,
+.theme-light-modern .data-quality-panel,
+.theme-light-modern .quality-score-card,
+.theme-light-modern .quality-issue,
+.theme-light-modern .warning-strip,
+.theme-light-modern .modal-panel,
+.theme-light-modern .multi-select-dropdown,
+.theme-light-modern .cdr-page-intro,
+.theme-light-modern .followup-mini-card,
+.theme-light-modern .followup-action-button,
+.theme-light-modern .followup-status-panel,
+.theme-light-modern .local-login-note,
+.theme-neon-futuristic .topbar,
+.theme-neon-futuristic .dashboard-tabs,
+.theme-neon-futuristic .dashboard-tabs-actions,
+.theme-neon-futuristic .filters-panel,
+.theme-neon-futuristic .workbook-card,
+.theme-neon-futuristic .hero-panel,
+.theme-neon-futuristic .summary-card,
+.theme-neon-futuristic .metric-card,
+.theme-neon-futuristic .chart-card,
+.theme-neon-futuristic .table-card,
+.theme-neon-futuristic .records-card,
+.theme-neon-futuristic .modern-panel,
+.theme-neon-futuristic .modern-record-card,
+.theme-neon-futuristic .data-quality-panel,
+.theme-neon-futuristic .quality-score-card,
+.theme-neon-futuristic .quality-issue,
+.theme-neon-futuristic .warning-strip,
+.theme-neon-futuristic .modal-panel,
+.theme-neon-futuristic .multi-select-dropdown,
+.theme-neon-futuristic .cdr-page-intro,
+.theme-neon-futuristic .followup-mini-card,
+.theme-neon-futuristic .followup-action-button,
+.theme-neon-futuristic .followup-status-panel,
+.theme-neon-futuristic .local-login-note {
+  background: var(--theme-card) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.theme-light-modern .topbar,
+.theme-light-modern .dashboard-tabs,
+.theme-light-modern .dashboard-tabs-actions,
+.theme-light-modern .filters-panel,
+.theme-light-modern .workbook-card,
+.theme-light-modern .summary-card,
+.theme-light-modern .chart-card,
+.theme-light-modern .table-card,
+.theme-light-modern .records-card,
+.theme-light-modern .modern-panel,
+.theme-light-modern .cdr-page-intro {
+  box-shadow: 0 12px 34px rgba(15, 23, 42, .09) !important;
+}
+
+.theme-dark-command .cdr-navy-banner,
+.theme-light-modern .cdr-navy-banner,
+.theme-neon-futuristic .cdr-navy-banner {
+  background:
+    radial-gradient(circle at 8% 20%, color-mix(in srgb, var(--theme-accent) 24%, transparent), transparent 28rem),
+    linear-gradient(135deg, var(--theme-header), color-mix(in srgb, var(--theme-header) 78%, var(--theme-accent) 22%)) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.theme-light-modern .cdr-navy-banner .followup-dashboard-title h1,
+.theme-light-modern .cdr-navy-banner .followup-dashboard-title p {
+  color: #ffffff !important;
+}
+
+.theme-dark-command .dashboard-tab.active,
+.theme-light-modern .dashboard-tab.active,
+.theme-neon-futuristic .dashboard-tab.active,
+.theme-dark-command .button.primary,
+.theme-light-modern .button.primary,
+.theme-neon-futuristic .button.primary,
+.theme-dark-command .cdr-action-primary,
+.theme-light-modern .cdr-action-primary,
+.theme-neon-futuristic .cdr-action-primary,
+.theme-dark-command .followup-primary-upload,
+.theme-light-modern .followup-primary-upload,
+.theme-neon-futuristic .followup-primary-upload,
+.theme-dark-command .followup-confirm-upload,
+.theme-light-modern .followup-confirm-upload,
+.theme-neon-futuristic .followup-confirm-upload {
+  background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-2)) !important;
+  color: #ffffff !important;
+  border-color: color-mix(in srgb, var(--theme-accent) 58%, #ffffff 12%) !important;
+}
+
+.theme-neon-futuristic .dashboard-tab.active,
+.theme-neon-futuristic .cdr-action-primary,
+.theme-neon-futuristic .followup-primary-upload,
+.theme-neon-futuristic .followup-confirm-upload {
+  box-shadow: 0 0 22px rgba(6, 182, 212, .34), inset 0 0 22px rgba(217, 70, 239, .12) !important;
+}
+
+.theme-dark-command input,
+.theme-dark-command select,
+.theme-dark-command .multi-select-trigger,
+.theme-dark-command .search-box input,
+.theme-light-modern input,
+.theme-light-modern select,
+.theme-light-modern .multi-select-trigger,
+.theme-light-modern .search-box input,
+.theme-neon-futuristic input,
+.theme-neon-futuristic select,
+.theme-neon-futuristic .multi-select-trigger,
+.theme-neon-futuristic .search-box input {
+  background: color-mix(in srgb, var(--theme-card-2) 92%, transparent) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.theme-light-modern input,
+.theme-light-modern select,
+.theme-light-modern .multi-select-trigger,
+.theme-light-modern .search-box input {
+  background: #ffffff !important;
+}
+
+.theme-dark-command th,
+.theme-light-modern th,
+.theme-neon-futuristic th {
+  background: color-mix(in srgb, var(--theme-header) 86%, var(--theme-accent) 14%) !important;
+  color: color-mix(in srgb, var(--theme-text) 90%, var(--theme-accent) 10%) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.theme-dark-command td,
+.theme-light-modern td,
+.theme-neon-futuristic td {
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.theme-light-modern td {
+  color: #1e293b !important;
+}
+
+.theme-dark-command .theme-toggle,
+.theme-light-modern .theme-toggle,
+.theme-neon-futuristic .theme-toggle {
+  display: none !important;
+}
+
+.cdr-theme-selector,
+.cdr-layout-selector {
+  background: color-mix(in srgb, var(--theme-card-2, #111827) 88%, transparent) !important;
+  border: 1px solid var(--theme-border, #1f2937) !important;
+  color: var(--theme-text, #f8fafc) !important;
+}
+
+.cdr-theme-selector select,
+.cdr-layout-selector select {
+  min-width: 190px;
+}
+
+/* Layout 1: full width NOC command center */
+.app-shell.layout-command-center {
+  padding: clamp(16px, 2vw, 28px) !important;
+}
+
+.app-shell.layout-command-center > * {
+  width: 100%;
+  max-width: none;
+}
+
+.app-shell.layout-command-center .dashboard-tabs {
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+/* Layout 2: centered executive/report composition */
+.app-shell.layout-executive-analytics {
+  padding: clamp(24px, 3vw, 42px) !important;
+}
+
+.app-shell.layout-executive-analytics > :not(.toast):not(.modal-backdrop) {
+  max-width: 1540px !important;
+  width: min(1540px, 100%) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.app-shell.layout-executive-analytics .cdr-command-shell {
+  padding: 20px !important;
+  border-radius: 28px !important;
+}
+
+.app-shell.layout-executive-analytics .dashboard-tabs-row {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+}
+
+.app-shell.layout-executive-analytics .dashboard-tabs {
+  justify-content: center !important;
+  padding: 12px !important;
+}
+
+.app-shell.layout-executive-analytics .dashboard-tabs-actions,
+.app-shell.layout-executive-analytics .cdr-header-actions {
+  justify-content: center !important;
+}
+
+.app-shell.layout-executive-analytics .filters-fields-grid,
+.app-shell.layout-executive-analytics .filters-grid,
+.app-shell.layout-executive-analytics .filter-grid {
+  grid-template-columns: repeat(4, minmax(180px, 1fr)) !important;
+}
+
+.app-shell.layout-executive-analytics .modern-stat-deck,
+.app-shell.layout-executive-analytics .cdr-kpi-strip-30 {
+  grid-template-columns: repeat(5, minmax(170px, 1fr)) !important;
+  gap: 18px !important;
+}
+
+.app-shell.layout-executive-analytics .modern-dashboard-grid.cdr-saas-overview-grid,
+.app-shell.layout-executive-analytics .modern-dashboard-grid.cdr-deep-dive-grid,
+.app-shell.layout-executive-analytics .modern-dashboard-grid.cdr-top-entities-grid,
+.app-shell.layout-executive-analytics .chart-grid,
+.app-shell.layout-executive-analytics .behavior-grid,
+.app-shell.layout-executive-analytics .quality-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+}
+
+.app-shell.layout-executive-analytics .modern-panel-wide,
+.app-shell.layout-executive-analytics .modern-panel-table-wide,
+.app-shell.layout-executive-analytics .records-card,
+.app-shell.layout-executive-analytics .table-card {
+  grid-column: 1 / -1 !important;
+}
+
+.upload-shell.layout-executive-analytics .followup-upload-card,
+.local-login-shell.layout-executive-analytics .local-login-card {
+  max-width: 1180px !important;
+  border-radius: 30px !important;
+}
+
+/* Layout 3: vertical navigation rail and dense operations frame */
+.app-shell.layout-futuristic-ops {
+  padding: 10px !important;
+}
+
+.app-shell.layout-futuristic-ops > :not(.toast):not(.modal-backdrop) {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.app-shell.layout-futuristic-ops .cdr-command-shell {
+  display: grid !important;
+  grid-template-columns: 230px minmax(0, 1fr) !important;
+  grid-template-areas:
+    "header header"
+    "profile profile"
+    "nav filters" !important;
+  gap: 10px !important;
+  padding: 10px !important;
+  border-radius: 16px !important;
+}
+
+.app-shell.layout-futuristic-ops .cdr-command-shell > .topbar {
+  grid-area: header !important;
+  margin: 0 !important;
+  min-height: 68px !important;
+}
+
+.app-shell.layout-futuristic-ops .cdr-command-shell > .cdr-header-profile-band {
+  grid-area: profile !important;
+  margin: 0 !important;
+}
+
+.app-shell.layout-futuristic-ops .dashboard-tabs-row {
+  grid-area: nav !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  align-self: stretch !important;
+}
+
+.app-shell.layout-futuristic-ops .dashboard-tabs {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  height: 100% !important;
+  padding: 10px !important;
+}
+
+.app-shell.layout-futuristic-ops .dashboard-tab {
+  justify-content: flex-start !important;
+  width: 100% !important;
+  min-height: 40px !important;
+}
+
+.app-shell.layout-futuristic-ops .dashboard-tabs-actions,
+.app-shell.layout-futuristic-ops .cdr-header-actions {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.app-shell.layout-futuristic-ops .cdr-header-actions > *,
+.app-shell.layout-futuristic-ops .cdr-theme-selector,
+.app-shell.layout-futuristic-ops .cdr-layout-selector,
+.app-shell.layout-futuristic-ops .cdr-action-pill {
+  width: 100% !important;
+  justify-content: space-between !important;
+}
+
+.app-shell.layout-futuristic-ops .filters-panel {
+  grid-area: filters !important;
+  margin: 0 !important;
+  padding: 10px !important;
+}
+
+.app-shell.layout-futuristic-ops .filters-fields-grid,
+.app-shell.layout-futuristic-ops .filters-grid,
+.app-shell.layout-futuristic-ops .filter-grid {
+  grid-template-columns: repeat(6, minmax(130px, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.app-shell.layout-futuristic-ops .modern-stat-deck,
+.app-shell.layout-futuristic-ops .cdr-kpi-strip-30 {
+  grid-template-columns: repeat(8, minmax(120px, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.app-shell.layout-futuristic-ops .modern-dashboard-grid.cdr-saas-overview-grid,
+.app-shell.layout-futuristic-ops .modern-dashboard-grid.cdr-deep-dive-grid,
+.app-shell.layout-futuristic-ops .modern-dashboard-grid.cdr-top-entities-grid,
+.app-shell.layout-futuristic-ops .chart-grid,
+.app-shell.layout-futuristic-ops .behavior-grid,
+.app-shell.layout-futuristic-ops .quality-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.app-shell.layout-futuristic-ops .summary-card,
+.app-shell.layout-futuristic-ops .modern-kpi-card,
+.app-shell.layout-futuristic-ops .modern-stat-tile,
+.app-shell.layout-futuristic-ops .chart-card,
+.app-shell.layout-futuristic-ops .modern-panel,
+.app-shell.layout-futuristic-ops .table-card,
+.app-shell.layout-futuristic-ops .records-card {
+  border-radius: 12px !important;
+  min-height: auto !important;
+}
+
+.app-shell.layout-futuristic-ops .summary-card,
+.app-shell.layout-futuristic-ops .modern-kpi-card,
+.app-shell.layout-futuristic-ops .modern-stat-tile {
+  padding: 10px !important;
+}
+
+.app-shell.layout-futuristic-ops .summary-card strong,
+.app-shell.layout-futuristic-ops .modern-kpi-card strong,
+.app-shell.layout-futuristic-ops .modern-stat-tile strong {
+  font-size: clamp(17px, 1.15vw, 24px) !important;
+}
+
+.upload-shell.layout-futuristic-ops .followup-upload-card {
+  max-width: 1420px !important;
+  grid-template-columns: minmax(620px, 1.25fr) minmax(360px, .75fr) !important;
+  gap: 16px !important;
+  border-radius: 18px !important;
+}
+
+.local-login-shell.layout-futuristic-ops .local-login-card {
+  max-width: 1040px !important;
+  border-radius: 18px !important;
+}
+
+@media (max-width: 1280px) {
+  .app-shell.layout-futuristic-ops .cdr-command-shell {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "header"
+      "profile"
+      "nav"
+      "filters" !important;
+  }
+
+  .app-shell.layout-futuristic-ops .dashboard-tabs,
+  .app-shell.layout-futuristic-ops .cdr-header-actions {
+    flex-direction: row !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+  }
+
+  .app-shell.layout-futuristic-ops .cdr-header-actions > *,
+  .app-shell.layout-futuristic-ops .cdr-theme-selector,
+  .app-shell.layout-futuristic-ops .cdr-layout-selector,
+  .app-shell.layout-futuristic-ops .cdr-action-pill {
+    width: auto !important;
+  }
+
+  .app-shell.layout-executive-analytics .modern-stat-deck,
+  .app-shell.layout-executive-analytics .cdr-kpi-strip-30,
+  .app-shell.layout-futuristic-ops .modern-stat-deck,
+  .app-shell.layout-futuristic-ops .cdr-kpi-strip-30 {
+    grid-template-columns: repeat(4, minmax(140px, 1fr)) !important;
+  }
+
+  .app-shell.layout-futuristic-ops .filters-fields-grid,
+  .app-shell.layout-futuristic-ops .filters-grid,
+  .app-shell.layout-futuristic-ops .filter-grid {
+    grid-template-columns: repeat(3, minmax(150px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell.layout-executive-analytics,
+  .app-shell.layout-futuristic-ops,
+  .app-shell.layout-command-center {
+    padding: 12px !important;
+  }
+
+  .app-shell.layout-executive-analytics .modern-stat-deck,
+  .app-shell.layout-executive-analytics .cdr-kpi-strip-30,
+  .app-shell.layout-futuristic-ops .modern-stat-deck,
+  .app-shell.layout-futuristic-ops .cdr-kpi-strip-30,
+  .app-shell.layout-command-center .modern-stat-deck,
+  .app-shell.layout-command-center .cdr-kpi-strip-30,
+  .app-shell.layout-executive-analytics .filters-fields-grid,
+  .app-shell.layout-futuristic-ops .filters-fields-grid,
+  .app-shell.layout-command-center .filters-fields-grid,
+  .app-shell.layout-executive-analytics .filter-grid,
+  .app-shell.layout-futuristic-ops .filter-grid,
+  .app-shell.layout-command-center .filter-grid,
+  .app-shell.layout-executive-analytics .modern-dashboard-grid.cdr-saas-overview-grid,
+  .app-shell.layout-futuristic-ops .modern-dashboard-grid.cdr-saas-overview-grid,
+  .app-shell.layout-command-center .modern-dashboard-grid.cdr-saas-overview-grid,
+  .app-shell.layout-executive-analytics .chart-grid,
+  .app-shell.layout-futuristic-ops .chart-grid,
+  .app-shell.layout-command-center .chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .cdr-theme-selector select,
+  .cdr-layout-selector select {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+
+

@@ -1,0 +1,158 @@
+﻿/* Global button hover, active, disabled states. Source split from src/styles.css lines 2289-2445. */
+/* ============================================================
+   Global button hover / active polish
+   Applies to all dashboard, upload, nav, export, theme and reset buttons
+   ============================================================ */
+
+.app-shell button,
+.upload-shell button,
+.app-shell .button,
+.upload-shell .button,
+.app-shell .section-nav-button,
+.upload-shell .section-nav-button,
+.app-shell .theme-toggle,
+.upload-shell .theme-toggle,
+.app-shell .reset-filter-button,
+.upload-shell .reset-filter-button,
+.app-shell .quick-card-export,
+.upload-shell .quick-card-export,
+.app-shell .export-menu button,
+.upload-shell .export-menu button,
+.app-shell label.button,
+.upload-shell label.button {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease !important;
+}
+
+.app-shell button:hover:not(:disabled),
+.upload-shell button:hover:not(:disabled),
+.app-shell .button:hover:not(:disabled),
+.upload-shell .button:hover:not(:disabled),
+.app-shell label.button:hover,
+.upload-shell label.button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 26px rgba(0, 120, 212, 0.22) !important;
+}
+
+.app-shell button:active:not(:disabled),
+.upload-shell button:active:not(:disabled),
+.app-shell .button:active:not(:disabled),
+.upload-shell .button:active:not(:disabled),
+.app-shell label.button:active,
+.upload-shell label.button:active {
+  transform: translateY(0) scale(0.98) !important;
+  box-shadow: 0 6px 16px rgba(0, 120, 212, 0.16) !important;
+}
+
+.app-shell button:focus-visible,
+.upload-shell button:focus-visible,
+.app-shell .button:focus-visible,
+.upload-shell .button:focus-visible,
+.app-shell label.button:focus-within,
+.upload-shell label.button:focus-within {
+  outline: 3px solid rgba(0, 120, 212, 0.34) !important;
+  outline-offset: 2px !important;
+}
+
+/* Light theme button hover */
+.app-shell.light-background-theme button:hover:not(:disabled),
+.upload-shell.light-background-theme button:hover:not(:disabled),
+.app-shell.light-background-theme .button:hover:not(:disabled),
+.upload-shell.light-background-theme .button:hover:not(:disabled),
+.app-shell.light-background-theme label.button:hover,
+.upload-shell.light-background-theme label.button:hover {
+  background: #eaf6ff !important;
+  color: #06324c !important;
+  border-color: rgba(0, 120, 212, 0.46) !important;
+  box-shadow: 0 12px 28px rgba(0, 120, 212, 0.20) !important;
+}
+
+/* Dark theme button hover */
+.app-shell.dark-background-theme button:hover:not(:disabled),
+.upload-shell.dark-background-theme button:hover:not(:disabled),
+.app-shell.dark-background-theme .button:hover:not(:disabled),
+.upload-shell.dark-background-theme .button:hover:not(:disabled),
+.app-shell.dark-background-theme label.button:hover,
+.upload-shell.dark-background-theme label.button:hover {
+  background: #0d3550 !important;
+  color: #ffffff !important;
+  border-color: rgba(110, 201, 255, 0.62) !important;
+  box-shadow: 0 12px 28px rgba(0, 120, 212, 0.26) !important;
+}
+
+/* Primary buttons keep their blue identity */
+.app-shell .button.primary:hover:not(:disabled),
+.upload-shell .button.primary:hover:not(:disabled),
+.app-shell button.primary:hover:not(:disabled),
+.upload-shell button.primary:hover:not(:disabled) {
+  background: #006fc4 !important;
+  color: #ffffff !important;
+  border-color: #006fc4 !important;
+  box-shadow: 0 14px 30px rgba(0, 120, 212, 0.34) !important;
+}
+
+/* Section navigation hover */
+.app-shell .section-nav-button:hover:not(:disabled) {
+  background: rgba(0, 120, 212, 0.14) !important;
+  color: var(--theme-text, #ffffff) !important;
+  border-color: rgba(0, 120, 212, 0.42) !important;
+}
+
+.app-shell.light-background-theme .section-nav-button:hover:not(:disabled) {
+  background: #e8f5ff !important;
+  color: #005f93 !important;
+  border-color: rgba(0, 120, 212, 0.40) !important;
+}
+
+.app-shell.dark-background-theme .section-nav-button:hover:not(:disabled) {
+  background: #0d3550 !important;
+  color: #ffffff !important;
+  border-color: rgba(110, 201, 255, 0.62) !important;
+}
+
+/* Active section nav must remain stronger than hover */
+.app-shell .section-nav-button.active,
+.app-shell .section-nav-button.active:hover {
+  background: #0078d4 !important;
+  color: #ffffff !important;
+  border-color: #0078d4 !important;
+  box-shadow: 0 10px 24px rgba(0, 120, 212, 0.30) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Theme toggle hover */
+.app-shell .theme-toggle:hover:not(:disabled),
+.upload-shell .theme-toggle:hover:not(:disabled) {
+  background: rgba(255, 176, 0, 0.16) !important;
+  color: #ffb000 !important;
+  border-color: rgba(255, 176, 0, 0.54) !important;
+  box-shadow: 0 12px 26px rgba(255, 176, 0, 0.18) !important;
+}
+
+/* Reset / danger-style hover */
+.app-shell .reset-filter-button:hover:not(:disabled),
+.upload-shell .reset-filter-button:hover:not(:disabled) {
+  background: rgba(217, 95, 95, 0.14) !important;
+  color: #d95f5f !important;
+  border-color: rgba(217, 95, 95, 0.52) !important;
+  box-shadow: 0 12px 26px rgba(217, 95, 95, 0.16) !important;
+}
+
+/* Disabled buttons */
+.app-shell button:disabled,
+.upload-shell button:disabled,
+.app-shell .button:disabled,
+.upload-shell .button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.48 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+

@@ -1,27 +1,30 @@
+# Dependencies
 node_modules/
+
+# Build and packaged outputs
 dist/
+release/
+*.zip
+package-lock.json
+
+# Local environment and secrets
 .env
 .env.*
 *.local
+!.env.example
+
+# Local databases, exports, and backups
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+Backup/
+Reports/
+artifacts/
+test-results/
+.cdr-report-settings.json
+
+# Logs and OS/editor noise
 *.log
 .DS_Store
 Thumbs.db
-Backup/
-electron/
-release/
-node_modules/
-dist/
-release/
-Backup/
-electron/
-*.log
-
-release/
-
-node_modules/
-
-.env
-
-package-lock.json
-
-*.zip

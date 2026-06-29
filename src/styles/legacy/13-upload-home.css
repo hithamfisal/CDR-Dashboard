@@ -1,0 +1,300 @@
+﻿/* Home raw upload and upload cards. Source split from src/styles.css lines 3794-4092. */
+/* ============================================================
+   Home screen: raw system call log upload option
+   Adds a fifth upload card for direct calllog CSV/XLSX exports.
+   ============================================================ */
+
+.workbook-choice-panel.three-tile {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-areas:
+    "theme theme"
+    "master fixed"
+    "new raw"
+    "previous previous" !important;
+  gap: 12px !important;
+}
+
+.workbook-choice-panel.three-tile .raw-system-choice-card {
+  grid-area: raw !important;
+  grid-column: auto !important;
+  border-color: rgba(0, 166, 166, 0.38) !important;
+}
+
+.workbook-choice-panel.three-tile .raw-system-choice-card .choice-icon {
+  color: var(--cyan) !important;
+  border-color: rgba(0, 166, 166, 0.35) !important;
+  background: rgba(0, 166, 166, 0.10) !important;
+}
+
+.workbook-choice-panel.three-tile .raw-system-choice-card .choice-eyebrow {
+  color: var(--cyan) !important;
+}
+
+.upload-shell.light-background-theme .raw-system-choice-card,
+.se-theme .raw-system-choice-card {
+  border-color: rgba(0, 135, 185, 0.28) !important;
+}
+
+.upload-shell.light-background-theme .raw-system-choice-card .choice-icon,
+.se-theme .raw-system-choice-card .choice-icon {
+  color: #0078c8 !important;
+  border-color: rgba(0, 120, 200, 0.26) !important;
+  background: rgba(0, 120, 200, 0.08) !important;
+}
+
+@media (max-width: 720px) {
+  .workbook-choice-panel.three-tile {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "theme"
+      "master"
+      "fixed"
+      "new"
+      "raw"
+      "previous" !important;
+  }
+}
+
+/* ============================================================
+   Inactive Radios tables: force count column visible
+   ============================================================ */
+
+.app-shell .network-utilization-section .inactive-radio-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:first-child,
+.app-shell .network-utilization-section .inactive-radio-table td:first-child {
+  width: 72% !important;
+  text-align: left !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:nth-child(2),
+.app-shell .network-utilization-section .inactive-radio-table td:nth-child(2),
+.app-shell .network-utilization-section .inactive-radio-table .inactive-count-header,
+.app-shell .network-utilization-section .inactive-radio-table .inactive-count-cell {
+  width: 28% !important;
+  min-width: 120px !important;
+  text-align: center !important;
+  color: inherit !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .inactive-radio-table .inactive-count-header {
+  color: #006fae !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .inactive-radio-table .inactive-count-cell {
+  color: #092033 !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .inactive-radio-table .inactive-count-header {
+  color: #dff8ff !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .inactive-radio-table .inactive-count-cell {
+  color: #f4fbff !important;
+}
+
+/* ============================================================
+   Inactive Radios tables: add Active Radios column
+   ============================================================ */
+
+.app-shell .network-utilization-section .inactive-radio-table {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:first-child,
+.app-shell .network-utilization-section .inactive-radio-table td:first-child {
+  width: 56% !important;
+  text-align: left !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:nth-child(2),
+.app-shell .network-utilization-section .inactive-radio-table td:nth-child(2),
+.app-shell .network-utilization-section .inactive-radio-table .inactive-count-header,
+.app-shell .network-utilization-section .inactive-radio-table .inactive-count-cell {
+  width: 22% !important;
+  min-width: 105px !important;
+  text-align: center !important;
+  color: inherit !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .network-utilization-section .inactive-radio-table th:nth-child(3),
+.app-shell .network-utilization-section .inactive-radio-table td:nth-child(3),
+.app-shell .network-utilization-section .inactive-radio-table .active-count-header,
+.app-shell .network-utilization-section .inactive-radio-table .active-count-cell {
+  width: 22% !important;
+  min-width: 105px !important;
+  text-align: center !important;
+  color: inherit !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .inactive-radio-table .active-count-header {
+  color: #008f66 !important;
+}
+
+.app-shell.light-background-theme .network-utilization-section .inactive-radio-table .active-count-cell {
+  color: #092033 !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .inactive-radio-table .active-count-header {
+  color: #7adfa5 !important;
+}
+
+.app-shell.dark-background-theme .network-utilization-section .inactive-radio-table .active-count-cell {
+  color: #f4fbff !important;
+}
+
+/* ============================================================
+   Unmatched Fleetmap Report
+   Shows raw Caller Numbers that do not match Master/Fixed fleetmap
+   ============================================================ */
+
+.app-shell .unmatched-fleetmap-report-section {
+  margin: 0 0 16px !important;
+}
+
+.app-shell .unmatched-fleetmap-report-card {
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.app-shell .unmatched-fleetmap-report-card .table-note {
+  margin: 0 0 10px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: var(--theme-muted, #3f6174) !important;
+}
+
+.app-shell .unmatched-fleetmap-table-wrap {
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.app-shell .unmatched-fleetmap-table {
+  width: 100% !important;
+  min-width: 1180px !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell .unmatched-fleetmap-table th,
+.app-shell .unmatched-fleetmap-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  height: 32px !important;
+  padding: 7px 8px !important;
+  font-size: 12px !important;
+}
+
+.app-shell .unmatched-fleetmap-table th:nth-child(1),
+.app-shell .unmatched-fleetmap-table td:nth-child(1) { width: 120px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(2),
+.app-shell .unmatched-fleetmap-table td:nth-child(2) { width: 170px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(3),
+.app-shell .unmatched-fleetmap-table td:nth-child(3) { width: 150px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(4),
+.app-shell .unmatched-fleetmap-table td:nth-child(4) { width: 80px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(5),
+.app-shell .unmatched-fleetmap-table td:nth-child(5) { width: 120px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(6),
+.app-shell .unmatched-fleetmap-table td:nth-child(6) { width: 170px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(7),
+.app-shell .unmatched-fleetmap-table td:nth-child(7) { width: 170px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(8),
+.app-shell .unmatched-fleetmap-table td:nth-child(8) { width: 190px !important; }
+.app-shell .unmatched-fleetmap-table th:nth-child(9),
+.app-shell .unmatched-fleetmap-table td:nth-child(9) { width: 250px !important; }
+
+/* ============================================================
+   Tabular dashboard interface
+   Converts long dashboard sections into clean dashboard tabs.
+   ============================================================ */
+
+.dashboard-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 14px 0 16px !important;
+  padding: 8px !important;
+  border-radius: 16px !important;
+  background: var(--theme-card-bg, rgba(8, 31, 47, 0.98)) !important;
+  border: 1px solid var(--theme-border, rgba(116, 181, 214, 0.34)) !important;
+  box-shadow: var(--theme-shadow, 0 18px 42px rgba(0, 0, 0, 0.30)) !important;
+  position: relative !important;
+  z-index: 20 !important;
+}
+
+.dashboard-tab {
+  min-height: 38px !important;
+  padding: 8px 14px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--theme-border, rgba(116, 181, 214, 0.34)) !important;
+  background: transparent !important;
+  color: var(--theme-muted, #a8c8d8) !important;
+  font-weight: 850 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  transition: transform .16s ease, background .16s ease, color .16s ease, border-color .16s ease, box-shadow .16s ease !important;
+}
+
+.dashboard-tab:hover {
+  color: var(--theme-text, #f4fbff) !important;
+  background: rgba(0, 120, 212, 0.14) !important;
+  border-color: rgba(0, 163, 255, 0.55) !important;
+  transform: translateY(-1px) !important;
+}
+
+.dashboard-tab.active {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0078d4, #00a7d8) !important;
+  border-color: #008ddc !important;
+  box-shadow: 0 12px 28px rgba(0, 120, 212, 0.32) !important;
+}
+
+.app-shell.light-background-theme .dashboard-tabs {
+  background: #ffffff !important;
+  border-color: rgba(0, 100, 150, 0.20) !important;
+  box-shadow: 0 18px 42px rgba(17, 86, 128, 0.14) !important;
+}
+
+.app-shell.light-background-theme .dashboard-tab {
+  color: #3f6174 !important;
+  border-color: rgba(0, 100, 150, 0.22) !important;
+}
+
+.app-shell.light-background-theme .dashboard-tab:hover {
+  color: #092033 !important;
+  background: rgba(0, 120, 212, 0.08) !important;
+}
+
+.app-shell.light-background-theme .dashboard-tab.active {
+  color: #ffffff !important;
+}
+

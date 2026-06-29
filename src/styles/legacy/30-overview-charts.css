@@ -1,0 +1,1386 @@
+﻿/* Overview distribution and chart refinements. Source split from src/styles.css lines 16631-18015. */
+/* ============================================================
+   CDR filter row update: add Call Type / Radio Type / Encryption / Duplex Mode
+   Keeps all filters readable while allowing the row to wrap cleanly.
+   ============================================================ */
+.app-shell .filters-panel {
+  grid-template-columns:
+    minmax(280px, 1.55fr)
+    minmax(88px, .55fr)
+    minmax(82px, .5fr)
+    minmax(92px, .58fr)
+    minmax(132px, .82fr)
+    minmax(150px, .95fr)
+    minmax(145px, .9fr)
+    minmax(128px, .82fr)
+    minmax(128px, .82fr)
+    minmax(118px, .76fr)
+    minmax(128px, .82fr)
+    auto
+    minmax(150px, .75fr) !important;
+  gap: 8px !important;
+}
+
+.app-shell .filters-panel .multi-select-trigger,
+.app-shell .filters-panel .filter-field input {
+  min-height: 32px !important;
+  height: 32px !important;
+}
+
+.app-shell .filters-panel .filter-field > span {
+  white-space: nowrap !important;
+}
+
+.app-shell .filters-panel .filter-wide .multi-select-value,
+.app-shell .filters-panel .filter-xwide .multi-select-value,
+.app-shell .filters-panel .filter-company .multi-select-value,
+.app-shell .filters-panel .filter-compact .multi-select-value {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 1480px) {
+  .app-shell .filters-panel {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell .filters-panel > .search-box.search-compact {
+    grid-column: span 2;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell .filters-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell .filters-panel > .search-box.search-compact,
+  .app-shell .filters-panel .filter-count {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .app-shell .filters-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell .filters-panel > .search-box.search-compact {
+    grid-column: auto;
+  }
+}
+
+/* Distribution donut cleanup: remove internal data table and let the chart/legend use the full panel. */
+.app-shell.active-tab-overview .cdr-overview-distribution .modern-donut-layout {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  align-items: center !important;
+  justify-items: center !important;
+  gap: 8px !important;
+  height: 100% !important;
+}
+
+.app-shell.active-tab-overview .cdr-overview-distribution .modern-donut-chart {
+  width: 100% !important;
+  max-width: 430px !important;
+  min-width: 0 !important;
+  justify-self: center !important;
+}
+
+.app-shell.active-tab-overview .cdr-overview-distribution .cdr-pie-legend {
+  justify-content: center !important;
+  margin-top: -4px !important;
+}
+
+/* ============================================================
+   CDR filters final fit fix
+   - every filter control expands to its longest option label
+   - reset and info/result pills keep full text visible
+   - filter row wraps instead of squeezing/truncating values
+   ============================================================ */
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell .filters-panel {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  grid-template-columns: none !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > .search-box.search-compact,
+.app-shell .filters-panel > .search-box.search-compact {
+  flex: 1 1 320px !important;
+  min-width: 320px !important;
+  max-width: 420px !important;
+  width: auto !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .multi-select-filter,
+.app-shell .filters-panel .multi-select-filter {
+  flex: 0 0 auto !important;
+  min-width: min(max(var(--filter-fit-ch, 12ch), 118px), 360px) !important;
+  width: min(max(var(--filter-fit-ch, 12ch), 118px), 360px) !important;
+  max-width: 360px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .filter-company,
+.app-shell .filters-panel .filter-company {
+  min-width: min(max(var(--filter-fit-ch, 14ch), 165px), 380px) !important;
+  width: min(max(var(--filter-fit-ch, 14ch), 165px), 380px) !important;
+  max-width: 380px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .filter-wide,
+.app-shell .filters-panel .filter-wide,
+.app-shell .cdr-command-shell .filters-panel .filter-xwide,
+.app-shell .filters-panel .filter-xwide {
+  min-width: min(max(var(--filter-fit-ch, 16ch), 205px), 460px) !important;
+  width: min(max(var(--filter-fit-ch, 16ch), 205px), 460px) !important;
+  max-width: 460px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .multi-select-trigger,
+.app-shell .filters-panel .multi-select-trigger {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding-inline: 10px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .multi-select-value,
+.app-shell .filters-panel .multi-select-value {
+  display: block !important;
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .reset-filter-button,
+.app-shell .filters-panel .reset-filter-button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 18px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  justify-content: center !important;
+}
+
+.app-shell .cdr-command-shell .filter-count,
+.app-shell .filters-panel .filter-count {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 16px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  justify-self: auto !important;
+}
+
+.multi-select-dropdown {
+  min-width: max-content !important;
+  max-width: min(620px, calc(100vw - 20px)) !important;
+  overflow-x: hidden !important;
+}
+
+.multi-select-dropdown .multi-select-option span {
+  white-space: nowrap !important;
+}
+
+@media (max-width: 900px) {
+  .app-shell .cdr-command-shell .filters-panel > .search-box.search-compact,
+  .app-shell .filters-panel > .search-box.search-compact,
+  .app-shell .cdr-command-shell .filters-panel .multi-select-filter,
+  .app-shell .filters-panel .multi-select-filter,
+  .app-shell .cdr-command-shell .reset-filter-button,
+  .app-shell .filters-panel .reset-filter-button,
+  .app-shell .cdr-command-shell .filter-count,
+  .app-shell .filters-panel .filter-count {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* ============================================================
+   Final CDR filter fit correction
+   - fixes overlap between Duplex Mode, Reset Filters, and result info
+   - all dropdown buttons reserve space for the longest option + arrow
+   - reset/info pills never squeeze or truncate
+   ============================================================ */
+.app-shell .cdr-command-shell .filters-panel,
+.app-shell .filters-panel {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  gap: 12px 14px !important;
+  grid-template-columns: none !important;
+  overflow: visible !important;
+  padding: 14px !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > *,
+.app-shell .filters-panel > * {
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel > .search-box.search-compact,
+.app-shell .filters-panel > .search-box.search-compact {
+  flex: 0 0 320px !important;
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 420px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .multi-select-filter,
+.app-shell .filters-panel .multi-select-filter {
+  flex: 0 0 auto !important;
+  width: clamp(150px, calc(var(--filter-fit-ch, 14ch) + 58px), 430px) !important;
+  min-width: clamp(150px, calc(var(--filter-fit-ch, 14ch) + 58px), 430px) !important;
+  max-width: 430px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .filter-company,
+.app-shell .filters-panel .filter-company {
+  width: clamp(190px, calc(var(--filter-fit-ch, 16ch) + 62px), 460px) !important;
+  min-width: clamp(190px, calc(var(--filter-fit-ch, 16ch) + 62px), 460px) !important;
+  max-width: 460px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .filter-wide,
+.app-shell .filters-panel .filter-wide,
+.app-shell .cdr-command-shell .filters-panel .filter-xwide,
+.app-shell .filters-panel .filter-xwide {
+  width: clamp(260px, calc(var(--filter-fit-ch, 20ch) + 66px), 560px) !important;
+  min-width: clamp(260px, calc(var(--filter-fit-ch, 20ch) + 66px), 560px) !important;
+  max-width: 560px !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .multi-select-trigger,
+.app-shell .filters-panel .multi-select-trigger {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 14px !important;
+  gap: 14px !important;
+  overflow: visible !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .multi-select-value,
+.app-shell .filters-panel .multi-select-value,
+.app-shell .filters-panel .filter-wide .multi-select-value,
+.app-shell .filters-panel .filter-xwide .multi-select-value,
+.app-shell .filters-panel .filter-company .multi-select-value,
+.app-shell .filters-panel .filter-compact .multi-select-value {
+  display: block !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .filters-panel .multi-select-trigger svg,
+.app-shell .filters-panel .multi-select-trigger svg {
+  flex: 0 0 auto !important;
+}
+
+.app-shell .cdr-command-shell .reset-filter-button,
+.app-shell .filters-panel .reset-filter-button {
+  flex: 0 0 auto !important;
+  width: max-content !important;
+  min-width: 158px !important;
+  max-width: none !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell .cdr-command-shell .filter-count,
+.app-shell .filters-panel .filter-count {
+  flex: 0 0 auto !important;
+  width: max-content !important;
+  min-width: 250px !important;
+  max-width: none !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  box-sizing: border-box !important;
+}
+
+.multi-select-dropdown {
+  min-width: max-content !important;
+  max-width: min(680px, calc(100vw - 24px)) !important;
+}
+
+.multi-select-dropdown .multi-select-option span {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+@media (max-width: 900px) {
+  .app-shell .cdr-command-shell .filters-panel > .search-box.search-compact,
+  .app-shell .filters-panel > .search-box.search-compact,
+  .app-shell .cdr-command-shell .filters-panel .multi-select-filter,
+  .app-shell .filters-panel .multi-select-filter,
+  .app-shell .cdr-command-shell .reset-filter-button,
+  .app-shell .filters-panel .reset-filter-button,
+  .app-shell .cdr-command-shell .filter-count,
+  .app-shell .filters-panel .filter-count {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* ============================================================
+   CDR filter arrangement final correction
+   - separates filters from Reset/Info actions to prevent overlap
+   - search input uses the same height as dropdown filters
+   - controls keep readable widths and wrap in clean rows
+   ============================================================ */
+.app-shell .filters-panel.filters-panel-arranged,
+.app-shell .cdr-command-shell .filters-panel.filters-panel-arranged {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  width: 100% !important;
+  overflow: visible !important;
+  padding: 14px !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell .filters-panel-arranged .filters-fields-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+.app-shell .filters-panel-arranged .filters-fields-grid > * {
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  max-width: 100% !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-search {
+  flex: 0 0 330px !important;
+  width: 330px !important;
+  min-width: 330px !important;
+  max-width: 420px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-region,
+.app-shell .filters-panel-arranged .cdr-filter-year,
+.app-shell .filters-panel-arranged .cdr-filter-month {
+  flex: 0 0 150px !important;
+  width: 150px !important;
+  min-width: 150px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-company {
+  flex: 0 0 230px !important;
+  width: 230px !important;
+  min-width: 230px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-base-station,
+.app-shell .filters-panel-arranged .cdr-filter-talkgroup {
+  flex: 0 0 300px !important;
+  width: 300px !important;
+  min-width: 300px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-call-type {
+  flex: 0 0 250px !important;
+  width: 250px !important;
+  min-width: 250px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-radio-type,
+.app-shell .filters-panel-arranged .cdr-filter-encryption,
+.app-shell .filters-panel-arranged .cdr-filter-duplex {
+  flex: 0 0 210px !important;
+  width: 210px !important;
+  min-width: 210px !important;
+}
+
+.app-shell .filters-panel-arranged .search-box,
+.app-shell .filters-panel-arranged .multi-select-filter {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.app-shell .filters-panel-arranged .search-box > span,
+.app-shell .filters-panel-arranged .filter-field > span,
+.app-shell .filters-panel-arranged .multi-select-filter > span {
+  min-height: 16px !important;
+  line-height: 16px !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .filters-panel-arranged .search-box input,
+.app-shell .filters-panel-arranged .multi-select-trigger {
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  border-radius: 10px !important;
+  box-sizing: border-box !important;
+  font-size: 0.92rem !important;
+  line-height: 1 !important;
+}
+
+.app-shell .filters-panel-arranged .search-box input {
+  width: 100% !important;
+  padding-left: 42px !important;
+  padding-right: 14px !important;
+}
+
+.app-shell .filters-panel-arranged .search-box svg {
+  left: 14px !important;
+  bottom: 14px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.app-shell .filters-panel-arranged .multi-select-trigger {
+  width: 100% !important;
+  padding: 0 14px !important;
+  gap: 12px !important;
+  overflow: hidden !important;
+}
+
+.app-shell .filters-panel-arranged .multi-select-value {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .filters-panel-arranged .multi-select-trigger svg {
+  flex: 0 0 auto !important;
+}
+
+.app-shell .filters-panel-arranged .filters-actions-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+.app-shell .filters-panel-arranged .reset-filter-button,
+.app-shell .filters-panel-arranged .filter-count {
+  flex: 0 0 auto !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell .filters-panel-arranged .reset-filter-button {
+  min-width: 166px !important;
+  padding: 0 20px !important;
+  gap: 8px !important;
+}
+
+.app-shell .filters-panel-arranged .filter-count {
+  min-width: 280px !important;
+  padding: 0 18px !important;
+  font-size: 0.86rem !important;
+  font-weight: 900 !important;
+  color: #7ecef4 !important;
+}
+
+@media (max-width: 1580px) {
+  .app-shell .filters-panel-arranged .cdr-filter-search { flex-basis: 300px !important; width: 300px !important; min-width: 300px !important; }
+  .app-shell .filters-panel-arranged .cdr-filter-base-station,
+  .app-shell .filters-panel-arranged .cdr-filter-talkgroup { flex-basis: 270px !important; width: 270px !important; min-width: 270px !important; }
+}
+
+@media (max-width: 1100px) {
+  .app-shell .filters-panel-arranged .filters-fields-grid > *,
+  .app-shell .filters-panel-arranged .cdr-filter-search,
+  .app-shell .filters-panel-arranged .multi-select-filter {
+    flex: 1 1 calc(50% - 8px) !important;
+    width: calc(50% - 8px) !important;
+    min-width: 260px !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .app-shell .filters-panel-arranged .filters-fields-grid > *,
+  .app-shell .filters-panel-arranged .cdr-filter-search,
+  .app-shell .filters-panel-arranged .multi-select-filter,
+  .app-shell .filters-panel-arranged .reset-filter-button,
+  .app-shell .filters-panel-arranged .filter-count {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* ============================================================
+   FINAL FILTER BAR ALIGNMENT FIX
+   - search label stays one line
+   - search input has identical height and vertical position as dropdowns
+   - icon stays inside the search input
+   - controls wrap cleanly with no overlap
+   ============================================================ */
+.app-shell .filters-panel.filters-panel-arranged,
+.app-shell .cdr-command-shell .filters-panel.filters-panel-arranged {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  row-gap: 12px !important;
+  column-gap: 0 !important;
+  padding: 14px 16px !important;
+  overflow: visible !important;
+}
+
+.app-shell .filters-panel-arranged .filters-fields-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 12px 14px !important;
+  width: 100% !important;
+  overflow: visible !important;
+}
+
+.app-shell .filters-panel-arranged .search-box,
+.app-shell .filters-panel-arranged .multi-select-filter,
+.app-shell .filters-panel-arranged .filter-field {
+  position: relative !important;
+  display: grid !important;
+  grid-template-rows: 18px 44px !important;
+  align-items: start !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  max-height: 68px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.app-shell .filters-panel-arranged .search-box > span,
+.app-shell .filters-panel-arranged .multi-select-filter > span,
+.app-shell .filters-panel-arranged .filter-field > span {
+  display: flex !important;
+  align-items: center !important;
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  line-height: 18px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.app-shell .filters-panel-arranged .search-box input,
+.app-shell .filters-panel-arranged .multi-select-trigger {
+  grid-row: 2 !important;
+  align-self: start !important;
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 10px !important;
+  line-height: 44px !important;
+}
+
+.app-shell .filters-panel-arranged .search-box input {
+  padding: 0 14px 0 42px !important;
+}
+
+.app-shell .filters-panel-arranged .search-box svg {
+  position: absolute !important;
+  left: 14px !important;
+  top: 40px !important;
+  bottom: auto !important;
+  width: 16px !important;
+  height: 16px !important;
+  transform: none !important;
+  color: #65c9ff !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+.app-shell .filters-panel-arranged .multi-select-trigger {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 14px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-search {
+  flex: 0 0 360px !important;
+  width: 360px !important;
+  min-width: 360px !important;
+  max-width: 360px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-region,
+.app-shell .filters-panel-arranged .cdr-filter-year,
+.app-shell .filters-panel-arranged .cdr-filter-month {
+  flex: 0 0 210px !important;
+  width: 210px !important;
+  min-width: 210px !important;
+  max-width: 210px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-company {
+  flex: 0 0 250px !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-base-station,
+.app-shell .filters-panel-arranged .cdr-filter-talkgroup {
+  flex: 0 0 330px !important;
+  width: 330px !important;
+  min-width: 330px !important;
+  max-width: 330px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-call-type {
+  flex: 0 0 260px !important;
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-radio-type,
+.app-shell .filters-panel-arranged .cdr-filter-encryption,
+.app-shell .filters-panel-arranged .cdr-filter-duplex {
+  flex: 0 0 230px !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+}
+
+.app-shell .filters-panel-arranged .filters-actions-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin-top: 0 !important;
+  overflow: visible !important;
+}
+
+.app-shell .filters-panel-arranged .reset-filter-button,
+.app-shell .filters-panel-arranged .filter-count {
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 1500px) {
+  .app-shell .filters-panel-arranged .cdr-filter-search {
+    flex: 0 0 340px !important;
+    width: 340px !important;
+    min-width: 340px !important;
+    max-width: 340px !important;
+  }
+  .app-shell .filters-panel-arranged .cdr-filter-base-station,
+  .app-shell .filters-panel-arranged .cdr-filter-talkgroup {
+    flex: 0 0 300px !important;
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell .filters-panel-arranged .filters-fields-grid > *,
+  .app-shell .filters-panel-arranged .cdr-filter-search,
+  .app-shell .filters-panel-arranged .multi-select-filter {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* ============================================================
+   PRECISE FILTER ALIGNMENT PATCH
+   Fixes Search Radio / User label, input height, and vertical text alignment.
+   Search field now uses exactly the same label/control sizing as dropdowns.
+   ============================================================ */
+.app-shell .filters-panel-arranged {
+  --cdr-filter-label-height: 20px;
+  --cdr-filter-label-font-size: 14px;
+  --cdr-filter-control-height: 52px;
+  --cdr-filter-row-gap: 8px;
+  --cdr-filter-field-height: calc(var(--cdr-filter-label-height) + var(--cdr-filter-row-gap) + var(--cdr-filter-control-height));
+}
+
+.app-shell .filters-panel-arranged .filters-fields-grid {
+  align-items: flex-start !important;
+  gap: 14px 16px !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-search,
+.app-shell .filters-panel-arranged .multi-select-filter,
+.app-shell .filters-panel-arranged .filter-field {
+  position: relative !important;
+  display: grid !important;
+  grid-template-rows: var(--cdr-filter-label-height) var(--cdr-filter-control-height) !important;
+  row-gap: var(--cdr-filter-row-gap) !important;
+  align-items: start !important;
+  height: var(--cdr-filter-field-height) !important;
+  min-height: var(--cdr-filter-field-height) !important;
+  max-height: var(--cdr-filter-field-height) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-search > span,
+.app-shell .filters-panel-arranged .multi-select-filter > span,
+.app-shell .filters-panel-arranged .filter-field > span {
+  grid-row: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  height: var(--cdr-filter-label-height) !important;
+  min-height: var(--cdr-filter-label-height) !important;
+  max-height: var(--cdr-filter-label-height) !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  font-size: var(--cdr-filter-label-font-size) !important;
+  font-weight: 900 !important;
+  line-height: var(--cdr-filter-label-height) !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+  color: #c7ecff !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-search input,
+.app-shell .filters-panel-arranged .multi-select-trigger {
+  grid-row: 2 !important;
+  align-self: start !important;
+  width: 100% !important;
+  height: var(--cdr-filter-control-height) !important;
+  min-height: var(--cdr-filter-control-height) !important;
+  max-height: var(--cdr-filter-control-height) !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+  box-sizing: border-box !important;
+  font-size: 15px !important;
+  font-weight: 850 !important;
+  line-height: 1.2 !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-search input {
+  display: block !important;
+  padding: 0 16px 0 46px !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-search input::placeholder {
+  font-size: 15px !important;
+  font-weight: 850 !important;
+  color: #a8d7f0 !important;
+  opacity: 1 !important;
+}
+
+.app-shell .filters-panel-arranged .cdr-filter-search svg {
+  position: absolute !important;
+  left: 16px !important;
+  top: calc(var(--cdr-filter-label-height) + var(--cdr-filter-row-gap) + ((var(--cdr-filter-control-height) - 18px) / 2)) !important;
+  bottom: auto !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  margin: 0 !important;
+  transform: none !important;
+  color: #65c9ff !important;
+  pointer-events: none !important;
+  z-index: 3 !important;
+}
+
+.app-shell .filters-panel-arranged .multi-select-trigger {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 16px !important;
+  gap: 14px !important;
+  overflow: hidden !important;
+}
+
+.app-shell .filters-panel-arranged .multi-select-value {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 100% !important;
+  line-height: 1.2 !important;
+  font-size: 15px !important;
+  font-weight: 850 !important;
+}
+
+/* ============================================================
+   ULTIMATE FILTER BAR ROW LAYOUT
+   This block overrides the older compact filter styles completely.
+   - Search label uses the exact same label style as dropdown labels
+   - Search box and dropdown boxes use the same height
+   - Search text/icon and dropdown values are vertically centered
+   - Filters are arranged in fixed clean rows with no overlap
+   ============================================================ */
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged,
+body .app-shell .filters-panel.filters-panel-arranged {
+  --cdr-filter-label-height: 22px;
+  --cdr-filter-label-font-size: 16px;
+  --cdr-filter-control-height: 56px;
+  --cdr-filter-row-gap: 10px;
+  --cdr-filter-field-height: calc(var(--cdr-filter-label-height) + var(--cdr-filter-row-gap) + var(--cdr-filter-control-height));
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 16px !important;
+  align-items: start !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 14px 18px !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-fields-grid,
+body .app-shell .filters-panel.filters-panel-arranged .filters-fields-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 18px !important;
+  align-items: start !important;
+  justify-content: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-fields-grid > .filters-row,
+body .app-shell .filters-panel.filters-panel-arranged .filters-fields-grid > .filters-row {
+  display: grid !important;
+  align-items: start !important;
+  gap: 18px 22px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: var(--cdr-filter-field-height) !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary {
+  grid-template-columns:
+    minmax(420px, 1.7fr)
+    minmax(210px, 0.8fr)
+    minmax(210px, 0.8fr)
+    minmax(210px, 0.8fr)
+    minmax(260px, 1fr)
+    minmax(330px, 1.35fr) !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+  grid-template-columns:
+    minmax(330px, 1.3fr)
+    minmax(320px, 1.15fr)
+    minmax(260px, 0.95fr)
+    minmax(260px, 0.95fr)
+    minmax(260px, 0.95fr)
+    minmax(0, 1fr) !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: var(--cdr-filter-label-height) var(--cdr-filter-control-height) !important;
+  row-gap: var(--cdr-filter-row-gap) !important;
+  align-items: start !important;
+  align-self: start !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: var(--cdr-filter-field-height) !important;
+  min-height: var(--cdr-filter-field-height) !important;
+  max-height: var(--cdr-filter-field-height) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+  flex: none !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > span,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > span,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > span,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > span {
+  grid-row: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: var(--cdr-filter-label-height) !important;
+  min-height: var(--cdr-filter-label-height) !important;
+  max-height: var(--cdr-filter-label-height) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: var(--cdr-filter-label-font-size) !important;
+  font-weight: 900 !important;
+  line-height: var(--cdr-filter-label-height) !important;
+  letter-spacing: 0.035em !important;
+  text-transform: uppercase !important;
+  color: #c7ecff !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > .multi-select-trigger,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > .multi-select-trigger {
+  grid-row: 2 !important;
+  align-self: start !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: var(--cdr-filter-control-height) !important;
+  min-height: var(--cdr-filter-control-height) !important;
+  max-height: var(--cdr-filter-control-height) !important;
+  margin: 0 !important;
+  border-radius: 14px !important;
+  box-sizing: border-box !important;
+  font-size: 18px !important;
+  font-weight: 850 !important;
+  line-height: var(--cdr-filter-control-height) !important;
+  color: #c7ecff !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  padding: 0 18px 0 58px !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input::placeholder,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input::placeholder {
+  font-size: 18px !important;
+  font-weight: 850 !important;
+  color: #a8d7f0 !important;
+  opacity: 1 !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > svg,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > svg {
+  position: absolute !important;
+  left: 20px !important;
+  top: calc(var(--cdr-filter-label-height) + var(--cdr-filter-row-gap) + ((var(--cdr-filter-control-height) - 18px) / 2)) !important;
+  bottom: auto !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  margin: 0 !important;
+  transform: none !important;
+  color: #65c9ff !important;
+  pointer-events: none !important;
+  z-index: 3 !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > .multi-select-trigger,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > .multi-select-trigger {
+  justify-content: space-between !important;
+  padding: 0 18px !important;
+  gap: 16px !important;
+  overflow: hidden !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .multi-select-value,
+body .app-shell .filters-panel.filters-panel-arranged .multi-select-value {
+  display: flex !important;
+  align-items: center !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 18px !important;
+  font-weight: 850 !important;
+  line-height: var(--cdr-filter-control-height) !important;
+  color: #c7ecff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .multi-select-trigger > svg,
+body .app-shell .filters-panel.filters-panel-arranged .multi-select-trigger > svg {
+  flex: 0 0 auto !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-actions-row,
+body .app-shell .filters-panel.filters-panel-arranged .filters-actions-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .reset-filter-button,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filter-count,
+body .app-shell .filters-panel.filters-panel-arranged .reset-filter-button,
+body .app-shell .filters-panel.filters-panel-arranged .filter-count {
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 1700px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(3, minmax(260px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(2, minmax(240px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 620px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* ============================================================
+   FINAL REQUESTED FILTER ROW ARRANGEMENT
+   Desktop layout:
+   Row 1 = 6 controls: Search, Region, Year, Month, Company, Base Station
+   Row 2 = 5 controls + Reset + Info: Talkgroup, Call Type, Radio Type, Encryption, Duplex Mode, Reset, Count
+   ============================================================ */
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged,
+body .app-shell .filters-panel.filters-panel-arranged {
+  --cdr-filter-label-height: 22px;
+  --cdr-filter-label-font-size: 16px;
+  --cdr-filter-control-height: 56px;
+  --cdr-filter-row-gap: 10px;
+  --cdr-filter-field-height: calc(var(--cdr-filter-label-height) + var(--cdr-filter-row-gap) + var(--cdr-filter-control-height));
+  display: block !important;
+  padding: 14px 18px !important;
+  overflow: visible !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-fields-grid,
+body .app-shell .filters-panel.filters-panel-arranged .filters-fields-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 18px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row {
+  display: grid !important;
+  align-items: start !important;
+  gap: 18px 20px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary {
+  grid-template-columns:
+    minmax(360px, 1.55fr)
+    minmax(160px, 0.72fr)
+    minmax(160px, 0.72fr)
+    minmax(160px, 0.72fr)
+    minmax(230px, 1fr)
+    minmax(280px, 1.18fr) !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+  grid-template-columns:
+    minmax(280px, 1.25fr)
+    minmax(280px, 1.15fr)
+    minmax(220px, 0.92fr)
+    minmax(220px, 0.92fr)
+    minmax(220px, 0.92fr)
+    minmax(158px, 0.64fr)
+    minmax(270px, 1.1fr) !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: var(--cdr-filter-label-height) var(--cdr-filter-control-height) !important;
+  row-gap: var(--cdr-filter-row-gap) !important;
+  align-items: start !important;
+  align-self: start !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: var(--cdr-filter-field-height) !important;
+  min-height: var(--cdr-filter-field-height) !important;
+  max-height: var(--cdr-filter-field-height) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  flex: none !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > span,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > span,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .filter-action-label,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > span,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > span,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .filter-action-label {
+  grid-row: 1 !important;
+  height: var(--cdr-filter-label-height) !important;
+  min-height: var(--cdr-filter-label-height) !important;
+  max-height: var(--cdr-filter-label-height) !important;
+  line-height: var(--cdr-filter-label-height) !important;
+  font-size: var(--cdr-filter-label-font-size) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.035em !important;
+  text-transform: uppercase !important;
+  color: #c7ecff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > .multi-select-trigger,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .reset-filter-button,
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .filter-count,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .multi-select-filter > .multi-select-trigger,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .reset-filter-button,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .filter-count {
+  grid-row: 2 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: var(--cdr-filter-control-height) !important;
+  min-height: var(--cdr-filter-control-height) !important;
+  max-height: var(--cdr-filter-control-height) !important;
+  display: flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  border-radius: 14px !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .reset-filter-button,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .reset-filter-button {
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0 14px !important;
+  white-space: nowrap !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .filter-count,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell > .filter-count {
+  justify-content: center !important;
+  padding: 0 14px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > input {
+  padding: 0 18px 0 58px !important;
+  line-height: normal !important;
+  font-size: 18px !important;
+  font-weight: 850 !important;
+  vertical-align: middle !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > svg,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .search-box.search-compact.cdr-filter-search > svg {
+  left: 20px !important;
+  top: calc(var(--cdr-filter-label-height) + var(--cdr-filter-row-gap) + ((var(--cdr-filter-control-height) - 18px) / 2)) !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-actions-row,
+body .app-shell .filters-panel.filters-panel-arranged .filters-actions-row {
+  display: none !important;
+}
+
+@media (max-width: 1500px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(3, minmax(240px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+

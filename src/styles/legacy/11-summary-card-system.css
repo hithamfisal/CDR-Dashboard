@@ -1,0 +1,289 @@
+﻿/* Summary card color systems. Source split from src/styles.css lines 3184-3471. */
+/* ============================================================
+   Professional summary-card color system
+   Purpose: replace random yellow/green usage with a consistent
+   operational color language across dashboard cards.
+
+   Color meaning:
+   Blue   = volume / totals
+   Purple = coverage / categories
+   Green  = active / good utilization
+   Amber  = peak / attention / busiest
+   Red    = inactive / risk
+   Cyan   = duration / traffic intensity
+   ============================================================ */
+
+.app-shell {
+  --card-blue: #0078d4;
+  --card-blue-soft: rgba(0, 120, 212, 0.14);
+  --card-purple: #6f5bd5;
+  --card-purple-soft: rgba(111, 91, 213, 0.14);
+  --card-green: #16a34a;
+  --card-green-soft: rgba(22, 163, 74, 0.14);
+  --card-amber: #f59e0b;
+  --card-amber-soft: rgba(245, 158, 11, 0.16);
+  --card-red: #dc2626;
+  --card-red-soft: rgba(220, 38, 38, 0.14);
+  --card-cyan: #0891b2;
+  --card-cyan-soft: rgba(8, 145, 178, 0.14);
+}
+
+/* Base summary-card system surface */
+.app-shell .summary-card {
+  position: relative !important;
+  border-left: 5px solid var(--system-card-color, var(--card-blue)) !important;
+  border-color: color-mix(in srgb, var(--system-card-color, var(--card-blue)) 44%, transparent) !important;
+  background:
+    linear-gradient(180deg, var(--system-card-soft, var(--card-blue-soft)), transparent 58%),
+    var(--theme-card-bg, #071c2a) !important;
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.app-shell.light-background-theme .summary-card {
+  background:
+    linear-gradient(180deg, var(--system-card-soft, var(--card-blue-soft)), transparent 62%),
+    #ffffff !important;
+  box-shadow:
+    0 12px 28px rgba(17, 86, 128, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86) !important;
+}
+
+/* Header strip inherits the card meaning color */
+.app-shell .summary-card > span:first-child,
+.app-shell .summary-card.yellow > span:first-child,
+.app-shell .summary-card.green > span:first-child,
+.app-shell.dark-background-theme .summary-card.yellow span,
+.app-shell.light-background-theme .summary-card.yellow span,
+.app-shell.dark-background-theme .summary-card.green span,
+.app-shell.light-background-theme .summary-card.green span {
+  background: var(--system-card-color, var(--card-blue)) !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+.app-shell .summary-card strong {
+  color: var(--theme-text, #f4fbff) !important;
+}
+
+.app-shell.light-background-theme .summary-card strong {
+  color: #092033 !important;
+}
+
+.app-shell .summary-card small {
+  color: var(--theme-muted, #a8c8d8) !important;
+}
+
+/* Main summary arrangement: 5-column color language */
+.app-shell .summary-cards-arranged .summary-card:nth-child(1) {
+  --system-card-color: var(--card-blue);
+  --system-card-soft: var(--card-blue-soft);
+}
+
+/* Coverage / category cards */
+.app-shell .summary-cards-arranged .summary-card:nth-child(2),
+.app-shell .summary-cards-arranged .summary-card:nth-child(3),
+.app-shell .summary-cards-arranged .summary-card:nth-child(5),
+.app-shell .summary-cards-arranged .summary-card:nth-child(6) {
+  --system-card-color: var(--card-purple);
+  --system-card-soft: var(--card-purple-soft);
+}
+
+/* Active resources */
+.app-shell .summary-cards-arranged .summary-card:nth-child(4),
+.app-shell .summary-cards-arranged .summary-card:nth-child(10),
+.app-shell .summary-cards-arranged .summary-card:nth-child(17),
+.app-shell .summary-cards-arranged .summary-card:nth-child(20),
+.app-shell .summary-cards-arranged .summary-card:nth-child(22) {
+  --system-card-color: var(--card-green);
+  --system-card-soft: var(--card-green-soft);
+}
+
+/* Duration and traffic cards */
+.app-shell .summary-cards-arranged .summary-card:nth-child(7),
+.app-shell .summary-cards-arranged .summary-card:nth-child(8),
+.app-shell .summary-cards-arranged .summary-card:nth-child(9),
+.app-shell .summary-cards-arranged .summary-card:nth-child(26),
+.app-shell .summary-cards-arranged .summary-card:nth-child(27),
+.app-shell .summary-cards-arranged .summary-card:nth-child(28) {
+  --system-card-color: var(--card-cyan);
+  --system-card-soft: var(--card-cyan-soft);
+}
+
+/* Peak / busiest cards */
+.app-shell .summary-cards-arranged .summary-card:nth-child(11),
+.app-shell .summary-cards-arranged .summary-card:nth-child(12),
+.app-shell .summary-cards-arranged .summary-card:nth-child(13),
+.app-shell .summary-cards-arranged .summary-card:nth-child(14),
+.app-shell .summary-cards-arranged .summary-card:nth-child(15),
+.app-shell .summary-cards-arranged .summary-card:nth-child(16),
+.app-shell .summary-cards-arranged .summary-card:nth-child(18),
+.app-shell .summary-cards-arranged .summary-card:nth-child(19),
+.app-shell .summary-cards-arranged .summary-card:nth-child(21),
+.app-shell .summary-cards-arranged .summary-card:nth-child(23),
+.app-shell .summary-cards-arranged .summary-card:nth-child(24),
+.app-shell .summary-cards-arranged .summary-card:nth-child(25) {
+  --system-card-color: var(--card-amber);
+  --system-card-soft: var(--card-amber-soft);
+}
+
+/* Network utilization cards */
+.app-shell .network-utilization-cards .summary-card:nth-child(1) {
+  --system-card-color: var(--card-purple);
+  --system-card-soft: var(--card-purple-soft);
+}
+.app-shell .network-utilization-cards .summary-card:nth-child(2),
+.app-shell .network-utilization-cards .summary-card:nth-child(4) {
+  --system-card-color: var(--card-green);
+  --system-card-soft: var(--card-green-soft);
+}
+.app-shell .network-utilization-cards .summary-card:nth-child(3) {
+  --system-card-color: var(--card-red);
+  --system-card-soft: var(--card-red-soft);
+}
+.app-shell .network-utilization-cards .summary-card:nth-child(5) {
+  --system-card-color: var(--card-cyan);
+  --system-card-soft: var(--card-cyan-soft);
+}
+
+/* Traffic-intensity cards */
+.app-shell .traffic-intensity-cards .summary-card:nth-child(1),
+.app-shell .traffic-intensity-cards .summary-card:nth-child(2) {
+  --system-card-color: var(--card-amber);
+  --system-card-soft: var(--card-amber-soft);
+}
+.app-shell .traffic-intensity-cards .summary-card:nth-child(3),
+.app-shell .traffic-intensity-cards .summary-card:nth-child(4),
+.app-shell .traffic-intensity-cards .summary-card:nth-child(5) {
+  --system-card-color: var(--card-cyan);
+  --system-card-soft: var(--card-cyan-soft);
+}
+
+/* Hover makes the system color visible but still professional */
+.app-shell .summary-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: var(--system-card-color, var(--card-blue)) !important;
+  box-shadow:
+    0 18px 38px color-mix(in srgb, var(--system-card-color, var(--card-blue)) 18%, transparent),
+    0 14px 34px rgba(0, 0, 0, 0.20) !important;
+}
+
+/* Fallback for browsers that do not support color-mix fully */
+@supports not (color: color-mix(in srgb, red 50%, white)) {
+  .app-shell .summary-card {
+    border-color: var(--system-card-color, #0078d4) !important;
+  }
+}
+
+
+/* ============================================================
+   NON-SEMANTIC CARD COLOR SYSTEM
+   Purpose: card colors are now a repeated visual palette by
+   position, not by topic/metric meaning.
+   Place after all previous summary-card color rules.
+   ============================================================ */
+
+.app-shell .summary-cards {
+  --card-palette-1: #0078d4;
+  --card-palette-2: #00a6a6;
+  --card-palette-3: #6f5bd5;
+  --card-palette-4: #ffb000;
+  --card-palette-5: #65c18c;
+  --card-palette-6: #d95f5f;
+}
+
+/* Reset old topic/semantic coloring so every card follows only position. */
+.app-shell .summary-cards .summary-card,
+.app-shell .summary-cards .summary-card.yellow,
+.app-shell .summary-cards .summary-card.green,
+.app-shell .summary-cards .summary-card.blue,
+.app-shell .summary-cards .summary-card.red,
+.app-shell .summary-cards .summary-card.amber,
+.app-shell .summary-cards .summary-card.cyan,
+.app-shell .summary-cards .summary-card.purple {
+  --summary-accent: var(--card-palette-1);
+  border-color: color-mix(in srgb, var(--summary-accent) 46%, transparent) !important;
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.20),
+    inset 0 0 0 1px color-mix(in srgb, var(--summary-accent) 18%, transparent) !important;
+}
+
+/* Repeating visual palette: 1 to 6, then repeat. */
+.app-shell .summary-cards .summary-card:nth-child(6n + 1) { --summary-accent: var(--card-palette-1); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 2) { --summary-accent: var(--card-palette-2); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 3) { --summary-accent: var(--card-palette-3); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 4) { --summary-accent: var(--card-palette-4); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 5) { --summary-accent: var(--card-palette-5); }
+.app-shell .summary-cards .summary-card:nth-child(6n + 6) { --summary-accent: var(--card-palette-6); }
+
+/* Card surface: light and dark both get the same ordered accent language. */
+.app-shell.dark-background-theme .summary-cards .summary-card {
+  background:
+    linear-gradient(180deg, rgba(9, 32, 48, 0.98), rgba(4, 18, 28, 0.98)) !important;
+  border-left: 5px solid var(--summary-accent) !important;
+}
+
+.app-shell.light-background-theme .summary-cards .summary-card,
+.app-shell.se-theme.light-background-theme .summary-cards .summary-card {
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f6fbff 100%) !important;
+  border-left: 5px solid var(--summary-accent) !important;
+  box-shadow:
+    0 12px 26px rgba(17, 86, 128, 0.12),
+    inset 0 0 0 1px rgba(255,255,255,0.80) !important;
+}
+
+/* Header strip: position-based accent, not topic-based classes. */
+.app-shell .summary-cards .summary-card > span,
+.app-shell .summary-cards .summary-card.yellow > span,
+.app-shell .summary-cards .summary-card.green > span,
+.app-shell .summary-cards .summary-card.blue > span,
+.app-shell .summary-cards .summary-card.red > span,
+.app-shell .summary-cards .summary-card.amber > span,
+.app-shell .summary-cards .summary-card.cyan > span,
+.app-shell .summary-cards .summary-card.purple > span {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--summary-accent) 82%, #ffffff 18%),
+    var(--summary-accent)
+  ) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.24) !important;
+}
+
+/* Strong number uses neutral text; accent remains on border/header only. */
+.app-shell.dark-background-theme .summary-cards .summary-card strong {
+  color: #f8fdff !important;
+}
+
+.app-shell.light-background-theme .summary-cards .summary-card strong,
+.app-shell.se-theme.light-background-theme .summary-cards .summary-card strong {
+  color: #092033 !important;
+}
+
+.app-shell .summary-cards .summary-card small,
+.app-shell .summary-cards .summary-card p {
+  color: var(--theme-muted) !important;
+}
+
+/* Subtle hover follows the same ordered accent. */
+.app-shell .summary-cards .summary-card:hover {
+  border-color: var(--summary-accent) !important;
+  transform: translateY(-2px);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.app-shell.dark-background-theme .summary-cards .summary-card:hover {
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.34),
+    0 0 0 1px color-mix(in srgb, var(--summary-accent) 30%, transparent) inset !important;
+}
+
+.app-shell.light-background-theme .summary-cards .summary-card:hover,
+.app-shell.se-theme.light-background-theme .summary-cards .summary-card:hover {
+  box-shadow:
+    0 18px 38px rgba(17, 86, 128, 0.16),
+    0 0 0 1px color-mix(in srgb, var(--summary-accent) 24%, transparent) inset !important;
+}
+

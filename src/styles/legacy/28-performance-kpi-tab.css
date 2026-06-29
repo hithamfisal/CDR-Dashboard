@@ -1,0 +1,650 @@
+﻿/* Performance and KPI hub layout. Source split from src/styles.css lines 15544-16192. */
+/* Final V6 polish: Performance & KPI tab */
+.app-shell.active-tab-kpi .kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(10px, 0.72vw, 14px) !important;
+  margin-bottom: clamp(12px, 0.9vw, 18px) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card {
+  grid-column: 1 / -1 !important;
+  padding: clamp(10px, 0.72vw, 14px) !important;
+  overflow: hidden !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card .records-scroll {
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(116, 181, 214, 0.18) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th,
+.app-shell.active-tab-kpi .kpi-measurements-table td {
+  height: 31px !important;
+  padding: 6px 9px !important;
+  border: 1px solid rgba(116, 181, 214, 0.18) !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th {
+  font-size: clamp(11px, 0.7vw, 13px) !important;
+  font-weight: 950 !important;
+  background: rgba(72, 196, 255, 0.1) !important;
+  color: var(--theme-text, #edf8ff) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table td {
+  font-size: clamp(10px, 0.6vw, 12px) !important;
+  font-weight: 450 !important;
+  color: var(--theme-text, #f4fbff) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th:first-child,
+.app-shell.active-tab-kpi .kpi-measurements-table td:first-child {
+  text-align: left !important;
+  min-width: 170px !important;
+  max-width: 260px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card,
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card {
+  min-height: 430px !important;
+  padding: clamp(11px, 0.78vw, 15px) !important;
+  border-radius: 10px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card h3,
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card h3 {
+  margin-bottom: 4px !important;
+  font-size: clamp(15px, 0.98vw, 18px) !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card p,
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card p {
+  margin: 0 0 8px !important;
+  color: var(--theme-muted, #9fb7c8) !important;
+  font-size: clamp(10px, 0.62vw, 12px) !important;
+  font-weight: 750 !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+}
+
+.app-shell.active-tab-kpi .kpi-average-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-calls-duration-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-monthly-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-total-avg-card .recharts-responsive-container {
+  min-height: 350px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-calls-duration-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-monthly-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-total-avg-card .recharts-responsive-container {
+  min-height: 400px !important;
+}
+
+.app-shell.active-tab-kpi .chart-legend,
+.app-shell.active-tab-kpi .company-color-legend {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 7px 12px !important;
+  margin-top: 6px !important;
+  font-size: clamp(10px, 0.62vw, 12px) !important;
+}
+
+.app-shell.active-tab-kpi .Company-pie-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 170px) !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.app-shell.active-tab-kpi .Company-pie-layout .recharts-responsive-container {
+  width: 100% !important;
+}
+
+.app-shell.active-tab-kpi .kpi-total-avg-legend {
+  align-self: center !important;
+  max-height: 390px !important;
+  overflow: auto !important;
+  justify-content: flex-start !important;
+}
+
+.app-shell.active-tab-kpi .performance-chart-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(10px, 0.72vw, 14px) !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card {
+  grid-column: span 2 !important;
+  min-height: 470px !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card .recharts-responsive-container {
+  min-height: 386px !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card .chart-legend {
+  justify-content: center !important;
+}
+
+.app-shell.active-tab-kpi .recharts-wrapper text {
+  paint-order: stroke !important;
+  stroke: rgba(3, 12, 20, 0.55) !important;
+  stroke-width: 2px !important;
+  stroke-linejoin: round !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi .kpi-measurements-table th {
+  background: rgba(0, 127, 200, 0.11) !important;
+  color: #092033 !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi .kpi-measurements-table td,
+.app-shell.light-background-theme.active-tab-kpi .kpi-grid > .chart-card p,
+.app-shell.light-background-theme.active-tab-kpi .performance-chart-grid > .chart-card p {
+  color: #24485b !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi .recharts-wrapper text {
+  stroke: rgba(255, 255, 255, 0.65) !important;
+}
+
+@media (max-width: 1280px) {
+  .app-shell.active-tab-kpi .performance-chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell.active-tab-kpi .region-radar-card {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .app-shell.active-tab-kpi .kpi-grid,
+  .app-shell.active-tab-kpi .performance-chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell.active-tab-kpi .Company-pie-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Final V6 KPI Hub layout: reference-style analytics board */
+.app-shell.active-tab-kpi #kpi.section-title,
+.app-shell.active-tab-kpi #Performance.section-title {
+  align-items: center !important;
+  margin: clamp(8px, 0.62vw, 12px) 0 8px !important;
+  padding: 8px 12px !important;
+  min-height: 38px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(72, 196, 255, 0.26) !important;
+  background:
+    linear-gradient(90deg, rgba(18, 159, 216, 0.25), rgba(4, 22, 35, 0.86) 34%, rgba(4, 22, 35, 0.94)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.18) !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-heading,
+.app-shell.active-tab-kpi #Performance .section-title-heading {
+  align-items: center !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-copy,
+.app-shell.active-tab-kpi #Performance .section-title-copy {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-copy p,
+.app-shell.active-tab-kpi #Performance .section-title-copy p {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  background: linear-gradient(135deg, #22d3ee, #3b82f6) !important;
+  color: #03131f !important;
+  font-weight: 950 !important;
+  font-size: 14px !important;
+  letter-spacing: 0 !important;
+  line-height: 1 !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-copy h2,
+.app-shell.active-tab-kpi #Performance .section-title-copy h2 {
+  margin: 0 !important;
+  color: var(--theme-text, #edf8ff) !important;
+  font-size: clamp(17px, 1.12vw, 23px) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.015em !important;
+  line-height: 1.05 !important;
+  text-transform: uppercase !important;
+}
+
+.app-shell.active-tab-kpi #kpi .section-title-copy span,
+.app-shell.active-tab-kpi #Performance .section-title-copy span {
+  margin-left: auto !important;
+  color: var(--theme-muted, #a7c1d2) !important;
+  font-size: clamp(10px, 0.62vw, 12px) !important;
+  font-weight: 750 !important;
+  line-height: 1.2 !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid {
+  grid-template-columns: minmax(360px, 1.25fr) minmax(245px, 0.82fr) minmax(275px, 0.93fr) !important;
+  grid-template-areas:
+    "kpiTable kpiAvg kpiCalls"
+    "kpiMonthly kpiMonthly kpiDonut" !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+  margin-bottom: 10px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card {
+  grid-area: kpiTable !important;
+  grid-column: auto !important;
+  min-height: 330px !important;
+  padding: 10px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-average-card {
+  grid-area: kpiAvg !important;
+  min-height: 330px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-calls-duration-card {
+  grid-area: kpiCalls !important;
+  min-height: 330px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-monthly-card {
+  grid-area: kpiMonthly !important;
+  min-height: 410px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-total-avg-card {
+  grid-area: kpiDonut !important;
+  min-height: 410px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card,
+.app-shell.active-tab-kpi .kpi-measurements-table-card {
+  padding: 10px !important;
+  border-radius: 8px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card h3,
+.app-shell.active-tab-kpi .kpi-measurements-table-card h3 {
+  margin-bottom: 5px !important;
+  font-size: clamp(12px, 0.78vw, 15px) !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+}
+
+.app-shell.active-tab-kpi .kpi-grid > .chart-card p {
+  margin-bottom: 5px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table-card .records-scroll {
+  max-height: 286px !important;
+  overflow: auto !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th,
+.app-shell.active-tab-kpi .kpi-measurements-table td {
+  height: 27px !important;
+  padding: 5px 7px !important;
+  font-size: clamp(9.5px, 0.55vw, 11.5px) !important;
+}
+
+.app-shell.active-tab-kpi .kpi-measurements-table th:first-child,
+.app-shell.active-tab-kpi .kpi-measurements-table td:first-child {
+  min-width: 150px !important;
+  max-width: 230px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-average-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-calls-duration-card .recharts-responsive-container {
+  min-height: 275px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-monthly-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .kpi-total-avg-card .recharts-responsive-container {
+  min-height: 355px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-total-avg-card .Company-pie-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(128px, 170px) !important;
+  gap: 8px !important;
+}
+
+.app-shell.active-tab-kpi .kpi-total-avg-legend {
+  max-height: 346px !important;
+}
+
+.app-shell.active-tab-kpi .performance-chart-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
+  gap: 10px !important;
+}
+
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card {
+  min-height: 360px !important;
+  padding: 10px !important;
+  border-radius: 8px !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card {
+  grid-column: auto !important;
+  min-height: 390px !important;
+}
+
+.app-shell.active-tab-kpi .region-radar-card .recharts-responsive-container,
+.app-shell.active-tab-kpi .performance-chart-grid .recharts-responsive-container {
+  min-height: 300px !important;
+}
+
+.app-shell.active-tab-kpi .performance-chart-grid > .chart-card h3 {
+  font-size: clamp(12px, 0.78vw, 15px) !important;
+  text-transform: uppercase !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi #kpi.section-title,
+.app-shell.light-background-theme.active-tab-kpi #Performance.section-title {
+  background:
+    linear-gradient(90deg, rgba(14, 165, 233, 0.18), rgba(255, 255, 255, 0.94) 34%, rgba(235, 248, 255, 0.96)) !important;
+  border-color: rgba(0, 111, 174, 0.2) !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi #kpi .section-title-copy h2,
+.app-shell.light-background-theme.active-tab-kpi #Performance .section-title-copy h2 {
+  color: #092033 !important;
+}
+
+.app-shell.light-background-theme.active-tab-kpi #kpi .section-title-copy span,
+.app-shell.light-background-theme.active-tab-kpi #Performance .section-title-copy span {
+  color: #315d73 !important;
+}
+
+@media (max-width: 1280px) {
+  .app-shell.active-tab-kpi .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-areas:
+      "kpiTable kpiTable"
+      "kpiAvg kpiCalls"
+      "kpiMonthly kpiDonut" !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell.active-tab-kpi .kpi-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "kpiTable"
+      "kpiAvg"
+      "kpiCalls"
+      "kpiMonthly"
+      "kpiDonut" !important;
+  }
+
+  .app-shell.active-tab-kpi .performance-chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* CDR SaaS command-center redesign: preserve all 30 KPI cards */
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner {
+  min-height: 90px !important;
+  height: 90px !important;
+  grid-template-rows: 90px !important;
+  background: #0A0F1A !important;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.34) !important;
+  border-bottom: 1px solid rgba(31,41,55,0.9) !important;
+}
+
+.app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-topbar.cdr-navy-banner > .cdr-banner-art .cdr-banner-svg {
+  min-height: 90px !important;
+  height: 90px !important;
+}
+
+.app-shell.active-tab-overview .followup-dashboard-title h1 {
+  font-size: clamp(1.8rem, 2.1vw, 2.8rem) !important;
+  color: #ffffff !important;
+}
+
+.app-shell.active-tab-overview .followup-dashboard-title p {
+  color: #9CA3AF !important;
+  font-size: 0.76rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: none !important;
+}
+
+.app-shell.active-tab-overview .dashboard-tabs,
+.app-shell.active-tab-overview .filters-card,
+.app-shell.active-tab-overview .filter-panel,
+.app-shell.active-tab-overview .dashboard-filters {
+  background: rgba(10,15,26,0.92) !important;
+  border-color: rgba(31,41,55,0.95) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.24) !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-overview {
+  gap: 14px !important;
+  color: #ffffff !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-profile-band {
+  grid-template-columns: minmax(320px, 0.9fr) minmax(460px, 1.3fr) !important;
+  gap: 12px !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-main,
+.app-shell.active-tab-overview .modern-profile-card,
+.app-shell.active-tab-overview .modern-panel,
+.app-shell.active-tab-overview .modern-quality-tile,
+.app-shell.active-tab-overview .modern-record-card,
+.app-shell.active-tab-overview .modern-stat-tile {
+  background: #111827 !important;
+  border: 1px solid #1F2937 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.045) !important;
+}
+
+.app-shell.active-tab-overview .modern-profile-main,
+.app-shell.active-tab-overview .modern-profile-card {
+  min-height: 102px !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 {
+  display: grid !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile {
+  min-height: 78px !important;
+  padding: 8px 7px !important;
+  align-content: center !important;
+  gap: 4px !important;
+  border-radius: 14px !important;
+  background: #111827 !important;
+  color: #06B6D4 !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-icon {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #2563EB, #06B6D4) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(6,182,212,0.22) !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile span {
+  color: #9CA3AF !important;
+  font-size: 10px !important;
+  letter-spacing: 0.02em !important;
+}
+
+.app-shell.active-tab-overview .cdr-kpi-strip-30 .modern-stat-tile strong {
+  color: #ffffff !important;
+  font-size: clamp(13px, 0.95vw, 19px) !important;
+  line-height: 1 !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-overview-grid {
+  grid-template-columns: minmax(0, 1.65fr) minmax(360px, 0.85fr) !important;
+  grid-template-areas: "volume distribution" !important;
+  gap: 14px !important;
+}
+
+.app-shell.active-tab-overview .cdr-overview-volume { grid-area: volume !important; }
+.app-shell.active-tab-overview .cdr-overview-distribution { grid-area: distribution !important; }
+
+.app-shell.active-tab-overview .cdr-overview-volume,
+.app-shell.active-tab-overview .cdr-overview-distribution {
+  min-height: 345px !important;
+  height: auto !important;
+  padding: 16px !important;
+}
+
+.app-shell.active-tab-overview .modern-panel-head h3 {
+  color: #ffffff !important;
+  font-size: 15px !important;
+  letter-spacing: 0.01em !important;
+}
+
+.app-shell.active-tab-overview .modern-panel-menu { color: #9CA3AF !important; }
+
+.app-shell.active-tab-overview .cdr-performance-matrix-panel {
+  min-height: 0 !important;
+  padding: 16px !important;
+}
+
+.app-shell.active-tab-overview .cdr-performance-matrix-wrap,
+.app-shell.active-tab-overview .cdr-behavior-panel .modern-table-wrap {
+  overflow-x: auto !important;
+}
+
+.app-shell.active-tab-overview .cdr-performance-matrix-table,
+.app-shell.active-tab-overview .cdr-behavior-table {
+  min-width: 100% !important;
+  table-layout: auto !important;
+}
+
+.app-shell.active-tab-overview .modern-table th {
+  background: #1E293B !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+}
+
+.app-shell.active-tab-overview .modern-table td {
+  color: #E5E7EB !important;
+}
+
+.app-shell.active-tab-overview .modern-table tbody tr:hover td {
+  background: #1E293B !important;
+}
+
+.app-shell.active-tab-overview .cdr-deep-dive-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-areas: none !important;
+  gap: 14px !important;
+}
+
+.app-shell.active-tab-overview .cdr-deep-dive-grid .modern-panel {
+  min-height: 335px !important;
+  height: auto !important;
+  padding: 14px !important;
+  display: block !important;
+}
+
+.app-shell.active-tab-overview .cdr-split-chart {
+  display: grid !important;
+  grid-template-columns: minmax(120px, 0.75fr) minmax(160px, 1fr) !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-areas: none !important;
+  gap: 14px !important;
+}
+
+.app-shell.active-tab-overview .cdr-top-entities-grid .modern-panel {
+  min-height: 360px !important;
+  height: auto !important;
+  padding: 14px !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+}
+
+.app-shell.active-tab-overview .cdr-behavior-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.app-shell.active-tab-overview .cdr-behavior-panel {
+  min-height: 320px !important;
+  padding: 14px !important;
+}
+
+.app-shell.active-tab-overview .cdr-quality-footer-strip {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(190px, 1fr) !important;
+  gap: 8px !important;
+}
+
+.app-shell.active-tab-overview .cdr-quality-footer-strip .modern-quality-tile,
+.app-shell.active-tab-overview .cdr-quality-footer-strip .modern-record-card {
+  min-height: 64px !important;
+  height: auto !important;
+}
+
+.app-shell.active-tab-overview .cdr-saas-footer {
+  min-height: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  background: #0A0F1A !important;
+  border: 1px solid #1F2937 !important;
+  color: #6B7280 !important;
+  justify-content: space-between !important;
+}
+
+@media (max-width: 1450px) {
+  .app-shell.active-tab-overview .cdr-kpi-strip-30 { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+  .app-shell.active-tab-overview .cdr-deep-dive-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+
+@media (max-width: 1100px) {
+  .app-shell.active-tab-overview .cdr-saas-profile-band,
+  .app-shell.active-tab-overview .cdr-saas-overview-grid,
+  .app-shell.active-tab-overview .cdr-top-entities-grid,
+  .app-shell.active-tab-overview .cdr-behavior-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: none !important;
+  }
+  .app-shell.active-tab-overview .cdr-kpi-strip-30 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+

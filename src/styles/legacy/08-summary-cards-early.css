@@ -1,0 +1,103 @@
+﻿/* Early summary card row arrangements. Source split from src/styles.css lines 2446-2547. */
+/* ============================================================
+   Summary cards perfect arrangement
+   First row: Calls -> Regions -> Companies -> Radios -> Talkgroups -> Base Stations
+   ============================================================ */
+
+.summary-cards.summary-cards-arranged {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+}
+
+.summary-cards-arranged .summary-card {
+  min-height: 74px !important;
+}
+
+.summary-cards-arranged .summary-card-primary {
+  border-color: rgba(0, 120, 212, 0.56) !important;
+  box-shadow: 0 16px 36px rgba(0, 120, 212, 0.18) !important;
+}
+
+.summary-cards-arranged .summary-card small {
+  display: block !important;
+  margin-top: 5px !important;
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+  font-weight: 800 !important;
+  color: var(--theme-muted) !important;
+  opacity: 0.95 !important;
+}
+
+@media (max-width: 1480px) {
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ============================================================
+   Summary cards: 5 cards per row
+   Desktop: 5 per row
+   Large tablet: 4 per row
+   Tablet: 3 per row
+   Mobile: 2 per row
+   Small mobile: 1 per row
+   ============================================================ */
+
+.summary-cards,
+.summary-cards.summary-cards-arranged {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.summary-cards-arranged .summary-card,
+.summary-cards .summary-card {
+  min-width: 0 !important;
+}
+
+@media (max-width: 1480px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .summary-cards,
+  .summary-cards.summary-cards-arranged {
+    grid-template-columns: 1fr !important;
+  }
+}
+

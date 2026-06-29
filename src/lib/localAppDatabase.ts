@@ -1,3 +1,5 @@
+import type { ThemeName } from "../types/dashboard";
+
 export type PortalRole = "admin" | "customerAdmin" | "customer";
 
 export type LocalCredential = {
@@ -23,6 +25,11 @@ export type LocalAppSettings = {
   uploadHeroImageDataUrl: string;
   radioShowcaseImageName: string;
   radioShowcaseImageDataUrl: string;
+  defaultTheme: ThemeName;
+  showSampleDataButton: boolean;
+  headerLogoSize: number;
+  headerTitleScale: number;
+  compactDashboardLayout: boolean;
   supportEmail: string;
   supportPhone: string;
   primaryColor: string;
@@ -37,8 +44,8 @@ export const DEFAULT_LOCAL_SETTINGS: LocalAppSettings = {
   customerPortalTitle: "CDR Customer View",
   customerPortalDescription:
     "Customer access: upload sheets, load sample data, continue previous workbooks, view all dashboard tabs and use fleetmap files. Admin Settings and system admin controls are hidden.",
-  dashboardHeaderTitle: "CDR Traffic Intelligence Dashboard",
-  dashboardHeaderDescription: "CALL DETAIL RECORD ANALYTICS – LIVE INSIGHTS",
+  dashboardHeaderTitle: "CDR Traffic Intelligence Analyzer",
+  dashboardHeaderDescription: "CALL DETAIL RECORD ANALYTICS - LIVE INSIGHTS",
   leftLogoName: "Left Logo",
   leftLogoDataUrl: "",
   rightLogoName: "Right Logo",
@@ -47,6 +54,11 @@ export const DEFAULT_LOCAL_SETTINGS: LocalAppSettings = {
   uploadHeroImageDataUrl: "",
   radioShowcaseImageName: "Radio Showcase Picture",
   radioShowcaseImageDataUrl: "",
+  defaultTheme: "proposal3",
+  showSampleDataButton: true,
+  headerLogoSize: 66,
+  headerTitleScale: 1,
+  compactDashboardLayout: false,
   supportEmail: "support@example.com",
   supportPhone: "+966 000 000 000",
   primaryColor: "#2563eb",
@@ -54,9 +66,9 @@ export const DEFAULT_LOCAL_SETTINGS: LocalAppSettings = {
 };
 
 const DEFAULT_CREDENTIAL_INPUTS: Record<PortalRole, { username: string; password: string }> = {
-  admin: { username: "admin", password: "Admin@12345" },
-  customerAdmin: { username: "customeradmin", password: "CustomerAdmin@12345" },
-  customer: { username: "customer", password: "Customer@12345" },
+  admin: { username: "admin", password: "" },
+  customerAdmin: { username: "customeradmin", password: "" },
+  customer: { username: "customer", password: "" },
 };
 
 function getApiBase() {
@@ -86,13 +98,18 @@ function setSessionToken(token: string) {
 
 async function apiJson<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getSessionToken();
-  const response = await fetch(`${getApiBase()}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { "X-CDR-Session": token } : {}),
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getApiBase()}${path}`, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { "X-CDR-Session": token } : {}),
+      },
+    });
+  } catch {
+    throw new Error("Dashboard service is not reachable. Check the API app, internet connection, and api.cdr.hitham.app status.");
+  }
 
   let payload: unknown = null;
   try {
@@ -105,39 +122,31 @@ async function apiJson<T>(path: string, init?: RequestInit): Promise<T> {
     const message =
       payload && typeof payload === "object" && "error" in payload
         ? String((payload as { error?: unknown }).error)
-        : `MySQL API request failed (${response.status})`;
+        : `Dashboard service request failed (${response.status})`;
     throw new Error(message);
   }
 
   return payload as T;
 }
 
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const hashBuffer = await window.crypto.subtle.digest("SHA-256", encoder.encode(password));
-  return Array.from(new Uint8Array(hashBuffer))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-async function buildDefaultCredentials(): Promise<Record<PortalRole, LocalCredential>> {
+function buildDefaultCredentials(): Record<PortalRole, LocalCredential> {
   return {
     admin: {
       role: "admin",
       username: DEFAULT_CREDENTIAL_INPUTS.admin.username,
-      passwordHash: await hashPassword(DEFAULT_CREDENTIAL_INPUTS.admin.password),
+      passwordHash: "",
       updatedAt: new Date().toISOString(),
     },
     customerAdmin: {
       role: "customerAdmin",
       username: DEFAULT_CREDENTIAL_INPUTS.customerAdmin.username,
-      passwordHash: await hashPassword(DEFAULT_CREDENTIAL_INPUTS.customerAdmin.password),
+      passwordHash: "",
       updatedAt: new Date().toISOString(),
     },
     customer: {
       role: "customer",
       username: DEFAULT_CREDENTIAL_INPUTS.customer.username,
-      passwordHash: await hashPassword(DEFAULT_CREDENTIAL_INPUTS.customer.password),
+      passwordHash: "",
       updatedAt: new Date().toISOString(),
     },
   };
@@ -150,7 +159,7 @@ export async function ensureLocalAppDatabase(): Promise<{
   const result = await apiJson<{ settings: Partial<LocalAppSettings> }>("/app/bootstrap");
   return {
     settings: { ...DEFAULT_LOCAL_SETTINGS, ...(result.settings ?? {}) },
-    credentials: await buildDefaultCredentials(),
+    credentials: buildDefaultCredentials(),
   };
 }
 

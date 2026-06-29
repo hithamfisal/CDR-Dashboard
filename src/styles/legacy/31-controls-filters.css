@@ -1,0 +1,847 @@
+﻿/* Control bar, filters, typography, and table text policy. Source split from src/styles.css lines 18016-18863. */
+/* ============================================================
+   RESET FILTER WIDTH MINIMIZED PATCH
+   Keeps requested Row 1 = 6 controls and Row 2 = 5 controls + compact Reset + Info.
+   Reset button is a small action cell, not a full dropdown-width control.
+   ============================================================ */
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+  grid-template-columns:
+    minmax(280px, 1.25fr)
+    minmax(260px, 1.05fr)
+    minmax(220px, 0.9fr)
+    minmax(220px, 0.9fr)
+    minmax(220px, 0.9fr)
+    116px
+    minmax(260px, 1fr) !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-reset-cell,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-reset-cell {
+  width: 116px !important;
+  min-width: 116px !important;
+  max-width: 116px !important;
+  justify-self: start !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-reset-cell > .reset-filter-button,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-reset-cell > .reset-filter-button {
+  width: 116px !important;
+  min-width: 116px !important;
+  max-width: 116px !important;
+  justify-content: center !important;
+  padding: 0 10px !important;
+  gap: 6px !important;
+  font-size: 13px !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-info-cell,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-info-cell {
+  min-width: 260px !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-info-cell > .filter-count,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-info-cell > .filter-count {
+  min-width: 260px !important;
+  padding: 0 12px !important;
+}
+
+@media (max-width: 1500px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-reset-cell,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-reset-cell,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-reset-cell > .reset-filter-button,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row > .filter-action-cell.cdr-filter-reset-cell > .reset-filter-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ============================================================
+   FINAL PROJECT-WIDE BUTTON + FILTER WIDTH CONTROL PATCH
+   Location: src/styles.css (very bottom)
+
+   Use this block to adjust widths/heights for all dashboard filter
+   dropdown buttons, Search, Reset, Info, and normal project action buttons.
+   It is intentionally placed last to override older filter/button CSS.
+   ============================================================ */
+body .app-shell,
+body .upload-shell {
+  --cdr-global-button-height: 44px;
+  --cdr-global-button-min-width: 116px;
+  --cdr-global-button-padding-x: 16px;
+  --cdr-global-button-radius: 14px;
+
+  --cdr-filter-search-width: 360px;
+  --cdr-filter-region-width: 180px;
+  --cdr-filter-year-width: 160px;
+  --cdr-filter-month-width: 160px;
+  --cdr-filter-company-width: 230px;
+  --cdr-filter-base-station-width: 300px;
+  --cdr-filter-talkgroup-width: 260px;
+  --cdr-filter-call-type-width: 260px;
+  --cdr-filter-radio-type-width: 220px;
+  --cdr-filter-encryption-width: 220px;
+  --cdr-filter-duplex-width: 220px;
+  --cdr-filter-reset-width: 116px;
+  --cdr-filter-info-width: 270px;
+}
+
+/* Normal project buttons: header actions, section buttons, export buttons, upload buttons, reports buttons. */
+body .app-shell .button,
+body .upload-shell .button,
+body .app-shell label.button,
+body .upload-shell label.button,
+body .app-shell .cdr-action-pill,
+body .app-shell .section-top-button,
+body .app-shell .export-button,
+body .app-shell .section-nav-button,
+body .upload-shell .followup-action-button,
+body .upload-shell .followup-theme-button,
+body .app-shell .generate-report-tile {
+  min-height: var(--cdr-global-button-height) !important;
+  min-width: var(--cdr-global-button-min-width) !important;
+  padding-left: var(--cdr-global-button-padding-x) !important;
+  padding-right: var(--cdr-global-button-padding-x) !important;
+  border-radius: var(--cdr-global-button-radius) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+/* Keep tiny icon/menu buttons from becoming large. */
+body .app-shell .modern-panel-menu,
+body .app-shell .section-title-arrow,
+body .app-shell .quick-card-export,
+body .app-shell .multi-select-clear {
+  min-height: unset !important;
+  min-width: unset !important;
+}
+
+/* Filter row columns: row 1 = 6 controls, row 2 = 5 controls + Reset + Info. */
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary {
+  grid-template-columns:
+    var(--cdr-filter-search-width)
+    var(--cdr-filter-region-width)
+    var(--cdr-filter-year-width)
+    var(--cdr-filter-month-width)
+    var(--cdr-filter-company-width)
+    var(--cdr-filter-base-station-width) !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+  grid-template-columns:
+    var(--cdr-filter-talkgroup-width)
+    var(--cdr-filter-call-type-width)
+    var(--cdr-filter-radio-type-width)
+    var(--cdr-filter-encryption-width)
+    var(--cdr-filter-duplex-width)
+    var(--cdr-filter-reset-width)
+    var(--cdr-filter-info-width) !important;
+}
+
+/* Individual filter/dropdown/search widths. Change the variables above, or override these directly. */
+body .app-shell .filters-panel-arranged .cdr-filter-search {
+  flex: 0 0 var(--cdr-filter-search-width) !important;
+  width: var(--cdr-filter-search-width) !important;
+  min-width: var(--cdr-filter-search-width) !important;
+  max-width: var(--cdr-filter-search-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-region {
+  flex: 0 0 var(--cdr-filter-region-width) !important;
+  width: var(--cdr-filter-region-width) !important;
+  min-width: var(--cdr-filter-region-width) !important;
+  max-width: var(--cdr-filter-region-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-year {
+  flex: 0 0 var(--cdr-filter-year-width) !important;
+  width: var(--cdr-filter-year-width) !important;
+  min-width: var(--cdr-filter-year-width) !important;
+  max-width: var(--cdr-filter-year-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-month {
+  flex: 0 0 var(--cdr-filter-month-width) !important;
+  width: var(--cdr-filter-month-width) !important;
+  min-width: var(--cdr-filter-month-width) !important;
+  max-width: var(--cdr-filter-month-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-company {
+  flex: 0 0 var(--cdr-filter-company-width) !important;
+  width: var(--cdr-filter-company-width) !important;
+  min-width: var(--cdr-filter-company-width) !important;
+  max-width: var(--cdr-filter-company-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-base-station {
+  flex: 0 0 var(--cdr-filter-base-station-width) !important;
+  width: var(--cdr-filter-base-station-width) !important;
+  min-width: var(--cdr-filter-base-station-width) !important;
+  max-width: var(--cdr-filter-base-station-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-talkgroup {
+  flex: 0 0 var(--cdr-filter-talkgroup-width) !important;
+  width: var(--cdr-filter-talkgroup-width) !important;
+  min-width: var(--cdr-filter-talkgroup-width) !important;
+  max-width: var(--cdr-filter-talkgroup-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-call-type {
+  flex: 0 0 var(--cdr-filter-call-type-width) !important;
+  width: var(--cdr-filter-call-type-width) !important;
+  min-width: var(--cdr-filter-call-type-width) !important;
+  max-width: var(--cdr-filter-call-type-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-radio-type {
+  flex: 0 0 var(--cdr-filter-radio-type-width) !important;
+  width: var(--cdr-filter-radio-type-width) !important;
+  min-width: var(--cdr-filter-radio-type-width) !important;
+  max-width: var(--cdr-filter-radio-type-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-encryption {
+  flex: 0 0 var(--cdr-filter-encryption-width) !important;
+  width: var(--cdr-filter-encryption-width) !important;
+  min-width: var(--cdr-filter-encryption-width) !important;
+  max-width: var(--cdr-filter-encryption-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-duplex {
+  flex: 0 0 var(--cdr-filter-duplex-width) !important;
+  width: var(--cdr-filter-duplex-width) !important;
+  min-width: var(--cdr-filter-duplex-width) !important;
+  max-width: var(--cdr-filter-duplex-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-reset-cell,
+body .app-shell .filters-panel-arranged .cdr-filter-reset-cell > .reset-filter-button {
+  flex: 0 0 var(--cdr-filter-reset-width) !important;
+  width: var(--cdr-filter-reset-width) !important;
+  min-width: var(--cdr-filter-reset-width) !important;
+  max-width: var(--cdr-filter-reset-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-info-cell,
+body .app-shell .filters-panel-arranged .cdr-filter-info-cell > .filter-count {
+  flex: 0 0 var(--cdr-filter-info-width) !important;
+  width: var(--cdr-filter-info-width) !important;
+  min-width: var(--cdr-filter-info-width) !important;
+  max-width: var(--cdr-filter-info-width) !important;
+}
+
+/* Filter dropdown trigger buttons: same height and vertical alignment for all multi-select buttons. */
+body .app-shell .filters-panel-arranged .multi-select-trigger,
+body .app-shell .filters-panel-arranged .reset-filter-button,
+body .app-shell .filters-panel-arranged .filter-count,
+body .app-shell .filters-panel-arranged .cdr-filter-search > input {
+  height: var(--cdr-filter-control-height) !important;
+  min-height: var(--cdr-filter-control-height) !important;
+  max-height: var(--cdr-filter-control-height) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  line-height: normal !important;
+}
+
+body .app-shell .filters-panel-arranged .multi-select-value {
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Responsive fallback keeps controls readable on smaller screens. */
+@media (max-width: 1700px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(3, minmax(240px, 1fr)) !important;
+  }
+
+  body .app-shell .filters-panel-arranged .cdr-filter-search,
+  body .app-shell .filters-panel-arranged .multi-select-filter,
+  body .app-shell .filters-panel-arranged .filter-action-cell,
+  body .app-shell .filters-panel-arranged .filter-action-cell > .reset-filter-button,
+  body .app-shell .filters-panel-arranged .filter-action-cell > .filter-count {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+  body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+  body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* ============================================================
+   USER TEST WIDTH VALUES - HARD FINAL OVERRIDE
+   Keep this block as the last CSS block in src/styles.css.
+   This override is intentionally placed after all responsive media
+   rules so the values below actually change the visible filter sizes.
+   ============================================================ */
+body .app-shell,
+body .upload-shell {
+  --cdr-global-button-height: 44px;
+  --cdr-global-button-min-width: 116px;
+  --cdr-global-button-padding-x: 16px;
+  --cdr-global-button-radius: 14px;
+
+  --cdr-filter-search-width: 150px;
+  --cdr-filter-region-width: 200px;
+  
+  --cdr-filter-month-width: 250px;
+  --cdr-filter-company-width: 300px;
+  --cdr-filter-base-station-width: 300px;
+
+  --cdr-filter-talkgroup-width: 240px;
+  --cdr-filter-call-type-width: 250px;
+  --cdr-filter-radio-type-width: 190px;
+  --cdr-filter-encryption-width: 200px;
+  --cdr-filter-duplex-width: 200px;
+  --cdr-filter-reset-width: 100px;
+  --cdr-filter-info-width: 150px;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-primary,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row-primary {
+  display: grid !important;
+  grid-template-columns:
+    var(--cdr-filter-search-width)
+    var(--cdr-filter-region-width)
+    var(--cdr-filter-year-width)
+    var(--cdr-filter-month-width)
+    var(--cdr-filter-company-width)
+    var(--cdr-filter-base-station-width) !important;
+  gap: 14px !important;
+  align-items: end !important;
+}
+
+body .app-shell .cdr-command-shell .filters-panel.filters-panel-arranged .filters-row-secondary,
+body .app-shell .filters-panel.filters-panel-arranged .filters-row-secondary {
+  display: grid !important;
+  grid-template-columns:
+    var(--cdr-filter-talkgroup-width)
+    var(--cdr-filter-call-type-width)
+    var(--cdr-filter-radio-type-width)
+    var(--cdr-filter-encryption-width)
+    var(--cdr-filter-duplex-width)
+    var(--cdr-filter-reset-width)
+    var(--cdr-filter-info-width) !important;
+  gap: 14px !important;
+  align-items: end !important;
+}
+
+body .app-shell .filters-panel-arranged .cdr-filter-search {
+  width: var(--cdr-filter-search-width) !important;
+  min-width: var(--cdr-filter-search-width) !important;
+  max-width: var(--cdr-filter-search-width) !important;
+  flex: 0 0 var(--cdr-filter-search-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-region {
+  width: var(--cdr-filter-region-width) !important;
+  min-width: var(--cdr-filter-region-width) !important;
+  max-width: var(--cdr-filter-region-width) !important;
+  flex: 0 0 var(--cdr-filter-region-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-year {
+  width: var(--cdr-filter-year-width) !important;
+  min-width: var(--cdr-filter-year-width) !important;
+  max-width: var(--cdr-filter-year-width) !important;
+  flex: 0 0 var(--cdr-filter-year-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-month {
+  width: var(--cdr-filter-month-width) !important;
+  min-width: var(--cdr-filter-month-width) !important;
+  max-width: var(--cdr-filter-month-width) !important;
+  flex: 0 0 var(--cdr-filter-month-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-company {
+  width: var(--cdr-filter-company-width) !important;
+  min-width: var(--cdr-filter-company-width) !important;
+  max-width: var(--cdr-filter-company-width) !important;
+  flex: 0 0 var(--cdr-filter-company-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-base-station {
+  width: var(--cdr-filter-base-station-width) !important;
+  min-width: var(--cdr-filter-base-station-width) !important;
+  max-width: var(--cdr-filter-base-station-width) !important;
+  flex: 0 0 var(--cdr-filter-base-station-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-talkgroup {
+  width: var(--cdr-filter-talkgroup-width) !important;
+  min-width: var(--cdr-filter-talkgroup-width) !important;
+  max-width: var(--cdr-filter-talkgroup-width) !important;
+  flex: 0 0 var(--cdr-filter-talkgroup-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-call-type {
+  width: var(--cdr-filter-call-type-width) !important;
+  min-width: var(--cdr-filter-call-type-width) !important;
+  max-width: var(--cdr-filter-call-type-width) !important;
+  flex: 0 0 var(--cdr-filter-call-type-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-radio-type {
+  width: var(--cdr-filter-radio-type-width) !important;
+  min-width: var(--cdr-filter-radio-type-width) !important;
+  max-width: var(--cdr-filter-radio-type-width) !important;
+  flex: 0 0 var(--cdr-filter-radio-type-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-encryption {
+  width: var(--cdr-filter-encryption-width) !important;
+  min-width: var(--cdr-filter-encryption-width) !important;
+  max-width: var(--cdr-filter-encryption-width) !important;
+  flex: 0 0 var(--cdr-filter-encryption-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-duplex {
+  width: var(--cdr-filter-duplex-width) !important;
+  min-width: var(--cdr-filter-duplex-width) !important;
+  max-width: var(--cdr-filter-duplex-width) !important;
+  flex: 0 0 var(--cdr-filter-duplex-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-reset-cell,
+body .app-shell .filters-panel-arranged .cdr-filter-reset-cell > .reset-filter-button {
+  width: var(--cdr-filter-reset-width) !important;
+  min-width: var(--cdr-filter-reset-width) !important;
+  max-width: var(--cdr-filter-reset-width) !important;
+  flex: 0 0 var(--cdr-filter-reset-width) !important;
+}
+body .app-shell .filters-panel-arranged .cdr-filter-info-cell,
+body .app-shell .filters-panel-arranged .cdr-filter-info-cell > .filter-count {
+  width: var(--cdr-filter-info-width) !important;
+  min-width: var(--cdr-filter-info-width) !important;
+  max-width: var(--cdr-filter-info-width) !important;
+  flex: 0 0 var(--cdr-filter-info-width) !important;
+}
+
+body .app-shell .filters-panel-arranged .multi-select-trigger,
+body .app-shell .filters-panel-arranged .cdr-filter-search > input,
+body .app-shell .filters-panel-arranged .reset-filter-button,
+body .app-shell .filters-panel-arranged .filter-count {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* ============================================================
+   FINAL FONT SIZE + WEIGHT CONTROL
+   Put this block at the VERY BOTTOM of src/styles.css.
+   Change only the variables below to control dashboard fonts.
+   ============================================================ */
+
+body .app-shell,
+body .upload-shell {
+  --cdr-font-filter-label-size: 9px;
+  --cdr-font-filter-label-weight: 700;
+
+  --cdr-font-filter-value-size: 9px;
+  --cdr-font-filter-value-weight: 600;
+
+  --cdr-font-button-size: 13px;
+  --cdr-font-button-weight: 850;
+
+  --cdr-font-kpi-label-size: 8px;
+  --cdr-font-kpi-label-weight: 900;
+
+  --cdr-font-kpi-value-size: 13px;
+  --cdr-font-kpi-value-weight: 900;
+
+  --cdr-font-kpi-subtitle-size: 8px;
+  --cdr-font-kpi-subtitle-weight: 750;
+
+  --cdr-font-table-header-size: 11px;
+  --cdr-font-table-header-weight: 900;
+
+  --cdr-font-table-body-size: 11px;
+  --cdr-font-table-body-weight: 700;
+
+  --cdr-font-chart-title-size: 15px;
+  --cdr-font-chart-title-weight: 900;
+
+  --cdr-font-tab-size: 12px;
+  --cdr-font-tab-weight: 850;
+}
+
+/* Filter labels: Search Radio / User, Region, Year, Month, Company, etc. */
+body .app-shell .filters-panel-arranged .search-box > span,
+body .app-shell .filters-panel-arranged .cdr-filter-search > span,
+body .app-shell .filters-panel-arranged .multi-select-filter > span,
+body .app-shell .filters-panel-arranged .filter-field > span,
+body .app-shell .filters-panel-arranged .filter-action-label {
+  font-size: var(--cdr-font-filter-label-size) !important;
+  font-weight: var(--cdr-font-filter-label-weight) !important;
+}
+
+/* Filter dropdown/search values */
+body .app-shell .filters-panel-arranged .search-box input,
+body .app-shell .filters-panel-arranged .cdr-filter-search > input,
+body .app-shell .filters-panel-arranged .multi-select-trigger,
+body .app-shell .filters-panel-arranged .multi-select-value {
+  font-size: var(--cdr-font-filter-value-size) !important;
+  font-weight: var(--cdr-font-filter-value-weight) !important;
+}
+
+/* Reset and info/count buttons in the filter bar */
+body .app-shell .filters-panel-arranged .reset-filter-button,
+body .app-shell .filters-panel-arranged .filter-count {
+  font-size: var(--cdr-font-filter-value-size) !important;
+  font-weight: 900 !important;
+}
+
+/* Normal project buttons */
+body .app-shell button,
+body .upload-shell button,
+body .app-shell .button,
+body .upload-shell .button,
+body .app-shell .export-button,
+body .app-shell .section-top-button,
+body .app-shell .generate-report-tile,
+body .app-shell label.button,
+body .upload-shell label.button {
+  font-size: var(--cdr-font-button-size) !important;
+  font-weight: var(--cdr-font-button-weight) !important;
+}
+
+/* Dashboard tabs and section navigation */
+body .app-shell .dashboard-tab,
+body .app-shell .section-nav-button,
+body .app-shell .section-nav button {
+  font-size: var(--cdr-font-tab-size) !important;
+  font-weight: var(--cdr-font-tab-weight) !important;
+}
+
+/* KPI card labels */
+body .app-shell .summary-cards .summary-card span,
+body .app-shell .summary-cards-10-layout .summary-card span,
+body .app-shell .visual-kpi-cards .summary-card-head span {
+  font-size: var(--cdr-font-kpi-label-size) !important;
+  font-weight: var(--cdr-font-kpi-label-weight) !important;
+}
+
+/* KPI card values */
+body .app-shell .summary-cards .summary-card strong,
+body .app-shell .summary-cards-10-layout .summary-card strong,
+body .app-shell .visual-kpi-cards .summary-card strong,
+body .app-shell .visual-kpi-cards .summary-card-value {
+  font-size: var(--cdr-font-kpi-value-size) !important;
+  font-weight: var(--cdr-font-kpi-value-weight) !important;
+}
+
+/* KPI card subtitles */
+body .app-shell .summary-cards .summary-card small,
+body .app-shell .summary-cards-10-layout .summary-card small,
+body .app-shell .visual-kpi-cards .summary-card small {
+  font-size: var(--cdr-font-kpi-subtitle-size) !important;
+  font-weight: var(--cdr-font-kpi-subtitle-weight) !important;
+}
+
+/* Chart and table titles */
+body .app-shell .chart-card h3,
+body .app-shell .table-card h3,
+body .app-shell .records-card h3,
+body .app-shell .modern-panel-title,
+body .app-shell .section-title h2 {
+  font-size: var(--cdr-font-chart-title-size) !important;
+  font-weight: var(--cdr-font-chart-title-weight) !important;
+}
+
+/* Table headers */
+body .app-shell table th {
+  font-size: var(--cdr-font-table-header-size) !important;
+  font-weight: var(--cdr-font-table-header-weight) !important;
+}
+
+/* Table body */
+body .app-shell table td {
+  font-size: var(--cdr-font-table-body-size) !important;
+  font-weight: var(--cdr-font-table-body-weight) !important;
+}
+
+
+/* ============================================================
+   STEP 1 - CDR command-center portal shell
+   Navigation/header shell only. No KPI/data card content removed.
+   ============================================================ */
+.app-shell[class*="active-tab-"] {
+  --cdr-sidebar-width: 178px;
+  padding: 14px 16px 24px calc(var(--cdr-sidebar-width) + 22px) !important;
+  background: #06101f !important;
+}
+
+.cdr-portal-sidebar {
+  position: fixed !important;
+  inset: 0 auto 0 0 !important;
+  width: var(--cdr-sidebar-width, 178px) !important;
+  z-index: 450 !important;
+  padding: 12px 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  background: linear-gradient(180deg, #06162a 0%, #071d34 52%, #05101f 100%) !important;
+  border-right: 1px solid rgba(94, 161, 208, 0.26) !important;
+  box-shadow: 18px 0 42px rgba(0, 0, 0, 0.30) !important;
+}
+
+.cdr-sidebar-brand {
+  min-height: 62px !important;
+  display: grid !important;
+  grid-template-columns: 54px 1fr !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 6px 6px 12px !important;
+  border-bottom: 1px solid rgba(118, 178, 255, 0.18) !important;
+}
+
+.cdr-sidebar-brand img {
+  width: 52px !important;
+  height: 52px !important;
+  object-fit: contain !important;
+}
+
+.cdr-sidebar-brand span {
+  font-size: 12px !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #eaf7ff !important;
+}
+
+.cdr-portal-sidebar .dashboard-tabs {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  gap: 7px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.cdr-portal-sidebar .dashboard-tab {
+  width: 100% !important;
+  justify-content: flex-start !important;
+  min-height: 42px !important;
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  color: #a9c3d8 !important;
+  background: rgba(13, 39, 66, 0.42) !important;
+  border: 1px solid rgba(118, 178, 255, 0.12) !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.cdr-portal-sidebar .dashboard-tab.active,
+.cdr-portal-sidebar .dashboard-tab:hover {
+  color: #ffffff !important;
+  background: linear-gradient(90deg, rgba(33, 150, 243, 0.38), rgba(0, 188, 212, 0.16)) !important;
+  border-color: rgba(99, 192, 255, 0.45) !important;
+  box-shadow: inset 3px 0 0 #37c8ff, 0 10px 24px rgba(0, 120, 212, 0.20) !important;
+  transform: none !important;
+}
+
+.dashboard-tabs-row {
+  margin: 8px 0 10px !important;
+  padding: 8px 10px !important;
+  border: 1px solid rgba(96, 165, 250, 0.22) !important;
+  border-radius: 14px !important;
+  background: rgba(3, 18, 35, 0.76) !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18) !important;
+}
+
+.dashboard-tabs-actions,
+.cdr-banner-control-bar,
+.cdr-control-actions {
+  width: 100% !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.app-shell .cdr-command-shell {
+  padding: 10px 12px 12px !important;
+  margin-bottom: 14px !important;
+  border-radius: 12px !important;
+  background: #06162a !important;
+  border-color: rgba(96, 165, 250, 0.22) !important;
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.26) !important;
+}
+
+.app-shell .cdr-command-shell::before,
+.app-shell .cdr-command-shell .cdr-banner-art {
+  display: none !important;
+}
+
+.app-shell .cdr-command-shell .followup-style-topbar,
+.app-shell .cdr-command-shell > .topbar.followup-style-topbar {
+  position: relative !important;
+  top: auto !important;
+  z-index: 10 !important;
+  display: grid !important;
+  grid-template-columns: 150px minmax(300px, 1fr) 150px !important;
+  align-items: center !important;
+  min-height: 72px !important;
+  padding: 8px 12px !important;
+  margin: 0 0 8px !important;
+  border-radius: 10px !important;
+  background: #081b31 !important;
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18) !important;
+  overflow: hidden !important;
+}
+
+.cdr-header-logo {
+  display: flex !important;
+  align-items: center !important;
+  height: 58px !important;
+}
+.cdr-header-logo-left { justify-content: flex-start !important; }
+.cdr-header-logo-right { justify-content: flex-end !important; }
+.cdr-header-logo img {
+  max-width: 118px !important;
+  max-height: 52px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.34)) !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title {
+  grid-column: 2 !important;
+  justify-self: center !important;
+  min-height: 50px !important;
+  width: min(620px, 100%) !important;
+  padding: 8px 18px !important;
+  border-radius: 10px !important;
+  background: rgba(2, 10, 24, 0.46) !important;
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+  text-align: center !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title h1 {
+  margin: 0 !important;
+  font-family: Arial, system-ui, sans-serif !important;
+  font-size: clamp(20px, 2.1vw, 30px) !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+}
+
+.app-shell .cdr-command-shell .followup-dashboard-title p {
+  margin: 5px 0 0 !important;
+  font-size: 10px !important;
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #76d7ff !important;
+  white-space: nowrap !important;
+}
+
+.cdr-action-pill {
+  min-height: 34px !important;
+  padding: 7px 11px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+}
+
+.cdr-command-shell .filters-panel,
+.cdr-command-shell .filter-panel {
+  margin-top: 8px !important;
+  border-radius: 12px !important;
+  background: rgba(4, 22, 42, 0.88) !important;
+  border-color: rgba(96, 165, 250, 0.18) !important;
+}
+
+.app-shell.light-background-theme[class*="active-tab-"] {
+  background: #edf5fb !important;
+}
+.app-shell.light-background-theme .cdr-portal-sidebar {
+  background: linear-gradient(180deg, #eef8ff 0%, #dff0fa 100%) !important;
+  border-right-color: rgba(0, 95, 145, 0.22) !important;
+}
+.app-shell.light-background-theme .cdr-sidebar-brand,
+.app-shell.light-background-theme .cdr-sidebar-brand span {
+  color: #082236 !important;
+}
+.app-shell.light-background-theme .cdr-portal-sidebar .dashboard-tab {
+  color: #31576e !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(0, 95, 145, 0.16) !important;
+}
+.app-shell.light-background-theme .cdr-portal-sidebar .dashboard-tab.active,
+.app-shell.light-background-theme .cdr-portal-sidebar .dashboard-tab:hover {
+  color: #ffffff !important;
+  background: linear-gradient(90deg, #0078d4, #16a6d8) !important;
+}
+.app-shell.light-background-theme .cdr-command-shell,
+.app-shell.light-background-theme .cdr-command-shell .followup-style-topbar,
+.app-shell.light-background-theme .dashboard-tabs-row {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-color: rgba(0, 95, 145, 0.18) !important;
+}
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title h1 {
+  color: #082236 !important;
+}
+.app-shell.light-background-theme .cdr-command-shell .followup-dashboard-title p {
+  color: #0078b8 !important;
+}
+
+@media (max-width: 980px) {
+  .app-shell[class*="active-tab-"] {
+    padding-left: 12px !important;
+    padding-top: 82px !important;
+  }
+  .cdr-portal-sidebar {
+    right: 0 !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: 72px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    overflow-x: auto !important;
+  }
+  .cdr-sidebar-brand { min-width: 144px !important; border-bottom: 0 !important; padding-bottom: 6px !important; }
+  .cdr-portal-sidebar .dashboard-tabs { flex-direction: row !important; min-width: max-content !important; }
+  .cdr-portal-sidebar .dashboard-tab { width: auto !important; min-width: 132px !important; }
+  .app-shell .cdr-command-shell .followup-style-topbar { grid-template-columns: 1fr !important; }
+  .cdr-header-logo { display: none !important; }
+  .app-shell .cdr-command-shell .followup-dashboard-title { grid-column: 1 !important; }
+}
+

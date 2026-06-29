@@ -1,0 +1,291 @@
+﻿/* Hero, data quality, loading, empty state, export polish. Source split from src/styles.css lines 1999-2288. */
+/* ============================================================
+   10 dashboard improvements patch
+   Adds hero focus, active section nav, reset filter button,
+   data quality panel, empty/loading states, and export polish.
+   Place at end of styles.css.
+   ============================================================ */
+
+/* 1) Stronger hero number layout */
+.app-shell .hero-main {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  min-height: 100% !important;
+}
+
+.app-shell .hero-main .eyebrow {
+  width: 100% !important;
+  margin: 0 0 10px !important;
+  text-align: center !important;
+  font-size: clamp(14px, 1.3vw, 20px) !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0.16em !important;
+}
+
+.app-shell .hero-main h2 {
+  width: 100% !important;
+  margin: 0 !important;
+  text-align: center !important;
+  font-size: clamp(54px, 7vw, 104px) !important;
+  line-height: 0.9 !important;
+  font-weight: 950 !important;
+}
+
+.app-shell .hero-subtitle {
+  margin: 10px 0 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  font-size: clamp(18px, 2vw, 30px) !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  color: var(--theme-muted) !important;
+}
+
+/* 2) Standalone section nav + active section state */
+.app-shell .section-nav {
+  margin: 18px 0 18px !important;
+  padding: 10px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.app-shell .section-nav-button {
+  min-height: 36px !important;
+  padding: 8px 13px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease !important;
+}
+
+.app-shell .section-nav-button:hover {
+  transform: translateY(-1px) !important;
+}
+
+.app-shell .section-nav-button.active {
+  background: #0078d4 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: #0078d4 !important;
+  box-shadow: 0 10px 24px rgba(0, 120, 212, 0.28) !important;
+}
+
+/* 3) Clear reset filter action */
+.app-shell .reset-filter-button {
+  border-color: rgba(217, 95, 95, 0.45) !important;
+  color: #d95f5f !important;
+  font-weight: 900 !important;
+}
+
+.app-shell .reset-filter-button:hover {
+  background: rgba(217, 95, 95, 0.12) !important;
+  border-color: rgba(217, 95, 95, 0.70) !important;
+}
+
+/* 4) Better KPI card context labels */
+.app-shell .summary-card small {
+  position: relative !important;
+  z-index: 2 !important;
+  display: block !important;
+  margin-top: 4px !important;
+  font-size: 10px !important;
+  line-height: 1.1 !important;
+  font-weight: 750 !important;
+  color: var(--theme-muted) !important;
+  opacity: .9 !important;
+}
+
+/* 5) Data quality panel */
+.app-shell .data-quality-panel {
+  display: grid !important;
+  grid-template-columns: minmax(220px, 0.6fr) minmax(0, 2fr) !important;
+  gap: 12px !important;
+  margin: 12px 0 22px !important;
+  padding: 14px !important;
+  border-radius: 18px !important;
+  background: var(--theme-card-bg) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.app-shell .quality-score-card,
+.app-shell .quality-issue {
+  border-radius: 14px !important;
+  padding: 12px 14px !important;
+  background: var(--theme-card-bg-soft) !important;
+  border: 1px solid var(--theme-border) !important;
+}
+
+.app-shell .quality-score-card span,
+.app-shell .quality-issue span {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+  color: var(--theme-muted) !important;
+}
+
+.app-shell .quality-score-card strong {
+  display: block !important;
+  margin-top: 6px !important;
+  font-size: clamp(28px, 3vw, 46px) !important;
+  line-height: 1 !important;
+  color: var(--theme-text) !important;
+}
+
+.app-shell .quality-score-card small,
+.app-shell .quality-issue small {
+  display: block !important;
+  margin-top: 5px !important;
+  font-size: 11px !important;
+  color: var(--theme-muted) !important;
+}
+
+.app-shell .quality-issue-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.app-shell .quality-issue strong {
+  display: block !important;
+  margin-top: 6px !important;
+  font-size: clamp(18px, 2vw, 28px) !important;
+  color: var(--theme-text) !important;
+}
+
+/* 6) Loading overlay for parsing/merging/export-heavy flows */
+.loading-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 24px !important;
+  background: rgba(0, 0, 0, 0.46) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.loading-card {
+  display: grid !important;
+  gap: 10px !important;
+  justify-items: center !important;
+  width: min(420px, 100%) !important;
+  padding: 24px 30px !important;
+  border-radius: 22px !important;
+  background: var(--theme-card-bg, #071c2a) !important;
+  color: var(--theme-text, #f4fbff) !important;
+  border: 1px solid var(--theme-border, rgba(116,181,214,.36)) !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.38) !important;
+  text-align: center !important;
+}
+
+.loading-card strong {
+  color: var(--theme-text, #f4fbff) !important;
+  font-size: 18px !important;
+}
+
+.loading-card span {
+  color: var(--theme-muted, #a8c8d8) !important;
+  font-size: 13px !important;
+}
+
+/* 7) Empty state for zero filtered records */
+.app-shell .empty-state {
+  min-height: 220px !important;
+  display: grid !important;
+  place-items: center !important;
+  align-content: center !important;
+  gap: 8px !important;
+  margin: 12px 0 20px !important;
+  text-align: center !important;
+  border-radius: 20px !important;
+  background: var(--theme-card-bg) !important;
+  border: 1px dashed var(--theme-border-strong) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.app-shell .empty-state strong {
+  color: var(--theme-text) !important;
+  font-size: 22px !important;
+}
+
+.app-shell .empty-state span,
+.app-shell .empty-state svg {
+  color: var(--theme-muted) !important;
+}
+
+/* 8) Export button grouping polish without changing export functions */
+.app-shell .section-title-actions {
+  gap: 6px !important;
+}
+
+.app-shell .export-button {
+  min-width: 58px !important;
+  justify-content: center !important;
+}
+
+.app-shell .section-title-actions:has(.export-button) {
+  padding: 5px !important;
+  border-radius: 999px !important;
+  background: rgba(0, 120, 212, 0.07) !important;
+  border: 1px solid var(--theme-border) !important;
+}
+
+/* 9) Chart readability improvements */
+.app-shell .chart-card {
+  min-height: 400px !important;
+}
+
+.app-shell .chart-card .recharts-wrapper text {
+  paint-order: stroke !important;
+}
+
+.app-shell.light-background-theme .chart-card .recharts-wrapper text {
+  fill: #3f6174 !important;
+}
+
+.app-shell.dark-background-theme .chart-card .recharts-wrapper text {
+  fill: #a8c8d8 !important;
+}
+
+/* 10) Professional responsive behavior */
+@media (max-width: 1180px) {
+  .app-shell .data-quality-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell .quality-issue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell .hero-main h2 {
+    font-size: clamp(42px, 16vw, 70px) !important;
+  }
+
+  .app-shell .section-nav {
+    position: sticky !important;
+    top: 72px !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .app-shell .section-nav-button {
+    flex: 0 0 auto !important;
+  }
+
+  .app-shell .quality-issue-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+

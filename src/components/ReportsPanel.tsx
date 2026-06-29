@@ -1,6 +1,6 @@
-import { memo, useCallback, useMemo, useState } from "react";
-import { Download, Eye, FilePlus2, Search, Share2, Trash2 } from "lucide-react";
-import { ExportButton, type ExportKind } from "./DashboardUi";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { FilePlus2, FolderOpen, Save, Search, Trash2, X } from "lucide-react";
+import type { ExportKind } from "./DashboardUi";
 import { FilteredCallsRegister } from "./FilteredCallsRegister";
 import type { CallRecord } from "../types/dashboard";
 
@@ -17,22 +17,73 @@ type ReportAction = {
   onClick: () => void | Promise<void>;
 };
 
+type ReportPreset = {
+  id: string;
+  label: string;
+  description: string;
+  actionIds: string[] | "all";
+};
+
 type GeneratedReport = {
   id: string;
-  actionId: string;
   fileName: string;
   generatedAt: string;
   format: string;
-  kind: ExportKind;
-  blob?: Blob;
-  fileUrl?: string;
-  mimeType?: string;
+  savedPath?: string;
 };
 
 type GeneratedFileEventDetail = {
   fileName: string;
   blob: Blob;
   mimeType?: string;
+};
+
+type DownloadDirectoryState = {
+  configured: boolean;
+  directory: string;
+  canBrowse: boolean;
+  apiAvailable: boolean;
+  isLoading: boolean;
+  isSaving: boolean;
+  message: string;
+};
+
+type DownloadDirectoryResponse = {
+  ok?: boolean;
+  configured: boolean;
+  directory: string;
+  canBrowse: boolean;
+  updatedAt?: string;
+  cancelled?: boolean;
+};
+
+type SaveGeneratedFileResponse = {
+  ok: boolean;
+  fileName: string;
+  directory: string;
+  filePath: string;
+  size: number;
+  savedAt: string;
+};
+
+type BrowserWritableFile = {
+  write: (data: Blob | ArrayBuffer | string) => Promise<void>;
+  close: () => Promise<void>;
+};
+
+type BrowserFileHandle = {
+  createWritable: () => Promise<BrowserWritableFile>;
+};
+
+type BrowserDirectoryHandle = {
+  name: string;
+  queryPermission?: (descriptor: { mode: "readwrite" }) => Promise<PermissionState>;
+  requestPermission?: (descriptor: { mode: "readwrite" }) => Promise<PermissionState>;
+  getFileHandle: (name: string, options: { create: boolean }) => Promise<BrowserFileHandle>;
+};
+
+type BrowserDirectoryPickerWindow = Window & {
+  showDirectoryPicker?: (options?: { mode?: "read" | "readwrite" }) => Promise<BrowserDirectoryHandle>;
 };
 
 type ReportsPanelProps = {
@@ -84,8 +135,163 @@ const fileExtensionByKind: Record<ExportKind, string> = {
   png: "png",
 };
 
+const REPORT_PRESETS: ReportPreset[] = [
+  {
+    id: "single",
+    label: "Single selected report",
+    description: "Generate only the report selected below.",
+    actionIds: [],
+  },
+  {
+    id: "executive-summary",
+    label: "Executive Summary Pack",
+    description: "Filtered CDR register, KPI PDF, company contribution, and regional performance.",
+    actionIds: ["cdr-register-pdf", "kpi-report-pdf", "company-contribution-pdf", "region-performance-pdf"],
+  },
+  {
+    id: "kpi-pack",
+    label: "KPI Pack",
+    description: "KPI workbook, PDF, PPT, and the four KPI chart source exports.",
+    actionIds: [
+      "kpi-report-xlsx",
+      "kpi-report-pdf",
+      "kpi-report-ppt",
+      "KPI-KPI Average Duration / Co.-xlsx",
+      "KPI-KPI Calls and Duration / Co.-xlsx",
+      "KPI-Monthly KPI-xlsx",
+      "KPI-KPI Total Avg. Duration-xlsx",
+    ],
+  },
+  {
+    id: "operations-pack",
+    label: "Operations Pack",
+    description: "Fleetmap, radio/user behavior, busiest assets, radios, and busy-hour exports.",
+    actionIds: [
+      "unmatched-fleetmap-xlsx",
+      "radio-user-behavior-xlsx",
+      "radio-user-behavior-pdf",
+      "Fleetmap & Users-Radios / Month-xlsx",
+      "Fleetmap & Users-Radio Type / Month-xlsx",
+      "Fleetmap & Users-Busy-hour profile-xlsx",
+      "Fleetmap & Users-Top Companies / Calls-xlsx",
+      "Fleetmap & Users-Top BS / Calls-xlsx",
+      "Fleetmap & Users-Top TG / Calls-xlsx",
+    ],
+  },
+  {
+    id: "all-data",
+    label: "Full Data Export Pack",
+    description: "All available non-view report exports for the current filters.",
+    actionIds: "all",
+  },
+];
+
+const emptyDownloadDirectoryState: DownloadDirectoryState = {
+  configured: false,
+  directory: "",
+  canBrowse: false,
+  apiAvailable: true,
+  isLoading: true,
+  isSaving: false,
+  message: "",
+};
+
+function getApiSessionToken() {
+  const directToken = sessionStorage.getItem("cdr_mysql_session_token");
+  if (directToken) return directToken;
+  try {
+    const session = JSON.parse(sessionStorage.getItem("cdr_portal_session") || "{}");
+    return typeof session.token === "string" ? session.token : "";
+  } catch {
+    return "";
+  }
+}
+
+async function reportApiJson<T>(url: string, init: RequestInit = {}) {
+  const headers = new Headers(init.headers);
+  headers.set("Content-Type", "application/json");
+  const token = getApiSessionToken();
+  if (token) headers.set("X-CDR-Session", token);
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...init,
+      headers,
+    });
+  } catch {
+    throw new Error("Report service is not reachable. Check that the API app is running before using server-folder exports.");
+  }
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(typeof payload.error === "string" ? payload.error : `Report service request failed (${response.status}).`);
+  }
+  return payload as T;
+}
+
+function blobToBase64(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      resolve(result.includes(",") ? result.split(",")[1] : result);
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("Could not read generated file."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function triggerBrowserDownload(fileName: string, blob: Blob) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+async function saveGeneratedFileToApi(generatedFile: GeneratedFileEventDetail) {
+  return reportApiJson<SaveGeneratedFileResponse>("/api/reports/save-generated-file", {
+    method: "POST",
+    body: JSON.stringify({
+      fileName: generatedFile.fileName,
+      mimeType: generatedFile.mimeType || generatedFile.blob.type,
+      base64: await blobToBase64(generatedFile.blob),
+    }),
+  });
+}
+
 function safeFileName(label: string) {
   return label.replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, " ").trim();
+}
+
+function canUseBrowserDirectoryPicker() {
+  if (typeof window === "undefined") return false;
+  const pickerWindow = window as BrowserDirectoryPickerWindow;
+  return Boolean(window.isSecureContext && pickerWindow.showDirectoryPicker);
+}
+
+async function saveGeneratedFileToBrowserDirectory(directoryHandle: BrowserDirectoryHandle, generatedFile: GeneratedFileEventDetail) {
+  const permission = await directoryHandle.queryPermission?.({ mode: "readwrite" });
+  if (permission !== "granted") {
+    const requested = await directoryHandle.requestPermission?.({ mode: "readwrite" });
+    if (requested !== "granted") {
+      throw new Error("Folder write permission was not granted.");
+    }
+  }
+  const fileName = safeFileName(generatedFile.fileName) || generatedFile.fileName;
+  const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(generatedFile.blob);
+  await writable.close();
+  return {
+    fileName,
+    directory: directoryHandle.name,
+    filePath: `${directoryHandle.name} / ${fileName}`,
+    size: generatedFile.blob.size,
+    savedAt: new Date().toISOString(),
+  };
 }
 
 function timestampForFile() {
@@ -95,23 +301,8 @@ function timestampForFile() {
 }
 
 
-function downloadFolderDisplay(fileName: string) {
-  return `Downloads / ${fileName}`;
-}
-
-function triggerSessionFileOpen(report: GeneratedReport) {
-  if (!report.fileUrl) return false;
-  if (report.kind === "pdf" || report.kind === "png" || report.kind === "csv") {
-    window.open(report.fileUrl, "_blank", "noopener,noreferrer");
-    return true;
-  }
-  const link = document.createElement("a");
-  link.href = report.fileUrl;
-  link.download = report.fileName;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  return true;
+function downloadFolderDisplay(report: Pick<GeneratedReport, "fileName" | "savedPath">) {
+  return report.savedPath || `Downloads / ${report.fileName}`;
 }
 
 function timestampForDisplay() {
@@ -301,25 +492,188 @@ function ReportsPanelComponent({
   ]);
 
   const reportActions = useMemo(() => reportGroups.flatMap((group) => group.actions), [reportGroups]);
+  const reportActionById = useMemo(() => new Map(reportActions.map((action) => [action.id, action])), [reportActions]);
+  const reportPresetOptions = useMemo(() => REPORT_PRESETS.map((preset) => {
+    const actionIds = preset.actionIds === "all"
+      ? reportActions.filter((action) => action.kind !== "view").map((action) => action.id)
+      : preset.actionIds.filter((id) => reportActionById.has(id));
+    return { ...preset, actionIds };
+  }), [reportActionById, reportActions]);
   const [selectedReportId, setSelectedReportId] = useState(() => reportActions[0]?.id ?? "");
+  const [selectedPresetId, setSelectedPresetId] = useState("single");
   const [generatedReports, setGeneratedReports] = useState<GeneratedReport[]>([]);
   const [previewNotice, setPreviewNotice] = useState("");
   const [reportSearch, setReportSearch] = useState("");
   const [generatingReportId, setGeneratingReportId] = useState("");
+  const [downloadDirectory, setDownloadDirectory] = useState<DownloadDirectoryState>(emptyDownloadDirectoryState);
+  const [downloadDirectoryInput, setDownloadDirectoryInput] = useState("");
+  const [browserDirectoryHandle, setBrowserDirectoryHandle] = useState<BrowserDirectoryHandle | null>(null);
+  const browserDirectoryPickerAvailable = canUseBrowserDirectoryPicker();
+  const downloadDirectoryDisplay = browserDirectoryHandle?.name || downloadDirectoryInput;
   const selectedReport = reportActions.find((action) => action.id === selectedReportId) ?? reportActions[0];
+  const selectedPreset = reportPresetOptions.find((preset) => preset.id === selectedPresetId) ?? reportPresetOptions[0];
+  const selectedPresetActions = selectedPreset && selectedPreset.id !== "single"
+    ? selectedPreset.actionIds.map((id) => reportActionById.get(id)).filter((action): action is ReportAction => Boolean(action))
+    : [];
   const visibleGeneratedReports = useMemo(() => {
     const query = reportSearch.trim().toLowerCase();
     if (!query) return generatedReports;
-    return generatedReports.filter((report) => `${report.fileName} ${downloadFolderDisplay(report.fileName)} ${report.format} ${report.generatedAt}`.toLowerCase().includes(query));
+    return generatedReports.filter((report) => `${report.fileName} ${downloadFolderDisplay(report)} ${report.format} ${report.generatedAt}`.toLowerCase().includes(query));
   }, [generatedReports, reportSearch]);
 
-  const clearGeneratedReportsHistory = useCallback(() => {
-    setGeneratedReports((current) => {
-      current.forEach((report) => {
-        if (report.fileUrl) URL.revokeObjectURL(report.fileUrl);
+  useEffect(() => {
+    if (!selectedReportId || reportActionById.has(selectedReportId)) return;
+    setSelectedReportId(reportActions[0]?.id ?? "");
+  }, [reportActionById, reportActions, selectedReportId]);
+
+  const loadDownloadDirectory = useCallback(async () => {
+    try {
+      const payload = await reportApiJson<DownloadDirectoryResponse>("/api/reports/download-directory");
+      setDownloadDirectory({
+        configured: Boolean(payload.configured && payload.directory),
+        directory: payload.directory || "",
+        canBrowse: Boolean(payload.canBrowse),
+        apiAvailable: true,
+        isLoading: false,
+        isSaving: false,
+        message: payload.directory
+          ? "API folder is active for report exports."
+          : browserDirectoryPickerAvailable
+            ? "No API folder selected. Use Browse to choose a local folder, or reports use normal browser downloads."
+            : "No API folder selected. Reports use normal browser downloads.",
       });
-      return [];
-    });
+      setDownloadDirectoryInput(payload.directory || "");
+      setBrowserDirectoryHandle(null);
+    } catch (error) {
+      setDownloadDirectory({
+        ...emptyDownloadDirectoryState,
+        apiAvailable: false,
+        isLoading: false,
+        message: browserDirectoryPickerAvailable
+          ? "Local folder API is unavailable. Use Browse to choose a local browser folder."
+          : error instanceof Error ? error.message : "Local report folder API is unavailable.",
+      });
+    }
+  }, [browserDirectoryPickerAvailable]);
+
+  useEffect(() => {
+    void loadDownloadDirectory();
+  }, [loadDownloadDirectory]);
+
+  const saveDownloadDirectory = useCallback(async () => {
+    setDownloadDirectory((current) => ({ ...current, isSaving: true, message: "Saving report folder..." }));
+    try {
+      const payload = await reportApiJson<DownloadDirectoryResponse>("/api/reports/download-directory", {
+        method: "POST",
+        body: JSON.stringify({ directory: downloadDirectoryInput }),
+      });
+      setDownloadDirectory({
+        configured: Boolean(payload.configured && payload.directory),
+        directory: payload.directory || "",
+        canBrowse: Boolean(payload.canBrowse),
+        apiAvailable: true,
+        isLoading: false,
+        isSaving: false,
+        message: payload.directory ? "Reports will be saved to the selected API folder." : "No API folder selected.",
+      });
+      setDownloadDirectoryInput(payload.directory || "");
+      setBrowserDirectoryHandle(null);
+    } catch (error) {
+      setDownloadDirectory((current) => ({
+        ...current,
+        isSaving: false,
+        message: error instanceof Error ? error.message : "Could not save report folder.",
+      }));
+    }
+  }, [downloadDirectoryInput]);
+
+  const browseDownloadDirectory = useCallback(async () => {
+    setDownloadDirectory((current) => ({ ...current, isSaving: true, message: "Waiting for folder selection..." }));
+    try {
+      if (browserDirectoryPickerAvailable) {
+        const pickerWindow = window as BrowserDirectoryPickerWindow;
+        const directoryHandle = await pickerWindow.showDirectoryPicker?.({ mode: "readwrite" });
+        if (!directoryHandle) {
+          setDownloadDirectory((current) => ({ ...current, isSaving: false, message: "Folder selection was cancelled." }));
+          return;
+        }
+        setBrowserDirectoryHandle(directoryHandle);
+        setDownloadDirectory((current) => ({
+          ...current,
+          configured: false,
+          isLoading: false,
+          isSaving: false,
+          message: `Browser folder selected: ${directoryHandle.name}. Reports will be written there directly.`,
+        }));
+        setDownloadDirectoryInput(directoryHandle.name);
+        return;
+      }
+      if (!downloadDirectory.apiAvailable || !downloadDirectory.canBrowse) {
+        setDownloadDirectory((current) => ({
+          ...current,
+          isSaving: false,
+          message: "Folder browsing is not available in this browser/session. If you are online, the website cannot open your PC folders unless the browser folder picker is supported. Use the normal browser Downloads folder, or run the desktop/local API version.",
+        }));
+        return;
+      }
+      const payload = await reportApiJson<DownloadDirectoryResponse>("/api/reports/download-directory/browse", {
+        method: "POST",
+        body: JSON.stringify({ currentDirectory: downloadDirectoryInput || downloadDirectory.directory }),
+      });
+      if (payload.cancelled) {
+        setDownloadDirectory((current) => ({ ...current, isSaving: false, message: "Folder selection was cancelled." }));
+        return;
+      }
+      setDownloadDirectory({
+        configured: Boolean(payload.configured && payload.directory),
+        directory: payload.directory || "",
+        canBrowse: Boolean(payload.canBrowse),
+        apiAvailable: true,
+        isLoading: false,
+        isSaving: false,
+        message: payload.directory ? "Reports will be saved to the selected API folder." : "No API folder selected.",
+      });
+      setDownloadDirectoryInput(payload.directory || "");
+    } catch (error) {
+      setDownloadDirectory((current) => ({
+        ...current,
+        isSaving: false,
+        message: error instanceof Error ? error.message : "Could not open the folder picker.",
+      }));
+    }
+  }, [browserDirectoryPickerAvailable, downloadDirectory.directory, downloadDirectoryInput]);
+
+  const clearDownloadDirectory = useCallback(async () => {
+    setDownloadDirectory((current) => ({ ...current, isSaving: true, message: "Clearing report folder..." }));
+    try {
+      const payload = await reportApiJson<DownloadDirectoryResponse>("/api/reports/download-directory/clear", {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+      setDownloadDirectory({
+        configured: false,
+        directory: "",
+        canBrowse: Boolean(payload.canBrowse),
+        apiAvailable: true,
+        isLoading: false,
+        isSaving: false,
+        message: browserDirectoryPickerAvailable
+          ? "API folder cleared. Use Browse to choose a local folder, or reports use normal browser downloads."
+          : "API folder cleared. Reports use normal browser downloads.",
+      });
+      setDownloadDirectoryInput("");
+      setBrowserDirectoryHandle(null);
+    } catch (error) {
+      setDownloadDirectory((current) => ({
+        ...current,
+        isSaving: false,
+        message: error instanceof Error ? error.message : "Could not clear report folder.",
+      }));
+    }
+  }, [browserDirectoryPickerAvailable]);
+
+  const clearGeneratedReportsHistory = useCallback(() => {
+    setGeneratedReports([]);
     setPreviewNotice("");
   }, []);
 
@@ -327,16 +681,23 @@ function ReportsPanelComponent({
     if (generatingReportId) return;
     setGeneratingReportId(action.id);
     setPreviewNotice("");
+    const shouldUseBrowserDirectory = action.kind !== "view" && Boolean(browserDirectoryHandle);
+    const shouldUseApiDirectory = action.kind !== "view" && !shouldUseBrowserDirectory && downloadDirectory.configured && Boolean(downloadDirectory.directory);
     const generatedFilePromise = action.kind === "view"
       ? Promise.resolve(null)
       : waitForGeneratedFile(30000);
+    const reportWindow = window as Window & { __cdrSuppressBrowserDownload?: boolean };
+    const previousSuppressDownload = reportWindow.__cdrSuppressBrowserDownload;
     try {
+      if (shouldUseBrowserDirectory || shouldUseApiDirectory) reportWindow.__cdrSuppressBrowserDownload = true;
       await action.onClick();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown export error";
       setPreviewNotice(`${action.label} could not be generated. ${message}`);
       setGeneratingReportId("");
       return;
+    } finally {
+      reportWindow.__cdrSuppressBrowserDownload = previousSuppressDownload;
     }
     const generatedFile = await generatedFilePromise;
     if (action.kind !== "view" && !generatedFile) {
@@ -344,72 +705,63 @@ function ReportsPanelComponent({
       setGeneratingReportId("");
       return;
     }
-    const fileUrl = generatedFile?.blob ? URL.createObjectURL(generatedFile.blob) : undefined;
+    let apiSave: SaveGeneratedFileResponse | null = null;
+    let browserSave: Awaited<ReturnType<typeof saveGeneratedFileToBrowserDirectory>> | null = null;
+    let apiSaveError = "";
+    let browserSaveError = "";
+    if (generatedFile?.blob && shouldUseBrowserDirectory && browserDirectoryHandle) {
+      try {
+        browserSave = await saveGeneratedFileToBrowserDirectory(browserDirectoryHandle, generatedFile);
+      } catch (error) {
+        browserSaveError = error instanceof Error ? error.message : "The browser folder save failed.";
+        triggerBrowserDownload(generatedFile.fileName, generatedFile.blob);
+      }
+    } else if (generatedFile?.blob && shouldUseApiDirectory) {
+      try {
+        apiSave = await saveGeneratedFileToApi(generatedFile);
+      } catch (error) {
+        apiSaveError = error instanceof Error ? error.message : "The API folder save failed.";
+        triggerBrowserDownload(generatedFile.fileName, generatedFile.blob);
+      }
+    }
     const format = formatNameByKind[action.kind];
+    const fileName = browserSave?.fileName ?? apiSave?.fileName ?? generatedFile?.fileName ?? `${safeFileName(action.label)}.${timestampForFile()}.${fileExtensionByKind[action.kind]}`;
     const newReport: GeneratedReport = {
       id: `${action.id}-${Date.now()}`,
-      actionId: action.id,
-      fileName: generatedFile?.fileName ?? `${safeFileName(action.label)}.${timestampForFile()}.${fileExtensionByKind[action.kind]}`,
+      fileName,
       generatedAt: timestampForDisplay(),
       format,
-      kind: action.kind,
-      blob: generatedFile?.blob,
-      fileUrl,
-      mimeType: generatedFile?.mimeType,
+      savedPath: browserSave?.filePath ?? apiSave?.filePath,
     };
     setGeneratedReports((current) => {
       const next = [newReport, ...current];
-      next.slice(10).forEach((item) => {
-        if (item.fileUrl) URL.revokeObjectURL(item.fileUrl);
-      });
       return next.slice(0, 10);
     });
-    setPreviewNotice(`${newReport.fileName} generated successfully.`);
+    if (browserSave?.filePath) {
+      setPreviewNotice(`${newReport.fileName} saved to ${browserSave.filePath}.`);
+    } else if (apiSave?.filePath) {
+      setPreviewNotice(`${newReport.fileName} saved to ${apiSave.filePath}.`);
+    } else if (browserSaveError) {
+      setPreviewNotice(`${newReport.fileName} generated, but browser folder save failed: ${browserSaveError}. Normal browser download was used instead.`);
+    } else if (apiSaveError) {
+      setPreviewNotice(`${newReport.fileName} generated, but API folder save failed: ${apiSaveError}. Normal browser download was used instead.`);
+    } else {
+      setPreviewNotice(`${newReport.fileName} generated successfully.`);
+    }
     setGeneratingReportId("");
-  }, [generatingReportId]);
+  }, [browserDirectoryHandle, downloadDirectory.configured, downloadDirectory.directory, generatingReportId]);
 
-  const renderActionButton = (action: ReportAction) => (
-    <ExportButton
-      key={action.id}
-      kind={action.kind}
-      label={action.label}
-      report={action.group}
-      onClick={() => runReportAction(action)}
-      className={generatingReportId === action.id ? "is-generating" : ""}
-      title={generatingReportId === action.id ? `Generating ${action.label}...` : undefined}
-    />
-  );
-
-  const repeatGeneratedReport = (report: GeneratedReport) => {
-    const action = reportActions.find((candidate) => candidate.id === report.actionId);
-    if (action) void runReportAction(action);
-  };
-
-  const viewGeneratedReport = (report: GeneratedReport) => {
-    const action = reportActions.find((candidate) => candidate.id === report.actionId);
-    if (!action) return;
-    if (action.kind === "view") {
-      setPreviewNotice("");
-      void action.onClick();
+  const runSelectedReport = useCallback(async () => {
+    if (generatingReportId) return;
+    if (selectedPresetActions.length > 0) {
+      for (const action of selectedPresetActions) {
+        await runReportAction(action);
+      }
+      setPreviewNotice(`${selectedPreset.label} completed with ${selectedPresetActions.length} generated file${selectedPresetActions.length === 1 ? "" : "s"}.`);
       return;
     }
-    if (triggerSessionFileOpen(report)) {
-      setPreviewNotice(report.kind === "xlsx" || report.kind === "ppt"
-        ? `${report.fileName} was opened from the in-session file link. Browser security prevents direct opening from the physical Downloads folder, so Excel/PowerPoint files may download again depending on browser settings.`
-        : "");
-      return;
-    }
-    setPreviewNotice(`${report.fileName} is listed as ${downloadFolderDisplay(report.fileName)}, but the in-session file link is no longer available. Use Download again or open it from your browser Downloads folder.`);
-  };
-
-  const shareGeneratedReport = async (report: GeneratedReport) => {
-    const text = `${report.fileName} - generated ${report.generatedAt}`;
-    if (navigator.share) {
-      await navigator.share({ title: report.fileName, text });
-      return;
-    }
-    await navigator.clipboard?.writeText(text);
-  };
+    if (selectedReport) await runReportAction(selectedReport);
+  }, [generatingReportId, runReportAction, selectedPreset.label, selectedPresetActions, selectedReport]);
 
   return (
     <section id="reportsTabPanel" className="reports-tab-panel">
@@ -427,16 +779,25 @@ function ReportsPanelComponent({
 
         <div className="report-management-grid">
           <aside className="report-generator-panel">
-            <button className="generate-report-tile" type="button" disabled={Boolean(generatingReportId)} onClick={() => selectedReport && runReportAction(selectedReport)}>
+            <button className="generate-report-tile" type="button" disabled={Boolean(generatingReportId)} onClick={() => void runSelectedReport()}>
               <FilePlus2 size={28} />
-              <span>{generatingReportId ? "Generating Report..." : "Generate New Report"}</span>
+              <span>{generatingReportId ? "Generating Report..." : selectedPresetActions.length > 0 ? "Generate Report Pack" : "Generate New Report"}</span>
             </button>
 
             <div className="report-generation-form">
               <h4>Report Generation Form</h4>
               <label>
+                <span>Report Preset</span>
+                <select value={selectedPresetId} onChange={(event) => setSelectedPresetId(event.target.value)}>
+                  {reportPresetOptions.map((preset) => (
+                    <option key={preset.id} value={preset.id}>{preset.label}</option>
+                  ))}
+                </select>
+                <small>{selectedPreset.description}</small>
+              </label>
+              <label>
                 <span>Select Report Type</span>
-                <select value={selectedReportId} onChange={(event) => setSelectedReportId(event.target.value)}>
+                <select value={selectedReportId} onChange={(event) => setSelectedReportId(event.target.value)} disabled={selectedPresetActions.length > 0}>
                   {reportGroups.map((group) => (
                     <optgroup key={group.name} label={group.name}>
                       {group.actions.map((action) => <option key={action.id} value={action.id}>{action.label} - {formatNameByKind[action.kind]}</option>)}
@@ -450,8 +811,58 @@ function ReportsPanelComponent({
               </label>
               <label>
                 <span>Output Format</span>
-                <input value={selectedReport ? formatNameByKind[selectedReport.kind] : "XLSX"} readOnly />
+                <input value={selectedPresetActions.length > 0 ? `${selectedPresetActions.length} files` : selectedReport ? formatNameByKind[selectedReport.kind] : "XLSX"} readOnly />
               </label>
+              <div className="report-download-directory">
+                <label>
+                  <span>Download Directory</span>
+                  <div className="report-directory-row">
+                    <input
+                      value={downloadDirectoryDisplay}
+                      onChange={(event) => {
+                        setBrowserDirectoryHandle(null);
+                        setDownloadDirectoryInput(event.target.value);
+                      }}
+                      placeholder={browserDirectoryPickerAvailable ? "Use Browse for a PC folder, or type an API server path" : downloadDirectory.apiAvailable ? "Example: D:\\Reports\\CDR" : "Local report folder API is unavailable"}
+                      disabled={downloadDirectory.isSaving}
+                    />
+                    <button
+                      type="button"
+                      className="report-directory-button"
+                      onClick={() => void browseDownloadDirectory()}
+                      disabled={downloadDirectory.isSaving}
+                      title={browserDirectoryPickerAvailable ? "Choose a local report folder in this browser" : downloadDirectory.canBrowse ? "Browse for report folder" : "Click to check folder picker availability"}
+                    >
+                      <FolderOpen size={15} />
+                      <span>Browse</span>
+                    </button>
+                  </div>
+                </label>
+                <div className="report-directory-actions">
+                  <button
+                    type="button"
+                    className="report-directory-button"
+                    onClick={() => void saveDownloadDirectory()}
+                    disabled={Boolean(browserDirectoryHandle) || !downloadDirectory.apiAvailable || !downloadDirectoryInput.trim() || downloadDirectory.isSaving}
+                    title={browserDirectoryHandle ? "Browser-selected folders are already active and do not need Save" : "Save API/server folder path"}
+                  >
+                    <Save size={15} />
+                    <span>Save</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="report-directory-button"
+                    onClick={() => void clearDownloadDirectory()}
+                    disabled={downloadDirectory.isSaving}
+                  >
+                    <X size={15} />
+                    <span>Clear</span>
+                  </button>
+                </div>
+                <p className={`report-directory-status ${downloadDirectory.configured ? "is-configured" : ""}`}>
+                  {downloadDirectory.isLoading ? "Checking local report folder API..." : downloadDirectory.message}
+                </p>
+              </div>
             </div>
           </aside>
 
@@ -459,7 +870,13 @@ function ReportsPanelComponent({
             <div className="generated-reports-title">
               <div className="generated-reports-title-copy">
                 <h4>Generated Reports History</h4>
-                <p className="generated-reports-note">Generated files are saved by your browser to the Downloads folder.</p>
+                <p className="generated-reports-note">
+                  {browserDirectoryHandle
+                    ? `Generated files are saved to the browser-selected folder: ${browserDirectoryHandle.name}.`
+                    : downloadDirectory.configured
+                    ? `Generated files are saved by the local API to ${downloadDirectory.directory}.`
+                    : "Generated files are saved by your browser to the Downloads folder."}
+                </p>
               </div>
               <div className="generated-reports-title-actions">
                 <span>{reportSearch ? `${visibleGeneratedReports.length} / ${generatedReports.length}` : generatedReports.length} recent</span>
@@ -479,58 +896,22 @@ function ReportsPanelComponent({
             <div className="generated-reports-table-wrap">
               <table className="generated-reports-table">
                 <thead>
-                  <tr><th>File Name</th><th>Generated Date</th><th>Format</th><th>Downloaded Folder / File</th><th>Actions</th></tr>
+                  <tr><th>File Name</th><th>Generated Date</th><th>Format</th></tr>
                 </thead>
                 <tbody>
                   {visibleGeneratedReports.length === 0 ? (
-                    <tr><td colSpan={5} className="generated-reports-empty">{generatedReports.length === 0 ? "No reports generated in this session yet." : "No generated reports match your search."}</td></tr>
+                    <tr><td colSpan={3} className="generated-reports-empty">{generatedReports.length === 0 ? "No reports generated in this session yet." : "No generated reports match your search."}</td></tr>
                   ) : visibleGeneratedReports.map((report) => (
                     <tr key={report.id}>
                       <td>{report.fileName}</td>
                       <td>{report.generatedAt}</td>
                       <td>{report.format}</td>
-                      <td>
-                        {report.kind === "view" ? (
-                          <span className="generated-report-path generated-report-path-muted">Dashboard view only</span>
-                        ) : (
-                          <span
-                            className="generated-report-path"
-                            title={downloadFolderDisplay(report.fileName)}
-                          >
-                            {downloadFolderDisplay(report.fileName)}
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        <button type="button" disabled={Boolean(generatingReportId)} className={!(report.kind === "view" || report.fileUrl) ? "history-view-limited" : ""} onClick={() => viewGeneratedReport(report)} title={report.kind === "view" || report.fileUrl ? "Open report" : "Open from Downloads folder"}><Eye size={15} /></button>
-                        <button type="button" disabled={Boolean(generatingReportId)} onClick={() => repeatGeneratedReport(report)} title="Download again"><Download size={15} /></button>
-                        <button type="button" onClick={() => void shareGeneratedReport(report)} title="Share or copy name"><Share2 size={15} /></button>
-                        <button type="button" onClick={() => setGeneratedReports((current) => {
-                          if (report.fileUrl) URL.revokeObjectURL(report.fileUrl);
-                          return current.filter((item) => item.id !== report.id);
-                        })} title="Delete from history"><Trash2 size={15} /></button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-        </div>
-      </article>
-
-      <article className="table-card export-center-card reports-export-groups-hidden" aria-hidden="true">
-        <h3>Export Groups</h3>
-        <p className="table-note">Every button uses the same report action registry and carries data-report, data-format, and data-label attributes.</p>
-        <div className="export-center-grid">
-          {reportGroups.map((group) => (
-            <div key={group.name} className={`export-center-subgroup ${group.name === "Combined" ? "export-center-subgroup-wide" : ""}`}>
-              <h4>{group.name}</h4>
-              <div className="export-center-actions">
-                {group.actions.map(renderActionButton)}
-              </div>
-            </div>
-          ))}
         </div>
       </article>
 

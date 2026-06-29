@@ -1,7 +1,7 @@
 import { CHART_COLORS } from "../lib/dashboardConstants";
 import { chartLabel, formatDecimal, formatNumber, secondsToClock } from "../lib/formatters";
 import { mobileTypeColor, mobileTypeKey, truncateLabel } from "../lib/chartHelpers";
-import type { Ranking } from "../types/dashboard";
+import type { CallRecord, Ranking } from "../types/dashboard";
 import { ChartLegend } from "./DashboardUi";
 import {
   Bar,
@@ -14,6 +14,153 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+export const COMPANY_TREEMAP_COLORS = [
+  "var(--chart-series-1)",
+  "var(--chart-series-2)",
+  "var(--chart-series-3)",
+  "var(--chart-series-4)",
+  "var(--chart-series-5)",
+  "var(--chart-series-6)",
+  "var(--chart-series-7)",
+  "var(--chart-series-8)",
+];
+
+export const REGION_RADAR_COLORS = [
+  "var(--chart-series-1)",
+  "var(--chart-series-2)",
+  "var(--chart-series-3)",
+  "var(--chart-series-4)",
+];
+
+export const REGION_RADAR_ORDER = ["South", "West", "East", "North"];
+
+export const CALL_TYPE_SERIES = [
+  { key: "phoneCall", name: "Phone Call", color: "var(--chart-series-1)" },
+  { key: "groupCall", name: "Group Call", color: "var(--chart-series-2)" },
+  {
+    key: "environmentalListening",
+    name: "Environmental Listening",
+    color: "var(--chart-series-3)",
+  },
+  { key: "individualCall", name: "Individual Call", color: "var(--chart-series-4)" },
+  { key: "networkWide", name: "Network-wide", color: "var(--chart-series-5)" },
+  { key: "broadcast", name: "Broadcast", color: "var(--chart-series-6)" },
+];
+
+export const MONTH_BUCKETS = [
+  { label: "Jan", match: "jan" },
+  { label: "Feb", match: "feb" },
+  { label: "Mar", match: "mar" },
+  { label: "Apr", match: "apr" },
+  { label: "May", match: "may" },
+  { label: "Jun", match: "jun" },
+  { label: "Jul", match: "jul" },
+  { label: "Aug", match: "aug" },
+  { label: "Sep", match: "sep" },
+  { label: "Oct", match: "oct" },
+  { label: "Nov", match: "nov" },
+  { label: "Dec", match: "dec" },
+];
+
+export function callTypeMonthIndex(record: CallRecord) {
+  const text = `${record.month || record.callDate || ""}`.trim().toLowerCase();
+  const explicit = MONTH_BUCKETS.findIndex(
+    (month) => text.startsWith(month.match) || text.includes(` ${month.match}`),
+  );
+  if (explicit >= 0) return explicit;
+  const parsed = new Date(record.callDate);
+  return Number.isNaN(parsed.getTime()) ? -1 : parsed.getMonth();
+}
+
+export function callTypeMixKey(value: string) {
+  const text = `${value || ""}`.toLowerCase();
+  if (text.includes("broadcast")) return "broadcast";
+  if (text.includes("network")) return "networkWide";
+  if (text.includes("environment") || text.includes("listen")) return "environmentalListening";
+  if (text.includes("individual") || text.includes("private")) return "individualCall";
+  if (text.includes("group")) return "groupCall";
+  return "phoneCall";
+}
+
+export function StackedPercentLabel(props: any) {
+  const { x = 0, y = 0, width = 0, height = 0, value = 0 } = props;
+  const numeric = Number(value);
+  if (numeric < 9 || width < 18 || height < 18) return null;
+  return (
+    <text x={x + width / 2} y={y + height / 2 + 4} textAnchor="middle" fill="var(--design-bg)" fontSize={9} fontWeight={900}>
+      {formatDecimal(numeric, 0)}%
+    </text>
+  );
+}
+
+export function CallTypeMixTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  const visible = payload.filter((item: any) => Number(item.value) > 0);
+  return (
+    <div className="custom-tooltip">
+      <strong>{label}</strong>
+      {visible.map((item: any) => (
+        <span key={item.dataKey} style={{ color: item.color }}>
+          {item.name}: {formatDecimal(Number(item.value), 1)}% ({formatNumber(Number(item.payload?.[`${item.dataKey}Count`] ?? 0))})
+        </span>
+      ))}
+    </div>
+  );
+}
+
+export function CompanyTreemapTile(props: any) {
+  const { x = 0, y = 0, width = 0, height = 0, name = "", calls = 0, payload, index = 0 } = props;
+  const fill = payload?.fill ?? props.fill ?? COMPANY_TREEMAP_COLORS[0];
+  const tileName = payload?.name ?? name;
+  const tileCalls = Number(payload?.calls ?? calls ?? props.value ?? 0);
+  if (width < 8 || height < 8) return null;
+  const innerWidth = Math.max(0, width - 6);
+  const innerHeight = Math.max(0, height - 6);
+  const fontSize = width > 128 && height > 58 ? 12 : width > 82 && height > 34 ? 10 : 8;
+  const maxChars = Math.max(3, Math.floor((innerWidth - 14) / (fontSize * 0.56)));
+  const showName = innerWidth > 26 && innerHeight > 18;
+  const showValue = innerWidth > 42 && innerHeight > 28;
+  const clipId = `company-treemap-clip-${index}-${Math.round(x)}-${Math.round(y)}`.replace(/[^a-zA-Z0-9_-]/g, "");
+  return (
+    <g>
+      <defs>
+        <clipPath id={clipId}>
+          <rect x={x + 3} y={y + 3} width={innerWidth} height={innerHeight} rx={9} ry={9} />
+        </clipPath>
+      </defs>
+      <title>{`${tileName}: ${formatNumber(tileCalls)} calls`}</title>
+      <rect x={x + 3} y={y + 3} width={innerWidth} height={innerHeight} rx={9} ry={9} fill={fill} fillOpacity={0.94} stroke="rgba(237,246,250,0.34)" strokeWidth={1.2} />
+      <rect x={x + 3} y={y + 3} width={innerWidth} height={innerHeight} rx={9} ry={9} fill="var(--design-bg)" fillOpacity={0.08} />
+      <g clipPath={`url(#${clipId})`}>
+        {showName && (
+          <text x={x + 10} y={y + fontSize + 10} fill="var(--design-bg)" fontSize={fontSize} fontWeight={900}>
+            {truncateLabel(String(tileName), maxChars)}
+          </text>
+        )}
+        {showValue && (
+          <text x={x + 10} y={y + fontSize * 2 + 16} fill="var(--design-bg)" fontSize={Math.max(8, fontSize - 1)} fontWeight={850}>
+            {formatNumber(tileCalls)} calls
+          </text>
+        )}
+      </g>
+    </g>
+  );
+}
+
+export function RegionRadarTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="radar-tooltip">
+      <strong>{label}</strong>
+      {payload.map((item: any) => (
+        <span key={item.dataKey} style={{ color: item.color }}>
+          {item.name}: {item.payload?.[`${item.dataKey}RawText`] ?? formatDecimal(Number(item.value), 1)}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export function KpiBarLabel(props: any) {
   const value = Number(props.value ?? 0);
