@@ -261,6 +261,33 @@ Arabic quick steps
 5. اختبر:
    https://api.cdr.hitham.app/api/health
    https://cdr.hitham.app/?refresh=latest
+
+------------------------------------------------
+Direct online deployment script
+------------------------------------------------
+
+To upload directly to Namecheap by SSH/SCP:
+
+1. Prepare and upload in one command:
+   cd "D:\Dashboards Projects\CDR Dashboard\CDR Dashboard V8"
+   powershell -ExecutionPolicy Bypass -File .\scripts\deploy-namecheap-upload.ps1 -HostName server242.web-hosting.com -BuildFirst -RunRemoteNpmInstall -RunRemoteMigrate
+
+2. To test the deployment plan without uploading:
+   powershell -ExecutionPolicy Bypass -File .\scripts\deploy-namecheap-upload.ps1 -HostName server242.web-hosting.com -DryRun
+
+3. To upload only the web frontend:
+   powershell -ExecutionPolicy Bypass -File .\scripts\deploy-namecheap-upload.ps1 -HostName server242.web-hosting.com -BuildFirst -SkipApi
+
+4. To upload only the API:
+   powershell -ExecutionPolicy Bypass -File .\scripts\deploy-namecheap-upload.ps1 -HostName server242.web-hosting.com -BuildFirst -SkipWeb -RunRemoteNpmInstall -RunRemoteMigrate
+
+The deploy script will ask you to type DEPLOY before replacing remote files unless you add:
+  -Yes
+
+Arabic:
+  سكربت الرفع المباشر يحتاج SSH شغال على السيرفر.
+  إذا طلب كلمة مرور، اكتب كلمة مرور SSH.
+  لا تحفظ كلمة المرور داخل السكربت.
 '@ | Set-Content -LiteralPath (Join-Path $readyRoot "README_UPLOAD.txt") -Encoding UTF8
 
 if (-not $NoZip) {
