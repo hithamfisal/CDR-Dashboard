@@ -62,7 +62,7 @@ function Native-Run {
   param(
     [Parameter(Mandatory = $true)][string]$Exe,
     [Parameter(Mandatory = $true)][string[]]$Args,
-    [string]$InputText = ""
+  [string]$InputText = ""
   )
   if ($InputText) {
     $InputText | & $Exe @Args
@@ -73,6 +73,7 @@ function Native-Run {
     $message = "$Exe failed with exit code $LASTEXITCODE"
     if ($Exe -in @("ssh", "scp")) {
       $message += "`nSSH help: run .\scripts\setup-namecheap-ssh-key.ps1, import/authorize the public key in cPanel, then run deploy again."
+      $message += "`nIf the connection already works, check the command output above; the remote deploy script may have failed after SSH connected."
     }
     throw $message
   }
@@ -248,7 +249,14 @@ deploy_zip() {
   validate_target "$target"
   rm -rf "$src"
   mkdir -p "$src"
+  set +e
   unzip -q -o "$zip_path" -d "$src"
+  unzip_code=$?
+  set -e
+  if [ "$unzip_code" -gt 1 ]; then
+    echo "Failed to extract $zip_path with unzip exit code $unzip_code" >&2
+    exit "$unzip_code"
+  fi
   backup_target "$target" "$label"
   if command -v rsync >/dev/null 2>&1; then
     if [ "$mode" = "api" ]; then

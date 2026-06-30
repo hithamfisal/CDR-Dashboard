@@ -42,6 +42,35 @@ function Copy-RequiredFile {
   Copy-Item -LiteralPath $Source -Destination $Destination -Force
 }
 
+function Compress-FolderContents {
+  param(
+    [Parameter(Mandatory = $true)][string]$SourceDir,
+    [Parameter(Mandatory = $true)][string]$ZipPath
+  )
+  if (Test-Path -LiteralPath $ZipPath) {
+    Remove-Item -LiteralPath $ZipPath -Force
+  }
+  Add-Type -AssemblyName System.IO.Compression
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $sourceRoot = (Resolve-Path -LiteralPath $SourceDir).Path.TrimEnd('\', '/')
+  $zipDirectory = Split-Path -Parent $ZipPath
+  New-Item -ItemType Directory -Force -Path $zipDirectory | Out-Null
+  $zip = [System.IO.Compression.ZipFile]::Open($ZipPath, [System.IO.Compression.ZipArchiveMode]::Create)
+  try {
+    Get-ChildItem -LiteralPath $sourceRoot -Recurse -File -Force | ForEach-Object {
+      $relative = $_.FullName.Substring($sourceRoot.Length).TrimStart('\', '/') -replace '\\', '/'
+      [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+        $zip,
+        $_.FullName,
+        $relative,
+        [System.IO.Compression.CompressionLevel]::Optimal
+      ) | Out-Null
+    }
+  } finally {
+    $zip.Dispose()
+  }
+}
+
 Push-Location $root
 try {
   if (-not $SkipCheck) {
@@ -292,12 +321,9 @@ Arabic:
 
 if (-not $NoZip) {
   Write-Host "Creating ZIP files..."
-  Compress-Archive -Path (Join-Path $webFolder "*") -DestinationPath $webZip -Force
-  Compress-Archive -Path (Join-Path $apiFolder "*") -DestinationPath $apiZip -Force
-  if (Test-Path -LiteralPath $allZip) {
-    Remove-Item -LiteralPath $allZip -Force
-  }
-  Compress-Archive -Path (Join-Path $readyRoot "*") -DestinationPath $allZip -Force
+  Compress-FolderContents -SourceDir $webFolder -ZipPath $webZip
+  Compress-FolderContents -SourceDir $apiFolder -ZipPath $apiZip
+  Compress-FolderContents -SourceDir $readyRoot -ZipPath $allZip
 }
 
 Write-Host ""
