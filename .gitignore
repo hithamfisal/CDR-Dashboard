@@ -12,6 +12,7 @@ package-lock.json
 .env.*
 *.local
 !.env.example
+secrets/
 
 # Local databases, exports, and backups
 *.sql

@@ -23,6 +23,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $defaultPackageRoot = Join-Path $repoRoot "artifacts\namecheap-upload\FileZilla-upload-ready"
+$defaultIdentityFile = Join-Path $repoRoot "secrets\cdr_namecheap_ed25519"
 
 function Require-Command {
   param([Parameter(Mandatory = $true)][string]$Name)
@@ -69,7 +70,11 @@ function Native-Run {
     & $Exe @Args
   }
   if ($LASTEXITCODE -ne 0) {
-    throw "$Exe failed with exit code $LASTEXITCODE"
+    $message = "$Exe failed with exit code $LASTEXITCODE"
+    if ($Exe -in @("ssh", "scp")) {
+      $message += "`nSSH help: run .\scripts\setup-namecheap-ssh-key.ps1, import/authorize the public key in cPanel, then run deploy again."
+    }
+    throw $message
   }
 }
 
@@ -99,12 +104,20 @@ Require-Command -Name "ssh"
 Require-Command -Name "scp"
 
 $remote = "$RemoteUser@$HostName"
-$sshArgs = @("-p", "$SshPort")
-$scpArgs = @("-P", "$SshPort")
+$sshArgs = @("-p", "$SshPort", "-o", "StrictHostKeyChecking=accept-new")
+$scpArgs = @("-P", "$SshPort", "-o", "StrictHostKeyChecking=accept-new")
+if ([string]::IsNullOrWhiteSpace($IdentityFile) -and (Test-Path -LiteralPath $defaultIdentityFile -PathType Leaf)) {
+  $IdentityFile = $defaultIdentityFile
+}
 if (-not [string]::IsNullOrWhiteSpace($IdentityFile)) {
+  if (-not (Test-Path -LiteralPath $IdentityFile -PathType Leaf)) {
+    throw "Identity file was not found: $IdentityFile"
+  }
   $identity = (Resolve-Path -LiteralPath $IdentityFile).Path
-  $sshArgs += @("-i", $identity)
-  $scpArgs += @("-i", $identity)
+  $sshArgs += @("-i", $identity, "-o", "IdentitiesOnly=yes", "-o", "PreferredAuthentications=publickey", "-o", "BatchMode=yes")
+  $scpArgs += @("-i", $identity, "-o", "IdentitiesOnly=yes", "-o", "PreferredAuthentications=publickey", "-o", "BatchMode=yes")
+} else {
+  Write-Warning "No SSH key was found. For passwordless deployment, run .\scripts\setup-namecheap-ssh-key.ps1 and authorize the public key in cPanel."
 }
 
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -114,6 +127,7 @@ Write-Host ""
 Write-Host "CDR deployment plan"
 Write-Host "Package: $PackageRoot"
 Write-Host "Remote:  $remote port $SshPort"
+if (-not [string]::IsNullOrWhiteSpace($IdentityFile)) { Write-Host "SSH key: $IdentityFile" }
 Write-Host "Stage:   $remoteStage"
 if ($deployWeb) { Write-Host "Web:     $webZip -> $RemoteWebDir" }
 if ($deployApi) { Write-Host "API:     $apiZip -> $RemoteApiDir" }
