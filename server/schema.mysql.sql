@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS cdr_app_settings (
   radio_showcase_image_data_url LONGTEXT NULL,
   default_theme VARCHAR(32) NOT NULL DEFAULT 'proposal3',
   show_sample_data_button TINYINT(1) NOT NULL DEFAULT 1,
-  header_logo_size SMALLINT UNSIGNED NOT NULL DEFAULT 66,
+  header_logo_size SMALLINT UNSIGNED NOT NULL DEFAULT 96,
   header_title_scale DECIMAL(4,2) NOT NULL DEFAULT 1.00,
   compact_dashboard_layout TINYINT(1) NOT NULL DEFAULT 0,
   support_email VARCHAR(180) NOT NULL,

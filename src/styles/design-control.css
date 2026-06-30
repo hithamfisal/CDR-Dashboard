@@ -3223,8 +3223,8 @@ body .app-shell.layout-command-center .modern-stat-tile {
    - Branding upload cards are visible in Admin Settings.
    ============================================================ */
 :root {
-  --cdr-managed-header-height: 96px;
-  --cdr-managed-header-logo-column: minmax(132px, 210px);
+  --cdr-managed-header-height: 112px;
+  --cdr-managed-header-logo-column: clamp(170px, 15vw, 290px);
   --cdr-managed-header-title-size: clamp(24px, 2.25vw, 42px);
   --cdr-managed-header-title-spacing: 0.075em;
 }
@@ -3238,7 +3238,7 @@ body .app-shell.active-tab-overview .cdr-command-shell > .topbar.followup-style-
   align-items: center !important;
   min-height: var(--cdr-managed-header-height) !important;
   height: var(--cdr-managed-header-height) !important;
-  padding: 8px 18px !important;
+  padding: 8px 0 !important;
   overflow: hidden !important;
 }
 
@@ -3262,9 +3262,9 @@ body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo {
   align-items: center !important;
   justify-content: center !important;
   width: 100% !important;
-  height: calc(var(--cdr-managed-header-height) - 18px) !important;
-  min-height: 64px !important;
-  max-height: 84px !important;
+  height: calc(var(--cdr-managed-header-height) - 16px) !important;
+  min-height: 84px !important;
+  max-height: 104px !important;
   padding: 0 !important;
   background: transparent !important;
   border: 0 !important;
@@ -3276,6 +3276,7 @@ body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-left {
   grid-column: 1 !important;
   grid-row: 1 !important;
   justify-self: stretch !important;
+  justify-content: flex-start !important;
 }
 
 body .app-shell .cdr-command-shell .cdr-header-logo-right,
@@ -3283,6 +3284,7 @@ body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-right {
   grid-column: 3 !important;
   grid-row: 1 !important;
   justify-self: stretch !important;
+  justify-content: flex-end !important;
 }
 
 body .app-shell .cdr-command-shell .cdr-header-logo img,
@@ -3293,6 +3295,16 @@ body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo img {
   max-width: 100% !important;
   max-height: 100% !important;
   object-fit: contain !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-left img,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-left img {
+  object-position: left center !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-right img,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-right img {
+  object-position: right center !important;
 }
 
 body .app-shell .cdr-command-shell .followup-dashboard-title,
@@ -3463,8 +3475,42 @@ body .app-shell.active-tab-overview .cdr-command-shell .followup-dashboard-title
 /* V8 polish: admin-controlled sizing, report presets, mobile layout, and compact mode. */
 body .app-shell .cdr-command-shell .cdr-header-logo,
 body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo {
-  width: var(--cdr-admin-logo-size, 66px) !important;
-  height: calc(var(--cdr-admin-logo-size, 66px) * 0.78) !important;
+  --cdr-effective-logo-size: max(var(--cdr-admin-logo-size, 92px), 92px);
+  width: 100% !important;
+  height: var(--cdr-effective-logo-size) !important;
+  min-height: 84px !important;
+  max-height: 112px !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-left,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-left {
+  left: 0 !important;
+  justify-content: flex-start !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-right,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-right {
+  right: 0 !important;
+  justify-content: flex-end !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo img,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-left img,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-left img {
+  object-position: left center !important;
+}
+
+body .app-shell .cdr-command-shell .cdr-header-logo-right img,
+body .app-shell.active-tab-overview .cdr-command-shell .cdr-header-logo-right img {
+  object-position: right center !important;
 }
 
 body .app-shell .cdr-command-shell .followup-dashboard-title h1,

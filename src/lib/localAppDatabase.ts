@@ -56,7 +56,7 @@ export const DEFAULT_LOCAL_SETTINGS: LocalAppSettings = {
   radioShowcaseImageDataUrl: "",
   defaultTheme: "proposal3",
   showSampleDataButton: true,
-  headerLogoSize: 66,
+  headerLogoSize: 96,
   headerTitleScale: 1,
   compactDashboardLayout: false,
   supportEmail: "support@example.com",

@@ -75,7 +75,7 @@ const DEFAULT_SETTINGS = {
   radioShowcaseImageDataUrl: "",
   defaultTheme: "proposal3",
   showSampleDataButton: true,
-  headerLogoSize: 66,
+  headerLogoSize: 96,
   headerTitleScale: 1,
   compactDashboardLayout: false,
   supportEmail: "support@example.com",
@@ -421,7 +421,7 @@ async function ensureSchema(pool) {
       radio_showcase_image_data_url LONGTEXT NULL,
       default_theme VARCHAR(32) NOT NULL DEFAULT 'proposal3',
       show_sample_data_button TINYINT(1) NOT NULL DEFAULT 1,
-      header_logo_size SMALLINT UNSIGNED NOT NULL DEFAULT 66,
+      header_logo_size SMALLINT UNSIGNED NOT NULL DEFAULT 96,
       header_title_scale DECIMAL(4,2) NOT NULL DEFAULT 1.00,
       compact_dashboard_layout TINYINT(1) NOT NULL DEFAULT 0,
       support_email VARCHAR(180) NOT NULL,
@@ -438,7 +438,7 @@ async function ensureSchema(pool) {
   await tryMysql(pool, "ALTER TABLE cdr_app_settings ADD COLUMN radio_showcase_image_data_url LONGTEXT NULL AFTER radio_showcase_image_name");
   await tryMysql(pool, "ALTER TABLE cdr_app_settings ADD COLUMN default_theme VARCHAR(32) NOT NULL DEFAULT 'proposal3' AFTER radio_showcase_image_data_url");
   await tryMysql(pool, "ALTER TABLE cdr_app_settings ADD COLUMN show_sample_data_button TINYINT(1) NOT NULL DEFAULT 1 AFTER default_theme");
-  await tryMysql(pool, "ALTER TABLE cdr_app_settings ADD COLUMN header_logo_size SMALLINT UNSIGNED NOT NULL DEFAULT 66 AFTER show_sample_data_button");
+  await tryMysql(pool, "ALTER TABLE cdr_app_settings ADD COLUMN header_logo_size SMALLINT UNSIGNED NOT NULL DEFAULT 96 AFTER show_sample_data_button");
   await tryMysql(pool, "ALTER TABLE cdr_app_settings ADD COLUMN header_title_scale DECIMAL(4,2) NOT NULL DEFAULT 1.00 AFTER header_logo_size");
   await tryMysql(pool, "ALTER TABLE cdr_app_settings ADD COLUMN compact_dashboard_layout TINYINT(1) NOT NULL DEFAULT 0 AFTER header_title_scale");
 
