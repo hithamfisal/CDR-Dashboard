@@ -734,6 +734,15 @@ export default function App() {
   });
   const [page, setPage] = useState(1);
   const { theme, isDark, toggleTheme, setTheme } = useTheme();
+  const appShellStyle = useMemo(() => {
+    const logoSize = Math.min(120, Math.max(44, Number(appSettings.headerLogoSize) || DEFAULT_LOCAL_SETTINGS.headerLogoSize));
+    const titleScale = Math.min(1.25, Math.max(0.75, Number(appSettings.headerTitleScale) || DEFAULT_LOCAL_SETTINGS.headerTitleScale));
+    return {
+      "--cdr-admin-logo-size": `${logoSize}px`,
+      "--cdr-admin-title-scale": `${titleScale}`,
+      "--cdr-admin-primary-color": appSettings.primaryColor || DEFAULT_LOCAL_SETTINGS.primaryColor,
+    } as CSSProperties;
+  }, [appSettings.headerLogoSize, appSettings.headerTitleScale, appSettings.primaryColor]);
   const [activeSection, setActiveSection] = useState(
     SECTION_NAV_ITEMS[0]?.id ?? "kpi",
   );
@@ -4033,16 +4042,6 @@ export default function App() {
     reports:
       "Centralized report generation, report type selection, recent history, and download status.",
   }[activeTab];
-
-  const appShellStyle = useMemo(() => {
-    const logoSize = Math.min(120, Math.max(44, Number(appSettings.headerLogoSize) || DEFAULT_LOCAL_SETTINGS.headerLogoSize));
-    const titleScale = Math.min(1.25, Math.max(0.75, Number(appSettings.headerTitleScale) || DEFAULT_LOCAL_SETTINGS.headerTitleScale));
-    return {
-      "--cdr-admin-logo-size": `${logoSize}px`,
-      "--cdr-admin-title-scale": `${titleScale}`,
-      "--cdr-admin-primary-color": appSettings.primaryColor || DEFAULT_LOCAL_SETTINGS.primaryColor,
-    } as CSSProperties;
-  }, [appSettings.headerLogoSize, appSettings.headerTitleScale, appSettings.primaryColor]);
 
   const commandHeaderActions = (
     <div className="cdr-header-actions" aria-label="Dashboard quick actions">
